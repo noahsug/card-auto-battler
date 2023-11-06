@@ -1,4 +1,28 @@
-import { PlayerState, createPlayerState } from './player'
+export interface CardState {
+  text: string;
+}
+
+export interface PlayerState {
+  cards: CardState[];
+  cardIndex: number;
+  health: number;
+  maxHealth: number;
+}
+
+export function createPlayerState(): PlayerState {
+  const maxHealth = 30;
+
+  return {
+    cards: [],
+    cardIndex: 0,
+    health: maxHealth,
+    maxHealth,
+  };
+}
+
+export function getActiveCard(state: PlayerState) {
+  return state.cards[state.cardIndex];
+}
 
 export interface GameState {
   players: [PlayerState, PlayerState];

@@ -1,6 +1,6 @@
 import './Card.css';
 
-import { CardState } from '../state/card';
+import { CardState } from '../state';
 
 export default function Card({ card }: { card: CardState }) {
   const { text } = card;

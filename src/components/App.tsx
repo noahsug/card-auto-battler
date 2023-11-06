@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './App.css';
 import Player from './Player';
 
-import { createGameState, getP1, getP2 } from '../state/game';
+import { createGameState, getP1, getP2 } from '../state';
 
 export default function App() {
   const [state] = useState(createGameState());
