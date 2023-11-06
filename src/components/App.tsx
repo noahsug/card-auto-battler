@@ -1,14 +1,19 @@
+import { useState } from 'react';
 import './App.css';
-import Card from './Card';
+import Player from './Player';
 
-function App() {
+import { createGameState, getP1, getP2 } from '../state/game';
+
+export default function App() {
+  const [state] = useState(createGameState());
+  const p1 = getP1(state);
+  const p2 = getP2(state);
+
   return (
     <div className="App">
-      <Card />
+      <Player player={p1} />
       <div className="App-divider" />
-      <Card />
+      <Player player={p2} />
     </div>
   );
 }
-
-export default App;

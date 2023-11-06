@@ -1,7 +1,9 @@
 import './Card.css';
 
-function Card() {
-  return <div className="Card">this is a card</div>;
-}
+import { CardState } from '../state/card';
 
-export default Card;
+export default function Card({ card }: { card: CardState }) {
+  const { text } = card;
+
+  return <div className="Card">{text}</div>;
+}
