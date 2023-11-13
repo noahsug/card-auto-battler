@@ -1,15 +1,23 @@
-export interface CardState {
+export const USER_INDEX = 0;
+export const OPPONENT_INDEX = 1;
+export type PlayerIndex = USER_INDEX | OPPONENT_INDEX;
+
+export interface Card {
   text: string;
 }
 
-export interface PlayerState {
-  cards: CardState[];
+export interface Player {
+  cards: Card[];
   cardIndex: number;
   health: number;
   maxHealth: number;
 }
 
-export function createPlayerState(): PlayerState {
+export interface Game {
+  players: [Player, Player];
+}
+
+function createInitialPlayer(): Player {
   const maxHealth = 30;
 
   return {
@@ -18,14 +26,6 @@ export function createPlayerState(): PlayerState {
     health: maxHealth,
     maxHealth,
   };
-}
-
-export function getActiveCard(state: PlayerState) {
-  return state.cards[state.cardIndex];
-}
-
-export interface GameState {
-  players: [PlayerState, PlayerState];
 }
 
 const deck1 = [
@@ -46,9 +46,9 @@ const deck2 = [
   { text: 'dmg 3' },
 ]
 
-export function createGameState(): GameState {
-  const player1 = createPlayerState();
-  const player2 = createPlayerState();
+export function createInitialGame(): Game {
+  const player1 = createInitialPlayer();
+  const player2 = createInitialPlayer();
 
   player1.cards = deck1.slice();
   player2.cards = deck2.slice();
@@ -56,11 +56,4 @@ export function createGameState(): GameState {
   return {
     players: [player1, player2],
   }
-}
-
-export function getP1(state: GameState) {
-  return state.players[0];
-}
-export function getP2(state: GameState) {
-  return state.players[1];
 }

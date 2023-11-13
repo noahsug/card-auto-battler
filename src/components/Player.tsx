@@ -1,16 +1,17 @@
 import './Player.css';
 import Card from './Card';
 import HealthBar from './HealthBar';
+import { PlayerIndex } from '../state/game';
+import { useGame } from './GameContext';
 
-import { PlayerState, getActiveCard } from '../state';
+type Props = { playerIndex: PlayerIndex };
 
-export default function Player({ player }: { player: PlayerState }) {
-  const card = getActiveCard(player);
-  const { health, maxHealth } = player;
+export default function Player({ playerIndex }: Props) {
+  const { health, maxHealth } = useGame((game) => game.players[playerIndex]);
 
   return (
     <div className="Player">
-      <Card card={card} />
+      <Card />
       <HealthBar health={health} maxHealth={maxHealth} />
     </div>
   );
