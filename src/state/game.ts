@@ -4,7 +4,7 @@ export interface Card {
 
 export interface Player {
   cards: Card[];
-  cardIndex: number;
+  activeCard: number;
   health: number;
   maxHealth: number;
 }
@@ -12,6 +12,7 @@ export interface Player {
 export interface Game {
   user: Player;
   opponent: Player;
+  turn: number;
 }
 
 function createInitialPlayer(): Player {
@@ -19,28 +20,28 @@ function createInitialPlayer(): Player {
 
   return {
     cards: [],
-    cardIndex: 0,
+    activeCard: 0,
     health: maxHealth,
     maxHealth,
   };
 }
 
 const deck1 = [
-  { text: 'dmg 5' },
-  { text: 'dmg 5' },
-  { text: 'dmg 5' },
+  { text: 'dmg 1' },
+  { text: 'dmg 2' },
   { text: 'dmg 3' },
-  { text: 'dmg 3' },
-  { text: 'dmg 3' },
+  { text: 'dmg 4' },
+  { text: 'dmg 5' },
+  { text: 'dmg 6' },
 ]
 
 const deck2 = [
-  { text: 'dmg 5' },
-  { text: 'dmg 5' },
-  { text: 'dmg 5' },
+  { text: 'dmg 1' },
+  { text: 'dmg 2' },
   { text: 'dmg 3' },
-  { text: 'dmg 3' },
-  { text: 'dmg 3' },
+  { text: 'dmg 4' },
+  { text: 'dmg 5' },
+  { text: 'dmg 6' },
 ]
 
 export function createInitialGame(): Game {
@@ -53,5 +54,6 @@ export function createInitialGame(): Game {
   return {
     user,
     opponent,
+    turn: 0,
   }
 }

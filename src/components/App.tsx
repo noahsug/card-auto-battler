@@ -1,14 +1,13 @@
 import './App.css';
+
 import { GameProvider } from './GameContext';
-import Player from './Player';
+import BattleScreen from './BattleScreen';
 
 export default function App() {
   return (
     <div className="App">
       <GameProvider>
-        <Player isOpponent={true} />
-        <div className="App-divider" />
-        <Player isOpponent={false} />
+        <BattleScreen />
       </GameProvider>
     </div>
   );

@@ -7,11 +7,11 @@ type Props = { isOpponent: boolean };
 
 export default function Player({ isOpponent }: Props) {
   const player = useGame((game) => isOpponent ? game.opponent : game.user);
-  const { health, maxHealth, cards } = player;
+  const { health, maxHealth, cards, activeCard } = player;
 
   return (
     <div className="Player">
-      <Card card={cards[0]} />
+      <Card card={cards[activeCard]} />
       <HealthBar health={health} maxHealth={maxHealth} />
     </div>
   );
