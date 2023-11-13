@@ -1,8 +1,10 @@
 import './Card.css';
 
-import { CardState } from '../state';
+import { Card as CardState } from '../state/game';
 
-export default function Card({ card }: { card: CardState }) {
+type Props =  { card: CardState }
+
+export default function Card({ card }: Props) {
   const { text } = card;
 
   return <div className="Card">{text}</div>;

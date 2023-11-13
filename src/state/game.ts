@@ -1,7 +1,3 @@
-export const USER_INDEX = 0;
-export const OPPONENT_INDEX = 1;
-export type PlayerIndex = USER_INDEX | OPPONENT_INDEX;
-
 export interface Card {
   text: string;
 }
@@ -14,7 +10,8 @@ export interface Player {
 }
 
 export interface Game {
-  players: [Player, Player];
+  user: Player;
+  opponent: Player;
 }
 
 function createInitialPlayer(): Player {
@@ -47,13 +44,14 @@ const deck2 = [
 ]
 
 export function createInitialGame(): Game {
-  const player1 = createInitialPlayer();
-  const player2 = createInitialPlayer();
+  const opponent = createInitialPlayer();
+  opponent.cards = deck1.slice();
 
-  player1.cards = deck1.slice();
-  player2.cards = deck2.slice();
+  const user = createInitialPlayer();
+  user.cards = deck2.slice();
 
   return {
-    players: [player1, player2],
+    user,
+    opponent,
   }
 }
