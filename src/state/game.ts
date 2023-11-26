@@ -9,10 +9,16 @@ export interface Player {
   maxHealth: number;
 }
 
+export interface Input {
+  actionKeyDown: boolean;
+}
+
 export interface Game {
   user: Player;
   opponent: Player;
   turn: number;
+  screen: 'battle' | 'gameOver';
+  input: Input;
 }
 
 function createInitialPlayer(): Player {
@@ -51,15 +57,21 @@ export function createInitialGame(): Game {
   const user = createInitialPlayer();
   user.cards = deck2.slice();
 
+  const input = {
+    actionKeyDown: false,
+  };
+
   return {
     user,
     opponent,
     turn: 0,
+    screen: 'battle',
+    input,
   };
 }
 
 export function getIsOpponentTurn(game: Game) {
-  return game.turn % 2 === 0;
+  return game.turn % 2 === 1;
 }
 
 export function getActivePlayer(game: Game) {

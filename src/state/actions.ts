@@ -1,11 +1,21 @@
-import { Game, getActiveCard, getActivePlayer, getNonActivePlayer } from './game';
+import {
+  Game,
+  createInitialGame,
+  getActiveCard,
+  getActivePlayer,
+  getNonActivePlayer,
+} from './game';
 
-export const nextTurn = () => (game: Game) => {
-  game.turn++;
-}
+export const actionKeyDown = () => (game: Game) => {
+  game.input.actionKeyDown = true;
+};
+
+export const actionKeyUp = () => (game: Game) => {
+  game.input.actionKeyDown = false;
+};
 
 export const playCard = () => (game: Game) => {
-const activePlayer = getActivePlayer(game);
+  const activePlayer = getActivePlayer(game);
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getActiveCard(activePlayer);
 
@@ -15,4 +25,15 @@ const activePlayer = getActivePlayer(game);
   activePlayer.activeCard = (activePlayer.activeCard + 1) % activePlayer.cards.length;
 
   game.turn++;
-}
+};
+
+export const resetGame = () => (game: Game) => {
+  game.user.health = game.user.maxHealth;
+  game.user.activeCard = 0;
+
+  game.opponent.health = game.opponent.maxHealth;
+  game.opponent.activeCard = 0;
+
+  game.turn = 0;
+  game.screen = 'battle';
+};
