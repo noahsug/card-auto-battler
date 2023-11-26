@@ -4,3 +4,7 @@
   height: 32vh;
   margin: 2vh auto;
 }
+
+.Card-active {
+  border: 5px solid darkred;
+}

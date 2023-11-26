@@ -13,7 +13,6 @@ export interface Game {
   user: Player;
   opponent: Player;
   turn: number;
-  canPlayCard: false;
 }
 
 function createInitialPlayer(): Player {
@@ -56,20 +55,19 @@ export function createInitialGame(): Game {
     user,
     opponent,
     turn: 0,
-    canPlayCard: false,
   };
 }
 
-export function isOpponentTurn(game: Game) {
+export function getIsOpponentTurn(game: Game) {
   return game.turn % 2 === 0;
 }
 
 export function getActivePlayer(game: Game) {
-  return isOpponentTurn(game) ? game.opponent : game.user;
+  return getIsOpponentTurn(game) ? game.opponent : game.user;
 }
 
 export function getNonActivePlayer(game: Game) {
-  return isOpponentTurn(game) ? game.user : game.opponent;
+  return getIsOpponentTurn(game) ? game.user : game.opponent;
 }
 
 export function getActiveCard(playerOrGame: Player | Game) {

@@ -5,9 +5,7 @@ export const nextTurn = () => (game: Game) => {
 }
 
 export const playCard = () => (game: Game) => {
-  // if (!game.canPlayCard) return;
-
-  const activePlayer = getActivePlayer(game);
+const activePlayer = getActivePlayer(game);
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getActiveCard(activePlayer);
 
@@ -17,5 +15,4 @@ export const playCard = () => (game: Game) => {
   activePlayer.activeCard = (activePlayer.activeCard + 1) % activePlayer.cards.length;
 
   game.turn++;
-  // game.canPlayCard = false;
 }

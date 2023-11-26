@@ -1,11 +1,22 @@
 import './Card.css';
 
-import { Card as CardState } from '../state/game';
+import { getActiveCard, getIsOpponentTurn } from '../state/game';
+import { useGame } from './GameContext';
 
-type Props =  { card: CardState }
+type Props = { isOpponent: boolean };
 
-export default function Card({ card }: Props) {
-  const { text } = card;
+export default function Card({ isOpponent }: Props) {
+  const game = useGame();
+  const player = isOpponent ? game.opponent : game.user;
+  const isOpponentTurn = getIsOpponentTurn(game);
 
-  return <div className="Card">{text}</div>;
+  const isActive = isOpponent ? isOpponentTurn : !isOpponentTurn;
+  const { text } = getActiveCard(player);
+
+  let className = 'Card';
+  if (isActive) {
+    className += ' Card-active';
+  }
+
+  return <div className={className}>{text}</div>;
 }
