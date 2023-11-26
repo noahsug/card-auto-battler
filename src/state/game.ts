@@ -13,6 +13,7 @@ export interface Game {
   user: Player;
   opponent: Player;
   turn: number;
+  canPlayCard: false;
 }
 
 function createInitialPlayer(): Player {
@@ -33,7 +34,7 @@ const deck1 = [
   { text: 'dmg 4' },
   { text: 'dmg 5' },
   { text: 'dmg 6' },
-]
+];
 
 const deck2 = [
   { text: 'dmg 1' },
@@ -42,7 +43,7 @@ const deck2 = [
   { text: 'dmg 4' },
   { text: 'dmg 5' },
   { text: 'dmg 6' },
-]
+];
 
 export function createInitialGame(): Game {
   const opponent = createInitialPlayer();
@@ -55,5 +56,27 @@ export function createInitialGame(): Game {
     user,
     opponent,
     turn: 0,
-  }
+    canPlayCard: false,
+  };
+}
+
+export function isOpponentTurn(game: Game) {
+  return game.turn % 2 === 0;
+}
+
+export function getActivePlayer(game: Game) {
+  return isOpponentTurn(game) ? game.opponent : game.user;
+}
+
+export function getNonActivePlayer(game: Game) {
+  return isOpponentTurn(game) ? game.user : game.opponent;
+}
+
+export function getActiveCard(playerOrGame: Player | Game) {
+  const player =
+    (playerOrGame as Player).activeCard === undefined
+      ? getActivePlayer(playerOrGame as Game)
+      : (playerOrGame as Player);
+
+  return player.cards[player.activeCard];
 }
