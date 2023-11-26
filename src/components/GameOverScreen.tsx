@@ -6,11 +6,14 @@ import { useGame, useActions } from './GameContext';
 
 export default function GameOverScreen() {
   const game = useGame();
-  const { resetGame } = useActions();
+  const { resetGame, actionKeyUsed } = useActions();
 
-  if (game.input.actionKeyDown) {
-    resetGame();
-  }
+  useEffect(() => {
+    if (game.input.actionKeyDown) {
+      resetGame();
+      actionKeyUsed();
+    }
+  }, [game.input.actionKeyDown, resetGame, actionKeyUsed]);
 
   const isWin = game.user.health > 0;
   const message = isWin ? 'You win!' : 'You lose!';

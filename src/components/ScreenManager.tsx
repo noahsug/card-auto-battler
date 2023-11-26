@@ -7,11 +7,14 @@ import { useGame } from './GameContext';
 import { Game } from '../state/game';
 
 function getScreen(game: Game) {
-  if (game.user.health <= 0 || game.opponent.health <= 0) {
-    return <GameOverScreen />;
+  switch (game.screen) {
+    case 'gameOver':
+      return <GameOverScreen />;
+    case 'battle':
+      return <BattleScreen />;
+    default:
+      throw new Error(`unknown screen: ${game.screen}`);
   }
-
-  return <BattleScreen />;
 }
 
 export default function ScreenManager() {

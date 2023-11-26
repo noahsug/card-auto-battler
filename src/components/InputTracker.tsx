@@ -31,7 +31,7 @@ export default function InputTracker() {
       window.removeEventListener('keyup', handleKeyUp);
       clearTimeout(actionKeyUpTimeout.current);
     };
-  }, []);
+  }, [actionKeyDown, actionKeyUp]);
 
   return null;
 }

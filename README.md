@@ -1,11 +1,5 @@
 # Card Auto Battler
 
-- P1 card plays first card every turn, dealing dmg to P2
-- P1 and P2 alternate playing cards
-- win screen
-- restart to new game after win screen
-- play through deck in order
-
 
 
 

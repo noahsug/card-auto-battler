@@ -1,6 +1,13 @@
 import './HealthBar.css';
 
-export default function HealthBar({ health, maxHealth }: { health: number; maxHealth: number }) {
+interface Props {
+  health: number;
+  maxHealth: number;
+}
+
+export default function HealthBar({ health, maxHealth }: Props) {
+  health = Math.max(health, 0);
+
   const healthPercent = Math.min(health / maxHealth, 1) * 100;
 
   return (

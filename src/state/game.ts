@@ -11,18 +11,21 @@ export interface Player {
 
 export interface Input {
   actionKeyDown: boolean;
+  actionKeyUsed: boolean;
 }
+
+export type Screen = 'battle' | 'gameOver';
 
 export interface Game {
   user: Player;
   opponent: Player;
   turn: number;
-  screen: 'battle' | 'gameOver';
+  screen: Screen;
   input: Input;
 }
 
 function createInitialPlayer(): Player {
-  const maxHealth = 30;
+  const maxHealth = 2;
 
   return {
     cards: [],
@@ -59,6 +62,7 @@ export function createInitialGame(): Game {
 
   const input = {
     actionKeyDown: false,
+    actionKeyUsed: false,
   };
 
   return {

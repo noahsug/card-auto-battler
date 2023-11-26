@@ -1,16 +1,14 @@
-import {
-  Game,
-  createInitialGame,
-  getActiveCard,
-  getActivePlayer,
-  getNonActivePlayer,
-} from './game';
+import { Game, Screen, getActiveCard, getActivePlayer, getNonActivePlayer } from './game';
 
 export const actionKeyDown = () => (game: Game) => {
   game.input.actionKeyDown = true;
 };
 
 export const actionKeyUp = () => (game: Game) => {
+  game.input.actionKeyDown = false;
+};
+
+export const actionKeyUsed = () => (game: Game) => {
   game.input.actionKeyDown = false;
 };
 
@@ -25,6 +23,10 @@ export const playCard = () => (game: Game) => {
   activePlayer.activeCard = (activePlayer.activeCard + 1) % activePlayer.cards.length;
 
   game.turn++;
+};
+
+export const goToScreen = (screen: Screen) => (game: Game) => {
+  game.screen = screen;
 };
 
 export const resetGame = () => (game: Game) => {

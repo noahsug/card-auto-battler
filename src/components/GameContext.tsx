@@ -6,7 +6,7 @@ import * as reduceFnActions from '../state/actions';
 import { Writeable } from '../utils/types';
 
 type ReduceFn = (game: Game) => void;
-type GetReduceFn<A = never> = (...args: A[]) => ReduceFn;
+type GetReduceFn = (...args: any[]) => ReduceFn;
 type Actions = {
   [K in keyof typeof reduceFnActions]: (...args: Parameters<(typeof reduceFnActions)[K]>) => void;
 };
@@ -32,11 +32,11 @@ export function useGame(selector: (game: Game) => any = (game) => game) {
   return selector(useContext(GameContext));
 }
 
-function wrapWithDispatch<A>(
-  getReduceFn: GetReduceFn<A>,
+function wrapWithDispatch(
+  getReduceFn: GetReduceFn,
   dispatch: (reduceFn: ReduceFn) => void,
-): (...args: A[]) => void {
-  return (...args: A[]) => dispatch(getReduceFn(...args));
+): (...args: any[]) => void {
+  return (...args: any[]) => dispatch(getReduceFn(...args));
 }
 
 export function useActions(): Actions {
