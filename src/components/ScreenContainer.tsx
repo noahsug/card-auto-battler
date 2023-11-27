@@ -1,4 +1,4 @@
-import './ScreenContainer.css';
+import styled from 'styled-components';
 
 import GameStartScreen from './GameStartScreen';
 import CardSelectionScreen from './CardSelectionScreen';
@@ -6,7 +6,7 @@ import BattleScreen from './BattleScreen';
 import GameEndScreen from './GameEndScreen';
 import RoundEndScreen from './RoundEndScreen';
 import { useGame } from './GameContext';
-
+import rel from './shared/rel';
 import { Screen } from '../state/game';
 
 type ScreenMapping = {
@@ -27,5 +27,16 @@ export default function ScreenContainer() {
   const screenComponent = screenMapping[game.screen];
   // const screenComponent = screenMapping['battle']; // DEBUG
 
-  return <div className="ScreenContainer">{screenComponent}</div>;
+  return <Container>{screenComponent}</Container>;
 }
+
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  font-size: ${rel(24)};
+`;

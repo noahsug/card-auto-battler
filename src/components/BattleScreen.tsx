@@ -3,12 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import './BattleScreen.css';
 
 import { useGame, useActions } from './GameContext';
-import { MAX_WINS, MAX_LOSSES } from '../state/game';
 import Player from './Player';
+import ProgressDisplay from './ProgressDisplay';
 
 export default function BattleScreen() {
   const game = useGame();
-  const { wins, losses, user, opponent } = game;
+  const { user, opponent } = game;
   const { playCard, nextTurn, endRound } = useActions();
   const [isWaitingToStart, setIsWaitingToStart] = useState(true);
 
@@ -33,9 +33,9 @@ export default function BattleScreen() {
 
       // return; // DEBUG
 
-      const isGameOver = user.health <= 0 || opponent.health <= 0;
+      const isRoundOver = user.health <= 0 || opponent.health <= 0;
 
-      if (isGameOver) {
+      if (isRoundOver) {
         if (currentTimeSinceLastAction >= 1000) {
           endRound();
           timeSinceLastAction.current = 0;
@@ -59,13 +59,9 @@ export default function BattleScreen() {
     };
   }, [playCard, nextTurn, user.health, opponent.health, endRound, isWaitingToStart]);
 
-  const lives = new Array(MAX_LOSSES - losses).fill('❤️').join('');
-
   return (
     <div className="BattleScreen">
-      <div>
-        Wins: {wins}/{MAX_WINS} Lives: {lives}
-      </div>
+      <ProgressDisplay />
       <Player isOpponent={true} forceInactive={isWaitingToStart} />
       <div className="BattleScreen-divider" />
       <Player isOpponent={false} forceInactive={isWaitingToStart} />

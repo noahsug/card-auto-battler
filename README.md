@@ -1,10 +1,11 @@
 # Card Auto Battler
 
-3. card reward screen
-4. more cards
-5. relic reward screen
-6. more relics
-7. game engine analysis
+- use REM and set root font size based on vh
+- select cards from card reward screen
+- more cards
+- relic reward screen
+- more relics
+- game engine analysis
 
 ## Available Scripts
 
