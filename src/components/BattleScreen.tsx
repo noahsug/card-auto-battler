@@ -31,6 +31,8 @@ export default function BattleScreen() {
       timeSinceLastAction.current += timestamp - elapsedTime.current;
       elapsedTime.current = timestamp;
 
+      // return; // DEBUG
+
       const isGameOver = user.health <= 0 || opponent.health <= 0;
 
       if (isGameOver) {

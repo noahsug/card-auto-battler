@@ -25,6 +25,7 @@ export default function ScreenContainer() {
   const game = useGame();
 
   const screenComponent = screenMapping[game.screen];
+  // const screenComponent = screenMapping['battle']; // DEBUG
 
   return <div className="ScreenContainer">{screenComponent}</div>;
 }

@@ -20,7 +20,7 @@ export default function Player({ isOpponent, forceInactive }: Props) {
   const isOpponentTurn = getIsOpponentTurn(game);
   const isActive = !forceInactive && (isOpponent ? isOpponentTurn : !isOpponentTurn);
 
-  const card = getActiveCard(game);
+  const card = getActiveCard(player);
 
   let className = 'Player';
   if (isActive) {
@@ -30,7 +30,7 @@ export default function Player({ isOpponent, forceInactive }: Props) {
   return (
     <div className={className}>
       <div className="Player-cardContainer">
-        <Card card={card} />
+        <Card card={card} isActive={isActive} />
       </div>
       <HealthBar health={health} maxHealth={maxHealth} />
     </div>

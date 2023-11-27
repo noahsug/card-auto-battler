@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import './CardSelectionScreen.css';
@@ -23,8 +23,8 @@ export default function CardSelectionScreen() {
   const lives = new Array(MAX_LOSSES - losses).fill('❤️').join('');
 
   const cards = getCardSelections();
-  const cardComponents = cards.map((card) => {
-    return <Card card={card} scale={0.75} />;
+  const cardComponents = cards.map((card, i) => {
+    return <StyledCard key={i} card={card} scale={0.75} />;
   });
 
   return (
@@ -38,12 +38,12 @@ export default function CardSelectionScreen() {
   );
 }
 
+const StyledCard = styled(Card)`
+  margin: ${rel(10)};
+`;
+
 const CardGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-
-  div {
-    margin: ${rel(2)};
-  }
 `;
