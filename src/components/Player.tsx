@@ -3,12 +3,12 @@ import './Player.css';
 import Card from './Card';
 import HealthBar from './HealthBar';
 import { useGame } from './GameContext';
-import { getIsOpponentTurn } from '../state/game';
+import { getIsOpponentTurn, getActiveCard } from '../state/game';
 
 interface Props {
-  isOpponent: boolean,
-  forceInactive: boolean,
-};
+  isOpponent: boolean;
+  forceInactive: boolean;
+}
 
 export default function Player({ isOpponent, forceInactive }: Props) {
   const game = useGame();
@@ -20,6 +20,8 @@ export default function Player({ isOpponent, forceInactive }: Props) {
   const isOpponentTurn = getIsOpponentTurn(game);
   const isActive = !forceInactive && (isOpponent ? isOpponentTurn : !isOpponentTurn);
 
+  const card = getActiveCard(game);
+
   let className = 'Player';
   if (isActive) {
     className += ' Player-active';
@@ -28,7 +30,7 @@ export default function Player({ isOpponent, forceInactive }: Props) {
   return (
     <div className={className}>
       <div className="Player-cardContainer">
-        <Card isOpponent={isOpponent} forceInactive={forceInactive} />
+        <Card card={card} />
       </div>
       <HealthBar health={health} maxHealth={maxHealth} />
     </div>

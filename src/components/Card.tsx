@@ -1,27 +1,36 @@
-import './Card.css';
+import styled from 'styled-components';
 
-import { getActiveCard, getIsOpponentTurn } from '../state/game';
-import { useGame } from './GameContext';
+import rel from './shared/rel';
+import { Card as CardState } from '../state/game';
 
 interface Props {
-  isOpponent: boolean;
-  forceInactive: boolean;
+  card: CardState;
+  isActive?: boolean;
+  scale?: number;
 }
 
-export default function Card({ isOpponent, forceInactive }: Props) {
-  const game = useGame();
+export default function Card({ card, isActive = false, scale = 1 }: Props) {
+  // const game = useGame();
+  //
+  // const isOpponentTurn = getIsOpponentTurn(game);
+  // const isActive = !forceInactive && (isOpponent ? isOpponentTurn : !isOpponentTurn);
+  //
+  // const { opponent, user } = game;
+  // const player = isOpponent ? opponent : user;
 
-  const isOpponentTurn = getIsOpponentTurn(game);
-  const isActive = !forceInactive && (isOpponent ? isOpponentTurn : !isOpponentTurn);
-
-  const { opponent, user } = game;
-  const player = isOpponent ? opponent : user;
-  const { text } = getActiveCard(player);
-
-  let className = 'Card';
-  if (isActive) {
-    className += ' Card-active';
-  }
-
-  return <div className={className}>{text}</div>;
+  return (
+    <CardContainer $isActive={isActive} $scale={scale}>
+      {card.text}
+    </CardContainer>
+  );
 }
+
+const CardContainer = styled.div<{ $scale: number; $isActive: boolean }>`
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: transform 0.2s;
+  margin: auto;
+
+  width: ${({ $scale }) => rel($scale * 24)};
+  height: ${({ $scale }) => rel($scale * 32)};
+`;
