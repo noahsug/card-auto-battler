@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 import { MAX_WINS, MAX_LOSSES } from '../state/game';
 import { useGame } from './GameContext';
-import rel from './shared/rel';
 
 export default function ProgressDisplay() {
   const game = useGame();
@@ -22,11 +21,11 @@ export default function ProgressDisplay() {
 const Container = styled.div`
   display: flex;
   justify-content: center;
-  margin: ${rel(10)} 0 ${rel(30)};
+  margin: 10rem 0 30rem;
 `;
 
 const ProgressMessage = styled.div`
   & + & {
-    margin-left: ${rel(20)};
+    margin-left: 20rem;
   }
 `;

@@ -1,28 +1,41 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { getCardSelections } from '../state/game';
-import { useGame, useActions } from './GameContext';
+import { useActions } from './GameContext';
 import ProgressDisplay from './ProgressDisplay';
 import Title from './Title';
-import rel from './shared/rel';
 import Card from './Card';
+import wait from '../utils/wait';
 
 export default function CardSelectionScreen() {
-  const game = useGame();
-  const { startRound } = useActions();
-
-  const { input } = game;
-
-  useEffect(() => {
-    if (input.actionKeyDown) {
-      startRound();
-    }
-  }, [input.actionKeyDown, startRound]);
+  const { addCard, startRound } = useActions();
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
 
   const cards = getCardSelections();
+
+  useEffect(() => {
+    let cleanup: Awaited<ReturnType<typeof wait>> | undefined;
+    (async () => {
+      if (selectedCardIndex === null) return;
+      cleanup = await wait(500);
+      addCard(cards[selectedCardIndex]);
+      startRound();
+    })();
+
+    return cleanup;
+  }, [selectedCardIndex, startRound, addCard, cards]);
+
   const cardComponents = cards.map((card, i) => {
-    return <StyledCard key={i} card={card} scale={0.75} />;
+    return (
+      <StyledCard
+        key={i}
+        card={card}
+        scale={0.75}
+        onClick={() => setSelectedCardIndex(i)}
+        isActive={i === selectedCardIndex}
+      />
+    );
   });
 
   return (
@@ -35,7 +48,7 @@ export default function CardSelectionScreen() {
 }
 
 const StyledCard = styled(Card)`
-  margin: ${rel(10)};
+  margin: 10rem;
 `;
 
 const CardGrid = styled.div`

@@ -1,5 +1,8 @@
+import shuffle from 'lodash/shuffle';
+
 import {
   Game,
+  Card,
   MAX_WINS,
   MAX_LOSSES,
   getActiveCard,
@@ -61,6 +64,8 @@ export const startCardSelection = () => (game: Game) => {
 
 export const startRound = () => (game: Game) => {
   game.screen = 'battle';
+  game.user.cards = shuffle(game.user.cards);
+  game.opponent.cards = shuffle(game.opponent.cards);
 
   game.input.actionKeyDown = false;
 };
@@ -71,4 +76,8 @@ export const startGame = () => (game: Game) => {
   game.losses = 0;
   game.wins = 0;
   game.input.actionKeyDown = false;
+};
+
+export const addCard = (card: Card) => (game: Game) => {
+  game.user.cards.push(card);
 };

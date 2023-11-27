@@ -1,6 +1,5 @@
 import styled, { css } from 'styled-components';
 
-import rel from './shared/rel';
 import { Card as CardState } from '../state/game';
 
 interface Props {
@@ -8,11 +7,12 @@ interface Props {
   isActive?: boolean;
   scale?: number;
   className?: string;
+  onClick?: () => void;
 }
 
-export default function Card({ card, isActive = false, scale = 1, className }: Props) {
+export default function Card({ card, isActive = false, scale = 1, className, onClick }: Props) {
   return (
-    <Container $isActive={isActive} $scale={scale} className={className}>
+    <Container $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
       {card.text}
     </Container>
   );
@@ -25,13 +25,13 @@ const Container = styled.div<{ $scale: number; $isActive: boolean }>`
     transform 0.2s,
     box-shadow 0.2s;
 
-  width: ${({ $scale }) => rel($scale * 240)};
-  height: ${({ $scale }) => rel($scale * 320)};
+  width: ${({ $scale }) => $scale * 240}rem;
+  height: ${({ $scale }) => $scale * 320}rem;
 
   ${({ $isActive }) =>
     $isActive &&
     css`
       transform: scale(1.2);
-      box-shadow: ${rel(7)} ${rel(7)} ${rel(10)} 0 rgba(0, 0, 0, 0.5);
+      box-shadow: 7rem 7rem 10rem 0 rgba(0, 0, 0, 0.5);
     `}
 `;

@@ -1,10 +1,8 @@
 import styled from 'styled-components';
 
-import rel from './shared/rel';
-
 const Title = styled.div`
-  font-size: ${rel(50)};
-  margin-bottom: ${rel(20)};
+  font-size: 50rem;
+  margin-bottom: 20rem;
 `;
 
 export default Title;

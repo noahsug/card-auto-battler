@@ -6,7 +6,6 @@ import BattleScreen from './BattleScreen';
 import GameEndScreen from './GameEndScreen';
 import RoundEndScreen from './RoundEndScreen';
 import { useGame } from './GameContext';
-import rel from './shared/rel';
 import { Screen } from '../state/game';
 
 type ScreenMapping = {
@@ -38,5 +37,5 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: space-evenly;
-  font-size: ${rel(24)};
+  font-size: 24rem;
 `;

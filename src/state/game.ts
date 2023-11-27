@@ -29,7 +29,7 @@ export const MAX_WINS = 2;
 export const MAX_LOSSES = 2;
 
 function createInitialPlayer(): Player {
-  const maxHealth = 2;
+  const maxHealth = 6;
 
   return {
     cards: [],
@@ -43,13 +43,13 @@ const userDeck = [
   { text: 'dmg 1' },
   { text: 'dmg 2' },
   { text: 'dmg 3' },
-  { text: 'dmg 4' },
-  { text: 'dmg 5' },
-  { text: 'dmg 6' },
+  { text: 'dmg 1' },
+  { text: 'dmg 2' },
+  { text: 'dmg 3' },
 ];
 
 const opponentDeck = [
-  { text: 'dmg 10' },
+  { text: 'dmg 1' },
   { text: 'dmg 2' },
   { text: 'dmg 3' },
   { text: 'dmg 4' },
@@ -81,11 +81,11 @@ export function createInitialGame(): Game {
 
 export function getCardSelections() {
   return [
-    { text: 'dmg 10' },
-    { text: 'dmg 10' },
-    { text: 'dmg 10' },
-    { text: 'dmg 10' },
-    { text: 'dmg 10' },
+    { text: 'dmg 5' },
+    { text: 'dmg 6' },
+    { text: 'dmg 7' },
+    { text: 'dmg 8' },
+    { text: 'dmg 9' },
     { text: 'dmg 10' },
   ];
 }

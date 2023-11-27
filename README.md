@@ -1,6 +1,5 @@
 # Card Auto Battler
 
-- use REM and set root font size based on vh
 - select cards from card reward screen
 - more cards
 - relic reward screen
