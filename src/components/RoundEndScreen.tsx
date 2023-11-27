@@ -7,15 +7,15 @@ import { useGame, useActions } from './GameContext';
 
 export default function RoundEndScreen() {
   const game = useGame();
-  const { startRound } = useActions();
+  const { startCardSelection } = useActions();
 
   const { input, user, wins, losses } = game;
 
   useEffect(() => {
     if (input.actionKeyDown) {
-      startRound();
+      startCardSelection();
     }
-  }, [input.actionKeyDown, startRound]);
+  }, [input.actionKeyDown, startCardSelection]);
 
   const isWin = user.health > 0;
   const title = isWin ? 'Victory' : 'Defeat';

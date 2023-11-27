@@ -1,32 +1,30 @@
 import './ScreenContainer.css';
 
 import GameStartScreen from './GameStartScreen';
+import CardSelectionScreen from './CardSelectionScreen';
 import BattleScreen from './BattleScreen';
 import GameEndScreen from './GameEndScreen';
 import RoundEndScreen from './RoundEndScreen';
 import { useGame } from './GameContext';
 
-import { Game } from '../state/game';
+import { Screen } from '../state/game';
 
-function getScreen(game: Game) {
-  switch (game.screen) {
-    case 'game-start':
-      return <GameStartScreen />;
-    case 'battle':
-      return <BattleScreen />;
-    case 'round-end':
-      return <RoundEndScreen />;
-    case 'game-end':
-      return <GameEndScreen />;
-    default:
-      throw new Error(`unknown screen: ${game.screen}`);
-  }
-}
+type ScreenMapping = {
+  [K in Screen]: JSX.Element;
+};
+
+const screenMapping: ScreenMapping = {
+  'game-start': <GameStartScreen />,
+  'card-selection': <CardSelectionScreen />,
+  battle: <BattleScreen />,
+  'round-end': <RoundEndScreen />,
+  'game-end': <GameEndScreen />,
+};
 
 export default function ScreenContainer() {
   const game = useGame();
 
-  const screen = getScreen(game);
+  const screenComponent = screenMapping[game.screen];
 
-  return <div className="ScreenContainer">{screen}</div>;
+  return <div className="ScreenContainer">{screenComponent}</div>;
 }

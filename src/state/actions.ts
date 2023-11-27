@@ -45,7 +45,7 @@ export const endRound = () => (game: Game) => {
   game.input.actionKeyDown = false;
 };
 
-export const startRound = () => (game: Game) => {
+export const startCardSelection = () => (game: Game) => {
   game.user.health = game.user.maxHealth;
   game.user.activeCardIndex = 0;
 
@@ -53,13 +53,20 @@ export const startRound = () => (game: Game) => {
   game.opponent.activeCardIndex = 0;
 
   game.turn = 0;
+
+  game.screen = 'card-selection';
+
+  game.input.actionKeyDown = false;
+};
+
+export const startRound = () => (game: Game) => {
   game.screen = 'battle';
 
   game.input.actionKeyDown = false;
 };
 
 export const startGame = () => (game: Game) => {
-  startRound()(game);
+  startCardSelection()(game);
 
   game.losses = 0;
   game.wins = 0;

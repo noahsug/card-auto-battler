@@ -13,7 +13,7 @@ export interface Input {
   actionKeyDown: boolean;
 }
 
-export type Screen = 'game-start' | 'battle' | 'round-end' | 'game-end';
+export type Screen = 'game-start' | 'card-selection' | 'battle' | 'round-end' | 'game-end';
 
 export interface Game {
   user: Player;
@@ -77,6 +77,17 @@ export function createInitialGame(): Game {
     wins: 0,
     losses: 0,
   };
+}
+
+export function getCardSelections() {
+  return [
+    { text: 'dmg 10' },
+    { text: 'dmg 10' },
+    { text: 'dmg 10' },
+    { text: 'dmg 10' },
+    { text: 'dmg 10' },
+    { text: 'dmg 10' },
+  ];
 }
 
 export function getIsOpponentTurn(game: Game) {
