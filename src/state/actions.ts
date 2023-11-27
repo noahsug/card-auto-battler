@@ -1,14 +1,17 @@
-import { Game, Screen, getActiveCard, getActivePlayer, getNonActivePlayer } from './game';
+import {
+  Game,
+  MAX_WINS,
+  MAX_LOSSES,
+  getActiveCard,
+  getActivePlayer,
+  getNonActivePlayer,
+} from './game';
 
 export const actionKeyDown = () => (game: Game) => {
   game.input.actionKeyDown = true;
 };
 
 export const actionKeyUp = () => (game: Game) => {
-  game.input.actionKeyDown = false;
-};
-
-export const actionKeyUsed = () => (game: Game) => {
   game.input.actionKeyDown = false;
 };
 
@@ -19,23 +22,46 @@ export const playCard = () => (game: Game) => {
 
   const dmg = parseInt(card.text.split(' ')[1], 10);
   nonActivePlayer.health -= dmg;
+};
 
-  activePlayer.activeCard = (activePlayer.activeCard + 1) % activePlayer.cards.length;
+export const nextTurn = () => (game: Game) => {
+  const activePlayer = getActivePlayer(game);
+  activePlayer.activeCardIndex = (activePlayer.activeCardIndex + 1) % activePlayer.cards.length;
 
   game.turn++;
 };
 
-export const goToScreen = (screen: Screen) => (game: Game) => {
-  game.screen = screen;
+export const endRound = () => (game: Game) => {
+  if (game.user.health <= 0) {
+    game.losses++;
+  } else if (game.opponent.health <= 0) {
+    game.wins++;
+  } else {
+    throw new Error('endRound called, but neither player is dead');
+  }
+
+  game.screen = game.wins >= MAX_WINS || game.losses >= MAX_LOSSES ? 'game-end' : 'round-end';
+
+  game.input.actionKeyDown = false;
 };
 
-export const resetGame = () => (game: Game) => {
+export const startRound = () => (game: Game) => {
   game.user.health = game.user.maxHealth;
-  game.user.activeCard = 0;
+  game.user.activeCardIndex = 0;
 
   game.opponent.health = game.opponent.maxHealth;
-  game.opponent.activeCard = 0;
+  game.opponent.activeCardIndex = 0;
 
   game.turn = 0;
   game.screen = 'battle';
+
+  game.input.actionKeyDown = false;
+};
+
+export const startGame = () => (game: Game) => {
+  startRound()(game);
+
+  game.losses = 0;
+  game.wins = 0;
+  game.input.actionKeyDown = false;
 };

@@ -1,7 +1,10 @@
 # Card Auto Battler
 
-
-
+3. card reward screen
+4. more cards
+5. relic reward screen
+6. more relics
+7. game engine analysis
 
 ## Available Scripts
 

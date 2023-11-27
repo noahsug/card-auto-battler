@@ -2,9 +2,11 @@
   border: 1px solid #ccc;
   width: 24vh;
   height: 32vh;
-  margin: 2vh auto;
+  transition: transform .2s;
+  margin: auto;
 }
 
 .Card-active {
-  border: 5px solid darkred;
+  border: 5px solid #333;
+  transform: scale(1.2);
 }

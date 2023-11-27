@@ -1,0 +1,10 @@
+.GameEndScreen {
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.GameEndScreen-title {
+  font-size: 5vh;
+  margin-bottom: 2vh;
+}

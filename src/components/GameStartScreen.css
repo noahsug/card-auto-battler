@@ -1,0 +1,12 @@
+.GameStartScreen {
+  font-size: 5vh;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.GameStartScreen-space {
+  font-weight: bold;
+  color: darkred;
+  margin: 2vh 0;
+}

@@ -28,8 +28,8 @@ export function GameProvider({ children }: PropsWithChildren) {
   );
 }
 
-export function useGame(selector: (game: Game) => any = (game) => game) {
-  return selector(useContext(GameContext));
+export function useGame() {
+  return useContext(GameContext);
 }
 
 function wrapWithDispatch(

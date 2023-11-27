@@ -1,0 +1,16 @@
+.RoundEndScreen {
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.RoundEndScreen-title {
+  font-size: 5vh;
+  margin-bottom: 2vh;
+  margin-top: 10vh;
+}
+
+.RoundEndScreen-subtitle {
+  font-size: 3vh;
+  margin-top: 10vh;
+}

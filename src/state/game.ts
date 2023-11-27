@@ -4,17 +4,16 @@ export interface Card {
 
 export interface Player {
   cards: Card[];
-  activeCard: number;
+  activeCardIndex: number;
   health: number;
   maxHealth: number;
 }
 
 export interface Input {
   actionKeyDown: boolean;
-  actionKeyUsed: boolean;
 }
 
-export type Screen = 'battle' | 'gameOver';
+export type Screen = 'game-start' | 'battle' | 'round-end' | 'game-end';
 
 export interface Game {
   user: Player;
@@ -22,20 +21,25 @@ export interface Game {
   turn: number;
   screen: Screen;
   input: Input;
+  wins: number;
+  losses: number;
 }
+
+export const MAX_WINS = 2;
+export const MAX_LOSSES = 2;
 
 function createInitialPlayer(): Player {
   const maxHealth = 2;
 
   return {
     cards: [],
-    activeCard: 0,
+    activeCardIndex: 0,
     health: maxHealth,
     maxHealth,
   };
 }
 
-const deck1 = [
+const userDeck = [
   { text: 'dmg 1' },
   { text: 'dmg 2' },
   { text: 'dmg 3' },
@@ -44,8 +48,8 @@ const deck1 = [
   { text: 'dmg 6' },
 ];
 
-const deck2 = [
-  { text: 'dmg 1' },
+const opponentDeck = [
+  { text: 'dmg 10' },
   { text: 'dmg 2' },
   { text: 'dmg 3' },
   { text: 'dmg 4' },
@@ -54,23 +58,24 @@ const deck2 = [
 ];
 
 export function createInitialGame(): Game {
-  const opponent = createInitialPlayer();
-  opponent.cards = deck1.slice();
-
   const user = createInitialPlayer();
-  user.cards = deck2.slice();
+  user.cards = userDeck.slice();
+
+  const opponent = createInitialPlayer();
+  opponent.cards = opponentDeck.slice();
 
   const input = {
     actionKeyDown: false,
-    actionKeyUsed: false,
   };
 
   return {
     user,
     opponent,
     turn: 0,
-    screen: 'battle',
+    screen: 'game-start',
     input,
+    wins: 0,
+    losses: 0,
   };
 }
 
@@ -87,10 +92,10 @@ export function getNonActivePlayer(game: Game) {
 }
 
 export function getActiveCard(playerOrGame: Player | Game) {
-  const player =
-    (playerOrGame as Player).activeCard === undefined
-      ? getActivePlayer(playerOrGame as Game)
-      : (playerOrGame as Player);
+  let player = playerOrGame as Player;
+  if (player.activeCardIndex === undefined) {
+    player = getActivePlayer(playerOrGame as Game);
+  }
 
-  return player.cards[player.activeCard];
+  return player.cards[player.activeCardIndex];
 }

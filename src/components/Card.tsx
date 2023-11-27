@@ -3,14 +3,19 @@ import './Card.css';
 import { getActiveCard, getIsOpponentTurn } from '../state/game';
 import { useGame } from './GameContext';
 
-type Props = { isOpponent: boolean };
+interface Props {
+  isOpponent: boolean;
+  forceInactive: boolean;
+}
 
-export default function Card({ isOpponent }: Props) {
+export default function Card({ isOpponent, forceInactive }: Props) {
   const game = useGame();
-  const player = isOpponent ? game.opponent : game.user;
-  const isOpponentTurn = getIsOpponentTurn(game);
 
-  const isActive = isOpponent ? isOpponentTurn : !isOpponentTurn;
+  const isOpponentTurn = getIsOpponentTurn(game);
+  const isActive = !forceInactive && (isOpponent ? isOpponentTurn : !isOpponentTurn);
+
+  const { opponent, user } = game;
+  const player = isOpponent ? opponent : user;
   const { text } = getActiveCard(player);
 
   let className = 'Card';
