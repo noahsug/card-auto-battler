@@ -9,10 +9,6 @@ export interface Player {
   maxHealth: number;
 }
 
-export interface Input {
-  actionKeyDown: boolean;
-}
-
 export type Screen = 'game-start' | 'card-selection' | 'battle' | 'round-end' | 'game-end';
 
 export interface Game {
@@ -20,7 +16,6 @@ export interface Game {
   opponent: Player;
   turn: number;
   screen: Screen;
-  input: Input;
   wins: number;
   losses: number;
 }
@@ -64,16 +59,11 @@ export function createInitialGame(): Game {
   const opponent = createInitialPlayer();
   opponent.cards = opponentDeck.slice();
 
-  const input = {
-    actionKeyDown: false,
-  };
-
   return {
     user,
     opponent,
     turn: 0,
     screen: 'game-start',
-    input,
     wins: 0,
     losses: 0,
   };

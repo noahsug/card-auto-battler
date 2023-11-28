@@ -10,14 +10,6 @@ import {
   getNonActivePlayer,
 } from '../';
 
-export const actionKeyDown = () => (game: Game) => {
-  game.input.actionKeyDown = true;
-};
-
-export const actionKeyUp = () => (game: Game) => {
-  game.input.actionKeyDown = false;
-};
-
 export const playCard = () => (game: Game) => {
   const activePlayer = getActivePlayer(game);
   const nonActivePlayer = getNonActivePlayer(game);
@@ -44,8 +36,6 @@ export const endRound = () => (game: Game) => {
   }
 
   game.screen = game.wins >= MAX_WINS || game.losses >= MAX_LOSSES ? 'game-end' : 'round-end';
-
-  game.input.actionKeyDown = false;
 };
 
 export const startCardSelection = () => (game: Game) => {
@@ -58,16 +48,12 @@ export const startCardSelection = () => (game: Game) => {
   game.turn = 0;
 
   game.screen = 'card-selection';
-
-  game.input.actionKeyDown = false;
 };
 
 export const startRound = () => (game: Game) => {
   game.screen = 'battle';
   game.user.cards = shuffle(game.user.cards);
   game.opponent.cards = shuffle(game.opponent.cards);
-
-  game.input.actionKeyDown = false;
 };
 
 export const startGame = () => (game: Game) => {
@@ -75,7 +61,6 @@ export const startGame = () => (game: Game) => {
 
   game.losses = 0;
   game.wins = 0;
-  game.input.actionKeyDown = false;
 };
 
 export const addCard = (card: Card) => (game: Game) => {
