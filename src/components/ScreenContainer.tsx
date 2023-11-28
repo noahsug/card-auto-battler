@@ -6,13 +6,15 @@ import BattleScreen from './BattleScreen';
 import GameEndScreen from './GameEndScreen';
 import RoundEndScreen from './RoundEndScreen';
 import { useGame } from './GameContext';
-import { Screen } from '../state/game';
+import { Screen as ScreenState } from '../state/game';
 
 type ScreenMapping = {
-  [K in Screen]: JSX.Element;
+  [K in ScreenState]: JSX.Element;
 };
 
 const screenMapping: ScreenMapping = {
+  // 'game-start': <GameEndScreen />, // DEBUG
+
   'game-start': <GameStartScreen />,
   'card-selection': <CardSelectionScreen />,
   battle: <BattleScreen />,
@@ -22,20 +24,13 @@ const screenMapping: ScreenMapping = {
 
 export default function ScreenContainer() {
   const game = useGame();
+  const { screen } = game;
 
-  const screenComponent = screenMapping[game.screen];
-  // const screenComponent = screenMapping['battle']; // DEBUG
-
-  return <Container>{screenComponent}</Container>;
+  const screenComponent = screenMapping[screen];
+  return <Root>{screenComponent}</Root>;
 }
 
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
+const Root = styled.div`
   font-size: 24rem;
+  height: 100%;
 `;

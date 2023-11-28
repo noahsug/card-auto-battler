@@ -1,23 +1,26 @@
-import { useEffect } from 'react';
+import styled from 'styled-components';
 
-import './GameStartScreen.css';
-
-import { useGame, useActions } from './GameContext';
+import { useActions } from './GameContext';
+import { Screen } from './shared';
 
 export default function GameStartScreen() {
-  const game = useGame();
   const { startGame } = useActions();
 
-  const { input } = game;
-
-  useEffect(() => {
-    if (input.actionKeyDown) {
-      startGame();
-    }
-  }, [input.actionKeyDown, startGame]);
-
-  return <div className="GameStartScreen">
-    press
-    <div className="GameStartScreen-space">SPACE</div>
-    to start</div>;
+  return (
+    <Root onClick={startGame}>
+      <Bold>CLICK</Bold>
+      to start
+    </Root>
+  );
 }
+
+const Root = styled(Screen)`
+  font-size: 50rem;
+`;
+
+const Bold = styled.div`
+  font-size: 80rem;
+  font-weight: bold;
+  color: darkred;
+  margin-bottom: 20rem;
+`;

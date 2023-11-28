@@ -1,8 +1,9 @@
-import './Player.css';
+import styled from 'styled-components';
 
 import Card from './Card';
 import HealthBar from './HealthBar';
 import { useGame } from './GameContext';
+import { Screen } from './shared';
 import { getIsOpponentTurn, getActiveCard } from '../state/game';
 
 interface Props {
@@ -12,8 +13,8 @@ interface Props {
 
 export default function Player({ isOpponent, forceInactive }: Props) {
   const game = useGame();
-
   const { opponent, user } = game;
+
   const player = isOpponent ? opponent : user;
   const { health, maxHealth } = player;
 
@@ -22,17 +23,22 @@ export default function Player({ isOpponent, forceInactive }: Props) {
 
   const card = getActiveCard(player);
 
-  let className = 'Player';
-  if (isActive) {
-    className += ' Player-active';
-  }
-
   return (
-    <div className={className}>
-      <div className="Player-cardContainer">
+    <Root>
+      <CardContainer>
         <Card card={card} isActive={isActive} />
-      </div>
+      </CardContainer>
       <HealthBar health={health} maxHealth={maxHealth} />
-    </div>
+    </Root>
   );
 }
+
+const Root = styled(Screen)`
+  margin-bottom: 20rem;
+`;
+
+const CardContainer = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+`;

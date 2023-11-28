@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-
-import './BattleScreen.css';
+import styled from 'styled-components';
 
 import { useGame, useActions } from './GameContext';
 import Player from './Player';
 import ProgressDisplay from './ProgressDisplay';
+import { Screen } from './shared';
 
 export default function BattleScreen() {
   const game = useGame();
@@ -30,8 +30,6 @@ export default function BattleScreen() {
 
       timeSinceLastAction.current += timestamp - elapsedTime.current;
       elapsedTime.current = timestamp;
-
-      // return; // DEBUG
 
       const isRoundOver = user.health <= 0 || opponent.health <= 0;
 
@@ -60,11 +58,15 @@ export default function BattleScreen() {
   }, [playCard, nextTurn, user.health, opponent.health, endRound, isWaitingToStart]);
 
   return (
-    <div className="BattleScreen">
+    <Screen>
       <ProgressDisplay />
       <Player isOpponent={true} forceInactive={isWaitingToStart} />
-      <div className="BattleScreen-divider" />
+      <Divider />
       <Player isOpponent={false} forceInactive={isWaitingToStart} />
-    </div>
+    </Screen>
   );
 }
+
+const Divider = styled.div`
+  padding: 20rem;
+`;

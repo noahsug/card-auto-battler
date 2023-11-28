@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import { getCardSelections } from '../state/game';
 import { useActions } from './GameContext';
 import ProgressDisplay from './ProgressDisplay';
-import Title from './Title';
+import { Screen, Title } from './shared';
 import Card from './Card';
-import wait from '../utils/wait';
+import { wait } from '../utils';
 
 export default function CardSelectionScreen() {
   const { addCard, startRound } = useActions();
@@ -18,7 +18,7 @@ export default function CardSelectionScreen() {
     let cleanup: Awaited<ReturnType<typeof wait>> | undefined;
     (async () => {
       if (selectedCardIndex === null) return;
-      cleanup = await wait(500);
+      cleanup = await wait(200);
       addCard(cards[selectedCardIndex]);
       startRound();
     })();
@@ -28,7 +28,7 @@ export default function CardSelectionScreen() {
 
   const cardComponents = cards.map((card, i) => {
     return (
-      <StyledCard
+      <Card
         key={i}
         card={card}
         scale={0.75}
@@ -39,20 +39,20 @@ export default function CardSelectionScreen() {
   });
 
   return (
-    <div className="CardSelectionScreen">
+    <Screen>
       <ProgressDisplay />
       <Title>Select a Card</Title>
       <CardGrid>{cardComponents}</CardGrid>
-    </div>
+    </Screen>
   );
 }
-
-const StyledCard = styled(Card)`
-  margin: 10rem;
-`;
 
 const CardGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+
+  > * {
+    margin: 10rem;
+  }
 `;
