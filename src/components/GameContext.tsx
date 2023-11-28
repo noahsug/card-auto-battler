@@ -1,9 +1,9 @@
 import { createContext, useContext, PropsWithChildren, Dispatch } from 'react';
 import { useImmerReducer } from 'use-immer';
 
-import { Game, createInitialGame } from '../state/game';
+import { Game, createInitialGame } from '../state';
 import * as reduceFnActions from '../state/actions';
-import { Writeable } from '../utils/types';
+import { Writable } from '../utils/types';
 
 type ReduceFn = (game: Game) => void;
 type GetReduceFn = (...args: any[]) => ReduceFn;
@@ -42,7 +42,7 @@ function wrapWithDispatch(
 export function useActions(): Actions {
   const dispatch = useContext(GameDispatchContext);
 
-  const actions = {} as Writeable<Actions>;
+  const actions = {} as Writable<Actions>;
   for (const name in reduceFnActions) {
     const action = reduceFnActions[name as keyof Actions];
     actions[name as keyof Actions] = wrapWithDispatch(action, dispatch);

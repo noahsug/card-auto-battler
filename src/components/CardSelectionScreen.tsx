@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { getCardSelections } from '../state/game';
+import { getCardSelections } from '../state';
 import { useActions } from './GameContext';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen, Title } from './shared';

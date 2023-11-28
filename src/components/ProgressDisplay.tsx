@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { MAX_WINS, MAX_LOSSES } from '../state/game';
+import { MAX_WINS, MAX_LOSSES } from '../state';
 import { useGame } from './GameContext';
 
 export default function ProgressDisplay() {

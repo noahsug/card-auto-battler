@@ -8,7 +8,7 @@ import {
   getActiveCard,
   getActivePlayer,
   getNonActivePlayer,
-} from './game';
+} from '../';
 
 export const actionKeyDown = () => (game: Game) => {
   game.input.actionKeyDown = true;

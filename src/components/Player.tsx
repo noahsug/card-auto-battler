@@ -4,7 +4,7 @@ import Card from './Card';
 import HealthBar from './HealthBar';
 import { useGame } from './GameContext';
 import { Screen } from './shared';
-import { getIsOpponentTurn, getActiveCard } from '../state/game';
+import { getIsOpponentTurn, getActiveCard } from '../state';
 
 interface Props {
   isOpponent: boolean;
