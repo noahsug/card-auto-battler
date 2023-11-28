@@ -1,6 +1,5 @@
 # Card Auto Battler
 
-- select cards from card reward screen
 - more cards
 - relic reward screen
 - more relics

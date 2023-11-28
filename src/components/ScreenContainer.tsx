@@ -33,4 +33,5 @@ export default function ScreenContainer() {
 const Root = styled.div`
   font-size: 24rem;
   height: 100%;
+  user-select: none;
 `;

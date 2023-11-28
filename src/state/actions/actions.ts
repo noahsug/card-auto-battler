@@ -8,6 +8,8 @@ import {
   getActiveCard,
   getActivePlayer,
   getNonActivePlayer,
+  getOpponentCardsForRound,
+  getRound,
 } from '../';
 
 export const playCard = () => (game: Game) => {
@@ -52,8 +54,11 @@ export const startCardSelection = () => (game: Game) => {
 
 export const startRound = () => (game: Game) => {
   game.screen = 'battle';
+
   game.user.cards = shuffle(game.user.cards);
-  game.opponent.cards = shuffle(game.opponent.cards);
+
+  const opponentCards = getOpponentCardsForRound(getRound(game));
+  game.opponent.cards = shuffle(opponentCards);
 };
 
 export const startGame = () => (game: Game) => {

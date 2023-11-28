@@ -34,30 +34,29 @@ function createInitialPlayer(): Player {
   };
 }
 
-const userDeck = [
-  { text: 'dmg 1' },
-  { text: 'dmg 2' },
-  { text: 'dmg 3' },
-  { text: 'dmg 1' },
-  { text: 'dmg 2' },
-  { text: 'dmg 3' },
+const userCards = [{ text: 'dmg 1' }, { text: 'dmg 2' }, { text: 'dmg 3' }];
+
+const opponentCardsByRound = [
+  [{ text: 'dmg 1' }],
+  [{ text: 'dmg 2' }],
+  [{ text: 'dmg 3' }],
+  [{ text: 'dmg 4' }],
 ];
 
-const opponentDeck = [
-  { text: 'dmg 1' },
-  { text: 'dmg 2' },
-  { text: 'dmg 3' },
-  { text: 'dmg 4' },
-  { text: 'dmg 5' },
-  { text: 'dmg 6' },
-];
+export function getOpponentCardsForRound(round: number) {
+  return opponentCardsByRound[round].slice();
+}
+
+export function getRound(game: Game) {
+  return game.wins + game.losses;
+}
 
 export function createInitialGame(): Game {
   const user = createInitialPlayer();
-  user.cards = userDeck.slice();
+  user.cards = userCards.slice();
 
   const opponent = createInitialPlayer();
-  opponent.cards = opponentDeck.slice();
+  opponent.cards = getOpponentCardsForRound(0);
 
   return {
     user,
