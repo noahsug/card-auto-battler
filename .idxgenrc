@@ -1,0 +1,8 @@
+{
+  "mode": "manual",
+  "indexFile": "index.ts",
+  "extensions": ["ts", "tsx"],
+  "support": {
+    "eslint": true
+  }
+}

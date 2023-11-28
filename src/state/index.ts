@@ -2,6 +2,6 @@
 // idxgen-template export * from './$$';
 
 /* Auto-generated - start - do not modify in this block */
-/* eslint-disable import/prefer-default-export */
-export { default as wait } from './wait';
+export * from './actions';
+export * from './game';
 /* Auto-generated - end */

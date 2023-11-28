@@ -3,5 +3,5 @@
 
 /* Auto-generated - start - do not modify in this block */
 /* eslint-disable import/prefer-default-export */
-export { default as wait } from './wait';
+export * from './types';
 /* Auto-generated - end */
