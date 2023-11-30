@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 
-import { Card as CardState } from '../state';
+import { Card as CardState } from '../gameState';
 
 interface Props {
   card: CardState;

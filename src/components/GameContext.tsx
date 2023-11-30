@@ -1,8 +1,8 @@
 import { createContext, useContext, PropsWithChildren, Dispatch } from 'react';
 import { useImmerReducer } from 'use-immer';
 
-import { Game, createInitialGame } from '../state';
-import * as reduceFnActions from '../state/actions';
+import { Game, createInitialGame } from '../gameState';
+import * as reduceFnActions from '../gameState/actions';
 import { Writable } from '../utils/types';
 
 type ReduceFn = (game: Game) => void;
