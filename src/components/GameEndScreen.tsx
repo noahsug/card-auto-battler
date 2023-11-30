@@ -1,5 +1,5 @@
 import { Screen, Title, Subtitle } from './shared';
-import { MAX_WINS } from '../gameState';
+import { MAX_WINS } from '../state';
 import { useGame, useActions } from './GameContext';
 import ProgressDisplay from './ProgressDisplay';
 

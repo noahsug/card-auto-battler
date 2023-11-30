@@ -6,7 +6,7 @@ import BattleScreen from './BattleScreen';
 import GameEndScreen from './GameEndScreen';
 import RoundEndScreen from './RoundEndScreen';
 import { useGame } from './GameContext';
-import { Screen as ScreenState } from '../gameState';
+import { Screen as ScreenState } from '../state';
 
 type ScreenMapping = {
   [K in ScreenState]: JSX.Element;
