@@ -44,6 +44,8 @@ shuffle deck aniation
    - play all trashed cards
    - play all opponent cards trashed by you
    - immediately played when deck is shuffled
+   - stun 
+   - once per turn
 
 - characters
     - all dmg printed on cards is reduced by 50%, you have lifesteal

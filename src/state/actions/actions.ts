@@ -22,7 +22,7 @@ export const startTurn = () => (game: Game) => {
   nonActivePlayer.health -= dmg;
 };
 
-export const nextTurn = () => (game: Game) => {
+export const endTurn = () => (game: Game) => {
   const activePlayer = getActivePlayer(game);
   activePlayer.activeCardIndex = (activePlayer.activeCardIndex + 1) % activePlayer.cards.length;
 
