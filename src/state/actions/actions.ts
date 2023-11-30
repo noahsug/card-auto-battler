@@ -9,10 +9,11 @@ import {
   getActivePlayer,
   getNonActivePlayer,
   getOpponentCardsForRound,
+  createInitialGame,
   getRound,
 } from '../';
 
-export const playCard = () => (game: Game) => {
+export const startTurn = () => (game: Game) => {
   const activePlayer = getActivePlayer(game);
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getActiveCard(activePlayer);
@@ -63,6 +64,7 @@ export const startRound = () => (game: Game) => {
 
 export const startGame = () => (game: Game) => {
   startCardSelection()(game);
+  game.user.cards = createInitialGame().user.cards;
 
   game.losses = 0;
   game.wins = 0;

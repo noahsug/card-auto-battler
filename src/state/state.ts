@@ -15,12 +15,12 @@ export interface Game {
   user: Player;
   opponent: Player;
   turn: number;
-  screen: Screen;
   wins: number;
   losses: number;
+  screen: Screen;
 }
 
-export const MAX_WINS = 2;
+export const MAX_WINS = 3;
 export const MAX_LOSSES = 2;
 
 function createInitialPlayer(): Player {
@@ -34,13 +34,21 @@ function createInitialPlayer(): Player {
   };
 }
 
-const userCards = [{ text: 'dmg 1' }, { text: 'dmg 2' }, { text: 'dmg 3' }];
+// const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
+const userCards = [{ text: 'dmg 1' }, { text: 'dmg 2' }];
 
 const opponentCardsByRound = [
-  [{ text: 'dmg 1' }],
-  [{ text: 'dmg 2' }],
-  [{ text: 'dmg 3' }],
-  [{ text: 'dmg 4' }],
+  [
+    { text: 'dmg 1' },
+    { text: 'dmg 1' },
+    { text: 'dmg 1' },
+    { text: 'dmg 2' },
+    { text: 'dmg 2' },
+    { text: 'dmg 2' },
+  ], // 5 hits
+  [{ text: 'dmg 0' }, { text: 'dmg 0' }, { text: 'dmg 0' }, { text: 'dmg 3' }, { text: 'dmg 3' }], // 4 hits
+  [{ text: 'dmg 2' }, { text: 'dmg 2' }, { text: 'dmg 3' }, { text: 'dmg 3' }], // 3 hits
+  [{ text: 'dmg 3' }, { text: 'dmg 6' }, { text: 'dmg 9' }], // 2 hits
 ];
 
 export function getOpponentCardsForRound(round: number) {
@@ -62,21 +70,23 @@ export function createInitialGame(): Game {
     user,
     opponent,
     turn: 0,
-    screen: 'game-start',
     wins: 0,
     losses: 0,
+    screen: 'game-start',
   };
 }
 
-export function getCardSelections() {
-  return [
-    { text: 'dmg 5' },
-    { text: 'dmg 6' },
-    { text: 'dmg 7' },
-    { text: 'dmg 8' },
-    { text: 'dmg 9' },
-    { text: 'dmg 10' },
-  ];
+const cardSelectionsByRound: Card[][] = [];
+for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
+  cardSelectionsByRound[i] = [];
+  for (let j = 0; j < 6; j++) {
+    const dmg = Math.round(6 * Math.random() * Math.random());
+    cardSelectionsByRound[i].push({ text: `dmg ${dmg}` });
+  }
+}
+
+export function getCardSelectionsForRound(round: number) {
+  return cardSelectionsByRound[round];
 }
 
 export function getIsOpponentTurn(game: Game) {

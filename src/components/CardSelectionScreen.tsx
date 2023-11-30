@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { getCardSelections } from '../state';
-import { useActions } from './GameContext';
+import { getCardSelectionsForRound, getRound } from '../state';
+import { useGame, useActions } from './GameContext';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen, Title } from './shared';
 import Card from './Card';
 import { wait } from '../utils';
 
 export default function CardSelectionScreen() {
+  const game = useGame();
   const { addCard, startRound } = useActions();
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
 
-  const cards = getCardSelections();
+  const cards = getCardSelectionsForRound(getRound(game));
 
   useEffect(() => {
     let cleanup: Awaited<ReturnType<typeof wait>> | undefined;

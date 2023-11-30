@@ -1,9 +1,66 @@
 # Card Auto Battler
 
+- simple card effects
+   - play card twice
+   - play next card
+   - increase dmg next turn by 2
+   - dodge next dmg
+   - reduce all dmg to 1 next turn
+- UI indicators for card effects
 - more cards
 - relic reward screen
+    - 25% life steal while HP is lower than 50%
+    - upgrades are 2x more likely to be seen
+    - play first each battle twice
+    - deal one dmg at the end of your turn
+    - always get an upgrade option each card selection
+    - Jesus Take the Wheel: card selections made for you at random, double your max HP (you can still pick relics)
 - more relics
-- game engine analysis
+- more enemies
+- more selectable characters
+- game engine analysis 
+
+achievements
+view hero + relics + deck
+shuffle deck aniation
+
+- card effects
+   - heal 
+   - dmg
+   - lifesteal
+   - crit chance
+   - trash card
+   - next turn play card twice if dmg is dealt
+   - play another card
+   - permanent +1 dmg each time used
+   - play card(s) with highest dmg, trash
+   - loose half current HP, all cards have lifesteal, trash
+   - upgrade (replaces lesser version of card w/ same name, happens when playing 2 of the same card?)
+   - dodge
+   - every 5 turns played, gain dodge
+   - upgrades infinitely
+   - play once per turn whenever you heal
+   - adds a wound to your draw pile
+   - play all trashed cards
+   - play all opponent cards trashed by you
+   - immediately played when deck is shuffled
+
+- characters
+    - all dmg printed on cards is reduced by 50%, you have lifesteal
+    - 50% more likely to see cards you already own
+    - can remove a card instead of taking a new card
+    - healing is 50% more effective, dmg is 50% less effective, win if you reach 50 life
+    - instead of dealing dmg, trash cards equal to dmg you would have delt
+    - trash a card each turn, randomly play a trashed card (you still loose when you run out of cards)
+    - dmg shields yourself instead, the game ends on round 10
+    - play two cards per turn, trash cards played
+    - dmg each time dodged
+    - go second, start with better cards
+    - bravest hero: need 10 wins to win, unlocks true ending
+    - thief: play and trash an opponent card at the start of each battle
+    - cards are in alphebetical order
+    - cards are ordered by dmg delt (and random if they deal no dmg)
+    - all cards are played twice, can only play 2 cards per turn
 
 ## Available Scripts
 

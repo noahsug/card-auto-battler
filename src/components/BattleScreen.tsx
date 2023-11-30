@@ -9,7 +9,7 @@ import { Screen } from './shared';
 export default function BattleScreen() {
   const game = useGame();
   const { user, opponent } = game;
-  const { playCard, nextTurn, endRound } = useActions();
+  const { startTurn, nextTurn, endRound } = useActions();
   const [isWaitingToStart, setIsWaitingToStart] = useState(true);
 
   const timeSinceLastAction = useRef(0);
@@ -44,7 +44,7 @@ export default function BattleScreen() {
           timeSinceLastAction.current = 0;
         }
       } else if (currentTimeSinceLastAction === 0) {
-        playCard();
+        startTurn();
       } else if (currentTimeSinceLastAction >= 1000) {
         nextTurn();
         timeSinceLastAction.current = 0;
@@ -55,7 +55,7 @@ export default function BattleScreen() {
     return () => {
       if (handle) cancelAnimationFrame(handle);
     };
-  }, [playCard, nextTurn, user.health, opponent.health, endRound, isWaitingToStart]);
+  }, [startTurn, nextTurn, user.health, opponent.health, endRound, isWaitingToStart]);
 
   return (
     <Screen>
