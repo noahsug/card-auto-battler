@@ -1,9 +1,9 @@
-import { useGame, useActions } from './GameContext';
+import { useGameState, useActions } from './GameStateContext';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen, Title, Subtitle } from './shared';
 
 export default function RoundEndScreen() {
-  const game = useGame();
+  const game = useGameState();
   const { startCardSelection } = useActions();
 
   const { user } = game;

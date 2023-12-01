@@ -2,9 +2,9 @@ import styled from 'styled-components';
 
 import Card from './Card';
 import HealthBar from './HealthBar';
-import { useGame } from './GameContext';
+import { useGameState } from './GameStateContext';
 import { Screen } from './shared';
-import { getIsOpponentTurn, getActiveCard } from '../state';
+import { getIsOpponentTurn, getActiveCard } from '../gameState';
 
 interface Props {
   isOpponent: boolean;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function Player({ isOpponent, forceInactive }: Props) {
-  const game = useGame();
+  const game = useGameState();
   const { opponent, user } = game;
 
   const player = isOpponent ? opponent : user;

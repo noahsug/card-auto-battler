@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-import { useGame, useActions } from './GameContext';
+import { useGameState, useActions } from './GameStateContext';
 import Player from './Player';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen } from './shared';
 
 export default function BattleScreen() {
-  const game = useGame();
+  const game = useGameState();
   const { user, opponent } = game;
   const { startTurn, endTurn, endRound } = useActions();
   const [isWaitingToStart, setIsWaitingToStart] = useState(true);

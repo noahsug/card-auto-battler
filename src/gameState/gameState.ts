@@ -1,29 +1,29 @@
-export interface Card {
+export interface CardState {
   text: string;
 }
 
-export interface Player {
-  cards: Card[];
+export interface PlayerState {
+  cards: CardState[];
   activeCardIndex: number;
   health: number;
   maxHealth: number;
 }
 
-export type Screen = 'game-start' | 'card-selection' | 'battle' | 'round-end' | 'game-end';
+export type ScreenState = 'game-start' | 'card-selection' | 'battle' | 'round-end' | 'game-end';
 
-export interface Game {
-  user: Player;
-  opponent: Player;
+export interface GameState {
+  user: PlayerState;
+  opponent: PlayerState;
   turn: number;
   wins: number;
   losses: number;
-  screen: Screen;
+  screen: ScreenState;
 }
 
 export const MAX_WINS = 3;
 export const MAX_LOSSES = 2;
 
-function createInitialPlayer(): Player {
+function createInitialPlayerState(): PlayerState {
   const maxHealth = 6;
 
   return {
@@ -55,15 +55,15 @@ export function getOpponentCardsForRound(round: number) {
   return opponentCardsByRound[round].slice();
 }
 
-export function getRound(game: Game) {
+export function getRound(game: GameState) {
   return game.wins + game.losses;
 }
 
-export function createInitialGame(): Game {
-  const user = createInitialPlayer();
+export function createInitialGameState(): GameState {
+  const user = createInitialPlayerState();
   user.cards = userCards.slice();
 
-  const opponent = createInitialPlayer();
+  const opponent = createInitialPlayerState();
   opponent.cards = getOpponentCardsForRound(0);
 
   return {
@@ -76,7 +76,7 @@ export function createInitialGame(): Game {
   };
 }
 
-const cardSelectionsByRound: Card[][] = [];
+const cardSelectionsByRound: CardState[][] = [];
 for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
   cardSelectionsByRound[i] = [];
   for (let j = 0; j < 6; j++) {
@@ -89,22 +89,22 @@ export function getCardSelectionsForRound(round: number) {
   return cardSelectionsByRound[round];
 }
 
-export function getIsOpponentTurn(game: Game) {
+export function getIsOpponentTurn(game: GameState) {
   return game.turn % 2 === 1;
 }
 
-export function getActivePlayer(game: Game) {
+export function getActivePlayer(game: GameState) {
   return getIsOpponentTurn(game) ? game.opponent : game.user;
 }
 
-export function getNonActivePlayer(game: Game) {
+export function getNonActivePlayer(game: GameState) {
   return getIsOpponentTurn(game) ? game.user : game.opponent;
 }
 
-export function getActiveCard(playerOrGame: Player | Game) {
-  let player = playerOrGame as Player;
+export function getActiveCard(playerOrGame: PlayerState | GameState) {
+  let player = playerOrGame as PlayerState;
   if (player.activeCardIndex === undefined) {
-    player = getActivePlayer(playerOrGame as Game);
+    player = getActivePlayer(playerOrGame as GameState);
   }
 
   return player.cards[player.activeCardIndex];

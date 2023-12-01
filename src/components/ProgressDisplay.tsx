@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 
-import { MAX_WINS, MAX_LOSSES } from '../state';
-import { useGame } from './GameContext';
+import { MAX_WINS, MAX_LOSSES } from '../gameState';
+import { useGameState } from './GameStateContext';
 
 export default function ProgressDisplay() {
-  const game = useGame();
+  const game = useGameState();
   const { wins, losses } = game;
 
   const winsMessage = `🏆 Wins: ${wins}/${MAX_WINS}`;

@@ -5,8 +5,8 @@ import CardSelectionScreen from './CardSelectionScreen';
 import BattleScreen from './BattleScreen';
 import GameEndScreen from './GameEndScreen';
 import RoundEndScreen from './RoundEndScreen';
-import { useGame } from './GameContext';
-import { Screen as ScreenState } from '../state';
+import { useGameState } from './GameStateContext';
+import { ScreenState } from '../gameState';
 
 type ScreenMapping = {
   [K in ScreenState]: JSX.Element;
@@ -23,7 +23,7 @@ const screenMapping: ScreenMapping = {
 };
 
 export default function ScreenContainer() {
-  const game = useGame();
+  const game = useGameState();
   const { screen } = game;
 
   const screenComponent = screenMapping[screen];

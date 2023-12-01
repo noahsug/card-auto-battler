@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { getCardSelectionsForRound, getRound } from '../state';
-import { useGame, useActions } from './GameContext';
+import { getCardSelectionsForRound, getRound } from '../gameState';
+import { useGameState, useActions } from './GameStateContext';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen, Title } from './shared';
 import Card from './Card';
 import { wait } from '../utils';
 
 export default function CardSelectionScreen() {
-  const game = useGame();
+  const game = useGameState();
   const { addCard, startRound } = useActions();
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
 

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { useActions } from './GameContext';
+import { useActions } from './GameStateContext';
 import { Screen } from './shared';
 
 export default function GameStartScreen() {

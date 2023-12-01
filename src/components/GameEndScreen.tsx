@@ -1,10 +1,10 @@
 import { Screen, Title, Subtitle } from './shared';
-import { MAX_WINS } from '../state';
-import { useGame, useActions } from './GameContext';
+import { MAX_WINS } from '../gameState';
+import { useGameState, useActions } from './GameStateContext';
 import ProgressDisplay from './ProgressDisplay';
 
 export default function GameEndScreen() {
-  const game = useGame();
+  const game = useGameState();
   const { startGame } = useActions();
 
   const { wins } = game;

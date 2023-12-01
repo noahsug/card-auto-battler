@@ -1,14 +1,14 @@
 import styled from 'styled-components';
 
-import { GameProvider } from './GameContext';
+import { GameStateProvider } from './GameStateContext';
 import ScreenContainer from './ScreenContainer';
 
 export default function App() {
   return (
     <Root>
-      <GameProvider>
+      <GameStateProvider>
         <ScreenContainer />
-      </GameProvider>
+      </GameStateProvider>
     </Root>
   );
 }
