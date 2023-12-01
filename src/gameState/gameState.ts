@@ -1,3 +1,20 @@
+export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'round-end' | 'game-end';
+
+export interface Effect {
+  actions?: number;
+  health?: number;
+}
+
+export interface Event {
+  self: PlayerState;
+  selfEffect?: Effect;
+
+  target?: PlayerState;
+  targetEffect?: Effect;
+
+  source?: { card: CardState };
+}
+
 export interface CardState {
   text: string;
 }
@@ -7,9 +24,8 @@ export interface PlayerState {
   activeCardIndex: number;
   health: number;
   maxHealth: number;
+  actions: number;
 }
-
-export type ScreenState = 'game-start' | 'card-selection' | 'battle' | 'round-end' | 'game-end';
 
 export interface GameState {
   user: PlayerState;
@@ -17,7 +33,8 @@ export interface GameState {
   turn: number;
   wins: number;
   losses: number;
-  screen: ScreenState;
+  screen: ScreenName;
+  events: Event[];
 }
 
 export const MAX_WINS = 3;
@@ -31,6 +48,7 @@ function createInitialPlayerState(): PlayerState {
     activeCardIndex: 0,
     health: maxHealth,
     maxHealth,
+    actions: 0,
   };
 }
 
@@ -73,6 +91,7 @@ export function createInitialGameState(): GameState {
     wins: 0,
     losses: 0,
     screen: 'game-start',
+    events: [],
   };
 }
 

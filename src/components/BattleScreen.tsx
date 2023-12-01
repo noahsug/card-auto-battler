@@ -8,7 +8,7 @@ import { Screen } from './shared';
 
 export default function BattleScreen() {
   const game = useGameState();
-  const { user, opponent } = game;
+  const { user, opponent, events } = game;
   const { startTurn, endTurn, endRound } = useActions();
   const [isWaitingToStart, setIsWaitingToStart] = useState(true);
 
@@ -31,6 +31,7 @@ export default function BattleScreen() {
       timeSinceLastAction.current += timestamp - elapsedTime.current;
       elapsedTime.current = timestamp;
 
+      // TODO: rename round -> battle
       const isRoundOver = user.health <= 0 || opponent.health <= 0;
 
       if (isRoundOver) {

@@ -3,6 +3,8 @@ import shuffle from 'lodash/shuffle';
 import {
   GameState,
   CardState,
+  PlayerState,
+  Effect,
   MAX_WINS,
   MAX_LOSSES,
   getActiveCard,
@@ -12,15 +14,49 @@ import {
   createInitialGameState,
   getRound,
 } from '../';
+import { assertIsDefined } from '../../utils';
 
 export const startTurn = () => (gameState: GameState) => {
   const activePlayer = getActivePlayer(gameState);
   const nonActivePlayer = getNonActivePlayer(gameState);
-  const card = getActiveCard(activePlayer);
 
-  const dmg = parseInt(card.text.split(' ')[1], 10);
-  nonActivePlayer.health -= dmg;
+  activePlayer.actions = 1;
+
+  const card = getActiveCard(activePlayer);
+  const damage = parseInt(card.text.split(' ')[1], 10);
+
+  const event = {
+    self: activePlayer,
+    target: nonActivePlayer,
+    targetEffect: {
+      health: -damage,
+    },
+    source: { card },
+  };
+  gameState.events.push(event);
 };
+
+export const processEvent = () => (gameState: GameState) => {
+  const event = gameState.events.shift();
+  assertIsDefined(event);
+
+  if (event.targetEffect) {
+    assertIsDefined(event.target);
+    processEffect(event.target, event.targetEffect);
+  }
+  if (event.selfEffect) {
+    processEffect(event.self, event.selfEffect);
+  }
+};
+
+function processEffect(player: PlayerState, effect: Effect) {
+  if (effect.health) {
+    player.health += effect.health;
+  }
+  if (effect.actions) {
+    player.actions += effect.actions;
+  }
+}
 
 export const endTurn = () => (gameState: GameState) => {
   const activePlayer = getActivePlayer(gameState);

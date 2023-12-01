@@ -6,10 +6,10 @@ import BattleScreen from './BattleScreen';
 import GameEndScreen from './GameEndScreen';
 import RoundEndScreen from './RoundEndScreen';
 import { useGameState } from './GameStateContext';
-import { ScreenState } from '../gameState';
+import { ScreenName } from '../gameState';
 
 type ScreenMapping = {
-  [K in ScreenState]: JSX.Element;
+  [K in ScreenName]: JSX.Element;
 };
 
 const screenMapping: ScreenMapping = {
