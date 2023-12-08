@@ -3,16 +3,12 @@ export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'round-end
 export interface Effect {
   actions?: number;
   health?: number;
+  discard?: number;
 }
 
 export interface Event {
-  self: PlayerState;
-  selfEffect?: Effect;
-
-  target?: PlayerState;
-  targetEffect?: Effect;
-
-  source?: { card: CardState };
+  activePlayerEffect?: Effect;
+  nonActivePlayerEffect?: Effect;
 }
 
 export interface CardState {
@@ -21,7 +17,7 @@ export interface CardState {
 
 export interface PlayerState {
   cards: CardState[];
-  activeCardIndex: number;
+  nextCardIndex: number;
   health: number;
   maxHealth: number;
   actions: number;
@@ -45,7 +41,7 @@ function createInitialPlayerState(): PlayerState {
 
   return {
     cards: [],
-    activeCardIndex: 0,
+    nextCardIndex: 0,
     health: maxHealth,
     maxHealth,
     actions: 0,
@@ -120,11 +116,20 @@ export function getNonActivePlayer(game: GameState) {
   return getIsOpponentTurn(game) ? game.user : game.opponent;
 }
 
-export function getActiveCard(playerOrGame: PlayerState | GameState) {
+export function getNextCard(playerOrGame: PlayerState | GameState) {
   let player = playerOrGame as PlayerState;
-  if (player.activeCardIndex === undefined) {
+  if (player.nextCardIndex === undefined) {
     player = getActivePlayer(playerOrGame as GameState);
   }
 
-  return player.cards[player.activeCardIndex];
+  return player.cards[player.nextCardIndex];
+}
+
+export function getNextEvent(game: GameState) {
+  return game.events[0];
+}
+
+export function canPlayCard(game: GameState) {
+  const activePlayer = getActivePlayer(game);
+  return activePlayer.actions === 0;
 }

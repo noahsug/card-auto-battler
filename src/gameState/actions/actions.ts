@@ -7,45 +7,50 @@ import {
   Effect,
   MAX_WINS,
   MAX_LOSSES,
-  getActiveCard,
+  getNextCard,
   getActivePlayer,
-  getNonActivePlayer,
   getOpponentCardsForRound,
   createInitialGameState,
   getRound,
+  getNonActivePlayer,
+  canPlayCard,
 } from '../';
-import { assertIsDefined } from '../../utils';
+import { assertIsDefined, assert } from '../../utils';
 
 export const startTurn = () => (gameState: GameState) => {
   const activePlayer = getActivePlayer(gameState);
-  const nonActivePlayer = getNonActivePlayer(gameState);
-
   activePlayer.actions = 1;
+};
 
-  const card = getActiveCard(activePlayer);
+export const playCard = () => (gameState: GameState) => {
+  const activePlayer = getActivePlayer(gameState);
+  const card = getNextCard(activePlayer);
+
+  assert(activePlayer.actions > 0);
+  activePlayer.actions -= 1;
+  activePlayer.nextCardIndex = (activePlayer.nextCardIndex + 1) % activePlayer.cards.length;
+
   const damage = parseInt(card.text.split(' ')[1], 10);
 
-  const event = {
-    self: activePlayer,
-    target: nonActivePlayer,
-    targetEffect: {
+  gameState.events.push({
+    nonActivePlayerEffect: {
       health: -damage,
     },
-    source: { card },
-  };
-  gameState.events.push(event);
+  });
 };
 
 export const processEvent = () => (gameState: GameState) => {
   const event = gameState.events.shift();
   assertIsDefined(event);
 
-  if (event.targetEffect) {
-    assertIsDefined(event.target);
-    processEffect(event.target, event.targetEffect);
+  const activePlayer = getActivePlayer(gameState);
+
+  if (event.nonActivePlayerEffect) {
+    const nonActivePlayer = getNonActivePlayer(gameState);
+    processEffect(nonActivePlayer, event.nonActivePlayerEffect);
   }
-  if (event.selfEffect) {
-    processEffect(event.self, event.selfEffect);
+  if (event.activePlayerEffect) {
+    processEffect(activePlayer, event.activePlayerEffect);
   }
 };
 
@@ -59,8 +64,8 @@ function processEffect(player: PlayerState, effect: Effect) {
 }
 
 export const endTurn = () => (gameState: GameState) => {
-  const activePlayer = getActivePlayer(gameState);
-  activePlayer.activeCardIndex = (activePlayer.activeCardIndex + 1) % activePlayer.cards.length;
+  assert(gameState.events.length === 0);
+  assert(!canPlayCard(gameState));
 
   gameState.turn++;
 };
@@ -80,10 +85,10 @@ export const endRound = () => (gameState: GameState) => {
 
 export const startCardSelection = () => (gameState: GameState) => {
   gameState.user.health = gameState.user.maxHealth;
-  gameState.user.activeCardIndex = 0;
+  gameState.user.nextCardIndex = 0;
 
   gameState.opponent.health = gameState.opponent.maxHealth;
-  gameState.opponent.activeCardIndex = 0;
+  gameState.opponent.nextCardIndex = 0;
 
   gameState.turn = 0;
 

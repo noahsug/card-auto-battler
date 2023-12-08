@@ -7,6 +7,7 @@ import ProgressDisplay from './ProgressDisplay';
 import { Screen } from './shared';
 
 export default function BattleScreen() {
+  // TODO: played card local state, process event, etc
   const game = useGameState();
   const { user, opponent, events } = game;
   const { startTurn, endTurn, endRound } = useActions();
