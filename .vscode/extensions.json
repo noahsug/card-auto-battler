@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "styled-components.vscode-styled-components",
+    "orta.vscode-jest",
+    "stylelint.vscode-stylelint",
+    "timonwong.shellcheck"
+  ]
+}
