@@ -131,5 +131,5 @@ export function getNextEvent(game: GameState) {
 
 export function canPlayCard(game: GameState) {
   const activePlayer = getActivePlayer(game);
-  return activePlayer.actions === 0;
+  return activePlayer.actions > 0;
 }

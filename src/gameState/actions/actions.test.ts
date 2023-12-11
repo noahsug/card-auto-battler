@@ -1,4 +1,4 @@
-import { startTurn } from './actions';
+import { endTurn, playCard, processEvent, startGame, startRound, startTurn } from './actions';
 import { GameState, createInitialGameState } from '../';
 
 let game: GameState;
@@ -6,14 +6,17 @@ beforeEach(() => {
   game = createInitialGameState();
 });
 
-describe('startTurn', () => {
-  it('handles damage', () => {
-    game.user.cards = [{ text: 'dmg 1' }];
+it('plays out a round', () => {
+  startGame(game);
+  startRound(game);
 
-    const opponentStartingHealth = game.opponent.health;
+  const startingOpponentHealth = game.opponent.health;
+  game.user.cards = [{ text: 'dmg 1' }];
 
-    startTurn();
+  startTurn(game);
+  playCard(game);
+  processEvent(game);
+  endTurn(game);
 
-    expect(game.opponent.health).toEqual(opponentStartingHealth - 1);
-  });
+  expect(startingOpponentHealth - game.opponent.health).toBe(1);
 });

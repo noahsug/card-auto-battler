@@ -2,13 +2,13 @@ import { createContext, useContext, PropsWithChildren, Dispatch } from 'react';
 import { useImmerReducer } from 'use-immer';
 
 import { GameState, createInitialGameState } from '../gameState';
-import * as reduceFnActions from '../gameState/actions';
+import * as actions from '../gameState/actions';
 import { Writable } from '../utils/types';
 
 type ReduceFn = (gameState: GameState) => void;
-type GetReduceFn = (...args: any[]) => ReduceFn;
-type Actions = {
-  [K in keyof typeof reduceFnActions]: (...args: Parameters<(typeof reduceFnActions)[K]>) => void;
+type Action = (gameState: GameState, ...args: any[]) => void;
+type StatefulActions = {
+  [K in keyof typeof actions]: (...args: Parameters<(typeof actions)[K]>) => void;
 };
 
 const initialGameState = createInitialGameState();
@@ -34,20 +34,21 @@ export function useGameState() {
   return useContext(GameStateContext);
 }
 
-function wrapWithDispatch(
-  getReduceFn: GetReduceFn,
-  dispatch: (reduceFn: ReduceFn) => void,
-): (...args: any[]) => void {
-  return (...args: any[]) => dispatch(getReduceFn(...args));
+// Converts an action from `action(state, ...args)` -> `action(...args)`
+function getStatefulAction(action: Action, dispatch: (reduceFn: ReduceFn) => void) {
+  return (...args: any[]) => {
+    const reduceFn = (gameState: GameState) => action(gameState, ...args);
+    dispatch(reduceFn);
+  };
 }
 
-export function useActions(): Actions {
+export function useActions(): StatefulActions {
   const dispatch = useContext(GameStateDispatchContext);
 
-  const actions = {} as Writable<Actions>;
-  for (const name in reduceFnActions) {
-    const action = reduceFnActions[name as keyof Actions];
-    actions[name as keyof Actions] = wrapWithDispatch(action, dispatch);
+  const statefulActions = {} as Writable<StatefulActions>;
+  for (const name in actions) {
+    const action = actions[name as keyof StatefulActions];
+    statefulActions[name as keyof StatefulActions] = getStatefulAction(action, dispatch);
   }
 
   return actions;
