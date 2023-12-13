@@ -55,6 +55,8 @@ export function startTurn(game: GameState) {
 }
 
 export function playCard(game: GameState) {
+  assert(game.events.length === 0);
+
   const activePlayer = getActivePlayer(game);
   const card = getNextCard(activePlayer);
 

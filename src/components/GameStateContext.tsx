@@ -3,12 +3,12 @@ import { useImmerReducer } from 'use-immer';
 
 import { GameState, createInitialGameState } from '../gameState';
 import * as actions from '../gameState/actions';
-import { Writable } from '../utils/types';
+import { Tail, Writable } from '../utils/types';
 
 type ReduceFn = (gameState: GameState) => void;
 type Action = (gameState: GameState, ...args: any[]) => void;
 type StatefulActions = {
-  [K in keyof typeof actions]: (...args: Parameters<(typeof actions)[K]>) => void;
+  [K in keyof typeof actions]: (...args: Tail<Parameters<(typeof actions)[K]>>) => void;
 };
 
 const initialGameState = createInitialGameState();
@@ -51,5 +51,5 @@ export function useActions(): StatefulActions {
     statefulActions[name as keyof StatefulActions] = getStatefulAction(action, dispatch);
   }
 
-  return actions;
+  return statefulActions;
 }

@@ -16,15 +16,12 @@ export default function CardSelectionScreen() {
   const cards = getCardSelectionsForRound(getRound(game));
 
   useEffect(() => {
-    let cleanup: Awaited<ReturnType<typeof wait>> | undefined;
     (async () => {
       if (selectedCardIndex === null) return;
-      cleanup = await wait(200);
+      await wait(200);
       addCard(cards[selectedCardIndex]);
       startRound();
     })();
-
-    return cleanup;
   }, [selectedCardIndex, startRound, addCard, cards]);
 
   const cardComponents = cards.map((card, i) => {

@@ -6,7 +6,7 @@ beforeEach(() => {
   game = createInitialGameState();
 });
 
-it('plays out a round', () => {
+it('plays a damaging card', () => {
   startGame(game);
   startRound(game);
 
@@ -14,8 +14,10 @@ it('plays out a round', () => {
   game.user.cards = [{ text: 'dmg 1' }];
 
   startTurn(game);
+
   playCard(game);
   processEvent(game);
+
   endTurn(game);
 
   expect(startingOpponentHealth - game.opponent.health).toBe(1);

@@ -133,3 +133,8 @@ export function canPlayCard(game: GameState) {
   const activePlayer = getActivePlayer(game);
   return activePlayer.actions > 0;
 }
+
+export function isRoundOver(game: GameState) {
+  const { user, opponent } = game;
+  return user.health <= 0 || opponent.health <= 0;
+}
