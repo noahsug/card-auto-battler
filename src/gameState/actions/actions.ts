@@ -13,12 +13,13 @@ import {
   createInitialGameState,
   getRound,
   getNonActivePlayer,
-  canPlayCard,
+  getCanPlayCard,
 } from '../';
 import { assertIsDefined, assert } from '../../utils';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
+  startCardSelection(game);
 
   game.losses = 0;
   game.wins = 0;
@@ -99,7 +100,7 @@ function processEffect(player: PlayerState, effect: Effect) {
 
 export function endTurn(game: GameState) {
   assert(game.events.length === 0);
-  assert(!canPlayCard(game));
+  assert(!getCanPlayCard(game));
 
   game.turn++;
 }

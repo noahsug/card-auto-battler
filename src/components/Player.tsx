@@ -8,7 +8,7 @@ import { getIsOpponentTurn, getNextCard } from '../gameState';
 
 interface Props {
   isOpponent: boolean;
-  forceInactive: boolean;
+  forceInactive?: boolean;
 }
 
 export default function Player({ isOpponent, forceInactive }: Props) {

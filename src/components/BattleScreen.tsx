@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { useGameState, useActions } from './GameStateContext';
@@ -6,50 +6,65 @@ import Player from './Player';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen } from './shared';
 import { wait } from '../utils';
-import { getActivePlayer, isRoundOver } from '../gameState';
+import { getActivePlayer, getIsRoundOver } from '../gameState';
 
 export default function BattleScreen() {
-  const [battleStarted, setBattleStarted] = useState(false);
-  // TODO: played card local state, process event, etc
+  // const [cardsPlayed, setCardsPlayed] = useState(0);
+  // const [activeCard, setActiveCard] = useState(null);
+
   const game = useGameState();
   const { startTurn, playCard, processEvent, endTurn, endRound } = useActions();
+  // const battleSequence = useBattleSequence({ cardsPlayed, activeCard, isPaused });
 
-  const { user, opponent, turn, events } = game;
+  const { turn, events } = game;
   const activePlayer = getActivePlayer(game);
-  const isRoundOver = isRoundOver(game);
+  const isRoundOver = getIsRoundOver(game);
 
+  // start the turn when the previous turn ends
   useEffect(() => {
-    if (battleStarted) return;
-    (async () => {
-      await wait(1000);
-      setBattleStarted(true);
-    })();
-  });
-
-  useEffect(() => {
+    console.log('start turn', turn);
     startTurn();
-  }, [startTurn, turn]);
+  }, [turn]);
 
+  // play card
   useEffect(() => {
-    if (events.length === 0) return;
-    (async () => {
-      processEvent();
-      await wait(1000);
-      if (events.length === 0) {
-        if (activePlayer.actions > 0) {
-        }
-      }
-    })();
-  }, [processEvent, events]);
-
-  useEffect(() => {
-    if (user.health <= 0 || opponent.health <= 0) {
+    if (activePlayer.actions > 0 && events.length === 0) {
       (async () => {
         await wait(1000);
+        console.log('play card');
+        playCard();
+      })();
+    }
+  }, [activePlayer.actions, events.length]);
+
+  // process the next event
+  const hasEvents = events.length > 0;
+  useEffect(() => {
+    if (!hasEvents) return;
+    (async () => {
+      for await (const _ of events) {
+        console.log('process event');
+        processEvent();
+        await wait(1000);
+      }
+      if (activePlayer.actions === 0) {
+        console.log('end turn');
+        endTurn();
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasEvents]);
+
+  // end the battle when a player has died
+  useEffect(() => {
+    if (isRoundOver) {
+      (async () => {
+        await wait(1000);
+        console.log('end round');
         endRound();
       })();
     }
-  }, [endRound, opponent.health, user.health]);
+  }, [isRoundOver]);
 
   //     // TODO: rename round -> battle
   //     const isRoundOver = user.health <= 0 || opponent.health <= 0;
@@ -76,9 +91,9 @@ export default function BattleScreen() {
   return (
     <Screen>
       <ProgressDisplay />
-      <Player isOpponent={true} forceInactive={isWaitingToStart} />
+      <Player isOpponent={true} />
       <Divider />
-      <Player isOpponent={false} forceInactive={isWaitingToStart} />
+      <Player isOpponent={false} />
     </Screen>
   );
 }

@@ -129,12 +129,12 @@ export function getNextEvent(game: GameState) {
   return game.events[0];
 }
 
-export function canPlayCard(game: GameState) {
+export function getCanPlayCard(game: GameState) {
   const activePlayer = getActivePlayer(game);
   return activePlayer.actions > 0;
 }
 
-export function isRoundOver(game: GameState) {
+export function getIsRoundOver(game: GameState) {
   const { user, opponent } = game;
   return user.health <= 0 || opponent.health <= 0;
 }
