@@ -24,7 +24,7 @@ export default function BattleScreen() {
   useEffect(() => {
     console.log('start turn', turn);
     startTurn();
-  }, [turn]);
+  }, [turn, startTurn]);
 
   // play card
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function BattleScreen() {
         playCard();
       })();
     }
-  }, [activePlayer.actions, events.length]);
+  }, [activePlayer.actions, events.length, playCard]);
 
   // process the next event
   const hasEvents = events.length > 0;
@@ -53,7 +53,7 @@ export default function BattleScreen() {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasEvents]);
+  }, [hasEvents, processEvent, endTurn]);
 
   // end the battle when a player has died
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function BattleScreen() {
         endRound();
       })();
     }
-  }, [isRoundOver]);
+  }, [endRound, isRoundOver]);
 
   //     // TODO: rename round -> battle
   //     const isRoundOver = user.health <= 0 || opponent.health <= 0;

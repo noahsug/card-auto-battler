@@ -1,4 +1,4 @@
-import { createContext, useContext, PropsWithChildren, Dispatch } from 'react';
+import { createContext, useContext, PropsWithChildren, Dispatch, useMemo } from 'react';
 import { useImmerReducer } from 'use-immer';
 
 import { GameState, createInitialGameState } from '../gameState';
@@ -45,11 +45,13 @@ function getStatefulAction(action: Action, dispatch: (reduceFn: ReduceFn) => voi
 export function useActions(): StatefulActions {
   const dispatch = useContext(GameStateDispatchContext);
 
-  const statefulActions = {} as Writable<StatefulActions>;
-  for (const name in actions) {
-    const action = actions[name as keyof StatefulActions];
-    statefulActions[name as keyof StatefulActions] = getStatefulAction(action, dispatch);
-  }
+  return useMemo(() => {
+    const statefulActions = {} as Writable<StatefulActions>;
+    for (const name in actions) {
+      const action = actions[name as keyof StatefulActions];
+      statefulActions[name as keyof StatefulActions] = getStatefulAction(action, dispatch);
+    }
 
-  return statefulActions;
+    return statefulActions;
+  }, [dispatch]);
 }
