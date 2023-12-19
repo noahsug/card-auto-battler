@@ -7,7 +7,6 @@ import { Screen } from './shared';
 import { getIsRoundOver } from '../gameState';
 import { wait } from '../utils';
 import useSequence from '../hooks/useSequence';
-import { useCallback } from 'react';
 
 export default function BattleScreen() {
   const game = useGameState();
@@ -16,14 +15,19 @@ export default function BattleScreen() {
   const isRoundOver = getIsRoundOver(game);
 
   useSequence([
-    useCallback(() => {
+    () => wait(500),
+    () => {
       startTurn();
       playCard();
       processEvent();
-      return wait(1000);
-    }, [startTurn, playCard, processEvent]),
-    useCallback(() => isRoundOver && endRound(), [isRoundOver, endRound]),
-    useCallback(() => endTurn(), [endTurn]),
+      return wait(500);
+    },
+    () => {
+      if (!isRoundOver) return;
+      endRound();
+      return wait(500);
+    },
+    () => endTurn(),
   ]);
 
   return (

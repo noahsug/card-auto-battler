@@ -1,34 +1,27 @@
-import { useState, useEffect } from 'react';
-import { act } from 'react-dom/test-utils';
+import { useState, useEffect, useRef } from 'react';
 
 export default function useSequencer(actions) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRunningAction, setIsRunningAction] = useState(false);
 
-  useEffect(() => {
-    let isFinished = false;
+  const actionsRef = useRef(actions);
+  actionsRef.current = actions;
 
+  useEffect(() => {
     (async () => {
-      if (actions.length === 0) return;
+      if (actionsRef.current.length === 0) return;
       if (isRunningAction) return;
 
-      if (currentIndex > actions.length) {
+      if (currentIndex > actionsRef.current.length) {
         setCurrentIndex(0);
         return;
       }
 
       setIsRunningAction(true);
-      console.log('running', currentIndex);
-      await actions[currentIndex]();
-      // if (isFinished) return;
+      await actionsRef.current[currentIndex]();
 
-      setCurrentIndex((currentIndex + 1) % actions.length);
+      setCurrentIndex((currentIndex + 1) % actionsRef.current.length);
       setIsRunningAction(false);
     })();
-
-    return () => {
-      console.log('cleanup');
-      isFinished = true;
-    };
-  }, [currentIndex, actions, isRunningAction]);
+  }, [currentIndex, isRunningAction]);
 }
