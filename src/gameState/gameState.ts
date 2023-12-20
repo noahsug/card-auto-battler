@@ -37,7 +37,7 @@ function createInitialPlayerState(): PlayerState {
 }
 
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
-const userCards = [{ text: 'dmg 1' }];
+const userCards = [{ text: 'dmg 1, actions 1' }];
 
 const opponentCardsByRound = [
   [

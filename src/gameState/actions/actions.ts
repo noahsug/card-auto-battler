@@ -63,8 +63,17 @@ export function playCard(game: GameState) {
   activePlayer.actions -= 1;
   activePlayer.nextCardIndex = (activePlayer.nextCardIndex + 1) % activePlayer.cards.length;
 
-  const damage = parseInt(card.text.split(' ')[1], 10);
-  dealDamage({ target: nonActivePlayer, damage });
+  const damageText = card.text.match(/dmg (\d+)/)?.at(1);
+  if (damageText != null) {
+    const damage = Number(damageText);
+    dealDamage({ target: nonActivePlayer, damage });
+  }
+
+  const actionsText = card.text.match(/actions (\d+)/)?.at(1);
+  if (actionsText != null) {
+    const actions = Number(actionsText);
+    activePlayer.actions += actions;
+  }
 }
 
 function dealDamage({ target, damage }: { target: PlayerState; damage: number }) {
