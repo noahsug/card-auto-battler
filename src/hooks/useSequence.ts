@@ -1,27 +1,27 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function useSequencer(actions) {
+export default function useSequencer(actions: Array<() => unknown>) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isRunningAction, setIsRunningAction] = useState(false);
 
+  const isRunningAction = useRef(false);
   const actionsRef = useRef(actions);
   actionsRef.current = actions;
 
   useEffect(() => {
     (async () => {
       if (actionsRef.current.length === 0) return;
-      if (isRunningAction) return;
+      if (isRunningAction.current) return;
 
       if (currentIndex > actionsRef.current.length) {
         setCurrentIndex(0);
         return;
       }
 
-      setIsRunningAction(true);
+      isRunningAction.current = true;
       await actionsRef.current[currentIndex]();
 
       setCurrentIndex((currentIndex + 1) % actionsRef.current.length);
-      setIsRunningAction(false);
+      isRunningAction.current = false;
     })();
-  }, [currentIndex, isRunningAction]);
+  }, [currentIndex]);
 }
