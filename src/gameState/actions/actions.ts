@@ -4,7 +4,6 @@ import {
   GameState,
   CardState,
   PlayerState,
-  Effect,
   MAX_WINS,
   MAX_LOSSES,
   getNextCard,
@@ -15,7 +14,7 @@ import {
   getNonActivePlayer,
   getCanPlayCard,
 } from '../';
-import { assertIsDefined, assert } from '../../utils';
+import { assert } from '../../utils';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
@@ -56,9 +55,8 @@ export function startTurn(game: GameState) {
 }
 
 export function playCard(game: GameState) {
-  assert(game.events.length === 0);
-
   const activePlayer = getActivePlayer(game);
+  const nonActivePlayer = getNonActivePlayer(game);
   const card = getNextCard(activePlayer);
 
   assert(activePlayer.actions > 0);
@@ -66,45 +64,20 @@ export function playCard(game: GameState) {
   activePlayer.nextCardIndex = (activePlayer.nextCardIndex + 1) % activePlayer.cards.length;
 
   const damage = parseInt(card.text.split(' ')[1], 10);
-
-  game.events.push({
-    nonActivePlayerEffect: {
-      health: -damage,
-    },
-  });
+  dealDamage({ target: nonActivePlayer, damage });
 }
 
-export function processEvent(game: GameState) {
-  const event = game.events.shift();
-  assertIsDefined(event);
-
-  const activePlayer = getActivePlayer(game);
-
-  if (event.nonActivePlayerEffect) {
-    const nonActivePlayer = getNonActivePlayer(game);
-    processEffect(nonActivePlayer, event.nonActivePlayerEffect);
-  }
-  if (event.activePlayerEffect) {
-    processEffect(activePlayer, event.activePlayerEffect);
-  }
-}
-
-function processEffect(player: PlayerState, effect: Effect) {
-  if (effect.health) {
-    player.health += effect.health;
-  }
-  if (effect.actions) {
-    player.actions += effect.actions;
-  }
+function dealDamage({ target, damage }: { target: PlayerState; damage: number }) {
+  target.health -= damage;
 }
 
 export function endTurn(game: GameState) {
-  assert(game.events.length === 0);
   assert(!getCanPlayCard(game));
 
   game.turn++;
 }
 
+// TODO: rename to endBattle
 export function endRound(game: GameState) {
   if (game.user.health <= 0) {
     game.losses++;

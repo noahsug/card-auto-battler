@@ -1,16 +1,5 @@
 export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'round-end' | 'game-end';
 
-export interface Effect {
-  actions?: number;
-  health?: number;
-  discard?: number;
-}
-
-export interface Event {
-  activePlayerEffect?: Effect;
-  nonActivePlayerEffect?: Effect;
-}
-
 export interface CardState {
   text: string;
 }
@@ -30,7 +19,6 @@ export interface GameState {
   wins: number;
   losses: number;
   screen: ScreenName;
-  events: Event[];
 }
 
 export const MAX_WINS = 3;
@@ -49,7 +37,7 @@ function createInitialPlayerState(): PlayerState {
 }
 
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
-const userCards = [{ text: 'dmg 1' }, { text: 'dmg 2' }];
+const userCards = [{ text: 'dmg 1' }];
 
 const opponentCardsByRound = [
   [
@@ -87,7 +75,6 @@ export function createInitialGameState(): GameState {
     wins: 0,
     losses: 0,
     screen: 'game-start',
-    events: [],
   };
 }
 
@@ -123,10 +110,6 @@ export function getNextCard(playerOrGame: PlayerState | GameState) {
   }
 
   return player.cards[player.nextCardIndex];
-}
-
-export function getNextEvent(game: GameState) {
-  return game.events[0];
 }
 
 export function getCanPlayCard(game: GameState) {

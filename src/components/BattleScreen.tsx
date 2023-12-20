@@ -10,7 +10,7 @@ import useSequence from '../hooks/useSequence';
 
 export default function BattleScreen() {
   const game = useGameState();
-  const { startTurn, playCard, processEvent, endTurn, endRound } = useActions();
+  const { startTurn, playCard, endTurn, endRound } = useActions();
 
   const isRoundOver = getIsRoundOver(game);
 
@@ -19,13 +19,13 @@ export default function BattleScreen() {
     () => {
       startTurn();
       playCard();
-      processEvent();
       return wait(500);
     },
     () => {
-      if (!isRoundOver) return;
-      endRound();
-      return wait(500);
+      if (isRoundOver) {
+        endRound();
+        return wait(500);
+      }
     },
     () => endTurn(),
   ]);
