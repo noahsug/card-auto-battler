@@ -4,31 +4,48 @@ import { useGameState, useActions } from './GameStateContext';
 import Player from './Player';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen } from './shared';
-import { getIsRoundOver } from '../gameState';
+import { getCanPlayCard, getIsRoundOver } from '../gameState';
 import { wait } from '../utils';
 import useSequence from '../hooks/useSequence';
+import type { Sequence } from '../hooks/useSequence';
+import { useMemo } from 'react';
 
 export default function BattleScreen() {
   const game = useGameState();
   const { startTurn, playCard, endTurn, endRound } = useActions();
 
   const isRoundOver = getIsRoundOver(game);
+  const canPlayCard = getCanPlayCard(game);
 
-  useSequence([
-    () => wait(500),
-    () => {
+  const sequence: Sequence = useMemo(() => {
+    function startTurnSequence() {
       startTurn();
+    }
+
+    function playCardSequence() {
       playCard();
       return wait(500);
-    },
-    () => {
-      if (isRoundOver) {
-        endRound();
-        return wait(500);
-      }
-    },
-    () => endTurn(),
-  ]);
+    }
+
+    return [
+      () => wait(500),
+      startTurnSequence,
+      playCardSequence,
+      (run) => {
+        if (isRoundOver) {
+          endRound();
+          return wait(500);
+        } else if (canPlayCard) {
+          run(playCardSequence);
+        } else {
+          endTurn();
+          run(startTurnSequence);
+        }
+      },
+    ];
+  }, [isRoundOver, canPlayCard, endRound, endTurn, startTurn, playCard]);
+
+  useSequence(sequence);
 
   return (
     <Screen>

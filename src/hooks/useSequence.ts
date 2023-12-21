@@ -1,27 +1,37 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function useSequencer(actions: Array<() => unknown>) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+type Run = (sequenceFunction: SequenceFunction) => unknown;
+export type SequenceFunction = (run: Run) => unknown;
+export type Sequence = SequenceFunction[];
 
-  const isRunningAction = useRef(false);
-  const actionsRef = useRef(actions);
-  actionsRef.current = actions;
+export default function useSequence(sequenceFunctions: Sequence) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const isRunningSequenceFunction = useRef(false);
 
   useEffect(() => {
+    const run: Run = (sequenceFunction: SequenceFunction) => {
+      if (!isRunningSequenceFunction.current)
+        throw new Error('useSequence: run called outside of sequence function');
+
+      const nextsequenceFunctionIndex = sequenceFunctions.indexOf(sequenceFunction);
+      if (nextsequenceFunctionIndex === -1)
+        throw new Error('useSequence: run called with invalid sequence function');
+
+      setCurrentIndex(nextsequenceFunctionIndex - 1);
+    };
+
     (async () => {
-      if (actionsRef.current.length === 0) return;
-      if (isRunningAction.current) return;
+      if (sequenceFunctions.length === 0) return;
+      if (isRunningSequenceFunction.current) return;
+      if (currentIndex > sequenceFunctions.length) return;
 
-      if (currentIndex > actionsRef.current.length) {
-        setCurrentIndex(0);
-        return;
-      }
+      isRunningSequenceFunction.current = true;
+      await sequenceFunctions[currentIndex](run);
 
-      isRunningAction.current = true;
-      await actionsRef.current[currentIndex]();
-
-      setCurrentIndex((currentIndex + 1) % actionsRef.current.length);
-      isRunningAction.current = false;
+      setCurrentIndex((index) => {
+        isRunningSequenceFunction.current = false;
+        return index + 1;
+      });
     })();
-  }, [currentIndex]);
+  }, [currentIndex, sequenceFunctions]);
 }
