@@ -4,18 +4,24 @@ import { useGameState, useActions } from './GameStateContext';
 import Player from './Player';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen } from './shared';
-import { getCanPlayCard, getIsRoundOver } from '../gameState';
+import { CardState, getCanPlayCard, getCurrentCard, getIsBattleOver } from '../gameState';
 import { wait } from '../utils';
 import useSequence from '../hooks/useSequence';
 import type { Sequence } from '../hooks/useSequence';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { getIsOpponentTurn } from '../gameState/gameState';
 
 export default function BattleScreen() {
   const game = useGameState();
-  const { startTurn, playCard, endTurn, endRound } = useActions();
+  const { startTurn, playCard, endTurn, endBattle } = useActions();
+  const [activePlayerCard, setActivePlayerCard] = useState<
+    { card: CardState; isOpponentCard: boolean } | undefined
+  >();
 
-  const isRoundOver = getIsRoundOver(game);
+  const isBattleOver = getIsBattleOver(game);
   const canPlayCard = getCanPlayCard(game);
+  const currentCard = getCurrentCard(game);
+  const isOpponentTurn = getIsOpponentTurn(game);
 
   const sequence: Sequence = useMemo(() => {
     function startTurnSequence() {
@@ -23,8 +29,9 @@ export default function BattleScreen() {
     }
 
     function playCardSequence() {
+      setActivePlayerCard({ card: currentCard, isOpponentCard: isOpponentTurn });
       playCard();
-      return wait(500);
+      return wait(2000);
     }
 
     return [
@@ -32,9 +39,9 @@ export default function BattleScreen() {
       startTurnSequence,
       playCardSequence,
       (run) => {
-        if (isRoundOver) {
-          endRound();
-          return wait(500);
+        if (isBattleOver) {
+          endBattle();
+          return wait(750);
         } else if (canPlayCard) {
           run(playCardSequence);
         } else {
@@ -43,16 +50,29 @@ export default function BattleScreen() {
         }
       },
     ];
-  }, [isRoundOver, canPlayCard, endRound, endTurn, startTurn, playCard]);
+  }, [
+    startTurn,
+    currentCard,
+    isOpponentTurn,
+    playCard,
+    isBattleOver,
+    canPlayCard,
+    endBattle,
+    endTurn,
+  ]);
 
   useSequence(sequence);
+
+  const [activeUserCard, activeOpponentCard] = activePlayerCard?.isOpponentCard
+    ? [undefined, activePlayerCard.card]
+    : [activePlayerCard?.card, undefined];
 
   return (
     <Screen>
       <ProgressDisplay />
-      <Player isOpponent={true} />
+      <Player isOpponent={true} activeCard={activeOpponentCard} />
       <Divider />
-      <Player isOpponent={false} />
+      <Player isOpponent={false} activeCard={activeUserCard} />
     </Screen>
   );
 }

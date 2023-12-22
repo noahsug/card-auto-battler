@@ -4,7 +4,7 @@ import GameStartScreen from './GameStartScreen';
 import CardSelectionScreen from './CardSelectionScreen';
 import BattleScreen from './BattleScreen';
 import GameEndScreen from './GameEndScreen';
-import RoundEndScreen from './RoundEndScreen';
+import BattleEndScreen from './BattleEndScreen';
 import { useGameState } from './GameStateContext';
 import { ScreenName } from '../gameState';
 
@@ -18,7 +18,7 @@ const screenMapping: ScreenMapping = {
   'game-start': <GameStartScreen />,
   'card-selection': <CardSelectionScreen />,
   battle: <BattleScreen />,
-  'round-end': <RoundEndScreen />,
+  'battle-end': <BattleEndScreen />,
   'game-end': <GameEndScreen />,
 };
 

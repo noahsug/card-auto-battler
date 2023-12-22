@@ -2,7 +2,7 @@ import { useGameState, useActions } from './GameStateContext';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen, Title, Subtitle } from './shared';
 
-export default function RoundEndScreen() {
+export default function BattleEndScreen() {
   const game = useGameState();
   const { startCardSelection } = useActions();
 

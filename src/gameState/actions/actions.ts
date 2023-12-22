@@ -6,11 +6,11 @@ import {
   PlayerState,
   MAX_WINS,
   MAX_LOSSES,
-  getNextCard,
+  getCurrentCard,
   getActivePlayer,
-  getOpponentCardsForRound,
+  getOpponentCardsForBattle,
   createInitialGameState,
-  getRound,
+  getBattle,
   getNonActivePlayer,
   getCanPlayCard,
 } from '../';
@@ -26,10 +26,10 @@ export function startGame(game: GameState) {
 
 export function startCardSelection(game: GameState) {
   game.user.health = game.user.maxHealth;
-  game.user.nextCardIndex = 0;
+  game.user.currentCardIndex = 0;
 
   game.opponent.health = game.opponent.maxHealth;
-  game.opponent.nextCardIndex = 0;
+  game.opponent.currentCardIndex = 0;
 
   game.turn = 0;
 
@@ -40,12 +40,12 @@ export function addCard(game: GameState, card: CardState) {
   game.user.cards.push(card);
 }
 
-export function startRound(game: GameState) {
+export function startBattle(game: GameState) {
   game.screen = 'battle';
 
   game.user.cards = shuffle(game.user.cards);
 
-  const opponentCards = getOpponentCardsForRound(getRound(game));
+  const opponentCards = getOpponentCardsForBattle(getBattle(game));
   game.opponent.cards = shuffle(opponentCards);
 }
 
@@ -57,11 +57,11 @@ export function startTurn(game: GameState) {
 export function playCard(game: GameState) {
   const activePlayer = getActivePlayer(game);
   const nonActivePlayer = getNonActivePlayer(game);
-  const card = getNextCard(activePlayer);
+  const card = getCurrentCard(activePlayer);
 
   assert(activePlayer.actions > 0);
   activePlayer.actions -= 1;
-  activePlayer.nextCardIndex = (activePlayer.nextCardIndex + 1) % activePlayer.cards.length;
+  activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
   const damageText = card.text.match(/dmg (\d+)/)?.at(1);
   if (damageText != null) {
@@ -86,15 +86,14 @@ export function endTurn(game: GameState) {
   game.turn++;
 }
 
-// TODO: rename to endBattle
-export function endRound(game: GameState) {
+export function endBattle(game: GameState) {
   if (game.user.health <= 0) {
     game.losses++;
   } else if (game.opponent.health <= 0) {
     game.wins++;
   } else {
-    throw new Error('endRound called, but neither player is dead');
+    throw new Error('endBattle called, but neither player is dead');
   }
 
-  game.screen = game.wins >= MAX_WINS || game.losses >= MAX_LOSSES ? 'game-end' : 'round-end';
+  game.screen = game.wins >= MAX_WINS || game.losses >= MAX_LOSSES ? 'game-end' : 'battle-end';
 }

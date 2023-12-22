@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-type Run = (sequenceFunction: SequenceFunction) => unknown;
+type Run = (sequenceFunction: SequenceFunction) => void;
 export type SequenceFunction = (run: Run) => unknown;
 export type Sequence = SequenceFunction[];
 
@@ -13,11 +13,13 @@ export default function useSequence(sequenceFunctions: Sequence) {
       if (!isRunningSequenceFunction.current)
         throw new Error('useSequence: run called outside of sequence function');
 
-      const nextsequenceFunctionIndex = sequenceFunctions.indexOf(sequenceFunction);
-      if (nextsequenceFunctionIndex === -1)
+      const nextIndex = sequenceFunctions.indexOf(sequenceFunction);
+      if (nextIndex === -1)
         throw new Error('useSequence: run called with invalid sequence function');
 
-      setCurrentIndex(nextsequenceFunctionIndex - 1);
+      // set index one before what we want, since the index is incremented once the current
+      // sequence function finishes.
+      setCurrentIndex(nextIndex - 1);
     };
 
     (async () => {

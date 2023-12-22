@@ -4,29 +4,26 @@ import Card from './Card';
 import HealthBar from './HealthBar';
 import { useGameState } from './GameStateContext';
 import { Screen } from './shared';
-import { getIsOpponentTurn, getNextCard } from '../gameState';
+import { getCurrentCard, CardState } from '../gameState';
 
 interface Props {
   isOpponent: boolean;
-  forceInactive?: boolean;
+  activeCard?: CardState;
 }
 
-export default function Player({ isOpponent, forceInactive }: Props) {
+export default function Player({ isOpponent, activeCard }: Props) {
   const game = useGameState();
   const { opponent, user } = game;
 
   const player = isOpponent ? opponent : user;
   const { health, maxHealth } = player;
 
-  const isOpponentTurn = getIsOpponentTurn(game);
-  const isActive = !forceInactive && (isOpponent ? isOpponentTurn : !isOpponentTurn);
-
-  const card = getNextCard(player);
+  const card = activeCard || getCurrentCard(player);
 
   return (
     <Root>
       <CardContainer>
-        <Card card={card} isActive={isActive} />
+        <Card card={card} isActive={!!activeCard} />
       </CardContainer>
       <HealthBar health={health} maxHealth={maxHealth} />
     </Root>
