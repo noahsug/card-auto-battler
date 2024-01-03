@@ -9,6 +9,7 @@ export default function useSequence(sequenceFunctions: Sequence) {
   const isRunningSequenceFunction = useRef(false);
 
   useEffect(() => {
+    // TODO: rename run to goTo
     const run: Run = (sequenceFunction: SequenceFunction) => {
       if (!isRunningSequenceFunction.current)
         throw new Error('useSequence: run called outside of sequence function');
@@ -17,7 +18,7 @@ export default function useSequence(sequenceFunctions: Sequence) {
       if (nextIndex === -1)
         throw new Error('useSequence: run called with invalid sequence function');
 
-      // set index one before what we want, since the index is incremented once the current
+      // set index one before what we want, since the index is incremented when the current
       // sequence function finishes.
       setCurrentIndex(nextIndex - 1);
     };

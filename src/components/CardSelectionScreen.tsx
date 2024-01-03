@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { getCardSelectionsForBattle, getBattle } from '../gameState';
@@ -7,22 +7,45 @@ import ProgressDisplay from './ProgressDisplay';
 import { Screen, Title } from './shared';
 import Card from './Card';
 import { wait } from '../utils';
+import useSequence from '../hooks/useSequence';
+import type { Sequence } from '../hooks/useSequence';
+
+const CARDS_TO_SELECT = 2;
 
 export default function CardSelectionScreen() {
   const game = useGameState();
   const { addCard, startBattle } = useActions();
-  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
+  const [selectedCardIndexes, setSelectedCardIndexes] = useState(new Set<number>());
 
   const cards = getCardSelectionsForBattle(getBattle(game));
+  const canAddCards = selectedCardIndexes.size < CARDS_TO_SELECT;
 
-  useEffect(() => {
-    (async () => {
-      if (selectedCardIndex === null) return;
-      await wait(200);
-      addCard(cards[selectedCardIndex]);
-      startBattle();
-    })();
-  }, [selectedCardIndex, startBattle, addCard, cards]);
+  const startBattleSequence: Sequence = useMemo(
+    () => [
+      () => wait(200),
+      () => {
+        selectedCardIndexes.forEach((index) => addCard(cards[index]));
+        startBattle();
+      },
+    ],
+    [addCard, cards, selectedCardIndexes, startBattle],
+  );
+
+  useSequence(canAddCards ? [] : startBattleSequence);
+
+  function selectCard(index: number) {
+    if (!canAddCards) return;
+
+    setSelectedCardIndexes((prev) => {
+      const result = new Set(prev);
+      if (result.has(index)) {
+        result.delete(index);
+      } else {
+        result.add(index);
+      }
+      return result;
+    });
+  }
 
   const cardComponents = cards.map((card, i) => {
     return (
@@ -30,8 +53,8 @@ export default function CardSelectionScreen() {
         key={i}
         card={card}
         scale={0.75}
-        onClick={() => setSelectedCardIndex(i)}
-        isActive={i === selectedCardIndex}
+        onClick={() => selectCard(i)}
+        isActive={selectedCardIndexes.has(i)}
       />
     );
   });
