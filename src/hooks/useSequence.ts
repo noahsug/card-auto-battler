@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
-type Run = (sequenceFunction: SequenceFunction) => void;
-export type SequenceFunction = (run: Run) => unknown;
+type GoTo = (sequenceFunction: SequenceFunction) => void;
+export type SequenceFunction = (goTo: GoTo) => unknown;
 export type Sequence = SequenceFunction[];
 
 export default function useSequence(sequenceFunctions: Sequence) {
@@ -9,8 +9,7 @@ export default function useSequence(sequenceFunctions: Sequence) {
   const isRunningSequenceFunction = useRef(false);
 
   useEffect(() => {
-    // TODO: rename run to goTo
-    const run: Run = (sequenceFunction: SequenceFunction) => {
+    const goTo: GoTo = (sequenceFunction: SequenceFunction) => {
       if (!isRunningSequenceFunction.current)
         throw new Error('useSequence: run called outside of sequence function');
 
@@ -29,7 +28,7 @@ export default function useSequence(sequenceFunctions: Sequence) {
       if (currentIndex > sequenceFunctions.length) return;
 
       isRunningSequenceFunction.current = true;
-      await sequenceFunctions[currentIndex](run);
+      await sequenceFunctions[currentIndex](goTo);
 
       setCurrentIndex((index) => {
         isRunningSequenceFunction.current = false;

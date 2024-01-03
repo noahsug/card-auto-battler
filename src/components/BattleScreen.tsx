@@ -23,7 +23,7 @@ export default function BattleScreen() {
   const currentCard = getCurrentCard(game);
   const isOpponentTurn = getIsOpponentTurn(game);
 
-  const sequence: Sequence = useMemo(() => {
+  const battleSequence: Sequence = useMemo(() => {
     function startTurnSequence() {
       startTurn();
     }
@@ -38,15 +38,15 @@ export default function BattleScreen() {
       () => wait(500),
       startTurnSequence,
       playCardSequence,
-      (run) => {
+      (goTo) => {
         if (isBattleOver) {
           endBattle();
           return wait(500);
         } else if (canPlayCard) {
-          run(playCardSequence);
+          goTo(playCardSequence);
         } else {
           endTurn();
-          run(startTurnSequence);
+          goTo(startTurnSequence);
         }
       },
     ];
@@ -61,7 +61,7 @@ export default function BattleScreen() {
     endTurn,
   ]);
 
-  useSequence(sequence);
+  useSequence(battleSequence);
 
   const [activeUserCard, activeOpponentCard] = activePlayerCard?.isOpponentCard
     ? [undefined, activePlayerCard.card]
