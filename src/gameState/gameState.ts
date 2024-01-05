@@ -4,12 +4,18 @@ export interface CardState {
   text: string;
 }
 
+export interface Effects {
+  bleed: number;
+  extraCardPlays: number;
+}
+
 export interface PlayerState {
   cards: CardState[];
   currentCardIndex: number;
   health: number;
   maxHealth: number;
-  actions: number;
+  cardsPlayed: number;
+  effects: Effects;
 }
 
 export interface GameState {
@@ -21,8 +27,15 @@ export interface GameState {
   screen: ScreenName;
 }
 
+export const EMPTY_EFFECTS: Effects = {
+  bleed: 0,
+  extraCardPlays: 0,
+};
+
 export const MAX_WINS = 3;
 export const MAX_LOSSES = 2;
+
+export const BLEED_DAMAGE = 3;
 
 function createInitialPlayerState(): PlayerState {
   const maxHealth = 6;
@@ -32,12 +45,16 @@ function createInitialPlayerState(): PlayerState {
     currentCardIndex: 0,
     health: maxHealth,
     maxHealth,
-    actions: 0,
+    cardsPlayed: 0,
+    effects: {
+      bleed: 0,
+      extraCardPlays: 0,
+    },
   };
 }
 
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
-const userCards = [{ text: 'dmg 1, actions 1' }];
+const userCards = [{ text: 'dmg 1, bleed 2' }];
 
 const opponentCardsByBattle = [
   [
@@ -114,7 +131,7 @@ export function getCurrentCard(playerOrGame: PlayerState | GameState) {
 
 export function getCanPlayCard(game: GameState) {
   const activePlayer = getActivePlayer(game);
-  return activePlayer.actions > 0;
+  return activePlayer.cardsPlayed === 0 || activePlayer.effects.extraCardPlays > 0;
 }
 
 export function getIsBattleOver(game: GameState) {

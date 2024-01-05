@@ -13,6 +13,7 @@ import {
   getBattle,
   getNonActivePlayer,
   getCanPlayCard,
+  EMPTY_EFFECTS,
 } from '../';
 import { assert } from '../../utils';
 
@@ -25,12 +26,6 @@ export function startGame(game: GameState) {
 }
 
 export function startCardSelection(game: GameState) {
-  game.user.health = game.user.maxHealth;
-  game.user.currentCardIndex = 0;
-
-  game.opponent.health = game.opponent.maxHealth;
-  game.opponent.currentCardIndex = 0;
-
   game.turn = 0;
 
   game.screen = 'card-selection';
@@ -42,16 +37,23 @@ export function addCard(game: GameState, card: CardState) {
 
 export function startBattle(game: GameState) {
   game.screen = 'battle';
+  const { user, opponent } = game;
 
-  game.user.cards = shuffle(game.user.cards);
+  user.cards = shuffle(user.cards);
+  user.health = user.maxHealth;
+  user.currentCardIndex = 0;
+  user.effects = { ...EMPTY_EFFECTS };
 
   const opponentCards = getOpponentCardsForBattle(getBattle(game));
-  game.opponent.cards = shuffle(opponentCards);
+  opponent.cards = shuffle(opponentCards);
+  opponent.health = opponent.maxHealth;
+  opponent.currentCardIndex = 0;
+  opponent.effects = { ...EMPTY_EFFECTS };
 }
 
 export function startTurn(game: GameState) {
   const activePlayer = getActivePlayer(game);
-  activePlayer.actions = 1;
+  activePlayer.cardsPlayed = 0;
 }
 
 export function playCard(game: GameState) {
@@ -59,25 +61,43 @@ export function playCard(game: GameState) {
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getCurrentCard(activePlayer);
 
-  assert(activePlayer.actions > 0);
-  activePlayer.actions -= 1;
+  if (activePlayer.cardsPlayed > 0) {
+    assert(activePlayer.effects.extraCardPlays > 0);
+    activePlayer.effects.extraCardPlays -= 1;
+  }
+  activePlayer.cardsPlayed += 1;
+
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
+  // TODO: refactor cards to be objects, not text. Generate the text from the object
   const damageText = card.text.match(/dmg (\d+)/)?.at(1);
   if (damageText != null) {
     const damage = Number(damageText);
     dealDamage({ target: nonActivePlayer, damage });
   }
 
-  const actionsText = card.text.match(/actions (\d+)/)?.at(1);
-  if (actionsText != null) {
-    const actions = Number(actionsText);
-    activePlayer.actions += actions;
+  const bleedText = card.text.match(/bleed (\d+)/)?.at(1);
+  if (bleedText != null) {
+    const bleed = Number(bleedText);
+    nonActivePlayer.effects.bleed += bleed;
+  }
+
+  const extraCardPlaysText = card.text.match(/extraCardPlays (\d+)/)?.at(1);
+  if (extraCardPlaysText != null) {
+    const extraCardPlays = Number(extraCardPlaysText);
+    activePlayer.effects.extraCardPlays += extraCardPlays;
   }
 }
 
 function dealDamage({ target, damage }: { target: PlayerState; damage: number }) {
-  target.health -= damage;
+  if (damage > 0) {
+    target.health -= damage;
+
+    if (target.effects.bleed) {
+      target.health -= 3;
+      target.effects.bleed -= 1;
+    }
+  }
 }
 
 export function endTurn(game: GameState) {
