@@ -25,8 +25,8 @@ const Container = styled.div<{ $scale: number; $isActive: boolean }>`
     transform 0.2s,
     box-shadow 0.2s;
 
-  width: ${({ $scale }) => $scale * 240}rem;
-  height: ${({ $scale }) => $scale * 320}rem;
+  width: ${({ $scale }) => $scale * 192}rem;
+  height: ${({ $scale }) => $scale * 256}rem;
 
   ${({ $isActive }) =>
     $isActive &&

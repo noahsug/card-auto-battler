@@ -77,6 +77,4 @@ export default function BattleScreen() {
   );
 }
 
-const Divider = styled.div`
-  padding: 20rem;
-`;
+const Divider = styled.div``;

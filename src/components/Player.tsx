@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 import Card from './Card';
 import HealthBar from './HealthBar';
+import StatusEffects from './StatusEffects';
 import { useGameState } from './GameStateContext';
 import { Screen } from './shared';
 import { getCurrentCard, CardState } from '../gameState';
@@ -25,6 +26,7 @@ export default function Player({ isOpponent, activeCard }: Props) {
       <CardContainer>
         <Card card={card} isActive={!!activeCard} />
       </CardContainer>
+      <StatusEffects />
       <HealthBar health={health} maxHealth={maxHealth} />
     </Root>
   );
@@ -35,7 +37,5 @@ const Root = styled(Screen)`
 `;
 
 const CardContainer = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
+  margin-bottom: 30rem;
 `;
