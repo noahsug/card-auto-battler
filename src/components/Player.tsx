@@ -3,20 +3,15 @@ import styled from 'styled-components';
 import Card from './Card';
 import HealthBar from './HealthBar';
 import StatusEffects from './StatusEffects';
-import { useGameState } from './GameStateContext';
 import { Screen } from './shared';
-import { getCurrentCard, CardState } from '../gameState';
+import { getCurrentCard, CardState, PlayerState } from '../gameState';
 
 interface Props {
-  isOpponent: boolean;
+  player: PlayerState;
   activeCard?: CardState;
 }
 
-export default function Player({ isOpponent, activeCard }: Props) {
-  const game = useGameState();
-  const { opponent, user } = game;
-
-  const player = isOpponent ? opponent : user;
+export default function Player({ player, activeCard }: Props) {
   const { health, maxHealth } = player;
 
   const card = activeCard || getCurrentCard(player);

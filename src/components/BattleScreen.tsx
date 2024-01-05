@@ -22,6 +22,7 @@ export default function BattleScreen() {
   const canPlayCard = getCanPlayCard(game);
   const currentCard = getCurrentCard(game);
   const isOpponentTurn = getIsOpponentTurn(game);
+  const { opponent, user } = game;
 
   const battleSequence: Sequence = useMemo(() => {
     function startTurnSequence() {
@@ -70,9 +71,9 @@ export default function BattleScreen() {
   return (
     <Screen>
       <ProgressDisplay />
-      <Player isOpponent={true} activeCard={activeOpponentCard} />
+      <Player player={opponent} activeCard={activeOpponentCard} />
       <Divider />
-      <Player isOpponent={false} activeCard={activeUserCard} />
+      <Player player={user} activeCard={activeUserCard} />
     </Screen>
   );
 }
