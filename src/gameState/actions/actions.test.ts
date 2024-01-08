@@ -12,7 +12,7 @@ it('plays a damaging card', () => {
   startBattle(game);
 
   const startingOpponentHealth = game.opponent.health;
-  game.user.cards = [{ text: 'dmg 1' }];
+  game.user.cards = [{ target: { damage: 1 } }];
 
   startTurn(game);
   playCard(game);
@@ -26,8 +26,12 @@ describe('bleed effect', () => {
     startBattle(game);
 
     const startingOpponentHealth = game.opponent.health;
-    game.user.cards = [{ text: 'bleed 1' }, { text: 'dmg 1' }, { text: 'dmg 1' }];
-    game.opponent.cards = [{ text: 'dmg 0' }, { text: 'dmg 0' }];
+    game.user.cards = [
+      { target: { effects: { bleed: 1 } } },
+      { target: { damage: 1 } },
+      { target: { damage: 1 } },
+    ];
+    game.opponent.cards = [{ target: { damage: 0 } }, { target: { damage: 0 } }];
 
     startTurn(game);
     playCard(game); // bleed 1
@@ -57,7 +61,7 @@ describe('bleed effect', () => {
 
   it('does not apply to damage delt at the same time as bleed is applied', () => {
     const startingOpponentHealth = game.opponent.health;
-    game.user.cards = [{ text: 'bleed 1, dmg 1' }];
+    game.user.cards = [{ target: { damage: 1, effects: { bleed: 1 } } }];
 
     startTurn(game);
     playCard(game); // bleed 1, dmg 1
@@ -72,7 +76,10 @@ it('gains a bonus action', () => {
   startBattle(game);
 
   const startingOpponentHealth = game.opponent.health;
-  game.user.cards = [{ text: 'dmg 1, extraCardPlays 1' }, { text: 'dmg 1' }];
+  game.user.cards = [
+    { target: { damage: 1 }, self: { effects: { extraCardPlays: 1 } } },
+    { target: { damage: 1 } },
+  ];
 
   startTurn(game);
   playCard(game); // dmg 1, extraCardPlays 1

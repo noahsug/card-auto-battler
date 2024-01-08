@@ -1,7 +1,13 @@
 export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'battle-end' | 'game-end';
 
+export interface CardEffects {
+  damage?: number;
+  effects?: Partial<Effects>;
+}
+
 export interface CardState {
-  text: string;
+  self?: CardEffects;
+  target?: CardEffects;
 }
 
 export interface Effects {
@@ -54,20 +60,31 @@ function createInitialPlayerState(): PlayerState {
 }
 
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
-const userCards = [{ text: 'dmg 1, bleed 2' }];
+const userCards = [{ target: { damage: 1, effects: { bleed: 2 } } }];
 
 const opponentCardsByBattle = [
   [
-    { text: 'dmg 1' },
-    { text: 'dmg 1' },
-    { text: 'dmg 1' },
-    { text: 'dmg 2' },
-    { text: 'dmg 2' },
-    { text: 'dmg 2' },
+    { target: { damage: 1 } },
+    { target: { damage: 1 } },
+    { target: { damage: 1 } },
+    { target: { damage: 1 } },
+    { target: { damage: 1 } },
+    { target: { damage: 1 } },
   ], // 5 hits
-  [{ text: 'dmg 0' }, { text: 'dmg 0' }, { text: 'dmg 0' }, { text: 'dmg 3' }, { text: 'dmg 3' }], // 4 hits
-  [{ text: 'dmg 2' }, { text: 'dmg 2' }, { text: 'dmg 3' }, { text: 'dmg 3' }], // 3 hits
-  [{ text: 'dmg 3' }, { text: 'dmg 6' }, { text: 'dmg 9' }], // 2 hits
+  [
+    { target: { damage: 0 } },
+    { target: { damage: 0 } },
+    { target: { damage: 0 } },
+    { target: { damage: 3 } },
+    { target: { damage: 3 } },
+  ], // 4 hits
+  [
+    { target: { damage: 2 } },
+    { target: { damage: 2 } },
+    { target: { damage: 3 } },
+    { target: { damage: 3 } },
+  ], // 3 hits
+  [{ target: { damage: 3 } }, { target: { damage: 6 } }, { target: { damage: 9 } }], // 2 hits
 ];
 
 export function getOpponentCardsForBattle(battleCount: number) {
@@ -100,7 +117,7 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
   cardSelectionsByBattle[i] = [];
   for (let j = 0; j < 6; j++) {
     const dmg = Math.round(6 * Math.random() * Math.random());
-    cardSelectionsByBattle[i].push({ text: `dmg ${dmg}` });
+    cardSelectionsByBattle[i].push({ target: { damage: dmg } });
   }
 }
 

@@ -24,7 +24,6 @@ export default function StatusEffects({ effects }: Props) {
       );
     })
     .filter(Boolean);
-  console.log(effectMessages);
   return <Root>{effectMessages}</Root>;
 }
 

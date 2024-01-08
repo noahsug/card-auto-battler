@@ -10,10 +10,21 @@ interface Props {
   onClick?: () => void;
 }
 
+function getCardText(card: CardState) {
+  const message = [];
+  if (card.target?.damage != null) {
+    message.push(<Number key="damage">{card.target.damage}</Number>, `⚔️`, ' ');
+  }
+  if (card.target?.effects?.bleed != null) {
+    message.push(<Number key="bleed">{card.target.effects.bleed}</Number>, `🩸`, ' ');
+  }
+  return message;
+}
+
 export default function Card({ card, isActive = false, scale = 1, className, onClick }: Props) {
   return (
     <Container $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
-      {card.text}
+      {getCardText(card)}
     </Container>
   );
 }
@@ -35,3 +46,5 @@ const Container = styled.div<{ $scale: number; $isActive: boolean }>`
       box-shadow: 7rem 7rem 10rem 0 rgba(0, 0, 0, 0.5);
     `}
 `;
+
+const Number = styled.span``;

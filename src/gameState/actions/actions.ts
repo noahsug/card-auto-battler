@@ -57,6 +57,7 @@ export function startTurn(game: GameState) {
 }
 
 export function playCard(game: GameState) {
+  // TODO: refactor to target / self
   const activePlayer = getActivePlayer(game);
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getCurrentCard(activePlayer);
@@ -67,25 +68,19 @@ export function playCard(game: GameState) {
   }
   activePlayer.cardsPlayed += 1;
 
+  // refactor to function that takes player and applies dmg/effects
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
-  // TODO: refactor cards to be objects, not text. Generate the text from the object
-  const damageText = card.text.match(/dmg (\d+)/)?.at(1);
-  if (damageText != null) {
-    const damage = Number(damageText);
-    dealDamage({ target: nonActivePlayer, damage });
+  if (card.target?.damage != null) {
+    dealDamage({ target: nonActivePlayer, damage: card.target.damage });
   }
 
-  const bleedText = card.text.match(/bleed (\d+)/)?.at(1);
-  if (bleedText != null) {
-    const bleed = Number(bleedText);
-    nonActivePlayer.effects.bleed += bleed;
+  if (card.target?.effects?.bleed != null) {
+    nonActivePlayer.effects.bleed += card.target.effects.bleed;
   }
 
-  const extraCardPlaysText = card.text.match(/extraCardPlays (\d+)/)?.at(1);
-  if (extraCardPlaysText != null) {
-    const extraCardPlays = Number(extraCardPlaysText);
-    activePlayer.effects.extraCardPlays += extraCardPlays;
+  if (card.self?.effects?.extraCardPlays != null) {
+    activePlayer.effects.extraCardPlays += card.self.effects.extraCardPlays;
   }
 }
 
