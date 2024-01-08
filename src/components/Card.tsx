@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
-import { CardState } from '../gameState';
-import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
+import { CardEffects, CardState, StatusEffects } from '../gameState';
+import CardTextItem from './CardTextItem';
 
 interface Props {
   card: CardState;
@@ -11,42 +11,51 @@ interface Props {
   onClick?: () => void;
 }
 
-function getCardText(card: CardState) {
-  const selfEffects = card.self;
-  const targetEffects = card.target;
+function getCardTextItems(effects: CardEffects | undefined, targetSelf: boolean) {
+  if (!effects) {
+    return [];
+  }
 
-  const message = [];
-  if (targetEffects?.damage != null) {
-    message.push(<Number key="damage">{targetEffects.damage}</Number>, `⚔️`, ' ');
-  }
-  if (targetEffects?.statusEffects?.bleed != null) {
-    message.push(
-      <Number key="bleed">{targetEffects.statusEffects.bleed}</Number>,
-      STATUS_EFFECT_SYMBOLS.bleed,
-      ' ',
+  const cardTextItems = [];
+
+  if (effects.damage != null) {
+    cardTextItems.push(
+      <CardTextItem effectName="damage" cardEffects={effects} targetSelf={targetSelf} />,
     );
   }
-  if (selfEffects?.statusEffects?.extraCardPlays != null) {
-    message.push(
-      <Number key="extraCardPlayers">{selfEffects?.statusEffects?.extraCardPlays}</Number>,
-      STATUS_EFFECT_SYMBOLS.extraCardPlays,
-      ' ',
-    );
+
+  if (effects.statusEffects) {
+    Object.entries(effects.statusEffects).forEach(([statusEffectName, value]) => {
+      cardTextItems.push(
+        <CardTextItem
+          statusEffectName={statusEffectName as keyof StatusEffects}
+          cardEffects={effects}
+          targetSelf={targetSelf}
+        />,
+      );
+    });
   }
-  return message;
+
+  return cardTextItems;
 }
 
 export default function Card({ card, isActive = false, scale = 1, className, onClick }: Props) {
+  const cardTextItems = [
+    ...getCardTextItems(card.target, false),
+    ...getCardTextItems(card.self, true),
+  ];
+
   return (
-    <Container $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
-      {getCardText(card)}
-    </Container>
+    <Root $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
+      {cardTextItems}
+    </Root>
   );
 }
 
-const Container = styled.div<{ $scale: number; $isActive: boolean }>`
+const Root = styled.div<{ $scale: number; $isActive: boolean }>`
   border: 1px solid #ccc;
   border-radius: 4px;
+  padding: 10rem;
   transition:
     transform 0.2s,
     box-shadow 0.2s;
@@ -61,5 +70,3 @@ const Container = styled.div<{ $scale: number; $isActive: boolean }>`
       box-shadow: 7rem 7rem 10rem 0 rgba(0, 0, 0, 0.5);
     `}
 `;
-
-const Number = styled.span``;

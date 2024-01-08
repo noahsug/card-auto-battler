@@ -1,18 +1,18 @@
 import styled from 'styled-components';
-import { StatusEffects as StatusEffectStats } from '../gameState/gameState';
+import { StatusEffects as StatusEffectsState } from '../gameState/gameState';
 import { Entries } from '../utils/types/types';
 
 interface Props {
-  statusEffects: StatusEffectStats;
+  statusEffects: StatusEffectsState;
 }
 
-export const STATUS_EFFECT_SYMBOLS: { [K in keyof StatusEffectStats]: string } = {
+export const STATUS_EFFECT_SYMBOLS: { [K in keyof StatusEffectsState]: string } = {
   bleed: '🩸',
   extraCardPlays: '🃏',
 };
 
 export default function StatusEffects({ statusEffects }: Props) {
-  const effectMessages = (Object.entries(statusEffects) as Entries<StatusEffectStats>)
+  const effectMessages = (Object.entries(statusEffects) as Entries<StatusEffectsState>)
     .map(([name, value]) => {
       return (
         value && (

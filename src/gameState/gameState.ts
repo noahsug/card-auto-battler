@@ -118,7 +118,9 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
   cardSelectionsByBattle[i] = [];
   for (let j = 0; j < 6; j++) {
     const dmg = Math.round(6 * Math.random() * Math.random());
-    cardSelectionsByBattle[i].push({ target: { damage: dmg, multihit: 1 } });
+    cardSelectionsByBattle[i].push({
+      target: { damage: dmg, multihit: 1, statusEffects: { bleed: 10 } },
+    });
   }
 }
 
