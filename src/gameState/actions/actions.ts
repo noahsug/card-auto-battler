@@ -10,7 +10,7 @@ import {
   getActivePlayer,
   getOpponentCardsForBattle,
   createInitialGameState,
-  getBattle,
+  getBattleCount,
   getNonActivePlayer,
   getCanPlayCard,
   EMPTY_EFFECTS,
@@ -44,7 +44,7 @@ export function startBattle(game: GameState) {
   user.currentCardIndex = 0;
   user.effects = { ...EMPTY_EFFECTS };
 
-  const opponentCards = getOpponentCardsForBattle(getBattle(game));
+  const opponentCards = getOpponentCardsForBattle(getBattleCount(game));
   opponent.cards = shuffle(opponentCards);
   opponent.health = opponent.maxHealth;
   opponent.currentCardIndex = 0;

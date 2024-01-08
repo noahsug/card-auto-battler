@@ -70,11 +70,11 @@ const opponentCardsByBattle = [
   [{ text: 'dmg 3' }, { text: 'dmg 6' }, { text: 'dmg 9' }], // 2 hits
 ];
 
-export function getOpponentCardsForBattle(Battle: number) {
-  return opponentCardsByBattle[Battle].slice();
+export function getOpponentCardsForBattle(battleCount: number) {
+  return opponentCardsByBattle[battleCount].slice();
 }
 
-export function getBattle(game: GameState) {
+export function getBattleCount(game: GameState) {
   return game.wins + game.losses;
 }
 
@@ -104,8 +104,8 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
   }
 }
 
-export function getCardSelectionsForBattle(Battle: number) {
-  return cardSelectionsByBattle[Battle];
+export function getCardSelectionsForBattle(battleCount: number) {
+  return cardSelectionsByBattle[battleCount];
 }
 
 export function getIsOpponentTurn(game: GameState) {

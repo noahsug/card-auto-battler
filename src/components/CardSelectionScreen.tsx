@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import styled from 'styled-components';
 
-import { getCardSelectionsForBattle, getBattle } from '../gameState';
+import { getCardSelectionsForBattle, getBattleCount } from '../gameState';
 import { useGameState, useActions } from './GameStateContext';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen, Title } from './shared';
@@ -17,7 +17,7 @@ export default function CardSelectionScreen() {
   const { addCard, startBattle } = useActions();
   const [selectedCardIndexes, setSelectedCardIndexes] = useState(new Set<number>());
 
-  const cards = getCardSelectionsForBattle(getBattle(game));
+  const cards = getCardSelectionsForBattle(getBattleCount(game));
   const canAddCards = selectedCardIndexes.size < CARDS_TO_SELECT;
 
   const startBattleSequence: Sequence = useMemo(
