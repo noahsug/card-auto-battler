@@ -42,13 +42,13 @@ export function startBattle(game: GameState) {
   user.cards = shuffle(user.cards);
   user.health = user.maxHealth;
   user.currentCardIndex = 0;
-  user.effects = { ...EMPTY_EFFECTS };
+  user.statusEffects = { ...EMPTY_EFFECTS };
 
   const opponentCards = getOpponentCardsForBattle(getBattleCount(game));
   opponent.cards = shuffle(opponentCards);
   opponent.health = opponent.maxHealth;
   opponent.currentCardIndex = 0;
-  opponent.effects = { ...EMPTY_EFFECTS };
+  opponent.statusEffects = { ...EMPTY_EFFECTS };
 }
 
 export function startTurn(game: GameState) {
@@ -57,30 +57,32 @@ export function startTurn(game: GameState) {
 }
 
 export function playCard(game: GameState) {
-  // TODO: refactor to target / self
   const activePlayer = getActivePlayer(game);
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getCurrentCard(activePlayer);
 
   if (activePlayer.cardsPlayed > 0) {
-    assert(activePlayer.effects.extraCardPlays > 0);
-    activePlayer.effects.extraCardPlays -= 1;
+    assert(activePlayer.statusEffects.extraCardPlays > 0);
+    activePlayer.statusEffects.extraCardPlays -= 1;
   }
   activePlayer.cardsPlayed += 1;
 
   // refactor to function that takes player and applies dmg/effects
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
-  if (card.target?.damage != null) {
-    dealDamage({ target: nonActivePlayer, damage: card.target.damage });
+  const targetEffects = card.target;
+  const selfEffects = card.self;
+
+  if (targetEffects?.damage != null) {
+    dealDamage({ target: nonActivePlayer, damage: targetEffects.damage });
   }
 
-  if (card.target?.effects?.bleed != null) {
-    nonActivePlayer.effects.bleed += card.target.effects.bleed;
+  if (targetEffects?.statusEffects?.bleed != null) {
+    nonActivePlayer.statusEffects.bleed += targetEffects.statusEffects.bleed;
   }
 
-  if (card.self?.effects?.extraCardPlays != null) {
-    activePlayer.effects.extraCardPlays += card.self.effects.extraCardPlays;
+  if (selfEffects?.statusEffects?.extraCardPlays != null) {
+    activePlayer.statusEffects.extraCardPlays += selfEffects.statusEffects.extraCardPlays;
   }
 }
 
@@ -88,9 +90,9 @@ function dealDamage({ target, damage }: { target: PlayerState; damage: number })
   if (damage > 0) {
     target.health -= damage;
 
-    if (target.effects.bleed) {
+    if (target.statusEffects.bleed) {
       target.health -= 3;
-      target.effects.bleed -= 1;
+      target.statusEffects.bleed -= 1;
     }
   }
 }

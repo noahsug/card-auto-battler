@@ -21,7 +21,7 @@ export default function Player({ player, activeCard }: Props) {
       <CardContainer>
         <Card card={card} isActive={!!activeCard} />
       </CardContainer>
-      <StatusEffects effects={player.effects} />
+      <StatusEffects statusEffects={player.statusEffects} />
       <HealthBar health={health} maxHealth={maxHealth} />
     </Root>
   );

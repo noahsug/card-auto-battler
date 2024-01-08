@@ -2,7 +2,8 @@ export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'battle-en
 
 export interface CardEffects {
   damage?: number;
-  effects?: Partial<Effects>;
+  multihit?: number;
+  statusEffects?: Partial<StatusEffects>;
 }
 
 export interface CardState {
@@ -10,7 +11,7 @@ export interface CardState {
   target?: CardEffects;
 }
 
-export interface Effects {
+export interface StatusEffects {
   bleed: number;
   extraCardPlays: number;
 }
@@ -21,7 +22,7 @@ export interface PlayerState {
   health: number;
   maxHealth: number;
   cardsPlayed: number;
-  effects: Effects;
+  statusEffects: StatusEffects;
 }
 
 export interface GameState {
@@ -33,7 +34,7 @@ export interface GameState {
   screen: ScreenName;
 }
 
-export const EMPTY_EFFECTS: Effects = {
+export const EMPTY_EFFECTS: StatusEffects = {
   bleed: 0,
   extraCardPlays: 0,
 };
@@ -52,7 +53,7 @@ function createInitialPlayerState(): PlayerState {
     health: maxHealth,
     maxHealth,
     cardsPlayed: 0,
-    effects: {
+    statusEffects: {
       bleed: 0,
       extraCardPlays: 0,
     },
@@ -60,7 +61,7 @@ function createInitialPlayerState(): PlayerState {
 }
 
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
-const userCards = [{ target: { damage: 1, effects: { bleed: 2 } } }];
+const userCards: CardState[] = [{ target: { damage: 1, statusEffects: { bleed: 2 } } }];
 
 const opponentCardsByBattle = [
   [
@@ -117,7 +118,7 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
   cardSelectionsByBattle[i] = [];
   for (let j = 0; j < 6; j++) {
     const dmg = Math.round(6 * Math.random() * Math.random());
-    cardSelectionsByBattle[i].push({ target: { damage: dmg } });
+    cardSelectionsByBattle[i].push({ target: { damage: dmg, multihit: 1 } });
   }
 }
 
@@ -148,7 +149,7 @@ export function getCurrentCard(playerOrGame: PlayerState | GameState) {
 
 export function getCanPlayCard(game: GameState) {
   const activePlayer = getActivePlayer(game);
-  return activePlayer.cardsPlayed === 0 || activePlayer.effects.extraCardPlays > 0;
+  return activePlayer.cardsPlayed === 0 || activePlayer.statusEffects.extraCardPlays > 0;
 }
 
 export function getIsBattleOver(game: GameState) {

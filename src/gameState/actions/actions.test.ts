@@ -27,7 +27,7 @@ describe('bleed effect', () => {
 
     const startingOpponentHealth = game.opponent.health;
     game.user.cards = [
-      { target: { effects: { bleed: 1 } } },
+      { target: { statusEffects: { bleed: 1 } } },
       { target: { damage: 1 } },
       { target: { damage: 1 } },
     ];
@@ -55,18 +55,18 @@ describe('bleed effect', () => {
     playCard(game); // dmg 1 (without any bleed)
     endTurn(game);
 
-    expect(game.opponent.effects.bleed).toBe(0);
+    expect(game.opponent.statusEffects.bleed).toBe(0);
     expect(game.opponent.health).toBe(startingOpponentHealth - BLEED_DAMAGE - 1 - 1);
   });
 
   it('does not apply to damage delt at the same time as bleed is applied', () => {
     const startingOpponentHealth = game.opponent.health;
-    game.user.cards = [{ target: { damage: 1, effects: { bleed: 1 } } }];
+    game.user.cards = [{ target: { damage: 1, statusEffects: { bleed: 1 } } }];
 
     startTurn(game);
     playCard(game); // bleed 1, dmg 1
 
-    expect(game.opponent.effects.bleed).toBe(1);
+    expect(game.opponent.statusEffects.bleed).toBe(1);
     expect(game.opponent.health).toBe(startingOpponentHealth - 1);
   });
 });
@@ -77,7 +77,7 @@ it('gains a bonus action', () => {
 
   const startingOpponentHealth = game.opponent.health;
   game.user.cards = [
-    { target: { damage: 1 }, self: { effects: { extraCardPlays: 1 } } },
+    { target: { damage: 1 }, self: { statusEffects: { extraCardPlays: 1 } } },
     { target: { damage: 1 } },
   ];
 

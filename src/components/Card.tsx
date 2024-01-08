@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
 
 import { CardState } from '../gameState';
+import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
 
 interface Props {
   card: CardState;
@@ -11,12 +12,26 @@ interface Props {
 }
 
 function getCardText(card: CardState) {
+  const selfEffects = card.self;
+  const targetEffects = card.target;
+
   const message = [];
-  if (card.target?.damage != null) {
-    message.push(<Number key="damage">{card.target.damage}</Number>, `⚔️`, ' ');
+  if (targetEffects?.damage != null) {
+    message.push(<Number key="damage">{targetEffects.damage}</Number>, `⚔️`, ' ');
   }
-  if (card.target?.effects?.bleed != null) {
-    message.push(<Number key="bleed">{card.target.effects.bleed}</Number>, `🩸`, ' ');
+  if (targetEffects?.statusEffects?.bleed != null) {
+    message.push(
+      <Number key="bleed">{targetEffects.statusEffects.bleed}</Number>,
+      STATUS_EFFECT_SYMBOLS.bleed,
+      ' ',
+    );
+  }
+  if (selfEffects?.statusEffects?.extraCardPlays != null) {
+    message.push(
+      <Number key="extraCardPlayers">{selfEffects?.statusEffects?.extraCardPlays}</Number>,
+      STATUS_EFFECT_SYMBOLS.extraCardPlays,
+      ' ',
+    );
   }
   return message;
 }
