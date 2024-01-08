@@ -7,20 +7,48 @@ beforeEach(() => {
   game = createInitialGameState();
 });
 
-it('plays a damaging card', () => {
-  startGame(game);
-  startBattle(game);
+describe('damage effect', () => {
+  it('reduces health', () => {
+    startGame(game);
+    startBattle(game);
 
-  const startingOpponentHealth = game.opponent.health;
-  game.user.cards = [{ target: { damage: 1 } }];
+    const startingOpponentHealth = game.opponent.health;
+    game.user.cards = [{ target: { damage: 1 } }];
 
-  startTurn(game);
-  playCard(game);
+    startTurn(game);
+    playCard(game);
 
-  expect(startingOpponentHealth - game.opponent.health).toBe(1);
+    expect(startingOpponentHealth - game.opponent.health).toBe(1);
+  });
 });
 
-describe('bleed effect', () => {
+describe('multihit effect', () => {
+  it('deals damage twice', () => {
+    startGame(game);
+    startBattle(game);
+
+    const startingOpponentHealth = game.opponent.health;
+    game.user.cards = [{ target: { damage: 1, multihit: 1 } }];
+
+    startTurn(game);
+    playCard(game);
+
+    expect(startingOpponentHealth - game.opponent.health).toBe(2);
+  });
+  it('applies effects twice', () => {
+    startGame(game);
+    startBattle(game);
+
+    game.user.cards = [{ target: { statusEffects: { bleed: 1 }, multihit: 1 } }];
+
+    startTurn(game);
+    playCard(game);
+
+    expect(game.opponent.statusEffects.bleed).toBe(2);
+  });
+});
+
+describe('bleed status effect', () => {
   it('is decreased when damage is delt', () => {
     startGame(game);
     startBattle(game);
@@ -71,19 +99,21 @@ describe('bleed effect', () => {
   });
 });
 
-it('gains a bonus action', () => {
-  startGame(game);
-  startBattle(game);
+describe('extraCardPlays status effect', () => {
+  it('plays an extra card', () => {
+    startGame(game);
+    startBattle(game);
 
-  const startingOpponentHealth = game.opponent.health;
-  game.user.cards = [
-    { target: { damage: 1 }, self: { statusEffects: { extraCardPlays: 1 } } },
-    { target: { damage: 1 } },
-  ];
+    const startingOpponentHealth = game.opponent.health;
+    game.user.cards = [
+      { target: { damage: 1 }, self: { statusEffects: { extraCardPlays: 1 } } },
+      { target: { damage: 1 } },
+    ];
 
-  startTurn(game);
-  playCard(game); // dmg 1, extraCardPlays 1
-  playCard(game); // dmg 1
+    startTurn(game);
+    playCard(game); // dmg 1, extraCardPlays 1
+    playCard(game); // dmg 1
 
-  expect(startingOpponentHealth - game.opponent.health).toBe(2);
+    expect(startingOpponentHealth - game.opponent.health).toBe(2);
+  });
 });

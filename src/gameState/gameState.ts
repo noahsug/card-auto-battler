@@ -1,5 +1,10 @@
 export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'battle-end' | 'game-end';
 
+export interface StatusEffects extends Record<string, number> {
+  bleed: number;
+  extraCardPlays: number;
+}
+
 export interface CardEffects {
   damage?: number;
   multihit?: number;
@@ -9,11 +14,6 @@ export interface CardEffects {
 export interface CardState {
   self?: CardEffects;
   target?: CardEffects;
-}
-
-export interface StatusEffects {
-  bleed: number;
-  extraCardPlays: number;
 }
 
 export interface PlayerState {

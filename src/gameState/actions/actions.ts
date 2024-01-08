@@ -14,8 +14,11 @@ import {
   getNonActivePlayer,
   getCanPlayCard,
   EMPTY_EFFECTS,
+  CardEffects,
+  StatusEffects,
 } from '../';
 import { assert } from '../../utils';
+import { Entries } from '../../utils/types/types';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
@@ -70,19 +73,40 @@ export function playCard(game: GameState) {
   // refactor to function that takes player and applies dmg/effects
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
-  const targetEffects = card.target;
-  const selfEffects = card.self;
+  if (card.target) {
+    applyCardEffectsToTarget({ target: nonActivePlayer, effects: card.target });
+  }
+  if (card.self) {
+    applyCardEffectsToTarget({ target: activePlayer, effects: card.self });
+  }
+}
 
-  if (targetEffects?.damage != null) {
-    dealDamage({ target: nonActivePlayer, damage: targetEffects.damage });
+function applyCardEffectsToTarget(
+  {
+    target,
+    effects,
+  }: {
+    target: PlayerState;
+    effects: CardEffects;
+  },
+  appliedMultihit = false,
+) {
+  if (effects.damage != null) {
+    dealDamage({ target, damage: effects.damage });
   }
 
-  if (targetEffects?.statusEffects?.bleed != null) {
-    nonActivePlayer.statusEffects.bleed += targetEffects.statusEffects.bleed;
+  if (effects.statusEffects) {
+    (Object.entries(effects.statusEffects) as Entries<StatusEffects>).forEach(
+      ([statusEffect, value]) => {
+        target.statusEffects[statusEffect] += value;
+      },
+    );
   }
 
-  if (selfEffects?.statusEffects?.extraCardPlays != null) {
-    activePlayer.statusEffects.extraCardPlays += selfEffects.statusEffects.extraCardPlays;
+  if (effects.multihit != null && !appliedMultihit) {
+    for (let i = 0; i < effects.multihit; i++) {
+      applyCardEffectsToTarget({ target, effects }, true);
+    }
   }
 }
 
