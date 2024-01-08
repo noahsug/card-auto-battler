@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
 import { CardEffects, CardState, StatusEffects } from '../gameState';
-import CardTextItem from './CardTextItem';
+import CardEffectText, { CardText } from './CardEffectText';
 
 interface Props {
   card: CardState;
@@ -19,35 +19,44 @@ function getCardTextItems(effects: CardEffects | undefined, targetSelf: boolean)
   const cardTextItems = [];
 
   if (effects.damage != null) {
+    cardTextItems.push(<CardEffectText key="damage" effectName="damage" value={effects.damage} />);
+  }
+
+  const definedStatusEffects = effects.statusEffects
+    ? Object.entries(effects.statusEffects).filter(([_, value]) => value != null)
+    : [];
+
+  definedStatusEffects.forEach(([statusEffectName, value]) => {
     cardTextItems.push(
-      <CardTextItem effectName="damage" cardEffects={effects} targetSelf={targetSelf} />,
+      <CardEffectText
+        key={`status-${statusEffectName}`}
+        statusEffectName={statusEffectName as keyof StatusEffects}
+        value={value!}
+      />,
+    );
+  });
+
+  if (effects.multihit != null) {
+    cardTextItems.push(
+      <CardEffectText key="multihit" effectName="multihit" value={effects.multihit} />,
     );
   }
 
-  if (effects.statusEffects) {
-    Object.entries(effects.statusEffects).forEach(([statusEffectName, value]) => {
-      cardTextItems.push(
-        <CardTextItem
-          statusEffectName={statusEffectName as keyof StatusEffects}
-          cardEffects={effects}
-          targetSelf={targetSelf}
-        />,
-      );
-    });
+  if (targetSelf) {
+    cardTextItems.push(<CardText key="self">to self</CardText>);
   }
 
   return cardTextItems;
 }
 
 export default function Card({ card, isActive = false, scale = 1, className, onClick }: Props) {
-  const cardTextItems = [
-    ...getCardTextItems(card.target, false),
-    ...getCardTextItems(card.self, true),
-  ];
+  const targetTextItems = getCardTextItems(card.target, false);
+  const selfTextItems = getCardTextItems(card.self, true);
 
   return (
     <Root $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
-      {cardTextItems}
+      <CardTextSection>{targetTextItems}</CardTextSection>
+      <CardTextSection>{selfTextItems}</CardTextSection>
     </Root>
   );
 }
@@ -69,4 +78,10 @@ const Root = styled.div<{ $scale: number; $isActive: boolean }>`
       transform: scale(1.2);
       box-shadow: 7rem 7rem 10rem 0 rgba(0, 0, 0, 0.5);
     `}
+`;
+
+const CardTextSection = styled.div`
+  & + & {
+    margin-top: 10rem;
+  }
 `;
