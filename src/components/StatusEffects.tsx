@@ -9,6 +9,7 @@ interface Props {
 export const STATUS_EFFECT_SYMBOLS: { [K in keyof StatusEffectsState]: string } = {
   bleed: '🩸',
   extraCardPlays: '🃏',
+  dodge: '💨',
 };
 
 export default function StatusEffects({ statusEffects }: Props) {

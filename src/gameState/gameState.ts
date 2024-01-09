@@ -1,9 +1,14 @@
 export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'battle-end' | 'game-end';
 
-export interface StatusEffects extends Record<string, number> {
-  bleed: number;
-  extraCardPlays: number;
-}
+export const EMPTY_STATUS_EFFECTS = {
+  bleed: 0,
+  extraCardPlays: 0,
+  dodge: 0,
+};
+
+export type StatusEffects = {
+  [K in keyof typeof EMPTY_STATUS_EFFECTS]: number;
+};
 
 export interface CardEffects {
   damage?: number;
@@ -34,11 +39,6 @@ export interface GameState {
   screen: ScreenName;
 }
 
-export const EMPTY_EFFECTS: StatusEffects = {
-  bleed: 0,
-  extraCardPlays: 0,
-};
-
 export const MAX_WINS = 3;
 export const MAX_LOSSES = 2;
 
@@ -53,10 +53,7 @@ function createInitialPlayerState(): PlayerState {
     health: maxHealth,
     maxHealth,
     cardsPlayed: 0,
-    statusEffects: {
-      bleed: 0,
-      extraCardPlays: 0,
-    },
+    statusEffects: { ...EMPTY_STATUS_EFFECTS },
   };
 }
 

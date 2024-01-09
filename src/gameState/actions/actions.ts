@@ -13,7 +13,7 @@ import {
   getBattleCount,
   getNonActivePlayer,
   getCanPlayCard,
-  EMPTY_EFFECTS,
+  EMPTY_STATUS_EFFECTS,
   CardEffects,
   StatusEffects,
 } from '../';
@@ -45,13 +45,13 @@ export function startBattle(game: GameState) {
   user.cards = shuffle(user.cards);
   user.health = user.maxHealth;
   user.currentCardIndex = 0;
-  user.statusEffects = { ...EMPTY_EFFECTS };
+  user.statusEffects = { ...EMPTY_STATUS_EFFECTS };
 
   const opponentCards = getOpponentCardsForBattle(getBattleCount(game));
   opponent.cards = shuffle(opponentCards);
   opponent.health = opponent.maxHealth;
   opponent.currentCardIndex = 0;
-  opponent.statusEffects = { ...EMPTY_EFFECTS };
+  opponent.statusEffects = { ...EMPTY_STATUS_EFFECTS };
 }
 
 export function startTurn(game: GameState) {
@@ -74,25 +74,31 @@ export function playCard(game: GameState) {
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
   if (card.target) {
-    applyCardEffectsToTarget({ target: nonActivePlayer, effects: card.target });
+    applyCardEffectsToTarget({ target: nonActivePlayer, self: activePlayer, effects: card.target });
   }
   if (card.self) {
-    applyCardEffectsToTarget({ target: activePlayer, effects: card.self });
+    applyCardEffectsToTarget({ target: activePlayer, self: activePlayer, effects: card.self });
   }
 }
 
 function applyCardEffectsToTarget(
   {
     target,
+    self,
     effects,
   }: {
     target: PlayerState;
+    self: PlayerState;
     effects: CardEffects;
   },
   appliedMultihit = false,
 ) {
   if (effects.damage != null) {
-    dealDamage({ target, damage: effects.damage });
+    if (target.statusEffects.dodge > 0) {
+      target.statusEffects.dodge -= 1;
+    } else {
+      dealDamage({ target, damage: effects.damage });
+    }
   }
 
   if (effects.statusEffects) {
@@ -105,7 +111,7 @@ function applyCardEffectsToTarget(
 
   if (effects.multihit != null && !appliedMultihit) {
     for (let i = 0; i < effects.multihit; i++) {
-      applyCardEffectsToTarget({ target, effects }, true);
+      applyCardEffectsToTarget({ target, self, effects }, true);
     }
   }
 }

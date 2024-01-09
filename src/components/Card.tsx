@@ -55,13 +55,18 @@ export default function Card({ card, isActive = false, scale = 1, className, onC
 
   return (
     <Root $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
-      <CardTextSection>{targetTextItems}</CardTextSection>
-      <CardTextSection>{selfTextItems}</CardTextSection>
+      <div>
+        <CardTextSection>{targetTextItems}</CardTextSection>
+        <CardTextSection>{selfTextItems}</CardTextSection>
+      </div>
     </Root>
   );
 }
 
 const Root = styled.div<{ $scale: number; $isActive: boolean }>`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 10rem;

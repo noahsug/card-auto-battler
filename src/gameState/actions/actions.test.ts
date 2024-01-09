@@ -22,6 +22,25 @@ describe('damage effect', () => {
   });
 });
 
+describe('dodge effect', () => {
+  it('dodges the next source of damage', () => {
+    startGame(game);
+    startBattle(game);
+
+    const startingHealth = game.user.health;
+    game.user.cards = [{ self: { statusEffects: { dodge: 1 } } }];
+    game.opponent.cards = [{ target: { damage: 1 } }];
+
+    startTurn(game);
+    playCard(game);
+    endTurn(game);
+
+    startTurn(game);
+    playCard(game);
+
+    expect(startingHealth - game.user.health).toBe(0);
+  });
+});
 describe('multihit effect', () => {
   it('deals damage twice', () => {
     startGame(game);
