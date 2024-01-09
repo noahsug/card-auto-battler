@@ -1,138 +1,158 @@
-import { endTurn, playCard, startGame, startBattle, startTurn } from './actions';
-import { GameState, createInitialGameState } from '../';
-import { BLEED_DAMAGE } from '../gameState';
+import clonedeep from 'lodash/clonedeep';
+import merge from 'lodash/merge';
 
-let game: GameState;
-beforeEach(() => {
-  game = createInitialGameState();
-});
+import { endTurn, playCard, startGame, startBattle, startTurn } from './actions';
+import { createInitialGameState } from '../';
+import {
+  CardState,
+  PlayerState,
+  getCanPlayCard,
+  getIsBattleOver,
+  getIsOpponentTurn,
+} from '../gameState';
+
+function runBattle({
+  user,
+  opponent,
+  stopAfter,
+}: {
+  user?: Partial<PlayerState>;
+  opponent?: Partial<PlayerState>;
+  stopAfter?: { userCardsPlayed: true } | { turn: number };
+}) {
+  const game = merge(createInitialGameState(), { user, opponent });
+
+  startGame(game);
+  startBattle(game);
+
+  const startingState = clonedeep(game);
+
+  // unshuffle the cards
+  if (user?.cards) {
+    game.user.cards = user.cards;
+  }
+  if (opponent?.cards) {
+    game.opponent.cards = opponent.cards;
+  }
+
+  const stopAfterTurn = stopAfter && 'turn' in stopAfter ? stopAfter.turn : Infinity;
+  const stopAfterUserCardsPlayed =
+    stopAfter && 'userCardsPlayed' in stopAfter ? game.user.cards.length : Infinity;
+
+  let userCardsPlayed = 0;
+
+  while (
+    !getIsBattleOver(game) &&
+    game.turn < stopAfterTurn &&
+    userCardsPlayed < stopAfterUserCardsPlayed
+  ) {
+    startTurn(game);
+
+    while (
+      !getIsBattleOver(game) &&
+      getCanPlayCard(game) &&
+      userCardsPlayed < stopAfterUserCardsPlayed
+    ) {
+      playCard(game);
+      if (!getIsOpponentTurn(game)) {
+        userCardsPlayed++;
+      }
+    }
+
+    endTurn(game);
+  }
+
+  return { endingState: game, startingState };
+}
 
 describe('damage effect', () => {
   it('reduces health', () => {
-    startGame(game);
-    startBattle(game);
+    const userCards: CardState[] = [{ target: { damage: 1 } }];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      stopAfter: { userCardsPlayed: true },
+    });
 
-    const startingOpponentHealth = game.opponent.health;
-    game.user.cards = [{ target: { damage: 1 } }];
-
-    startTurn(game);
-    playCard(game);
-
-    expect(startingOpponentHealth - game.opponent.health).toBe(1);
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(1);
   });
 });
 
 describe('dodge effect', () => {
   it('dodges the next source of damage', () => {
-    startGame(game);
-    startBattle(game);
+    const userCards: CardState[] = [{ self: { statusEffects: { dodge: 1 } } }];
+    const opponentCards: CardState[] = [{ target: { damage: 1 } }];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      opponent: { cards: opponentCards },
+      stopAfter: { userCardsPlayed: true },
+    });
 
-    const startingHealth = game.user.health;
-    game.user.cards = [{ self: { statusEffects: { dodge: 1 } } }];
-    game.opponent.cards = [{ target: { damage: 1 } }];
-
-    startTurn(game);
-    playCard(game);
-    endTurn(game);
-
-    startTurn(game);
-    playCard(game);
-
-    expect(startingHealth - game.user.health).toBe(0);
-  });
-});
-describe('multihit effect', () => {
-  it('deals damage twice', () => {
-    startGame(game);
-    startBattle(game);
-
-    const startingOpponentHealth = game.opponent.health;
-    game.user.cards = [{ target: { damage: 1, multihit: 1 } }];
-
-    startTurn(game);
-    playCard(game);
-
-    expect(startingOpponentHealth - game.opponent.health).toBe(2);
-  });
-  it('applies effects twice', () => {
-    startGame(game);
-    startBattle(game);
-
-    game.user.cards = [{ target: { statusEffects: { bleed: 1 }, multihit: 1 } }];
-
-    startTurn(game);
-    playCard(game);
-
-    expect(game.opponent.statusEffects.bleed).toBe(2);
+    expect(startingState.user.health).toBe(endingState.user.health);
   });
 });
 
 describe('bleed status effect', () => {
   it('is decreased when damage is delt', () => {
-    startGame(game);
-    startBattle(game);
-
-    const startingOpponentHealth = game.opponent.health;
-    game.user.cards = [
-      { target: { statusEffects: { bleed: 1 } } },
+    const userCards: CardState[] = [
+      { target: { statusEffects: { bleed: 2 } } },
+      { target: { damage: 1 } },
       { target: { damage: 1 } },
       { target: { damage: 1 } },
     ];
-    game.opponent.cards = [{ target: { damage: 0 } }, { target: { damage: 0 } }];
+    const opponentCards: CardState[] = [{ target: { damage: 0 } }];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      opponent: { cards: opponentCards, maxHealth: 10 },
+      stopAfter: { userCardsPlayed: true },
+    });
 
-    startTurn(game);
-    playCard(game); // bleed 1
-    endTurn(game);
-
-    // opponent turn
-    startTurn(game);
-    playCard(game);
-    endTurn(game);
-
-    startTurn(game);
-    playCard(game); // dmg 1 (with bleed 1 applied)
-    endTurn(game);
-
-    // opponent turn
-    startTurn(game);
-    playCard(game);
-    endTurn(game);
-
-    startTurn(game);
-    playCard(game); // dmg 1 (without any bleed)
-    endTurn(game);
-
-    expect(game.opponent.statusEffects.bleed).toBe(0);
-    expect(game.opponent.health).toBe(startingOpponentHealth - BLEED_DAMAGE - 1 - 1);
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(9);
   });
 
   it('does not apply to damage delt at the same time as bleed is applied', () => {
-    const startingOpponentHealth = game.opponent.health;
-    game.user.cards = [{ target: { damage: 1, statusEffects: { bleed: 1 } } }];
+    const userCards: CardState[] = [{ target: { damage: 1, statusEffects: { bleed: 1 } } }];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      stopAfter: { userCardsPlayed: true },
+    });
 
-    startTurn(game);
-    playCard(game); // bleed 1, dmg 1
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(1);
+  });
+});
 
-    expect(game.opponent.statusEffects.bleed).toBe(1);
-    expect(game.opponent.health).toBe(startingOpponentHealth - 1);
+describe('multihit effect', () => {
+  it('deals damage twice', () => {
+    const userCards: CardState[] = [{ target: { damage: 1, multihit: 1 } }];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      stopAfter: { userCardsPlayed: true },
+    });
+
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
+  });
+  it('applies effects twice', () => {
+    const userCards: CardState[] = [{ target: { statusEffects: { bleed: 1 }, multihit: 1 } }];
+    const { endingState } = runBattle({
+      user: { cards: userCards },
+      stopAfter: { userCardsPlayed: true },
+    });
+
+    expect(endingState.opponent.statusEffects.bleed).toBe(2);
   });
 });
 
 describe('extraCardPlays status effect', () => {
   it('plays an extra card', () => {
-    startGame(game);
-    startBattle(game);
-
-    const startingOpponentHealth = game.opponent.health;
-    game.user.cards = [
+    const userCards: CardState[] = [
       { target: { damage: 1 }, self: { statusEffects: { extraCardPlays: 1 } } },
       { target: { damage: 1 } },
+      { target: { damage: 10 } }, // should not be played
     ];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      stopAfter: { turn: 1 },
+    });
 
-    startTurn(game);
-    playCard(game); // dmg 1, extraCardPlays 1
-    playCard(game); // dmg 1
-
-    expect(startingOpponentHealth - game.opponent.health).toBe(2);
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
   });
 });

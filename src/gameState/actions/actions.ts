@@ -56,7 +56,7 @@ export function startBattle(game: GameState) {
 
 export function startTurn(game: GameState) {
   const activePlayer = getActivePlayer(game);
-  activePlayer.cardsPlayed = 0;
+  activePlayer.cardsPlayedThisTurn = 0;
 }
 
 export function playCard(game: GameState) {
@@ -64,11 +64,11 @@ export function playCard(game: GameState) {
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getCurrentCard(activePlayer);
 
-  if (activePlayer.cardsPlayed > 0) {
+  if (activePlayer.cardsPlayedThisTurn > 0) {
     assert(activePlayer.statusEffects.extraCardPlays > 0);
     activePlayer.statusEffects.extraCardPlays -= 1;
   }
-  activePlayer.cardsPlayed += 1;
+  activePlayer.cardsPlayedThisTurn += 1;
 
   // refactor to function that takes player and applies dmg/effects
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;

@@ -3,9 +3,8 @@
 - simple card effects
   - ✅ play card twice
   - ✅ play next card
-  - dodge next dmg
+  - ✅ dodge next dmg
   - reduce all dmg to 1 next turn
-  -
 - archtypes
   - buff stacking (next dmg card is played twice, +2 dmg, applies bleed for each dmg, 2x damage, 25% lifesteal, etc)
   - ✅ bleed (hit 3 times, bleed 2, hit for each bleed, dmg causes bleed, 2x bleed)

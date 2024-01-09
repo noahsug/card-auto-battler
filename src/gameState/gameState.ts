@@ -26,7 +26,7 @@ export interface PlayerState {
   currentCardIndex: number;
   health: number;
   maxHealth: number;
-  cardsPlayed: number;
+  cardsPlayedThisTurn: number;
   statusEffects: StatusEffects;
 }
 
@@ -52,7 +52,7 @@ function createInitialPlayerState(): PlayerState {
     currentCardIndex: 0,
     health: maxHealth,
     maxHealth,
-    cardsPlayed: 0,
+    cardsPlayedThisTurn: 0,
     statusEffects: { ...EMPTY_STATUS_EFFECTS },
   };
 }
@@ -149,7 +149,7 @@ export function getCurrentCard(playerOrGame: PlayerState | GameState) {
 
 export function getCanPlayCard(game: GameState) {
   const activePlayer = getActivePlayer(game);
-  return activePlayer.cardsPlayed === 0 || activePlayer.statusEffects.extraCardPlays > 0;
+  return activePlayer.cardsPlayedThisTurn === 0 || activePlayer.statusEffects.extraCardPlays > 0;
 }
 
 export function getIsBattleOver(game: GameState) {
