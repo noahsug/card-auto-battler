@@ -4,6 +4,7 @@ export const EMPTY_STATUS_EFFECTS = {
   bleed: 0,
   extraCardPlays: 0,
   dodge: 0,
+  strength: 0,
 };
 
 export type StatusEffects = {

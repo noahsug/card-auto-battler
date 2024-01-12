@@ -14,13 +14,19 @@ import {
 function runBattle({
   user,
   opponent,
-  stopAfter,
+  stopAfterTurn = Infinity,
+  stopAfterNUserCardsPlayed = Infinity,
 }: {
   user?: Partial<PlayerState>;
   opponent?: Partial<PlayerState>;
-  stopAfter?: { userCardsPlayed: true } | { turn: number };
+  stopAfterTurn?: number;
+  stopAfterNUserCardsPlayed?: number;
 }) {
-  const game = merge(createInitialGameState(), { user, opponent });
+  const game = merge(
+    createInitialGameState(),
+    { user: { maxHealth: 10 }, opponent: { maxHealth: 10 } },
+    { user, opponent },
+  );
 
   startGame(game);
   startBattle(game);
@@ -28,30 +34,22 @@ function runBattle({
   const startingState = clonedeep(game);
 
   // unshuffle the cards
-  if (user?.cards) {
-    game.user.cards = user.cards;
-  }
-  if (opponent?.cards) {
-    game.opponent.cards = opponent.cards;
-  }
-
-  const stopAfterTurn = stopAfter && 'turn' in stopAfter ? stopAfter.turn : Infinity;
-  const stopAfterUserCardsPlayed =
-    stopAfter && 'userCardsPlayed' in stopAfter ? game.user.cards.length : Infinity;
+  game.user.cards = user?.cards || [{ target: { damage: 0 } }];
+  game.opponent.cards = opponent?.cards || [{ target: { damage: 0 } }];
 
   let userCardsPlayed = 0;
 
   while (
     !getIsBattleOver(game) &&
     game.turn < stopAfterTurn &&
-    userCardsPlayed < stopAfterUserCardsPlayed
+    userCardsPlayed < stopAfterNUserCardsPlayed
   ) {
     startTurn(game);
 
     while (
       !getIsBattleOver(game) &&
       getCanPlayCard(game) &&
-      userCardsPlayed < stopAfterUserCardsPlayed
+      userCardsPlayed < stopAfterNUserCardsPlayed
     ) {
       playCard(game);
       if (!getIsOpponentTurn(game)) {
@@ -65,13 +63,16 @@ function runBattle({
   return { endingState: game, startingState };
 }
 
+function playCards(cards: CardState[]) {
+  return runBattle({
+    user: { cards },
+    stopAfterNUserCardsPlayed: cards.length,
+  });
+}
+
 describe('damage effect', () => {
   it('reduces health', () => {
-    const userCards: CardState[] = [{ target: { damage: 1 } }];
-    const { endingState, startingState } = runBattle({
-      user: { cards: userCards },
-      stopAfter: { userCardsPlayed: true },
-    });
+    const { endingState, startingState } = playCards([{ target: { damage: 1 } }]);
 
     expect(startingState.opponent.health - endingState.opponent.health).toBe(1);
   });
@@ -84,7 +85,7 @@ describe('dodge effect', () => {
     const { endingState, startingState } = runBattle({
       user: { cards: userCards },
       opponent: { cards: opponentCards },
-      stopAfter: { userCardsPlayed: true },
+      stopAfterNUserCardsPlayed: userCards.length,
     });
 
     expect(startingState.user.health).toBe(endingState.user.health);
@@ -93,28 +94,19 @@ describe('dodge effect', () => {
 
 describe('bleed status effect', () => {
   it('is decreased when damage is delt', () => {
-    const userCards: CardState[] = [
+    const { endingState, startingState } = playCards([
       { target: { statusEffects: { bleed: 2 } } },
-      { target: { damage: 1 } },
-      { target: { damage: 1 } },
-      { target: { damage: 1 } },
-    ];
-    const opponentCards: CardState[] = [{ target: { damage: 0 } }];
-    const { endingState, startingState } = runBattle({
-      user: { cards: userCards },
-      opponent: { cards: opponentCards, maxHealth: 10 },
-      stopAfter: { userCardsPlayed: true },
-    });
-
+      { target: { damage: 1 } }, // 4 damage
+      { target: { damage: 1 } }, // 4 damage
+      { target: { damage: 1 } }, // 1 damage
+    ]);
     expect(startingState.opponent.health - endingState.opponent.health).toBe(9);
   });
 
   it('does not apply to damage delt at the same time as bleed is applied', () => {
-    const userCards: CardState[] = [{ target: { damage: 1, statusEffects: { bleed: 1 } } }];
-    const { endingState, startingState } = runBattle({
-      user: { cards: userCards },
-      stopAfter: { userCardsPlayed: true },
-    });
+    const { endingState, startingState } = playCards([
+      { target: { damage: 1, statusEffects: { bleed: 1 } } },
+    ]);
 
     expect(startingState.opponent.health - endingState.opponent.health).toBe(1);
   });
@@ -122,22 +114,33 @@ describe('bleed status effect', () => {
 
 describe('multihit effect', () => {
   it('deals damage twice', () => {
-    const userCards: CardState[] = [{ target: { damage: 1, multihit: 1 } }];
-    const { endingState, startingState } = runBattle({
-      user: { cards: userCards },
-      stopAfter: { userCardsPlayed: true },
-    });
+    const { endingState, startingState } = playCards([{ target: { damage: 1, multihit: 1 } }]);
 
     expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
   });
   it('applies effects twice', () => {
-    const userCards: CardState[] = [{ target: { statusEffects: { bleed: 1 }, multihit: 1 } }];
-    const { endingState } = runBattle({
-      user: { cards: userCards },
-      stopAfter: { userCardsPlayed: true },
-    });
+    const { endingState } = playCards([{ target: { statusEffects: { bleed: 1 }, multihit: 1 } }]);
 
     expect(endingState.opponent.statusEffects.bleed).toBe(2);
+  });
+});
+
+describe('strength effect', () => {
+  it('increases card damage by X', () => {
+    const { endingState, startingState } = playCards([
+      { self: { statusEffects: { strength: 1 } } },
+      { target: { damage: 1 } },
+    ]);
+
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
+  });
+  it('does not apply to damage delt at the same time as strength is applied', () => {
+    const { endingState, startingState } = playCards([
+      { target: { damage: 1 }, self: { statusEffects: { strength: 1 } } },
+      { target: { damage: 0 } },
+    ]);
+
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
   });
 });
 
@@ -150,7 +153,7 @@ describe('extraCardPlays status effect', () => {
     ];
     const { endingState, startingState } = runBattle({
       user: { cards: userCards },
-      stopAfter: { turn: 1 },
+      stopAfterTurn: 1,
     });
 
     expect(startingState.opponent.health - endingState.opponent.health).toBe(2);

@@ -97,7 +97,7 @@ function applyCardEffectsToTarget(
     if (target.statusEffects.dodge > 0) {
       target.statusEffects.dodge -= 1;
     } else {
-      dealDamage({ target, damage: effects.damage });
+      dealDamage({ target, self, damage: effects.damage });
     }
   }
 
@@ -116,7 +116,17 @@ function applyCardEffectsToTarget(
   }
 }
 
-function dealDamage({ target, damage }: { target: PlayerState; damage: number }) {
+function dealDamage({
+  target,
+  self,
+  damage,
+}: {
+  target: PlayerState;
+  self: PlayerState;
+  damage: number;
+}) {
+  damage += self.statusEffects.strength;
+
   if (damage > 0) {
     target.health -= damage;
 
