@@ -74,10 +74,14 @@ export function playCard(game: GameState) {
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
   if (card.target) {
-    applyCardEffectsToTarget({ target: nonActivePlayer, self: activePlayer, effects: card.target });
+    applyCardEffectsToTarget({
+      target: nonActivePlayer,
+      self: activePlayer,
+      cardEffects: card.target,
+    });
   }
   if (card.self) {
-    applyCardEffectsToTarget({ target: activePlayer, self: activePlayer, effects: card.self });
+    applyCardEffectsToTarget({ target: activePlayer, self: activePlayer, cardEffects: card.self });
   }
 }
 
@@ -85,33 +89,35 @@ function applyCardEffectsToTarget(
   {
     target,
     self,
-    effects,
+    cardEffects,
   }: {
     target: PlayerState;
     self: PlayerState;
-    effects: CardEffects;
+    cardEffects: CardEffects;
   },
   appliedMultihit = false,
 ) {
-  if (effects.damage != null) {
+  if (cardEffects.damage != null) {
     if (target.statusEffects.dodge > 0) {
       target.statusEffects.dodge -= 1;
     } else {
-      dealDamage({ target, self, damage: effects.damage });
+      dealDamage({ target, self, damage: cardEffects.damage });
     }
   }
 
-  if (effects.statusEffects) {
-    (Object.entries(effects.statusEffects) as Entries<StatusEffects>).forEach(
+  if (cardEffects.statusEffects) {
+    (Object.entries(cardEffects.statusEffects) as Entries<StatusEffects>).forEach(
       ([statusEffect, value]) => {
         target.statusEffects[statusEffect] += value;
       },
     );
   }
 
-  if (effects.multihit != null && !appliedMultihit) {
-    for (let i = 0; i < effects.multihit; i++) {
-      applyCardEffectsToTarget({ target, self, effects }, true);
+  if (!appliedMultihit) {
+    const bonusMultihit = cardEffects.multihitPerBleed != null && target.statusEffects.bleed;
+    const multihit = (cardEffects.multihit || 0) + (bonusMultihit || 0);
+    for (let i = 0; i < multihit; i++) {
+      applyCardEffectsToTarget({ target, self, cardEffects }, true);
     }
   }
 }

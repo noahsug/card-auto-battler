@@ -4,6 +4,7 @@ import merge from 'lodash/merge';
 import { endTurn, playCard, startGame, startBattle, startTurn } from './actions';
 import { createInitialGameState } from '../';
 import {
+  BLEED_DAMAGE,
   CardState,
   PlayerState,
   getCanPlayCard,
@@ -92,26 +93,6 @@ describe('dodge effect', () => {
   });
 });
 
-describe('bleed status effect', () => {
-  it('is decreased when damage is delt', () => {
-    const { endingState, startingState } = playCards([
-      { target: { statusEffects: { bleed: 2 } } },
-      { target: { damage: 1 } }, // 4 damage
-      { target: { damage: 1 } }, // 4 damage
-      { target: { damage: 1 } }, // 1 damage
-    ]);
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(9);
-  });
-
-  it('does not apply to damage delt at the same time as bleed is applied', () => {
-    const { endingState, startingState } = playCards([
-      { target: { damage: 1, statusEffects: { bleed: 1 } } },
-    ]);
-
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(1);
-  });
-});
-
 describe('multihit effect', () => {
   it('deals damage twice', () => {
     const { endingState, startingState } = playCards([{ target: { damage: 1, multihit: 1 } }]);
@@ -125,7 +106,42 @@ describe('multihit effect', () => {
   });
 });
 
-describe('strength effect', () => {
+describe('multihitPerBleed effect', () => {
+  it('applies X multihit per opponent bleed', () => {
+    const { endingState, startingState } = playCards([
+      { target: { statusEffects: { bleed: 2 } } },
+      { target: { multihitPerBleed: 1, damage: 1 } },
+    ]);
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 2);
+  });
+});
+
+describe('bleed status effect', () => {
+  it('deals flat damage when damage is delt', () => {
+    const { endingState, startingState } = playCards([
+      { target: { statusEffects: { bleed: 50 } } },
+      { target: { damage: 1 } },
+    ]);
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE + 1);
+  });
+  it('decreases by 1 when damage is delt', () => {
+    const { endingState, startingState } = playCards([
+      { target: { statusEffects: { bleed: 2 } } },
+      { target: { multihit: 1, damage: 1 } }, // 7 damage
+      { target: { damage: 1 } }, // 1 damage
+    ]);
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 3);
+  });
+  it('does not apply to damage delt at the same time as bleed is applied', () => {
+    const { endingState, startingState } = playCards([
+      { target: { damage: 1, statusEffects: { bleed: 1 } } },
+    ]);
+
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(1);
+  });
+});
+
+describe('strength status effect', () => {
   it('increases card damage by X', () => {
     const { endingState, startingState } = playCards([
       { self: { statusEffects: { strength: 1 } } },

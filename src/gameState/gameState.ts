@@ -13,6 +13,7 @@ export type StatusEffects = {
 
 export interface CardEffects {
   damage?: number;
+  multihitPerBleed?: number;
   multihit?: number;
   statusEffects?: Partial<StatusEffects>;
 }
