@@ -93,47 +93,47 @@ describe('dodge effect', () => {
   });
 });
 
-describe('multihit effect', () => {
-  it('deals damage twice', () => {
-    const { endingState, startingState } = playCards([{ target: { damage: 1, multihit: 1 } }]);
+describe('repeat effect', () => {
+  it('deals damage N times', () => {
+    const { endingState, startingState } = playCards([{ target: { damage: 1, repeat: 1 } }]);
 
     expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
   });
-  it('applies effects twice', () => {
-    const { endingState } = playCards([{ target: { statusEffects: { bleed: 1 }, multihit: 1 } }]);
+  it('applies effects N times', () => {
+    const { endingState } = playCards([{ target: { statusEffects: { bleed: 1 }, repeat: 1 } }]);
 
     expect(endingState.opponent.statusEffects.bleed).toBe(2);
   });
 });
 
-describe('multihitForBleed effect', () => {
-  it('applies X - 1 multihit per target bleed', () => {
+describe('repeatForBleed effect', () => {
+  it('repeats card target bleed - 1 times', () => {
     const { endingState, startingState } = playCards([
       { target: { statusEffects: { bleed: 2 } } },
-      { target: { multihitForBleed: 1, damage: 1 } },
+      { target: { repeatForBleed: 1, damage: 1 } },
     ]);
     expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 2);
     expect(endingState.opponent.statusEffects.bleed).toBe(0);
   });
-  it('does nothing when target has no bleed', () => {
+  it('causes the card to do nothing when target has no bleed', () => {
     const { endingState, startingState } = playCards([
-      { target: { multihitForBleed: 1, damage: 1 } },
+      { target: { repeatForBleed: 1, damage: 1 } },
     ]);
     expect(startingState.opponent.health - endingState.opponent.health).toBe(0);
   });
-  it('does not count bleed inflicted at the same time as this effect', () => {
+  it('does not count bleed inflicted at the same time', () => {
     const { endingState, startingState } = playCards([
       { target: { statusEffects: { bleed: 2 } } },
-      { target: { multihitForBleed: 1, damage: 1, statusEffects: { bleed: 50 } } },
+      { target: { repeatForBleed: 1, damage: 1, statusEffects: { bleed: 50 } } },
     ]);
 
     expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 2);
     expect(endingState.opponent.statusEffects.bleed).toBe(50 * 2);
   });
-  it('is additive with existing multihit', () => {
+  it('is additive with existing repeat', () => {
     const { endingState, startingState } = playCards([
       { target: { statusEffects: { bleed: 2 } } },
-      { target: { multihitForBleed: 1, multihit: 1, damage: 1 } },
+      { target: { repeatForBleed: 1, repeat: 1, damage: 1 } },
     ]);
 
     expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 3);
@@ -151,12 +151,12 @@ describe('bleed status effect', () => {
   it('decreases by 1 when damage is delt', () => {
     const { endingState, startingState } = playCards([
       { target: { statusEffects: { bleed: 2 } } },
-      { target: { multihit: 1, damage: 1 } }, // 7 damage
+      { target: { repeat: 1, damage: 1 } }, // 7 damage
       { target: { damage: 1 } }, // 1 damage
     ]);
     expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 3);
   });
-  it('does not apply to damage delt at the same time as bleed is applied', () => {
+  it('does not apply to damage delt at the same time', () => {
     const { endingState, startingState } = playCards([
       { target: { damage: 1, statusEffects: { bleed: 1 } } },
     ]);
@@ -166,7 +166,7 @@ describe('bleed status effect', () => {
 });
 
 describe('strength status effect', () => {
-  it('increases card damage by X', () => {
+  it('increases card damage by N', () => {
     const { endingState, startingState } = playCards([
       { self: { statusEffects: { strength: 1 } } },
       { target: { damage: 1 } },
@@ -174,7 +174,7 @@ describe('strength status effect', () => {
 
     expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
   });
-  it('does not apply to damage delt at the same time as strength is applied', () => {
+  it('does not apply to damage delt at the same time', () => {
     const { endingState, startingState } = playCards([
       { target: { damage: 1 }, self: { statusEffects: { strength: 1 } } },
       { target: { damage: 0 } },

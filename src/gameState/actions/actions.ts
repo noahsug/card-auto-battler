@@ -95,16 +95,16 @@ function applyCardEffectsToTarget(
     self: PlayerState;
     cardEffects: CardEffects;
   },
-  appliedMultihit = false,
+  appliedRepeat = false,
 ) {
-  const multihit = cardEffects.multihit || 0;
+  const repeat = cardEffects.repeat || 0;
   // Calculated before bleed is applied
-  const bonusMultihit =
-    cardEffects.multihitForBleed != null && target.statusEffects.bleed >= 0
+  const bonusRepeat =
+    cardEffects.repeatForBleed != null && target.statusEffects.bleed >= 0
       ? target.statusEffects.bleed - 1
       : 0;
 
-  if (multihit + bonusMultihit < 0) return;
+  if (repeat + bonusRepeat < 0) return;
 
   if (cardEffects.damage != null) {
     if (target.statusEffects.dodge > 0) {
@@ -122,9 +122,9 @@ function applyCardEffectsToTarget(
     );
   }
 
-  if (!appliedMultihit) {
-    const multihit = (cardEffects.multihit || 0) + bonusMultihit;
-    for (let i = 0; i < multihit; i++) {
+  if (!appliedRepeat) {
+    const repeat = (cardEffects.repeat || 0) + bonusRepeat;
+    for (let i = 0; i < repeat; i++) {
       applyCardEffectsToTarget({ target, self, cardEffects }, true);
     }
   }

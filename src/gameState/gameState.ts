@@ -13,8 +13,8 @@ export type StatusEffects = {
 
 export interface CardEffects {
   damage?: number;
-  multihitForBleed?: number;
-  multihit?: number;
+  repeatForBleed?: number;
+  repeat?: number;
   statusEffects?: Partial<StatusEffects>;
 }
 
@@ -61,7 +61,7 @@ function createInitialPlayerState(): PlayerState {
 
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
 const userCards: CardState[] = [
-  { target: { multihitForBleed: 1, damage: 1, statusEffects: { bleed: 2 } } },
+  { target: { repeatForBleed: 1, damage: 1, statusEffects: { bleed: 2 } } },
 ];
 
 const opponentCardsByBattle = [
@@ -120,7 +120,7 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
   for (let j = 0; j < 6; j++) {
     const damage = Math.round(6 * Math.random() * Math.random());
     cardSelectionsByBattle[i].push({
-      target: { multihitForBleed: 1, damage, statusEffects: { bleed: 2 } },
+      target: { repeatForBleed: 1, damage, statusEffects: { bleed: 2 } },
       self: { statusEffects: { extraCardPlays: 1 } },
     });
   }

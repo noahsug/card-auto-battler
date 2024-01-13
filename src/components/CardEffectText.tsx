@@ -18,7 +18,7 @@ function getSymbol({ effectName, statusEffectName }: EffectIdentifier) {
     return '⚔️';
   }
 
-  if (effectName === 'multihit') {
+  if (effectName === 'repeat') {
     return ' times';
   }
 
@@ -29,8 +29,8 @@ function getSymbol({ effectName, statusEffectName }: EffectIdentifier) {
 export default function CardEffectText({ effectName, statusEffectName, value }: Props) {
   const symbol = getSymbol({ effectName, statusEffectName });
 
-  if (effectName === 'multihit') {
-    // multihit 1 = hit two times
+  if (effectName === 'repeat') {
+    // repeat 1 = hit two times
     value += 1;
   }
 

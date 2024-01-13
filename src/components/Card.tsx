@@ -36,15 +36,13 @@ function getCardTextItems(effects: CardEffects | undefined, targetSelf: boolean)
     );
   });
 
-  if (effects.multihit != null) {
-    cardTextItems.push(
-      <CardEffectText key="multihit" effectName="multihit" value={effects.multihit} />,
-    );
+  if (effects.repeat != null) {
+    cardTextItems.push(<CardEffectText key="repeat" effectName="repeat" value={effects.repeat} />);
   }
 
-  if (effects.multihitForBleed != null) {
-    const nTimes = effects.multihitForBleed === 1 ? '' : `${effects.multihitForBleed} times `;
-    cardTextItems.push(<CardText key="multihit-per-bleed">{nTimes}per target bleed</CardText>);
+  if (effects.repeatForBleed != null) {
+    const nTimes = effects.repeatForBleed === 1 ? '' : `${effects.repeatForBleed} times `;
+    cardTextItems.push(<CardText key="repeat-per-bleed">{nTimes}per target bleed</CardText>);
   }
 
   if (targetSelf) {
