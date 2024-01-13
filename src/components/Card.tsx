@@ -42,6 +42,11 @@ function getCardTextItems(effects: CardEffects | undefined, targetSelf: boolean)
     );
   }
 
+  if (effects.multihitForBleed != null) {
+    const nTimes = effects.multihitForBleed === 1 ? '' : `${effects.multihitForBleed} times `;
+    cardTextItems.push(<CardText key="multihit-per-bleed">{nTimes}per target bleed</CardText>);
+  }
+
   if (targetSelf) {
     cardTextItems.push(<CardText key="self">to self</CardText>);
   }

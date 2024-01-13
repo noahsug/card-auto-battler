@@ -106,13 +106,37 @@ describe('multihit effect', () => {
   });
 });
 
-describe('multihitPerBleed effect', () => {
-  it('applies X multihit per opponent bleed', () => {
+describe('multihitForBleed effect', () => {
+  it('applies X - 1 multihit per target bleed', () => {
     const { endingState, startingState } = playCards([
       { target: { statusEffects: { bleed: 2 } } },
-      { target: { multihitPerBleed: 1, damage: 1 } },
+      { target: { multihitForBleed: 1, damage: 1 } },
     ]);
     expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 2);
+    expect(endingState.opponent.statusEffects.bleed).toBe(0);
+  });
+  it('does nothing when target has no bleed', () => {
+    const { endingState, startingState } = playCards([
+      { target: { multihitForBleed: 1, damage: 1 } },
+    ]);
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(0);
+  });
+  it('does not count bleed inflicted at the same time as this effect', () => {
+    const { endingState, startingState } = playCards([
+      { target: { statusEffects: { bleed: 2 } } },
+      { target: { multihitForBleed: 1, damage: 1, statusEffects: { bleed: 50 } } },
+    ]);
+
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 2);
+    expect(endingState.opponent.statusEffects.bleed).toBe(50 * 2);
+  });
+  it('is additive with existing multihit', () => {
+    const { endingState, startingState } = playCards([
+      { target: { statusEffects: { bleed: 2 } } },
+      { target: { multihitForBleed: 1, multihit: 1, damage: 1 } },
+    ]);
+
+    expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 3);
   });
 });
 

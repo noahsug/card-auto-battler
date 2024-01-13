@@ -97,6 +97,15 @@ function applyCardEffectsToTarget(
   },
   appliedMultihit = false,
 ) {
+  const multihit = cardEffects.multihit || 0;
+  // Calculated before bleed is applied
+  const bonusMultihit =
+    cardEffects.multihitForBleed != null && target.statusEffects.bleed >= 0
+      ? target.statusEffects.bleed - 1
+      : 0;
+
+  if (multihit + bonusMultihit < 0) return;
+
   if (cardEffects.damage != null) {
     if (target.statusEffects.dodge > 0) {
       target.statusEffects.dodge -= 1;
@@ -114,8 +123,7 @@ function applyCardEffectsToTarget(
   }
 
   if (!appliedMultihit) {
-    const bonusMultihit = cardEffects.multihitPerBleed != null && target.statusEffects.bleed;
-    const multihit = (cardEffects.multihit || 0) + (bonusMultihit || 0);
+    const multihit = (cardEffects.multihit || 0) + bonusMultihit;
     for (let i = 0; i < multihit; i++) {
       applyCardEffectsToTarget({ target, self, cardEffects }, true);
     }
