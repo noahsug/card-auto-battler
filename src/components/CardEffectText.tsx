@@ -4,6 +4,7 @@ import { CardEffects, StatusEffects } from '../gameState';
 import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
 import { assertIsNonNullable } from '../utils';
 
+// TODO: use CardEffectIdentifier from gameState
 interface EffectIdentifier {
   effectName?: keyof Omit<CardEffects, 'statusEffects'>;
   statusEffectName?: keyof StatusEffects;

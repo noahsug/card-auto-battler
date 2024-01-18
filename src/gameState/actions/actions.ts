@@ -16,9 +16,11 @@ import {
   EMPTY_STATUS_EFFECTS,
   CardEffects,
   StatusEffects,
+  PlayerValueIdentifier,
 } from '../';
 import { assert } from '../../utils';
 import { Entries } from '../../utils/types/types';
+import { cloneDeep } from 'lodash';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
@@ -85,16 +87,55 @@ export function playCard(game: GameState) {
   }
 }
 
-// function
-// if (cardEffects.gainEffectBasedOnEffect) {
-//   const basedOnEffect = cardEffects.gainEffectBasedOnEffect.basedOn;
-//   if (basedOnEffect.isCardEffect) {
-//     if (basedOnEffect.isStatusEffect) {
+function getPlayerValue({
+  valueIdentifier,
+  player,
+}: {
+  valueIdentifier: PlayerValueIdentifier;
+  player: PlayerState;
+}) {
+  if (valueIdentifier.isStatusEffect) {
+    return player.statusEffects[valueIdentifier.name];
+  }
 
-//     }
-//   }
-//   const effectTarget = cardEffects.gainEffectBasedOnEffect.target === 'self' ? self : target;
-// }
+  const value = player[valueIdentifier.name];
+  if (typeof value === 'number') return value;
+  if (Array.isArray(value)) return value.length;
+  return Object.values(value).reduce((sum, v) => sum + v, 0);
+}
+
+function gainEffectBasedOnPlayerValue({
+  target,
+  self,
+  cardEffects,
+}: {
+  target: PlayerState;
+  self: PlayerState;
+  cardEffects: CardEffects;
+}) {
+  if (!cardEffects.effectBasedOnPlayerValue) return cardEffects;
+
+  const { effect, basedOn, ratio = 1 } = cardEffects.effectBasedOnPlayerValue;
+  cardEffects = cloneDeep(cardEffects);
+
+  const basedOnValue = getPlayerValue({
+    valueIdentifier: basedOn,
+    player: basedOn.target === 'self' ? self : target,
+  });
+
+  if (effect.isStatusEffect) {
+    if (cardEffects.statusEffects == null) {
+      cardEffects.statusEffects = {};
+    }
+    const currentStatusEffectValue = cardEffects.statusEffects[effect.name] || 0;
+    cardEffects.statusEffects[effect.name] = currentStatusEffectValue + basedOnValue * ratio;
+  } else {
+    const currentEffectValue = cardEffects[effect.name] || 0;
+    cardEffects[effect.name] = currentEffectValue + basedOnValue * ratio;
+  }
+
+  return cardEffects;
+}
 
 function applyCardEffects(
   {
@@ -108,28 +149,12 @@ function applyCardEffects(
   },
   isRepeating = false,
 ) {
-  if (!isRepeating && cardEffects.effectBasedOnEffect) {
-    const basedOnValue = getEffectValue({
-      effectIdentifier: cardEffects.effectBasedOnEffect.basedOn,
-      target,
-      self,
-    });
-      gainEffect({
-        effectIdentifier: cardEffects.effectBasedOnEffect.effect,
-        value: basedOnValue,
-        state: { self, target, cardEffects }
-      });
-    } else {
-      gainEffect({
-        effectIdentifier: cardEffects.effectBasedOnEffect.effect,
-        value: basedOnValue,
-        player: self,
-      });
-    }
+  if (!isRepeating) {
+    cardEffects = gainEffectBasedOnPlayerValue({ target, self, cardEffects });
   }
 
   const repeat = cardEffects.repeat || 0;
-  if (repeat + bonusRepeat < 0) return;
+  if (repeat < 0) return;
 
   if (cardEffects.damage != null) {
     if (target.statusEffects.dodge > 0) {
@@ -147,10 +172,9 @@ function applyCardEffects(
     );
   }
 
-  if (!appliedRepeat) {
-    const repeat = (cardEffects.repeat || 0) + bonusRepeat;
+  if (!isRepeating) {
     for (let i = 0; i < repeat; i++) {
-      applyCardEffectsToTarget({ target, self, cardEffects }, true);
+      applyCardEffects({ target, self, cardEffects }, true);
     }
   }
 }

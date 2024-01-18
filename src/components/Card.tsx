@@ -40,11 +40,6 @@ function getCardTextItems(effects: CardEffects | undefined, targetSelf: boolean)
     cardTextItems.push(<CardEffectText key="repeat" effectName="repeat" value={effects.repeat} />);
   }
 
-  if (effects.repeatForBleed != null) {
-    const nTimes = effects.repeatForBleed === 1 ? '' : `${effects.repeatForBleed} times `;
-    cardTextItems.push(<CardText key="repeat-per-bleed">{nTimes}per target bleed</CardText>);
-  }
-
   if (targetSelf) {
     cardTextItems.push(<CardText key="self">to self</CardText>);
   }

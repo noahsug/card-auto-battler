@@ -1,3 +1,4 @@
+import { PickType } from '../utils/types/types';
 export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'battle-end' | 'game-end';
 
 export const EMPTY_STATUS_EFFECTS = {
@@ -12,59 +13,40 @@ export type StatusEffects = {
 };
 
 // TODO: rename to 'self' | 'opponent'
-type PlayerTarget = 'self' | 'target';
+type Target = 'self' | 'target';
 
-interface GenericEffectIdentifier {
-  target: PlayerTarget;
-  isCardEffect: boolean;
-  isStatusEffect: boolean;
-  valueName: string;
-}
+type Targeted<T> = T & { target: Target };
 
-interface PlayerEffectIdentifier extends GenericEffectIdentifier {
-  isCardEffect: false;
-  isStatusEffect: false;
-  valueName: keyof Omit<CardEffects, 'statusEffects'>;
-}
-
-interface PlayerStatusEffectIdentifier extends GenericEffectIdentifier {
-  isCardEffect: false;
+interface StatusEffectIdentifier {
   isStatusEffect: true;
-  valueName: keyof StatusEffects;
+  name: keyof StatusEffects;
 }
 
-interface CardEffectIdentifier extends GenericEffectIdentifier {
-  isCardEffect: true;
+interface NonStatusEffectIdentifier<T> {
   isStatusEffect: false;
-  valueName: keyof Omit<CardEffects, 'statusEffects'>;
+  name: keyof T;
 }
 
-interface CardStatusEffectIdentifier extends GenericEffectIdentifier {
-  isCardEffect: true;
-  isStatusEffect: true;
-  valueName: keyof StatusEffects;
-}
+// Card effect that is a number
+export type GainableCardEffects = Partial<PickType<Required<CardEffects>, number>>;
 
-export type EffectIdentifier =
-  | PlayerEffectIdentifier
-  | PlayerStatusEffectIdentifier
-  | CardEffectIdentifier
-  | CardStatusEffectIdentifier;
+export type PlayerValueIdentifier = StatusEffectIdentifier | NonStatusEffectIdentifier<PlayerState>;
 
-export type GainEffectIdentifier = (CardEffectIdentifier | CardStatusEffectIdentifier) & {
-  target: 'self';
-};
+export type CardEffectIdentifier = StatusEffectIdentifier | NonStatusEffectIdentifier<CardEffects>;
+
+export type GainableCardEffectIdentifier =
+  | StatusEffectIdentifier
+  | NonStatusEffectIdentifier<GainableCardEffects>;
 
 export interface CardEffects {
   damage?: number;
   repeat?: number;
   statusEffects?: Partial<StatusEffects>;
   // gain card effect based on target, self or current card value
-  // TODO: rename Effect to Value, since we can select player values such as "health" and "damage"
-  effectBasedOnPlayerEffect?: {
-    effect: GainEffectIdentifier;
-    basedOn: EffectIdentifier;
-    ratio: number;
+  effectBasedOnPlayerValue?: {
+    effect: GainableCardEffectIdentifier;
+    basedOn: Targeted<PlayerValueIdentifier>;
+    ratio?: number;
   };
 }
 
