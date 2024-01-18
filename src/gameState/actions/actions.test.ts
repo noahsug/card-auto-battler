@@ -106,37 +106,67 @@ describe('repeat effect', () => {
   });
 });
 
-describe('repeatForBleed effect', () => {
-  it('repeats card target bleed - 1 times', () => {
-    const { endingState, startingState } = playCards([
-      { target: { statusEffects: { bleed: 2 } } },
-      { target: { repeatForBleed: 1, damage: 1 } },
-    ]);
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 2);
-    expect(endingState.opponent.statusEffects.bleed).toBe(0);
-  });
-  it('causes the card to do nothing when target has no bleed', () => {
-    const { endingState, startingState } = playCards([
-      { target: { repeatForBleed: 1, damage: 1 } },
-    ]);
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(0);
-  });
-  it('does not count bleed inflicted at the same time', () => {
-    const { endingState, startingState } = playCards([
-      { target: { statusEffects: { bleed: 2 } } },
-      { target: { repeatForBleed: 1, damage: 1, statusEffects: { bleed: 50 } } },
-    ]);
+describe('gainEffectBasedOnEffect effect', () => {
+  describe('for each bleed', () => {
+    // TODO: rename to forEachOpponentBleed
+    const forEachBleed: CardState = {
+      self: {
+        repeat: -1,
+        effectBasedOnEffect: {
+          effect: {
+            target: 'self',
+            isCardEffect: true,
+            isStatusEffect: false,
+            valueName: 'repeat',
+          },
+          basedOn: {
+            target: 'target',
+            isCardEffect: false,
+            isStatusEffect: true,
+            valueName: 'bleed',
+          },
+          ratio: 1,
+        },
+      },
+    };
 
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 2);
-    expect(endingState.opponent.statusEffects.bleed).toBe(50 * 2);
-  });
-  it('is additive with existing repeat', () => {
-    const { endingState, startingState } = playCards([
-      { target: { statusEffects: { bleed: 2 } } },
-      { target: { repeatForBleed: 1, repeat: 1, damage: 1 } },
-    ]);
+    it('repeats card target bleed - 1 times', () => {
+      const { endingState, startingState } = playCards([
+        { target: { statusEffects: { bleed: 2 } } },
+        merge(forEachBleed, { target: { damage: 1 } }),
+      ]);
+      expect(startingState.opponent.health - endingState.opponent.health).toBe(
+        BLEED_DAMAGE * 2 + 2,
+      );
+      expect(endingState.opponent.statusEffects.bleed).toBe(0);
+    });
+    it('causes the card to do nothing when target has no bleed', () => {
+      const { endingState, startingState } = playCards([
+        merge(forEachBleed, { target: { damage: 1 } }),
+      ]);
+      expect(startingState.opponent.health - endingState.opponent.health).toBe(0);
+    });
+    it('does not count bleed inflicted at the same time', () => {
+      const { endingState, startingState } = playCards([
+        { target: { statusEffects: { bleed: 2 } } },
+        merge(forEachBleed, { target: { damage: 1, statusEffects: { bleed: 50 } } }),
+      ]);
 
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 3);
+      expect(startingState.opponent.health - endingState.opponent.health).toBe(
+        BLEED_DAMAGE * 2 + 2,
+      );
+      expect(endingState.opponent.statusEffects.bleed).toBe(50 * 2);
+    });
+    it('is additive with existing repeat', () => {
+      const { endingState, startingState } = playCards([
+        { target: { statusEffects: { bleed: 2 } } },
+        merge(forEachBleed, { target: { damage: 1, repeat: 1 } }),
+      ]);
+
+      expect(startingState.opponent.health - endingState.opponent.health).toBe(
+        BLEED_DAMAGE * 2 + 3,
+      );
+    });
   });
 });
 

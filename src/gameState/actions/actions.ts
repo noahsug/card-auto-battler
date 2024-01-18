@@ -60,6 +60,7 @@ export function startTurn(game: GameState) {
 }
 
 export function playCard(game: GameState) {
+  // TODO: reduce duplication between activePlayer/nonActivePlayer and self/opponent ?
   const activePlayer = getActivePlayer(game);
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getCurrentCard(activePlayer);
@@ -70,40 +71,64 @@ export function playCard(game: GameState) {
   }
   activePlayer.cardsPlayedThisTurn += 1;
 
-  // refactor to function that takes player and applies dmg/effects
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
   if (card.target) {
-    applyCardEffectsToTarget({
+    applyCardEffects({
       target: nonActivePlayer,
       self: activePlayer,
       cardEffects: card.target,
     });
   }
   if (card.self) {
-    applyCardEffectsToTarget({ target: activePlayer, self: activePlayer, cardEffects: card.self });
+    applyCardEffects({ target: activePlayer, self: activePlayer, cardEffects: card.self });
   }
 }
 
-function applyCardEffectsToTarget(
-  {
-    target,
-    self,
-    cardEffects,
-  }: {
-    target: PlayerState;
-    self: PlayerState;
-    cardEffects: CardEffects;
-  },
-  appliedRepeat = false,
-) {
-  const repeat = cardEffects.repeat || 0;
-  // Calculated before bleed is applied
-  const bonusRepeat =
-    cardEffects.repeatForBleed != null && target.statusEffects.bleed >= 0
-      ? target.statusEffects.bleed - 1
-      : 0;
+// function
+// if (cardEffects.gainEffectBasedOnEffect) {
+//   const basedOnEffect = cardEffects.gainEffectBasedOnEffect.basedOn;
+//   if (basedOnEffect.isCardEffect) {
+//     if (basedOnEffect.isStatusEffect) {
 
+//     }
+//   }
+//   const effectTarget = cardEffects.gainEffectBasedOnEffect.target === 'self' ? self : target;
+// }
+
+function applyCardEffects(
+  {
+    cardEffects,
+    self,
+    target,
+  }: {
+    cardEffects: CardEffects;
+    self: PlayerState;
+    target: PlayerState;
+  },
+  isRepeating = false,
+) {
+  if (!isRepeating && cardEffects.effectBasedOnEffect) {
+    const basedOnValue = getEffectValue({
+      effectIdentifier: cardEffects.effectBasedOnEffect.basedOn,
+      target,
+      self,
+    });
+      gainEffect({
+        effectIdentifier: cardEffects.effectBasedOnEffect.effect,
+        value: basedOnValue,
+        state: { self, target, cardEffects }
+      });
+    } else {
+      gainEffect({
+        effectIdentifier: cardEffects.effectBasedOnEffect.effect,
+        value: basedOnValue,
+        player: self,
+      });
+    }
+  }
+
+  const repeat = cardEffects.repeat || 0;
   if (repeat + bonusRepeat < 0) return;
 
   if (cardEffects.damage != null) {

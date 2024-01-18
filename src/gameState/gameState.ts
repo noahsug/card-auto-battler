@@ -11,11 +11,61 @@ export type StatusEffects = {
   [K in keyof typeof EMPTY_STATUS_EFFECTS]: number;
 };
 
+// TODO: rename to 'self' | 'opponent'
+type PlayerTarget = 'self' | 'target';
+
+interface GenericEffectIdentifier {
+  target: PlayerTarget;
+  isCardEffect: boolean;
+  isStatusEffect: boolean;
+  valueName: string;
+}
+
+interface PlayerEffectIdentifier extends GenericEffectIdentifier {
+  isCardEffect: false;
+  isStatusEffect: false;
+  valueName: keyof Omit<CardEffects, 'statusEffects'>;
+}
+
+interface PlayerStatusEffectIdentifier extends GenericEffectIdentifier {
+  isCardEffect: false;
+  isStatusEffect: true;
+  valueName: keyof StatusEffects;
+}
+
+interface CardEffectIdentifier extends GenericEffectIdentifier {
+  isCardEffect: true;
+  isStatusEffect: false;
+  valueName: keyof Omit<CardEffects, 'statusEffects'>;
+}
+
+interface CardStatusEffectIdentifier extends GenericEffectIdentifier {
+  isCardEffect: true;
+  isStatusEffect: true;
+  valueName: keyof StatusEffects;
+}
+
+export type EffectIdentifier =
+  | PlayerEffectIdentifier
+  | PlayerStatusEffectIdentifier
+  | CardEffectIdentifier
+  | CardStatusEffectIdentifier;
+
+export type GainEffectIdentifier = (CardEffectIdentifier | CardStatusEffectIdentifier) & {
+  target: 'self';
+};
+
 export interface CardEffects {
   damage?: number;
-  repeatForBleed?: number;
   repeat?: number;
   statusEffects?: Partial<StatusEffects>;
+  // gain card effect based on target, self or current card value
+  // TODO: rename Effect to Value, since we can select player values such as "health" and "damage"
+  effectBasedOnPlayerEffect?: {
+    effect: GainEffectIdentifier;
+    basedOn: EffectIdentifier;
+    ratio: number;
+  };
 }
 
 export interface CardState {
@@ -33,7 +83,10 @@ export interface PlayerState {
 }
 
 export interface GameState {
+  // TODO: rename "PlayerState" to "CharacterState"
+  // TODO: rename "user" to "player"
   user: PlayerState;
+  // TODO: rename to "npc"
   opponent: PlayerState;
   turn: number;
   wins: number;
@@ -60,9 +113,7 @@ function createInitialPlayerState(): PlayerState {
 }
 
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
-const userCards: CardState[] = [
-  { target: { repeatForBleed: 1, damage: 1, statusEffects: { bleed: 2 } } },
-];
+const userCards: CardState[] = [{ target: { damage: 1, statusEffects: { bleed: 2 } } }];
 
 const opponentCardsByBattle = [
   [
@@ -120,7 +171,7 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
   for (let j = 0; j < 6; j++) {
     const damage = Math.round(6 * Math.random() * Math.random());
     cardSelectionsByBattle[i].push({
-      target: { repeatForBleed: 1, damage, statusEffects: { bleed: 2 } },
+      target: { damage, statusEffects: { bleed: 2 } },
       self: { statusEffects: { extraCardPlays: 1 } },
     });
   }
