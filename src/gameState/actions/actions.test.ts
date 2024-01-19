@@ -11,7 +11,6 @@ import {
   getIsBattleOver,
   getIsOpponentTurn,
 } from '../gameState';
-import { before } from 'lodash';
 
 function runBattle({
   user,

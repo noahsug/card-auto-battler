@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { StatusEffects as StatusEffectsState } from '../gameState/gameState';
+import { StatusEffects as StatusEffectsState } from '../gameState';
 import { Entries } from '../utils/types/types';
 
 interface Props {

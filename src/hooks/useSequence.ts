@@ -4,7 +4,7 @@ type GoTo = (sequenceFunction: SequenceFunction) => void;
 export type SequenceFunction = (goTo: GoTo) => unknown;
 export type Sequence = SequenceFunction[];
 
-export default function useSequence(sequenceFunctions: Sequence) {
+export function useSequence(sequenceFunctions: Sequence) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const isRunningSequenceFunction = useRef(false);
 

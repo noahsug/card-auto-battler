@@ -11,3 +11,5 @@ export type KeysWithValueType<T, ValueType> = {
 }[keyof T];
 
 export type PickType<T, ValueType> = Pick<T, KeysWithValueType<T, ValueType>>;
+
+export type ExtendUnion<T, U> = T extends unknown ? U & T : never;

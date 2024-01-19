@@ -4,12 +4,18 @@ import { useGameState, useActions } from './GameStateContext';
 import Player from './Player';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen } from './shared';
-import { CardState, getCanPlayCard, getCurrentCard, getIsBattleOver } from '../gameState';
+import {
+  CardState,
+  getCanPlayCard,
+  getCurrentCard,
+  getIsBattleOver,
+  getIsOpponentTurn,
+} from '../gameState';
 import { wait } from '../utils';
-import useSequence from '../hooks/useSequence';
-import type { Sequence } from '../hooks/useSequence';
+import { useSequence } from '../hooks';
 import { useMemo, useState } from 'react';
-import { getIsOpponentTurn } from '../gameState/gameState';
+
+import type { Sequence } from '../hooks';
 
 export default function BattleScreen() {
   const game = useGameState();

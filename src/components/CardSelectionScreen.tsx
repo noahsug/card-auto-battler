@@ -7,8 +7,9 @@ import ProgressDisplay from './ProgressDisplay';
 import { Screen, Title } from './shared';
 import Card from './Card';
 import { wait } from '../utils';
-import useSequence from '../hooks/useSequence';
-import type { Sequence } from '../hooks/useSequence';
+import { useSequence } from '../hooks';
+
+import type { Sequence } from '../hooks';
 
 const CARDS_TO_SELECT = 2;
 
