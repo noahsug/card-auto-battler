@@ -12,8 +12,7 @@ export type StatusEffects = {
   [K in keyof typeof EMPTY_STATUS_EFFECTS]: number;
 };
 
-// TODO: rename to 'self' | 'enemy'
-type Target = 'self' | 'target';
+type Target = 'self' | 'opponent';
 
 type Targeted<T> = T & { target: Target };
 
@@ -52,7 +51,7 @@ export interface CardEffects {
 
 export interface CardState {
   self?: CardEffects;
-  target?: CardEffects;
+  opponent?: CardEffects;
 }
 
 export interface PlayerState {
@@ -92,31 +91,31 @@ function createInitialPlayerState(): PlayerState {
 }
 
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
-const userCards: CardState[] = [{ target: { damage: 1, statusEffects: { bleed: 2 } } }];
+const userCards: CardState[] = [{ opponent: { damage: 1, statusEffects: { bleed: 2 } } }];
 
 const enemyCardsByBattle = [
   [
-    { target: { damage: 1 } },
-    { target: { damage: 1 } },
-    { target: { damage: 1 } },
-    { target: { damage: 1 } },
-    { target: { damage: 1 } },
-    { target: { damage: 1 } },
+    { opponent: { damage: 1 } },
+    { opponent: { damage: 1 } },
+    { opponent: { damage: 1 } },
+    { opponent: { damage: 1 } },
+    { opponent: { damage: 1 } },
+    { opponent: { damage: 1 } },
   ], // 5 hits
   [
-    { target: { damage: 0 } },
-    { target: { damage: 0 } },
-    { target: { damage: 0 } },
-    { target: { damage: 3 } },
-    { target: { damage: 3 } },
+    { opponent: { damage: 0 } },
+    { opponent: { damage: 0 } },
+    { opponent: { damage: 0 } },
+    { opponent: { damage: 3 } },
+    { opponent: { damage: 3 } },
   ], // 4 hits
   [
-    { target: { damage: 2 } },
-    { target: { damage: 2 } },
-    { target: { damage: 3 } },
-    { target: { damage: 3 } },
+    { opponent: { damage: 2 } },
+    { opponent: { damage: 2 } },
+    { opponent: { damage: 3 } },
+    { opponent: { damage: 3 } },
   ], // 3 hits
-  [{ target: { damage: 3 } }, { target: { damage: 6 } }, { target: { damage: 9 } }], // 2 hits
+  [{ opponent: { damage: 3 } }, { target: { damage: 6 } }, { opponent: { damage: 9 } }], // 2 hits
 ];
 
 export function getEnemyCardsForBattle(battleCount: number) {
@@ -150,7 +149,7 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
   for (let j = 0; j < 6; j++) {
     const damage = Math.round(6 * Math.random() * Math.random());
     cardSelectionsByBattle[i].push({
-      target: { damage, statusEffects: { bleed: 2 } },
+      opponent: { damage, statusEffects: { bleed: 2 } },
       self: { statusEffects: { extraCardPlays: 1 } },
     });
   }

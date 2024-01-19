@@ -75,15 +75,15 @@ export function playCard(game: GameState) {
 
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
-  if (card.target) {
+  if (card.opponent) {
     applyCardEffects({
-      target: nonActivePlayer,
+      opponent: nonActivePlayer,
       self: activePlayer,
-      cardEffects: card.target,
+      cardEffects: card.opponent,
     });
   }
   if (card.self) {
-    applyCardEffects({ target: activePlayer, self: activePlayer, cardEffects: card.self });
+    applyCardEffects({ opponent: activePlayer, self: activePlayer, cardEffects: card.self });
   }
 }
 
@@ -105,11 +105,11 @@ function getPlayerValue({
 }
 
 function gainEffectBasedOnPlayerValue({
-  target,
+  opponent,
   self,
   cardEffects,
 }: {
-  target: PlayerState;
+  opponent: PlayerState;
   self: PlayerState;
   cardEffects: CardEffects;
 }) {
@@ -120,7 +120,7 @@ function gainEffectBasedOnPlayerValue({
 
   const basedOnValue = getPlayerValue({
     valueIdentifier: basedOn,
-    player: basedOn.target === 'self' ? self : target,
+    player: basedOn.target === 'self' ? self : opponent,
   });
 
   if (effect.isStatusEffect) {
@@ -141,61 +141,61 @@ function applyCardEffects(
   {
     cardEffects,
     self,
-    target,
+    opponent,
   }: {
     cardEffects: CardEffects;
     self: PlayerState;
-    target: PlayerState;
+    opponent: PlayerState;
   },
   isRepeating = false,
 ) {
   if (!isRepeating) {
-    cardEffects = gainEffectBasedOnPlayerValue({ target, self, cardEffects });
+    cardEffects = gainEffectBasedOnPlayerValue({ opponent, self, cardEffects });
   }
 
   const repeat = cardEffects.repeat || 0;
   if (repeat < 0) return;
 
   if (cardEffects.damage != null) {
-    if (target.statusEffects.dodge > 0) {
-      target.statusEffects.dodge -= 1;
+    if (opponent.statusEffects.dodge > 0) {
+      opponent.statusEffects.dodge -= 1;
     } else {
-      dealDamage({ target, self, damage: cardEffects.damage });
+      dealDamage({ self, opponent, damage: cardEffects.damage });
     }
   }
 
   if (cardEffects.statusEffects) {
     (Object.entries(cardEffects.statusEffects) as Entries<StatusEffects>).forEach(
       ([statusEffect, value]) => {
-        target.statusEffects[statusEffect] += value;
+        opponent.statusEffects[statusEffect] += value;
       },
     );
   }
 
   if (!isRepeating) {
     for (let i = 0; i < repeat; i++) {
-      applyCardEffects({ target, self, cardEffects }, true);
+      applyCardEffects({ opponent, self, cardEffects }, true);
     }
   }
 }
 
 function dealDamage({
-  target,
+  opponent,
   self,
   damage,
 }: {
-  target: PlayerState;
+  opponent: PlayerState;
   self: PlayerState;
   damage: number;
 }) {
   damage += self.statusEffects.strength;
 
   if (damage > 0) {
-    target.health -= damage;
+    opponent.health -= damage;
 
-    if (target.statusEffects.bleed) {
-      target.health -= 3;
-      target.statusEffects.bleed -= 1;
+    if (opponent.statusEffects.bleed) {
+      opponent.health -= 3;
+      opponent.statusEffects.bleed -= 1;
     }
   }
 }

@@ -48,7 +48,7 @@ function getCardTextItems(effects: CardEffects | undefined, targetSelf: boolean)
 }
 
 export default function Card({ card, isActive = false, scale = 1, className, onClick }: Props) {
-  const targetTextItems = getCardTextItems(card.target, false);
+  const targetTextItems = getCardTextItems(card.opponent, false);
   const selfTextItems = getCardTextItems(card.self, true);
 
   return (
