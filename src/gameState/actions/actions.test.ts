@@ -9,24 +9,24 @@ import {
   PlayerState,
   getCanPlayCard,
   getIsBattleOver,
-  getIsOpponentTurn,
+  getIsEnemyTurn,
 } from '../gameState';
 
 function runBattle({
   user,
-  opponent,
+  enemy,
   stopAfterTurn = Infinity,
   stopAfterNUserCardsPlayed = Infinity,
 }: {
   user?: Partial<PlayerState>;
-  opponent?: Partial<PlayerState>;
+  enemy?: Partial<PlayerState>;
   stopAfterTurn?: number;
   stopAfterNUserCardsPlayed?: number;
 }) {
   const game = merge(
     createInitialGameState(),
-    { user: { maxHealth: 10 }, opponent: { maxHealth: 10 } },
-    { user, opponent },
+    { user: { maxHealth: 10 }, enemy: { maxHealth: 10 } },
+    { user, enemy },
   );
 
   startGame(game);
@@ -36,7 +36,7 @@ function runBattle({
 
   // unshuffle the cards
   game.user.cards = user?.cards || [{ target: { damage: 0 } }];
-  game.opponent.cards = opponent?.cards || [{ target: { damage: 0 } }];
+  game.enemy.cards = enemy?.cards || [{ target: { damage: 0 } }];
 
   let userCardsPlayed = 0;
 
@@ -53,7 +53,7 @@ function runBattle({
       userCardsPlayed < stopAfterNUserCardsPlayed
     ) {
       playCard(game);
-      if (!getIsOpponentTurn(game)) {
+      if (!getIsEnemyTurn(game)) {
         userCardsPlayed++;
       }
     }
@@ -75,17 +75,17 @@ describe('damage effect', () => {
   it('reduces health', () => {
     const { endingState, startingState } = playCards([{ target: { damage: 1 } }]);
 
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(1);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(1);
   });
 });
 
 describe('dodge effect', () => {
   it('dodges the next source of damage', () => {
     const userCards: CardState[] = [{ self: { statusEffects: { dodge: 1 } } }];
-    const opponentCards: CardState[] = [{ target: { damage: 1 } }];
+    const enemyCards: CardState[] = [{ target: { damage: 1 } }];
     const { endingState, startingState } = runBattle({
       user: { cards: userCards },
-      opponent: { cards: opponentCards },
+      enemy: { cards: enemyCards },
       stopAfterNUserCardsPlayed: userCards.length,
     });
 
@@ -97,21 +97,21 @@ describe('repeat effect', () => {
   it('deals damage N times', () => {
     const { endingState, startingState } = playCards([{ target: { damage: 1, repeat: 1 } }]);
 
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
   });
 
   it('applies effects N times', () => {
     const { endingState } = playCards([{ target: { statusEffects: { bleed: 1 }, repeat: 1 } }]);
 
-    expect(endingState.opponent.statusEffects.bleed).toBe(2);
+    expect(endingState.enemy.statusEffects.bleed).toBe(2);
   });
 });
 
 describe('gainEffectBasedOnEffect effect', () => {
   describe('for each bleed', () => {
-    let forEachOpponentBleed: CardState;
+    let forEachEnemyBleed: CardState;
     beforeEach(() => {
-      forEachOpponentBleed = {
+      forEachEnemyBleed = {
         target: {
           repeat: -1,
           effectBasedOnPlayerValue: {
@@ -130,43 +130,37 @@ describe('gainEffectBasedOnEffect effect', () => {
       };
     });
 
-    it('repeats card opponent bleed - 1 times', () => {
+    it('repeats card enemy bleed - 1 times', () => {
       const { endingState, startingState } = playCards([
         { target: { statusEffects: { bleed: 2 } } },
-        merge(forEachOpponentBleed, { target: { damage: 1 } }),
+        merge(forEachEnemyBleed, { target: { damage: 1 } }),
       ]);
-      expect(startingState.opponent.health - endingState.opponent.health).toBe(
-        BLEED_DAMAGE * 2 + 2,
-      );
-      expect(endingState.opponent.statusEffects.bleed).toBe(0);
+      expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 2);
+      expect(endingState.enemy.statusEffects.bleed).toBe(0);
     });
 
     it('causes the card to do nothing when target has no bleed', () => {
       const { endingState, startingState } = playCards([
-        merge(forEachOpponentBleed, { target: { damage: 1 } }),
+        merge(forEachEnemyBleed, { target: { damage: 1 } }),
       ]);
-      expect(startingState.opponent.health - endingState.opponent.health).toBe(0);
+      expect(startingState.enemy.health - endingState.enemy.health).toBe(0);
     });
 
     it('does not count bleed inflicted at the same time', () => {
       const { endingState, startingState } = playCards([
         { target: { statusEffects: { bleed: 2 } } },
-        merge(forEachOpponentBleed, { target: { damage: 1, statusEffects: { bleed: 50 } } }),
+        merge(forEachEnemyBleed, { target: { damage: 1, statusEffects: { bleed: 50 } } }),
       ]);
-      expect(startingState.opponent.health - endingState.opponent.health).toBe(
-        BLEED_DAMAGE * 2 + 2,
-      );
-      expect(endingState.opponent.statusEffects.bleed).toBe(50 * 2);
+      expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 2);
+      expect(endingState.enemy.statusEffects.bleed).toBe(50 * 2);
     });
 
     it('is additive with existing repeat', () => {
       const { endingState, startingState } = playCards([
         { target: { statusEffects: { bleed: 2 } } },
-        merge(forEachOpponentBleed, { target: { damage: 1, repeat: 1 } }),
+        merge(forEachEnemyBleed, { target: { damage: 1, repeat: 1 } }),
       ]);
-      expect(startingState.opponent.health - endingState.opponent.health).toBe(
-        BLEED_DAMAGE * 2 + 4,
-      );
+      expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 4);
     });
   });
 });
@@ -177,7 +171,7 @@ describe('bleed status effect', () => {
       { target: { statusEffects: { bleed: 50 } } },
       { target: { damage: 1 } },
     ]);
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE + 1);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE + 1);
   });
 
   it('decreases by 1 when damage is delt', () => {
@@ -186,7 +180,7 @@ describe('bleed status effect', () => {
       { target: { repeat: 1, damage: 1 } }, // 7 damage
       { target: { damage: 1 } }, // 1 damage
     ]);
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(BLEED_DAMAGE * 2 + 3);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 3);
   });
 
   it('does not apply to damage delt at the same time', () => {
@@ -194,7 +188,7 @@ describe('bleed status effect', () => {
       { target: { damage: 1, statusEffects: { bleed: 1 } } },
     ]);
 
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(1);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(1);
   });
 });
 
@@ -205,7 +199,7 @@ describe('strength status effect', () => {
       { target: { damage: 1 } },
     ]);
 
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
   });
 
   it('does not apply to damage delt at the same time', () => {
@@ -214,7 +208,7 @@ describe('strength status effect', () => {
       { target: { damage: 0 } },
     ]);
 
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
   });
 });
 
@@ -230,6 +224,6 @@ describe('extraCardPlays status effect', () => {
       stopAfterTurn: 1,
     });
 
-    expect(startingState.opponent.health - endingState.opponent.health).toBe(2);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
   });
 });

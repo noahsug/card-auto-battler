@@ -12,7 +12,7 @@ export type StatusEffects = {
   [K in keyof typeof EMPTY_STATUS_EFFECTS]: number;
 };
 
-// TODO: rename to 'self' | 'opponent'
+// TODO: rename to 'self' | 'enemy'
 type Target = 'self' | 'target';
 
 type Targeted<T> = T & { target: Target };
@@ -65,11 +65,8 @@ export interface PlayerState {
 }
 
 export interface GameState {
-  // TODO: rename "PlayerState" to "CharacterState"
-  // TODO: rename "user" to "player"
   user: PlayerState;
-  // TODO: rename to "npc"
-  opponent: PlayerState;
+  enemy: PlayerState;
   turn: number;
   wins: number;
   losses: number;
@@ -97,7 +94,7 @@ function createInitialPlayerState(): PlayerState {
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
 const userCards: CardState[] = [{ target: { damage: 1, statusEffects: { bleed: 2 } } }];
 
-const opponentCardsByBattle = [
+const enemyCardsByBattle = [
   [
     { target: { damage: 1 } },
     { target: { damage: 1 } },
@@ -122,8 +119,8 @@ const opponentCardsByBattle = [
   [{ target: { damage: 3 } }, { target: { damage: 6 } }, { target: { damage: 9 } }], // 2 hits
 ];
 
-export function getOpponentCardsForBattle(battleCount: number) {
-  return opponentCardsByBattle[battleCount].slice();
+export function getEnemyCardsForBattle(battleCount: number) {
+  return enemyCardsByBattle[battleCount].slice();
 }
 
 export function getBattleCount(game: GameState) {
@@ -134,12 +131,12 @@ export function createInitialGameState(): GameState {
   const user = createInitialPlayerState();
   user.cards = userCards.slice();
 
-  const opponent = createInitialPlayerState();
-  opponent.cards = getOpponentCardsForBattle(0);
+  const enemy = createInitialPlayerState();
+  enemy.cards = getEnemyCardsForBattle(0);
 
   return {
     user,
-    opponent,
+    enemy,
     turn: 0,
     wins: 0,
     losses: 0,
@@ -163,16 +160,16 @@ export function getCardSelectionsForBattle(battleCount: number) {
   return cardSelectionsByBattle[battleCount];
 }
 
-export function getIsOpponentTurn(game: GameState) {
+export function getIsEnemyTurn(game: GameState) {
   return game.turn % 2 === 1;
 }
 
 export function getActivePlayer(game: GameState) {
-  return getIsOpponentTurn(game) ? game.opponent : game.user;
+  return getIsEnemyTurn(game) ? game.enemy : game.user;
 }
 
 export function getNonActivePlayer(game: GameState) {
-  return getIsOpponentTurn(game) ? game.user : game.opponent;
+  return getIsEnemyTurn(game) ? game.user : game.enemy;
 }
 
 export function getCurrentCard(playerOrGame: PlayerState | GameState) {
@@ -190,6 +187,6 @@ export function getCanPlayCard(game: GameState) {
 }
 
 export function getIsBattleOver(game: GameState) {
-  const { user, opponent } = game;
-  return user.health <= 0 || opponent.health <= 0;
+  const { user, enemy } = game;
+  return user.health <= 0 || enemy.health <= 0;
 }

@@ -9,7 +9,7 @@ import {
   getCanPlayCard,
   getCurrentCard,
   getIsBattleOver,
-  getIsOpponentTurn,
+  getIsEnemyTurn,
 } from '../gameState';
 import { wait } from '../utils';
 import { useSequence } from '../hooks';
@@ -21,14 +21,14 @@ export default function BattleScreen() {
   const game = useGameState();
   const { startTurn, playCard, endTurn, endBattle } = useActions();
   const [activePlayerCard, setActivePlayerCard] = useState<
-    { card: CardState; isOpponentCard: boolean } | undefined
+    { card: CardState; isEnemyCard: boolean } | undefined
   >();
 
   const isBattleOver = getIsBattleOver(game);
   const canPlayCard = getCanPlayCard(game);
   const currentCard = getCurrentCard(game);
-  const isOpponentTurn = getIsOpponentTurn(game);
-  const { opponent, user } = game;
+  const isEnemyTurn = getIsEnemyTurn(game);
+  const { enemy, user } = game;
 
   const battleSequence: Sequence = useMemo(() => {
     function startTurnSequence() {
@@ -36,7 +36,7 @@ export default function BattleScreen() {
     }
 
     function playCardSequence() {
-      setActivePlayerCard({ card: currentCard, isOpponentCard: isOpponentTurn });
+      setActivePlayerCard({ card: currentCard, isEnemyCard: isEnemyTurn });
       playCard();
       return wait(1000);
     }
@@ -60,7 +60,7 @@ export default function BattleScreen() {
   }, [
     startTurn,
     currentCard,
-    isOpponentTurn,
+    isEnemyTurn,
     playCard,
     isBattleOver,
     canPlayCard,
@@ -70,14 +70,14 @@ export default function BattleScreen() {
 
   useSequence(battleSequence);
 
-  const [activeUserCard, activeOpponentCard] = activePlayerCard?.isOpponentCard
+  const [activeUserCard, activeEnemyCard] = activePlayerCard?.isEnemyCard
     ? [undefined, activePlayerCard.card]
     : [activePlayerCard?.card, undefined];
 
   return (
     <Screen>
       <ProgressDisplay />
-      <Player player={opponent} activeCard={activeOpponentCard} />
+      <Player player={enemy} activeCard={activeEnemyCard} />
       <Divider />
       <Player player={user} activeCard={activeUserCard} />
     </Screen>

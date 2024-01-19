@@ -8,7 +8,7 @@ import {
   MAX_LOSSES,
   getCurrentCard,
   getActivePlayer,
-  getOpponentCardsForBattle,
+  getEnemyCardsForBattle,
   createInitialGameState,
   getBattleCount,
   getNonActivePlayer,
@@ -42,18 +42,18 @@ export function addCard(game: GameState, card: CardState) {
 
 export function startBattle(game: GameState) {
   game.screen = 'battle';
-  const { user, opponent } = game;
+  const { user, enemy } = game;
 
   user.cards = shuffle(user.cards);
   user.health = user.maxHealth;
   user.currentCardIndex = 0;
   user.statusEffects = { ...EMPTY_STATUS_EFFECTS };
 
-  const opponentCards = getOpponentCardsForBattle(getBattleCount(game));
-  opponent.cards = shuffle(opponentCards);
-  opponent.health = opponent.maxHealth;
-  opponent.currentCardIndex = 0;
-  opponent.statusEffects = { ...EMPTY_STATUS_EFFECTS };
+  const enemyCards = getEnemyCardsForBattle(getBattleCount(game));
+  enemy.cards = shuffle(enemyCards);
+  enemy.health = enemy.maxHealth;
+  enemy.currentCardIndex = 0;
+  enemy.statusEffects = { ...EMPTY_STATUS_EFFECTS };
 }
 
 export function startTurn(game: GameState) {
@@ -62,7 +62,7 @@ export function startTurn(game: GameState) {
 }
 
 export function playCard(game: GameState) {
-  // TODO: reduce duplication between activePlayer/nonActivePlayer and self/opponent ?
+  // TODO: reduce duplication between activePlayer/nonActivePlayer and self/enemy ?
   const activePlayer = getActivePlayer(game);
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getCurrentCard(activePlayer);
@@ -209,7 +209,7 @@ export function endTurn(game: GameState) {
 export function endBattle(game: GameState) {
   if (game.user.health <= 0) {
     game.losses++;
-  } else if (game.opponent.health <= 0) {
+  } else if (game.enemy.health <= 0) {
     game.wins++;
   } else {
     throw new Error('endBattle called, but neither player is dead');
