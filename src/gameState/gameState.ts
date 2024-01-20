@@ -12,7 +12,7 @@ export type StatusEffects = {
   [K in keyof typeof EMPTY_STATUS_EFFECTS]: number;
 };
 
-type Target = 'self' | 'opponent';
+export type Target = 'self' | 'opponent';
 
 type Targeted<T> = T & { target: Target };
 

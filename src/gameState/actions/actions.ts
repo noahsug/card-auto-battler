@@ -1,4 +1,5 @@
 import shuffle from 'lodash/shuffle';
+import { cloneDeep } from 'lodash';
 
 import {
   GameState,
@@ -20,7 +21,7 @@ import {
 } from '../';
 import { assert } from '../../utils';
 import { Entries } from '../../utils/types/types';
-import { cloneDeep } from 'lodash';
+import { Target } from '../gameState';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
@@ -62,7 +63,6 @@ export function startTurn(game: GameState) {
 }
 
 export function playCard(game: GameState) {
-  // TODO: reduce duplication between activePlayer/nonActivePlayer and self/enemy ?
   const activePlayer = getActivePlayer(game);
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getCurrentCard(activePlayer);
@@ -75,15 +75,22 @@ export function playCard(game: GameState) {
 
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
+  // apply effects to opponent first, then self, to avoid self effects being applied to opponent effects
   if (card.opponent) {
     applyCardEffects({
-      opponent: nonActivePlayer,
+      target: 'opponent',
       self: activePlayer,
+      opponent: nonActivePlayer,
       cardEffects: card.opponent,
     });
   }
   if (card.self) {
-    applyCardEffects({ opponent: activePlayer, self: activePlayer, cardEffects: card.self });
+    applyCardEffects({
+      target: 'self',
+      self: activePlayer,
+      opponent: nonActivePlayer,
+      cardEffects: card.self,
+    });
   }
 }
 
@@ -105,12 +112,12 @@ function getPlayerValue({
 }
 
 function gainEffectBasedOnPlayerValue({
-  opponent,
   self,
+  opponent,
   cardEffects,
 }: {
-  opponent: PlayerState;
   self: PlayerState;
+  opponent: PlayerState;
   cardEffects: CardEffects;
 }) {
   if (!cardEffects.effectBasedOnPlayerValue) return cardEffects;
@@ -140,62 +147,71 @@ function gainEffectBasedOnPlayerValue({
 function applyCardEffects(
   {
     cardEffects,
+    target,
     self,
     opponent,
   }: {
-    cardEffects: CardEffects;
+    target: Target;
     self: PlayerState;
     opponent: PlayerState;
+    cardEffects: CardEffects;
   },
   isRepeating = false,
 ) {
+  const targetPlayer = target === 'self' ? self : opponent;
+
   if (!isRepeating) {
-    cardEffects = gainEffectBasedOnPlayerValue({ opponent, self, cardEffects });
+    cardEffects = gainEffectBasedOnPlayerValue({ self, opponent, cardEffects });
   }
 
   const repeat = cardEffects.repeat || 0;
   if (repeat < 0) return;
 
   if (cardEffects.damage != null) {
-    if (opponent.statusEffects.dodge > 0) {
+    // dodge doesn't apply to self damage
+    if (target === 'opponent' && opponent.statusEffects.dodge > 0) {
       opponent.statusEffects.dodge -= 1;
     } else {
-      dealDamage({ self, opponent, damage: cardEffects.damage });
+      dealDamage({ target, self, opponent, damage: cardEffects.damage });
     }
   }
 
   if (cardEffects.statusEffects) {
     (Object.entries(cardEffects.statusEffects) as Entries<StatusEffects>).forEach(
       ([statusEffect, value]) => {
-        opponent.statusEffects[statusEffect] += value;
+        targetPlayer.statusEffects[statusEffect] += value;
       },
     );
   }
 
   if (!isRepeating) {
     for (let i = 0; i < repeat; i++) {
-      applyCardEffects({ opponent, self, cardEffects }, true);
+      applyCardEffects({ target, self, opponent, cardEffects }, true);
     }
   }
 }
 
 function dealDamage({
-  opponent,
+  target,
   self,
+  opponent,
   damage,
 }: {
+  target: Target;
   opponent: PlayerState;
   self: PlayerState;
   damage: number;
 }) {
+  const targetPlayer = target === 'self' ? self : opponent;
+
   damage += self.statusEffects.strength;
 
   if (damage > 0) {
-    opponent.health -= damage;
+    targetPlayer.health -= damage;
 
-    if (opponent.statusEffects.bleed) {
-      opponent.health -= 3;
-      opponent.statusEffects.bleed -= 1;
+    if (targetPlayer.statusEffects.bleed) {
+      targetPlayer.health -= 3;
+      targetPlayer.statusEffects.bleed -= 1;
     }
   }
 }
