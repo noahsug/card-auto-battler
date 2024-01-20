@@ -1,30 +1,56 @@
 # Card Auto Battler
 
-- simple card effects
-  - ✅ play card twice
-  - ✅ play next card
-  - ✅ dodge next dmg
-  - reduce all dmg to 1 next turn
-- archtypes
-  - buff stacking (next dmg card is played twice, +2 dmg, applies bleed for each dmg, 2x damage, 25% lifesteal, etc)
-  - ✅ bleed (hit 3 times, bleed 2, hit for each bleed, dmg causes bleed, 2x bleed)
-  - growth (+1 dmg each time played, +1 multihit each time played, heal +1 each time played, add X to deck)
-  - shuffle (+1 dmg for each card played this turn, +1 multihit for each shuffle, shuffle cards and play a card)
-  - many cards (1 dmg for each card in deck/discard)
-  - trash (add X to deck that trashes when played, trash 2 play 2, dmg for each trashed card, opponent trashes all cards played next turn, trash = heal 1)
-  - random (random debuff, random events have multihit)
-  - card selection (embeds in 2nd card picked - multihit 1, +2 dmg, always played first)
-  - low health (X when < 50% health - life steal, multihit, self damage, bleed self, +1 strength when dealing self damage, when < opponent health do X)
-  - high health (heal 4, regen 3, blessed +X health when restoring health, lifesteal, deal 50% of healed dmg, multihit when health > 10)
-  - non-damaging cards (non-damaging cards have play another card, non-damaging have +3 heal, no damage can be delt until your next turn)
-  - block (3 block - stops X damage then block is reduced by X, deal dmg = to block, 2x block, multihit when block > 10)
-- relic reward screen
-  - 25% life steal while HP is lower than 50%
-  - upgrades are 2x more likely to be seen
-  - play first each battle twice
-  - deal one dmg at the end of your turn
-  - always get an upgrade option each card selection
-  - Jesus Take the Wheel: card selections made for you at random, double your max HP (you can still pick relics)
+effects implemented
+
+- bleed: 0,
+- extraCardPlays: 0,
+- dodge: 0,
+- strength: 0
+- damage
+- repeat
+- effect based on player value
+
+archtypes implemented
+
+- strength - multihit, double strength, applies strength twice
+- bleed - multihit, repeat, dmg for each bleed
+- low hp - self damage, 50% lifesteal when < 50% health
+- heal -
+- trash
+- growth - play another card, perm +1 dmg each time played
+
+TODO: trash card text, would restructure card effect targeting make things simpler?
+
+## simple card effects
+
+- gain 1 strength each turn
+- reduce all dmg to 1 next turn
+- gain dodge whenever you deal more than X damage
+- dmg for each card played this turn
+
+## archtypes
+
+- buff stacking (next dmg card is played twice, +2 dmg, applies bleed for each dmg, 2x damage, 25% lifesteal, etc)
+- ✅ bleed (hit 3 times, bleed 2, hit for each bleed, dmg causes bleed, 2x bleed)
+- growth (+1 dmg each time played, +1 multihit each time played, heal +1 each time played, add X to deck)
+- shuffle (+1 dmg for each card played this turn, +1 multihit for each shuffle, shuffle cards and play a card)
+- many cards (1 dmg for each card in deck/discard)
+- trash (add X to deck that trashes when played, trash 2 play 2, dmg for each trashed card, opponent trashes all cards played next turn, trash = heal 1)
+- random (random debuff, random events have multihit)
+- card selection (embeds in 2nd card picked - multihit 1, +2 dmg, always played first)
+- low health (X when < 50% health - life steal, multihit, self damage, bleed self, +1 strength when dealing self damage, when < opponent health do X)
+- high health (heal 4, regen 3, blessed +X health when restoring health, lifesteal, deal 50% of healed dmg, multihit when health > 10)
+- non-damaging cards (non-damaging cards have play another card, non-damaging have +3 heal, no damage can be delt until your next turn)
+- block (3 block - stops X damage then block is reduced by X, deal dmg = to block, 2x block, multihit when block > 10)
+
+## relic reward screen
+
+- 25% life steal while HP is lower than 50%
+- upgrades are 2x more likely to be seen
+- play first each battle twice
+- deal one dmg at the end of your turn
+- always get an upgrade option each card selection
+- Jesus Take the Wheel: card selections made for you at random, double your max HP (you can still pick relics)
 - more relics
 - more enemies
 - more selectable characters

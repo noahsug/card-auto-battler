@@ -52,10 +52,12 @@ export interface CardEffects {
 export interface CardState {
   self?: CardEffects;
   opponent?: CardEffects;
+  trash?: boolean;
 }
 
 export interface PlayerState {
   cards: CardState[];
+  trashedCards: CardState[];
   currentCardIndex: number;
   health: number;
   maxHealth: number;
@@ -82,6 +84,7 @@ function createInitialPlayerState(): PlayerState {
 
   return {
     cards: [],
+    trashedCards: [],
     currentCardIndex: 0,
     health: maxHealth,
     maxHealth,

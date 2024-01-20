@@ -40,22 +40,16 @@ function runBattle({
 
   let userCardsPlayed = 0;
 
-  while (
-    !getIsBattleOver(game) &&
-    game.turn < stopAfterTurn &&
-    userCardsPlayed < stopAfterNUserCardsPlayed
-  ) {
+  while (game.turn < stopAfterTurn && userCardsPlayed < stopAfterNUserCardsPlayed) {
     startTurn(game);
 
-    while (
-      !getIsBattleOver(game) &&
-      getCanPlayCard(game) &&
-      userCardsPlayed < stopAfterNUserCardsPlayed
-    ) {
+    while (getCanPlayCard(game) && userCardsPlayed < stopAfterNUserCardsPlayed) {
       playCard(game);
       if (!getIsEnemyTurn(game)) {
         userCardsPlayed++;
       }
+
+      if (getIsBattleOver(game)) return { endingState: game, startingState };
     }
 
     endTurn(game);
@@ -93,6 +87,39 @@ describe('dodge effect', () => {
   });
 });
 
+describe('trash effect', () => {
+  it('trashes the played card', () => {
+    const userCards = [{ trash: true, opponent: { damage: 3 } }, { opponent: { damage: 1 } }];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      stopAfterTurn: 5, // 3 player turns
+    });
+
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(5);
+  });
+
+  it('causes a loss when no cards are left', () => {
+    const userCards = [{ trash: true, opponent: { damage: 1 } }];
+    const { endingState } = runBattle({
+      user: { cards: userCards },
+      stopAfterTurn: 3, // 2 player turns
+    });
+
+    expect(endingState.user.health).toBe(0);
+  });
+
+  it('does not cause a loss when final trashed card wins the game', () => {
+    const userCards = [{ trash: true, opponent: { damage: 10 } }];
+    const { endingState } = runBattle({
+      user: { cards: userCards },
+      stopAfterTurn: 3, // 2 player turns
+    });
+
+    expect(endingState.enemy.health).toBe(0);
+    expect(endingState.user.health).not.toBe(0);
+  });
+});
+
 describe('repeat effect', () => {
   it('deals damage N times', () => {
     const { endingState, startingState } = playCards([{ opponent: { damage: 1, repeat: 1 } }]);
@@ -108,7 +135,65 @@ describe('repeat effect', () => {
 });
 
 describe('gainEffectBasedOnEffect effect', () => {
-  describe('for each bleed', () => {
+  describe('double strength', () => {
+    let doubleStrength: CardState;
+    beforeEach(() => {
+      doubleStrength = {
+        self: {
+          effectBasedOnPlayerValue: {
+            effect: {
+              isStatusEffect: true,
+              name: 'strength',
+            },
+            basedOn: {
+              target: 'self',
+              isStatusEffect: true,
+              name: 'strength',
+            },
+          },
+        },
+      };
+    });
+
+    it('doubles own strength', () => {
+      const { endingState } = playCards([
+        { self: { statusEffects: { strength: 2 } } },
+        doubleStrength,
+      ]);
+      expect(endingState.user.statusEffects.strength).toBe(4);
+    });
+  });
+
+  describe('apply strength twice', () => {
+    let strengthEffecetsTwice: CardState;
+    beforeEach(() => {
+      strengthEffecetsTwice = {
+        opponent: {
+          effectBasedOnPlayerValue: {
+            effect: {
+              isStatusEffect: false,
+              name: 'damage',
+            },
+            basedOn: {
+              target: 'self',
+              isStatusEffect: true,
+              name: 'strength',
+            },
+          },
+        },
+      };
+    });
+
+    it('doubles own strength', () => {
+      const { endingState, startingState } = playCards([
+        { self: { statusEffects: { strength: 2 } } },
+        merge(strengthEffecetsTwice, { opponent: { damage: 2 } }),
+      ]);
+      expect(startingState.enemy.health - endingState.enemy.health).toBe(6);
+    });
+  });
+
+  describe('damage for each bleed', () => {
     let forEachEnemyBleed: CardState;
     beforeEach(() => {
       forEachEnemyBleed = {
@@ -124,7 +209,6 @@ describe('gainEffectBasedOnEffect effect', () => {
               isStatusEffect: true,
               name: 'bleed',
             },
-            ratio: 1,
           },
         },
       };

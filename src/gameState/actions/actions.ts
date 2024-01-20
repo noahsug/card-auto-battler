@@ -45,7 +45,8 @@ export function startBattle(game: GameState) {
   game.screen = 'battle';
   const { user, enemy } = game;
 
-  user.cards = shuffle(user.cards);
+  user.cards = shuffle([...user.cards, ...user.trashedCards]);
+  user.trashedCards = [];
   user.health = user.maxHealth;
   user.currentCardIndex = 0;
   user.statusEffects = { ...EMPTY_STATUS_EFFECTS };
@@ -67,13 +68,17 @@ export function playCard(game: GameState) {
   const nonActivePlayer = getNonActivePlayer(game);
   const card = getCurrentCard(activePlayer);
 
+  // die if out of cards
+  if (card == null) {
+    activePlayer.health = 0;
+    return;
+  }
+
   if (activePlayer.cardsPlayedThisTurn > 0) {
     assert(activePlayer.statusEffects.extraCardPlays > 0);
     activePlayer.statusEffects.extraCardPlays -= 1;
   }
   activePlayer.cardsPlayedThisTurn += 1;
-
-  activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
 
   // apply effects to opponent first, then self, to avoid self effects being applied to opponent effects
   if (card.opponent) {
@@ -91,6 +96,14 @@ export function playCard(game: GameState) {
       opponent: nonActivePlayer,
       cardEffects: card.self,
     });
+  }
+
+  if (card.trash) {
+    activePlayer.cards.splice(activePlayer.currentCardIndex, 1);
+    activePlayer.trashedCards.push(card);
+    activePlayer.currentCardIndex = activePlayer.currentCardIndex % activePlayer.cards.length;
+  } else {
+    activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
   }
 }
 
