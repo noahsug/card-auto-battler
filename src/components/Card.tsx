@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
+import React from 'react';
 
-import { CardEffects, CardState, StatusEffects } from '../gameState';
+import { CardEffects, CardState, statusEffectNames } from '../gameState';
 import CardEffectText, { CardText } from './CardEffectText';
 
 interface Props {
@@ -11,51 +12,49 @@ interface Props {
   onClick?: () => void;
 }
 
-function getCardTextItems(effects: CardEffects | undefined, targetSelf: boolean) {
-  if (!effects) {
-    return [];
-  }
+function getCardTextItems(effects: CardEffects, index: number) {
+  const textItems: React.JSX.Element[] = [];
 
-  const cardTextItems = [];
+  function addEffectText(effectName: keyof CardEffects, value: number) {
+    const key = `${effectName}-${index}`;
+    textItems.push(<CardEffectText key={key} effectName={effectName} value={value} />);
+  }
 
   if (effects.damage != null) {
-    cardTextItems.push(<CardEffectText key="damage" effectName="damage" value={effects.damage} />);
+    addEffectText('damage', effects.damage);
   }
 
-  const definedStatusEffects = effects.statusEffects
-    ? Object.entries(effects.statusEffects).filter(([_, value]) => value != null)
-    : [];
-
-  definedStatusEffects.forEach(([statusEffectName, value]) => {
-    cardTextItems.push(
-      <CardEffectText
-        key={`status-${statusEffectName}`}
-        statusEffectName={statusEffectName as keyof StatusEffects}
-        value={value!}
-      />,
-    );
+  statusEffectNames.forEach((effectName) => {
+    const value = effects[effectName];
+    if (value != null) {
+      addEffectText(effectName, value);
+    }
   });
 
   if (effects.repeat != null) {
-    cardTextItems.push(<CardEffectText key="repeat" effectName="repeat" value={effects.repeat} />);
+    addEffectText('repeat', effects.repeat);
   }
 
-  if (targetSelf) {
-    cardTextItems.push(<CardText key="self">to self</CardText>);
+  if (effects.target === 'self') {
+    textItems.push(<CardText key={`self-${index}`}>to self</CardText>);
   }
 
-  return cardTextItems;
+  return textItems;
 }
 
 export default function Card({ card, isActive = false, scale = 1, className, onClick }: Props) {
-  const targetTextItems = getCardTextItems(card.opponent, false);
-  const selfTextItems = getCardTextItems(card.self, true);
+  const textItemsBySection = card.effects.map(getCardTextItems);
+
+  if (card.trash) {
+    textItemsBySection.push([<CardText key="trash">trash</CardText>]);
+  }
 
   return (
     <Root $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
       <div>
-        <CardTextSection>{targetTextItems}</CardTextSection>
-        <CardTextSection>{selfTextItems}</CardTextSection>
+        {textItemsBySection.map((textItems) => (
+          <CardTextSection>{textItems}</CardTextSection>
+        ))}
       </div>
     </Root>
   );

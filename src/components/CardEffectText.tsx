@@ -1,19 +1,14 @@
 import styled from 'styled-components';
 
-import { CardEffects, StatusEffects } from '../gameState';
+import { CardEffects } from '../gameState';
 import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
-import { assertIsNonNullable } from '../utils';
 
-interface EffectIdentifier {
-  effectName?: keyof Omit<CardEffects, 'statusEffects'>;
-  statusEffectName?: keyof StatusEffects;
-}
-
-interface Props extends EffectIdentifier {
+interface Props {
+  effectName: keyof CardEffects;
   value: number;
 }
 
-function getSymbol({ effectName, statusEffectName }: EffectIdentifier) {
+function getSymbol(effectName: keyof CardEffects) {
   if (effectName === 'damage') {
     return '⚔️';
   }
@@ -22,12 +17,16 @@ function getSymbol({ effectName, statusEffectName }: EffectIdentifier) {
     return ' times';
   }
 
-  assertIsNonNullable(statusEffectName);
-  return STATUS_EFFECT_SYMBOLS[statusEffectName];
+  if (effectName in STATUS_EFFECT_SYMBOLS) {
+    const statusEffectName = effectName as keyof typeof STATUS_EFFECT_SYMBOLS;
+    return STATUS_EFFECT_SYMBOLS[statusEffectName];
+  }
+
+  throw new Error(`no symbol exists for effect ${effectName}`);
 }
 
-export default function CardEffectText({ effectName, statusEffectName, value }: Props) {
-  const symbol = getSymbol({ effectName, statusEffectName });
+export default function CardEffectText({ effectName, value }: Props) {
+  const symbol = getSymbol(effectName);
 
   if (effectName === 'repeat') {
     // repeat 1 = hit two times
@@ -36,13 +35,11 @@ export default function CardEffectText({ effectName, statusEffectName, value }: 
 
   return (
     <CardText>
-      <CardTextNumber>{value}</CardTextNumber>
+      <span>{value}</span>
       {symbol}
     </CardText>
   );
 }
-
-const CardTextNumber = styled.span``;
 
 export const CardText = styled.div`
   margin: 0 4rem;

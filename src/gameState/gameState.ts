@@ -1,68 +1,52 @@
 import { PickType } from '../utils/types/types';
+import { createCard } from './utils';
+
 export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'battle-end' | 'game-end';
 
-export const EMPTY_STATUS_EFFECTS = {
-  bleed: 0,
-  extraCardPlays: 0,
-  dodge: 0,
-  strength: 0,
-};
+export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength'] as const;
 
-export type StatusEffects = {
-  [K in keyof typeof EMPTY_STATUS_EFFECTS]: number;
-};
+export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
+  statusEffectNames.map((effectName) => [effectName, 0]),
+) as StatusEffects;
+
+export type StatusEffectName = (typeof statusEffectNames)[number];
+
+export type StatusEffects = Record<StatusEffectName, number>;
 
 export type Target = 'self' | 'opponent';
 
-type Targeted<T> = T & { target: Target };
+// Card effects that are numbers
+export type GainableCardEffect = keyof PickType<Required<CardEffects>, number>;
 
-interface StatusEffectIdentifier {
-  isStatusEffect: true;
-  name: keyof StatusEffects;
+export interface PlayerStateValueIdentifier {
+  valueName: keyof PlayerState;
+  target: Target;
 }
 
-interface NonStatusEffectIdentifier<T> {
-  isStatusEffect: false;
-  name: keyof T;
-}
-
-// Card effect that is a number
-export type GainableCardEffects = Partial<PickType<Required<CardEffects>, number>>;
-
-export type PlayerValueIdentifier = StatusEffectIdentifier | NonStatusEffectIdentifier<PlayerState>;
-
-export type CardEffectIdentifier = StatusEffectIdentifier | NonStatusEffectIdentifier<CardEffects>;
-
-export type GainableCardEffectIdentifier =
-  | StatusEffectIdentifier
-  | NonStatusEffectIdentifier<GainableCardEffects>;
-
-export interface CardEffects {
+export interface CardEffects extends Partial<StatusEffects> {
+  target: Target;
   damage?: number;
   repeat?: number;
-  statusEffects?: Partial<StatusEffects>;
   // gain card effect based on target, self or current card value
   effectBasedOnPlayerValue?: {
-    effect: GainableCardEffectIdentifier;
-    basedOn: Targeted<PlayerValueIdentifier>;
+    effectName: GainableCardEffect;
+    basedOn: PlayerStateValueIdentifier;
     ratio?: number;
   };
 }
 
 export interface CardState {
-  self?: CardEffects;
-  opponent?: CardEffects;
+  effects: CardEffects[];
   trash?: boolean;
 }
 
-export interface PlayerState {
+export interface PlayerState extends StatusEffects {
   cards: CardState[];
   trashedCards: CardState[];
   currentCardIndex: number;
   health: number;
   maxHealth: number;
   cardsPlayedThisTurn: number;
-  statusEffects: StatusEffects;
 }
 
 export interface GameState {
@@ -89,36 +73,43 @@ function createInitialPlayerState(): PlayerState {
     health: maxHealth,
     maxHealth,
     cardsPlayedThisTurn: 0,
-    statusEffects: { ...EMPTY_STATUS_EFFECTS },
+    ...EMPTY_STATUS_EFFECTS,
   };
 }
 
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
-const userCards: CardState[] = [{ opponent: { damage: 1, statusEffects: { bleed: 2 } } }];
+const userCards: CardState[] = [createCard({ target: 'opponent', damage: 1, bleed: 2 })];
 
-const enemyCardsByBattle = [
+const enemyCardsByBattle: CardState[][] = [
   [
-    { opponent: { damage: 1 } },
-    { opponent: { damage: 1 } },
-    { opponent: { damage: 1 } },
-    { opponent: { damage: 1 } },
-    { opponent: { damage: 1 } },
-    { opponent: { damage: 1 } },
-  ], // 5 hits
+    createCard({ target: 'opponent', damage: 1 }),
+    createCard({ target: 'opponent', damage: 1 }),
+    createCard({ target: 'opponent', damage: 1 }),
+    createCard({ target: 'opponent', damage: 1 }),
+    createCard({ target: 'opponent', damage: 1 }),
+    createCard({ target: 'opponent', damage: 1 }),
+  ],
+  // 5 hits
   [
-    { opponent: { damage: 0 } },
-    { opponent: { damage: 0 } },
-    { opponent: { damage: 0 } },
-    { opponent: { damage: 3 } },
-    { opponent: { damage: 3 } },
-  ], // 4 hits
+    createCard({ target: 'opponent', damage: 0 }),
+    createCard({ target: 'opponent', damage: 0 }),
+    createCard({ target: 'opponent', damage: 0 }),
+    createCard({ target: 'opponent', damage: 3 }),
+    createCard({ target: 'opponent', damage: 3 }),
+  ],
+  // 4 hits
   [
-    { opponent: { damage: 2 } },
-    { opponent: { damage: 2 } },
-    { opponent: { damage: 3 } },
-    { opponent: { damage: 3 } },
-  ], // 3 hits
-  [{ opponent: { damage: 3 } }, { target: { damage: 6 } }, { opponent: { damage: 9 } }], // 2 hits
+    createCard({ target: 'opponent', damage: 2 }),
+    createCard({ target: 'opponent', damage: 2 }),
+    createCard({ target: 'opponent', damage: 3 }),
+    createCard({ target: 'opponent', damage: 3 }),
+  ],
+  // 3 hits
+  [
+    createCard({ target: 'opponent', damage: 3 }),
+    createCard({ target: 'opponent', damage: 6 }),
+    createCard({ target: 'opponent', damage: 9 }),
+  ],
 ];
 
 export function getEnemyCardsForBattle(battleCount: number) {
@@ -151,10 +142,9 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
   cardSelectionsByBattle[i] = [];
   for (let j = 0; j < 6; j++) {
     const damage = Math.round(6 * Math.random() * Math.random());
-    cardSelectionsByBattle[i].push({
-      opponent: { damage, statusEffects: { bleed: 2 } },
-      self: { statusEffects: { extraCardPlays: 1 } },
-    });
+    cardSelectionsByBattle[i].push(
+      createCard({ target: 'opponent', damage, bleed: 2 }, { target: 'self', extraCardPlays: 1 }),
+    );
   }
 }
 
@@ -185,7 +175,7 @@ export function getCurrentCard(playerOrGame: PlayerState | GameState) {
 
 export function getCanPlayCard(game: GameState) {
   const activePlayer = getActivePlayer(game);
-  return activePlayer.cardsPlayedThisTurn === 0 || activePlayer.statusEffects.extraCardPlays > 0;
+  return activePlayer.cardsPlayedThisTurn === 0 || activePlayer.extraCardPlays > 0;
 }
 
 export function getIsBattleOver(game: GameState) {
