@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 import React from 'react';
 
 import { CardEffects, CardState, statusEffectNames } from '../gameState';
-import CardEffectText, { CardText } from './CardEffectText';
+import CardEffectText, { CardText, getSymbol } from './CardEffectText';
 
 interface Props {
   card: CardState;
@@ -20,10 +20,12 @@ function getCardTextItems(effects: CardEffects, index: number) {
     textItems.push(<CardEffectText key={key} effectName={effectName} value={value} />);
   }
 
+  // "X damage"
   if (effects.damage != null) {
     addEffectText('damage', effects.damage);
   }
 
+  // "X statusEffect"
   statusEffectNames.forEach((effectName) => {
     const value = effects[effectName];
     if (value != null) {
@@ -31,10 +33,44 @@ function getCardTextItems(effects: CardEffects, index: number) {
     }
   });
 
-  if (effects.repeat != null) {
+  // "for each playerValue"
+  const isRepeatingForEachPlayerValue =
+    effects.repeat === -1 && effects.effectBasedOnPlayerValue?.effectName === 'repeat';
+
+  // "2x times"
+  if (effects.repeat != null && !isRepeatingForEachPlayerValue) {
     addEffectText('repeat', effects.repeat);
   }
 
+  // "+X effect for each playerValue"
+  if (effects.effectBasedOnPlayerValue != null) {
+    const {
+      effectName,
+      basedOn: { target, valueName },
+      ratio = 1,
+    } = effects.effectBasedOnPlayerValue;
+
+    const effectSymbol = getSymbol(effectName);
+    let effectText = `+${ratio}${effectSymbol} `;
+
+    if (isRepeatingForEachPlayerValue && ratio === 1) {
+      // for each playerValue
+      effectText = '';
+    }
+
+    // TODO: handle ratios > 0 & < 1, e.g. "1 damage for every 2 opponent bleed"
+    const basedOnValueSymbol = getSymbol(valueName);
+    const forEachText = `for each ${target} ${basedOnValueSymbol}`;
+
+    textItems.push(
+      <CardText key={`effectBasedOnPlayerValue-${index}`}>
+        {effectText}
+        {forEachText}
+      </CardText>,
+    );
+  }
+
+  // "to self"
   if (effects.target === 'self') {
     textItems.push(<CardText key={`self-${index}`}>to self</CardText>);
   }
@@ -45,6 +81,7 @@ function getCardTextItems(effects: CardEffects, index: number) {
 export default function Card({ card, isActive = false, scale = 1, className, onClick }: Props) {
   const textItemsBySection = card.effects.map(getCardTextItems);
 
+  // "trash"
   if (card.trash) {
     textItemsBySection.push([<CardText key="trash">trash</CardText>]);
   }
@@ -52,8 +89,8 @@ export default function Card({ card, isActive = false, scale = 1, className, onC
   return (
     <Root $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
       <div>
-        {textItemsBySection.map((textItems) => (
-          <CardTextSection>{textItems}</CardTextSection>
+        {textItemsBySection.map((textItems, i) => (
+          <CardTextSection key={i}>{textItems}</CardTextSection>
         ))}
       </div>
     </Root>

@@ -19,8 +19,8 @@ export type Target = 'self' | 'opponent';
 export type GainableCardEffect = keyof PickType<Required<CardEffects>, number>;
 
 export interface PlayerStateValueIdentifier {
-  valueName: keyof PlayerState;
   target: Target;
+  valueName: keyof PlayerState;
 }
 
 export interface CardEffects extends Partial<StatusEffects> {
@@ -143,7 +143,19 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
   for (let j = 0; j < 6; j++) {
     const damage = Math.round(6 * Math.random() * Math.random());
     cardSelectionsByBattle[i].push(
-      createCard({ target: 'opponent', damage, bleed: 2 }, { target: 'self', extraCardPlays: 1 }),
+      createCard({
+        target: 'opponent',
+        damage,
+        bleed: 2,
+        repeat: -1,
+        effectBasedOnPlayerValue: {
+          effectName: 'repeat',
+          basedOn: {
+            target: 'opponent',
+            valueName: 'bleed',
+          },
+        },
+      }),
     );
   }
 }

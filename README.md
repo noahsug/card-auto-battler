@@ -16,7 +16,7 @@ archtypes implemented
 - bleed - multihit, repeat, dmg for each bleed
 - low hp - self damage, 50% lifesteal when < 50% health
 - heal -
-- trash
+- trash -
 - growth - play another card, perm +1 dmg each time played
 
 TODO: trash card text, would restructure card effect targeting make things simpler?

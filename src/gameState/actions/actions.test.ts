@@ -68,12 +68,18 @@ function playCards(cards: CardState[]) {
 }
 
 describe('damage effect', () => {
-  it('reduces health', () => {
+  it('reduces opponent health', () => {
     const { endingState, startingState } = playCards([
       createCard({ target: 'opponent', damage: 1 }),
     ]);
 
     expect(startingState.enemy.health - endingState.enemy.health).toBe(1);
+  });
+
+  it('reduces own health', () => {
+    const { endingState, startingState } = playCards([createCard({ target: 'self', damage: 1 })]);
+
+    expect(startingState.user.health - endingState.user.health).toBe(1);
   });
 });
 
@@ -187,7 +193,7 @@ describe('gainEffectBasedOnEffect effect', () => {
   });
 
   describe('damage for each bleed', () => {
-    const forEachEnemyBleed: CardEffects = {
+    const forEachOpponentBleed: CardEffects = {
       target: 'opponent',
       repeat: -1,
       effectBasedOnPlayerValue: {
@@ -202,7 +208,7 @@ describe('gainEffectBasedOnEffect effect', () => {
     it('repeats card enemy bleed - 1 times', () => {
       const { endingState, startingState } = playCards([
         createCard({ target: 'opponent', bleed: 2 }),
-        createCard({ ...forEachEnemyBleed, damage: 1 }),
+        createCard({ ...forEachOpponentBleed, damage: 1 }),
       ]);
       expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 2);
       expect(endingState.enemy.bleed).toBe(0);
@@ -210,7 +216,7 @@ describe('gainEffectBasedOnEffect effect', () => {
 
     it('causes the card to do nothing when opponent has no bleed', () => {
       const { endingState, startingState } = playCards([
-        createCard({ ...forEachEnemyBleed, damage: 1 }),
+        createCard({ ...forEachOpponentBleed, damage: 1 }),
       ]);
       expect(startingState.enemy.health - endingState.enemy.health).toBe(0);
     });
@@ -218,7 +224,7 @@ describe('gainEffectBasedOnEffect effect', () => {
     it('does not count bleed inflicted at the same time', () => {
       const { endingState, startingState } = playCards([
         createCard({ target: 'opponent', bleed: 2 }),
-        createCard({ ...forEachEnemyBleed, damage: 1, bleed: 50 }),
+        createCard({ ...forEachOpponentBleed, damage: 1, bleed: 50 }),
       ]);
       expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 2);
       expect(endingState.enemy.bleed).toBe(50 * 2);
@@ -227,7 +233,7 @@ describe('gainEffectBasedOnEffect effect', () => {
     it('is additive with existing repeat', () => {
       const { endingState, startingState } = playCards([
         createCard({ target: 'opponent', bleed: 2 }),
-        createCard({ ...forEachEnemyBleed, damage: 1, repeat: 1 }),
+        createCard({ ...forEachOpponentBleed, damage: 1, repeat: 1 }),
       ]);
       expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 4);
     });

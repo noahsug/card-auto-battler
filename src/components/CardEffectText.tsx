@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { CardEffects } from '../gameState';
+import { CardEffects, PlayerState } from '../gameState';
 import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
 
 interface Props {
@@ -8,13 +8,13 @@ interface Props {
   value: number;
 }
 
-function getSymbol(effectName: keyof CardEffects) {
+export function getSymbol(effectName: keyof (CardEffects & PlayerState)) {
   if (effectName === 'damage') {
     return '⚔️';
   }
 
   if (effectName === 'repeat') {
-    return ' times';
+    return 'x times';
   }
 
   if (effectName in STATUS_EFFECT_SYMBOLS) {
@@ -22,7 +22,7 @@ function getSymbol(effectName: keyof CardEffects) {
     return STATUS_EFFECT_SYMBOLS[statusEffectName];
   }
 
-  throw new Error(`no symbol exists for effect ${effectName}`);
+  return effectName;
 }
 
 export default function CardEffectText({ effectName, value }: Props) {
