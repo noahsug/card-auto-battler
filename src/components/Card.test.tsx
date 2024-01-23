@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
 
 import Card from './Card';
-import { CardState, createCard, createCustomCard, statusEffectNames } from '../gameState';
-import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
+import { CardState, createCard, createCustomCard } from '../gameState';
+import { CARD_TEXT_SYMBOLS } from './CardEffectText';
 
 describe('text', () => {
   function replaceWithSymbol(text: string, phrase: string, symbol: string) {
@@ -18,16 +18,17 @@ describe('text', () => {
   }
 
   function toCardText(...textSections: string[]) {
-    const cardTextSections: string[] = [];
+    const symbolNames = Object.keys(CARD_TEXT_SYMBOLS) as Array<keyof typeof CARD_TEXT_SYMBOLS>;
 
-    textSections.forEach((text) => {
-      text = replaceWithSymbol(text, 'damage', '⚔️');
+    // sort symbol names from shorter to longer to avoid a shorter name replacing part of a longer name
+    symbolNames.sort((a, b) => a.length - b.length);
 
-      statusEffectNames.forEach((effectName) => {
-        text = replaceWithSymbol(text, effectName, STATUS_EFFECT_SYMBOLS[effectName]);
+    const cardTextSections = textSections.map((text) => {
+      symbolNames.forEach((symbolName) => {
+        const symbol = CARD_TEXT_SYMBOLS[symbolName];
+        text = replaceWithSymbol(text, symbolName, symbol);
       });
-
-      cardTextSections.push(text);
+      return text;
     });
 
     return cardTextSections.join('');
@@ -85,22 +86,22 @@ describe('text', () => {
       expect(card.textContent).toBe(toCardText('+1 damage for each opponent bleed'));
     });
 
-    it('renders damage and +times for each bleed', () => {
+    it('renders damage and +times for each strength', () => {
       const card = getCardElement(
         createCard({
           target: 'opponent',
-          damage: 5,
+          damage: 2,
           effectBasedOnPlayerValue: {
             effectName: 'repeat',
-            basedOn: { target: 'opponent', valueName: 'bleed' },
+            basedOn: { target: 'self', valueName: 'strength' },
           },
         }),
       );
 
-      expect(card.textContent).toBe(toCardText('5 damage', '+1x times for each opponent bleed'));
+      expect(card.textContent).toBe(toCardText('2 damage', '+1x times for each self strength'));
     });
 
-    it('renders damage X times for each bleed', () => {
+    it('renders damage X times for each health', () => {
       const card = getCardElement(
         createCard({
           target: 'opponent',
@@ -108,12 +109,26 @@ describe('text', () => {
           repeat: -1,
           effectBasedOnPlayerValue: {
             effectName: 'repeat',
-            basedOn: { target: 'opponent', valueName: 'bleed' },
+            basedOn: { target: 'self', valueName: 'health' },
           },
         }),
       );
 
-      expect(card.textContent).toBe(toCardText('1 damage', 'for each opponent bleed'));
+      expect(card.textContent).toBe(toCardText('1 damage', 'for each self health'));
+    });
+
+    it('+dodge for each trashed card', () => {
+      const card = getCardElement(
+        createCard({
+          target: 'self',
+          effectBasedOnPlayerValue: {
+            effectName: 'dodge',
+            basedOn: { target: 'self', valueName: 'trashedCards' },
+          },
+        }),
+      );
+
+      expect(card.textContent).toBe(toCardText('+1 dodge for each self trashedCards', 'to self'));
     });
   });
 });

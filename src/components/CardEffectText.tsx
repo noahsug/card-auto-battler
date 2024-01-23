@@ -4,29 +4,28 @@ import { CardEffects, PlayerState } from '../gameState';
 import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
 
 interface Props {
-  effectName: keyof CardEffects;
+  effectName: keyof CardEffectsithSymbols;
   value: number;
 }
 
-export function getSymbol(effectName: keyof (CardEffects & PlayerState)) {
-  if (effectName === 'damage') {
-    return '⚔️';
-  }
+export type CardEffectsithSymbols = Omit<CardEffects, 'target' | 'effectBasedOnPlayerValue'>;
 
-  if (effectName === 'repeat') {
-    return 'x times';
-  }
+type NameWithSymbol = keyof (PlayerState & CardEffectsithSymbols);
 
-  if (effectName in STATUS_EFFECT_SYMBOLS) {
-    const statusEffectName = effectName as keyof typeof STATUS_EFFECT_SYMBOLS;
-    return STATUS_EFFECT_SYMBOLS[statusEffectName];
-  }
-
-  return effectName;
-}
+export const CARD_TEXT_SYMBOLS: Record<NameWithSymbol, string> = {
+  ...STATUS_EFFECT_SYMBOLS,
+  damage: '⚔️',
+  health: '❤️',
+  maxHealth: 'max ❤️',
+  repeat: 'x times',
+  cards: 'cards in deck',
+  trashedCards: 'trashed cards',
+  currentCardIndex: 'cards in discard',
+  cardsPlayedThisTurn: 'cards played this turn',
+} as const;
 
 export default function CardEffectText({ effectName, value }: Props) {
-  const symbol = getSymbol(effectName);
+  const symbol = CARD_TEXT_SYMBOLS[effectName];
 
   if (effectName === 'repeat') {
     // repeat 1 = hit two times

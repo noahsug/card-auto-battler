@@ -2,7 +2,11 @@ import styled, { css } from 'styled-components';
 import React from 'react';
 
 import { CardEffects, CardState, statusEffectNames } from '../gameState';
-import CardEffectText, { CardText, getSymbol } from './CardEffectText';
+import CardEffectText, {
+  CardText,
+  CARD_TEXT_SYMBOLS,
+  CardEffectsithSymbols,
+} from './CardEffectText';
 
 interface Props {
   card: CardState;
@@ -15,7 +19,7 @@ interface Props {
 function getCardTextItems(effects: CardEffects, index: number) {
   const textItems: React.JSX.Element[] = [];
 
-  function addEffectText(effectName: keyof CardEffects, value: number) {
+  function addEffectText(effectName: keyof CardEffectsithSymbols, value: number) {
     const key = `${effectName}-${index}`;
     textItems.push(<CardEffectText key={key} effectName={effectName} value={value} />);
   }
@@ -50,7 +54,7 @@ function getCardTextItems(effects: CardEffects, index: number) {
       ratio = 1,
     } = effects.effectBasedOnPlayerValue;
 
-    const effectSymbol = getSymbol(effectName);
+    const effectSymbol = CARD_TEXT_SYMBOLS[effectName];
     let effectText = `+${ratio}${effectSymbol} `;
 
     if (isRepeatingForEachPlayerValue && ratio === 1) {
@@ -59,7 +63,7 @@ function getCardTextItems(effects: CardEffects, index: number) {
     }
 
     // TODO: handle ratios > 0 & < 1, e.g. "1 damage for every 2 opponent bleed"
-    const basedOnValueSymbol = getSymbol(valueName);
+    const basedOnValueSymbol = CARD_TEXT_SYMBOLS[valueName];
     const forEachText = `for each ${target} ${basedOnValueSymbol}`;
 
     textItems.push(
