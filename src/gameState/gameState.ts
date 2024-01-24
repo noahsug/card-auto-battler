@@ -70,6 +70,9 @@ export const MAX_LOSSES = 2;
 
 export const BLEED_DAMAGE = 3;
 
+// the player with the highest health wins after this many turns
+export const END_GAME_AFTER_TURN = 40;
+
 function createInitialPlayerState(): PlayerState {
   const maxHealth = 300;
 

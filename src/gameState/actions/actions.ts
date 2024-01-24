@@ -21,6 +21,7 @@ import {
 } from '../';
 import { assert } from '../../utils';
 import { Value } from '../../utils/types/types';
+import { END_GAME_AFTER_TURN } from '../gameState';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
@@ -100,6 +101,11 @@ export function playCard(game: GameState) {
     activePlayer.currentCardIndex = activePlayer.currentCardIndex % activePlayer.cards.length;
   } else {
     activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
+  }
+
+  if (game.turn >= END_GAME_AFTER_TURN) {
+    const target = game.user.health <= game.enemy.health ? game.user : game.enemy;
+    target.health = 0;
   }
 }
 

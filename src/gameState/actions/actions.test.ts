@@ -6,6 +6,7 @@ import {
   BLEED_DAMAGE,
   CardEffects,
   CardState,
+  END_GAME_AFTER_TURN,
   PlayerState,
   createInitialGameState,
   getCanPlayCard,
@@ -42,7 +43,7 @@ function runBattle({
 
   let userCardsPlayed = 0;
 
-  while (game.turn < stopAfterTurn && userCardsPlayed < stopAfterNUserCardsPlayed) {
+  while (game.turn <= stopAfterTurn && userCardsPlayed < stopAfterNUserCardsPlayed) {
     startTurn(game);
 
     while (getCanPlayCard(game) && userCardsPlayed < stopAfterNUserCardsPlayed) {
@@ -297,9 +298,32 @@ describe('extraCardPlays status effect', () => {
     ];
     const { endingState, startingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: 1,
+      stopAfterTurn: 0,
     });
 
     expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
+  });
+});
+
+describe('ends the game after X turns', () => {
+  it('with the user winning if they have more health', () => {
+    const userCards: CardState[] = [
+      createCustomCard({ trash: true }, { target: 'opponent', damage: 1 }),
+      createCard({ target: 'opponent', damage: 0 }),
+    ];
+    const { endingState } = runBattle({
+      user: { cards: userCards },
+      stopAfterTurn: END_GAME_AFTER_TURN,
+    });
+
+    expect(endingState.enemy.health).toBe(0);
+  });
+
+  it('with the enemy winning if they have more or equal health', () => {
+    const { endingState } = runBattle({
+      stopAfterTurn: END_GAME_AFTER_TURN,
+    });
+
+    expect(endingState.user.health).toBe(0);
   });
 });
