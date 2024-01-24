@@ -39,7 +39,7 @@ function getCardTextItems(effects: CardEffects, index: number) {
 
   // "for each playerValue"
   const isRepeatingForEachPlayerValue =
-    effects.repeat === -1 && effects.effectFromPlayerValue?.effectName === 'repeat';
+    effects.repeat === -1 && effects.effectBasedOnPlayerValue?.effectName === 'repeat';
 
   // "2x times"
   if (effects.repeat != null && !isRepeatingForEachPlayerValue) {
@@ -47,12 +47,12 @@ function getCardTextItems(effects: CardEffects, index: number) {
   }
 
   // "+X effect for each playerValue"
-  if (effects.effectFromPlayerValue != null) {
+  if (effects.effectBasedOnPlayerValue != null) {
     const {
       effectName,
-      playerValueIdentifier: { target, valueName },
+      basedOn: { target, valueName },
       ratio = 1,
-    } = effects.effectFromPlayerValue;
+    } = effects.effectBasedOnPlayerValue;
 
     const effectSymbol = CARD_TEXT_SYMBOLS[effectName];
     let effectText = `+${ratio}${effectSymbol} `;
@@ -63,11 +63,11 @@ function getCardTextItems(effects: CardEffects, index: number) {
     }
 
     // TODO: handle ratios > 0 & < 1, e.g. "1 damage for every 2 opponent bleed"
-    const playerValueSymbol = CARD_TEXT_SYMBOLS[valueName];
-    const forEachText = `for each ${target} ${playerValueSymbol}`;
+    const basedOnValueSymbol = CARD_TEXT_SYMBOLS[valueName];
+    const forEachText = `for each ${target} ${basedOnValueSymbol}`;
 
     textItems.push(
-      <CardText key={`effectFromPlayerValue-${index}`}>
+      <CardText key={`effectBasedOnPlayerValue-${index}`}>
         {effectText}
         {forEachText}
       </CardText>,

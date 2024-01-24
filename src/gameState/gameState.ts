@@ -34,9 +34,9 @@ export interface CardEffects extends Partial<StatusEffects> {
   damage?: number;
   repeat?: number;
   // gain card effect based on target, self or current card value
-  effectFromPlayerValue?: {
+  effectBasedOnPlayerValue?: {
     effectName: GainableCardEffect;
-    playerValueIdentifier: PlayerStateValueIdentifier;
+    basedOn: PlayerStateValueIdentifier;
     ratio?: number;
   };
 }
@@ -159,9 +159,9 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
         damage,
         bleed: 2,
         repeat: -1,
-        effectFromPlayerValue: {
+        effectBasedOnPlayerValue: {
           effectName: 'repeat',
-          playerValueIdentifier: {
+          basedOn: {
             target: 'opponent',
             valueName: 'bleed',
           },

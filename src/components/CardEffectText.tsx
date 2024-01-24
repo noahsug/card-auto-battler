@@ -8,7 +8,7 @@ interface Props {
   value: number;
 }
 
-export type CardEffectsithSymbols = Omit<CardEffects, 'target' | 'effectFromPlayerValue'>;
+export type CardEffectsithSymbols = Omit<CardEffects, 'target' | 'effectBasedOnPlayerValue'>;
 
 type NameWithSymbol = keyof (PlayerState & CardEffectsithSymbols);
 

@@ -150,13 +150,13 @@ describe('repeat effect', () => {
   });
 });
 
-describe('effectFromPlayerValue', () => {
+describe('gainEffectBasedOnEffect effect', () => {
   describe('double strength', () => {
     const doubleStrength: CardState = createCard({
       target: 'self',
-      effectFromPlayerValue: {
+      effectBasedOnPlayerValue: {
         effectName: 'strength',
-        playerValueIdentifier: {
+        basedOn: {
           target: 'self',
           valueName: 'strength',
         },
@@ -175,9 +175,9 @@ describe('effectFromPlayerValue', () => {
   describe('apply strength twice', () => {
     const strengthEffecetsTwice: CardEffects = {
       target: 'opponent',
-      effectFromPlayerValue: {
+      effectBasedOnPlayerValue: {
         effectName: 'damage',
-        playerValueIdentifier: {
+        basedOn: {
           target: 'self',
           valueName: 'strength',
         },
@@ -197,9 +197,9 @@ describe('effectFromPlayerValue', () => {
     const forEachOpponentBleed: CardEffects = {
       target: 'opponent',
       repeat: -1,
-      effectFromPlayerValue: {
+      effectBasedOnPlayerValue: {
         effectName: 'repeat',
-        playerValueIdentifier: {
+        basedOn: {
           target: 'opponent',
           valueName: 'bleed',
         },
