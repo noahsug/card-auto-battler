@@ -13,9 +13,9 @@ type ScreenMapping = {
 };
 
 const screenMapping: ScreenMapping = {
-  // 'game-start': <GameEndScreen />, // DEBUG
+  'game-start': <BattleScreen />, // DEBUG
 
-  'game-start': <GameStartScreen />,
+  // 'game-start': <GameStartScreen />,
   'card-selection': <CardSelectionScreen />,
   battle: <BattleScreen />,
   'battle-end': <BattleEndScreen />,

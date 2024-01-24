@@ -1,7 +1,9 @@
 import styled from 'styled-components';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGameState, useActions } from './GameStateContext';
 import Player from './Player';
+import DamageNumber, { Props as DamageNumberProps } from './DamageNumber';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen } from './shared';
 import {
@@ -13,7 +15,6 @@ import {
 } from '../gameState';
 import { wait } from '../utils';
 import { useSequence } from '../hooks';
-import { useMemo, useState } from 'react';
 
 import type { Sequence } from '../hooks';
 
@@ -23,6 +24,9 @@ export default function BattleScreen() {
   const [activePlayerCard, setActivePlayerCard] = useState<
     { card: CardState; isEnemyCard: boolean } | undefined
   >();
+  const [userDamageNumbers, setUserDamageNumbers] = useState<DamageNumberProps[]>([]);
+  const [enemyDamageNumbers, setEnemyDamageNumbers] = useState<DamageNumberProps[]>([]);
+  const animationEventsAddedThisTurn = useRef(0);
 
   const isBattleOver = getIsBattleOver(game);
   const canPlayCard = getCanPlayCard(game);
@@ -33,6 +37,7 @@ export default function BattleScreen() {
   const battleSequence: Sequence = useMemo(() => {
     function startTurnSequence() {
       startTurn();
+      animationEventsAddedThisTurn.current = 0;
     }
 
     function playCardSequence() {
@@ -70,6 +75,24 @@ export default function BattleScreen() {
 
   useSequence(battleSequence);
 
+  useEffect(() => {
+    if (game.animationEvents.length > animationEventsAddedThisTurn.current) {
+      const newAnimationEvents = game.animationEvents.slice(animationEventsAddedThisTurn.current);
+      newAnimationEvents.forEach((event) => {
+        if (
+          (isEnemyTurn && event.target === 'self') ||
+          (!isEnemyTurn && event.target === 'opponent')
+        ) {
+          setEnemyDamageNumbers((current) => [...current, { value: event.value }]);
+        } else {
+          setUserDamageNumbers((current) => [...current, { value: event.value }]);
+        }
+
+        animationEventsAddedThisTurn.current = game.animationEvents.length;
+      });
+    }
+  }, [game.animationEvents, isEnemyTurn]);
+
   const [activeUserCard, activeEnemyCard] = activePlayerCard?.isEnemyCard
     ? [undefined, activePlayerCard.card]
     : [activePlayerCard?.card, undefined];
@@ -77,9 +100,17 @@ export default function BattleScreen() {
   return (
     <Screen>
       <ProgressDisplay />
-      <Player player={enemy} activeCard={activeEnemyCard} />
+      <Player player={enemy} activeCard={activeEnemyCard}>
+        {enemyDamageNumbers.map((props, i) => (
+          <DamageNumber key={i} {...props} />
+        ))}
+      </Player>
       <Divider />
-      <Player player={user} activeCard={activeUserCard} />
+      <Player player={user} activeCard={activeUserCard}>
+        {userDamageNumbers.map((props, i) => (
+          <DamageNumber key={i} {...props} />
+        ))}
+      </Player>
     </Screen>
   );
 }

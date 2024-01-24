@@ -17,6 +17,7 @@ import {
   PlayerState,
   statusEffectNames,
   Target,
+  AnimationEvent,
 } from '../';
 import { assert } from '../../utils';
 import { Value } from '../../utils/types/types';
@@ -43,6 +44,8 @@ export function startBattle(game: GameState) {
   game.screen = 'battle';
   const { user, enemy } = game;
 
+  game.animationEvents = [];
+
   user.cards = shuffle([...user.cards, ...user.trashedCards]);
   user.trashedCards = [];
   user.health = user.maxHealth;
@@ -62,6 +65,7 @@ export function startBattle(game: GameState) {
 export function startTurn(game: GameState) {
   const activePlayer = getActivePlayer(game);
   activePlayer.cardsPlayedThisTurn = 0;
+  game.animationEvents = [];
 }
 
 export function playCard(game: GameState) {
@@ -86,6 +90,7 @@ export function playCard(game: GameState) {
       self: activePlayer,
       opponent: nonActivePlayer,
       cardEffects,
+      animationEvents: game.animationEvents,
     });
   });
 
@@ -130,10 +135,12 @@ function applyCardEffects(
     self,
     opponent,
     cardEffects,
+    animationEvents,
   }: {
     self: PlayerState;
     opponent: PlayerState;
     cardEffects: CardEffects;
+    animationEvents: AnimationEvent[];
   },
   isRepeating = false,
 ) {
@@ -152,7 +159,7 @@ function applyCardEffects(
       opponent.dodge -= 1;
     } else {
       const { damage, target } = cardEffects;
-      dealDamage({ self, opponent, damage, target });
+      dealDamage({ self, opponent, damage, target, animationEvents });
     }
   }
 
@@ -162,7 +169,7 @@ function applyCardEffects(
 
   if (!isRepeating) {
     for (let i = 0; i < repeat; i++) {
-      applyCardEffects({ self, opponent, cardEffects }, true);
+      applyCardEffects({ self, opponent, cardEffects, animationEvents }, true);
     }
   }
 }
@@ -172,23 +179,25 @@ function dealDamage({
   opponent,
   damage,
   target,
+  animationEvents,
 }: {
   opponent: PlayerState;
   self: PlayerState;
   damage: number;
   target: Target;
+  animationEvents: AnimationEvent[];
 }) {
   const targetPlayer = target === 'self' ? self : opponent;
 
   damage += self.strength;
+  if (targetPlayer.bleed) {
+    damage += 3;
+    targetPlayer.bleed -= 1;
+  }
 
   if (damage > 0) {
     targetPlayer.health -= damage;
-
-    if (targetPlayer.bleed) {
-      targetPlayer.health -= 3;
-      targetPlayer.bleed -= 1;
-    }
+    animationEvents.push({ type: 'damage', target, value: damage });
   }
 }
 

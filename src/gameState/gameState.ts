@@ -3,6 +3,12 @@ import { createCard } from './utils';
 
 export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'battle-end' | 'game-end';
 
+export interface AnimationEvent {
+  type: 'damage';
+  target: Target;
+  value: number;
+}
+
 export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength'] as const;
 
 export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
@@ -56,6 +62,7 @@ export interface GameState {
   wins: number;
   losses: number;
   screen: ScreenName;
+  animationEvents: AnimationEvent[];
 }
 
 export const MAX_WINS = 3;
@@ -64,7 +71,7 @@ export const MAX_LOSSES = 2;
 export const BLEED_DAMAGE = 3;
 
 function createInitialPlayerState(): PlayerState {
-  const maxHealth = 6;
+  const maxHealth = 300;
 
   return {
     cards: [],
@@ -134,6 +141,7 @@ export function createInitialGameState(): GameState {
     wins: 0,
     losses: 0,
     screen: 'game-start',
+    animationEvents: [],
   };
 }
 
