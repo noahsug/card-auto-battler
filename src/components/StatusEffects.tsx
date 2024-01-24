@@ -10,9 +10,9 @@ interface Props {
 
 export const STATUS_EFFECT_SYMBOLS: Record<StatusEffectName, string> = {
   bleed: '🩸',
-  extraCardPlays: '🃏',
-  dodge: '💨',
   strength: '💪',
+  dodge: '💨',
+  extraCardPlays: '🃏',
 };
 
 export default function StatusEffects({ statusEffects }: Props) {

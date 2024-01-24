@@ -45,6 +45,20 @@ describe('text', () => {
     expect(card.textContent).toBe(toCardText('5 damage'));
   });
 
+  it('renders multiple card effects', () => {
+    const card = getCardElement(
+      createCard(
+        { target: 'opponent', damage: 5, bleed: 2 },
+        { target: 'self', dodge: 1, extraCardPlays: 1, strength: 1, repeat: 1 },
+      ),
+    );
+
+    const effects = '5⚔️2🩸1🃏1💨1💪2x times';
+    const toSelf = 'to self';
+
+    expect(card.textContent).toBe(effects + toSelf);
+  });
+
   it('renders self damage', () => {
     const card = getCardElement(createCard({ target: 'self', damage: 5 }));
 
@@ -65,10 +79,17 @@ describe('text', () => {
     expect(card.textContent).toBe(toCardText('5 damage', 'trash'));
   });
 
-  it('renders repeat', () => {
-    const card = getCardElement(createCard({ target: 'opponent', damage: 5, repeat: 2 }));
+  describe('renders repeat', () => {
+    it('with positive repeat', () => {
+      const card = getCardElement(createCard({ target: 'opponent', damage: 5, repeat: 2 }));
 
-    expect(card.textContent).toBe(toCardText(`5 damage`, '3x times'));
+      expect(card.textContent).toBe(toCardText(`5 damage`, '3x times'));
+    });
+    it('with -1 repeat', () => {
+      const card = getCardElement(createCard({ target: 'opponent', damage: 5, repeat: -1 }));
+
+      expect(card.textContent).toBe(toCardText(`5 damage`, '0x times'));
+    });
   });
 
   describe('for effect based on player value', () => {

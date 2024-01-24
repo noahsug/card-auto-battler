@@ -8,7 +8,9 @@ effects implemented
 - strength: 0
 - damage
 - repeat
-- effect based on player value
+- effect from player value
+- heal
+- lifesteal
 
 archtypes implemented
 
@@ -18,8 +20,6 @@ archtypes implemented
 - heal -
 - trash -
 - growth - play another card, perm +1 dmg each time played
-
-TODO: trash card text, would restructure card effect targeting make things simpler?
 
 ## simple card effects
 
