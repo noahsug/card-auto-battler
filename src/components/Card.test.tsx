@@ -76,9 +76,9 @@ describe('text', () => {
       const card = getCardElement(
         createCard({
           target: 'opponent',
-          effectBasedOnPlayerValue: {
+          effectFromPlayerValue: {
             effectName: 'damage',
-            basedOn: { target: 'opponent', valueName: 'bleed' },
+            playerValueIdentifier: { target: 'opponent', valueName: 'bleed' },
           },
         }),
       );
@@ -91,9 +91,9 @@ describe('text', () => {
         createCard({
           target: 'opponent',
           damage: 2,
-          effectBasedOnPlayerValue: {
+          effectFromPlayerValue: {
             effectName: 'repeat',
-            basedOn: { target: 'self', valueName: 'strength' },
+            playerValueIdentifier: { target: 'self', valueName: 'strength' },
           },
         }),
       );
@@ -107,9 +107,9 @@ describe('text', () => {
           target: 'opponent',
           damage: 1,
           repeat: -1,
-          effectBasedOnPlayerValue: {
+          effectFromPlayerValue: {
             effectName: 'repeat',
-            basedOn: { target: 'self', valueName: 'health' },
+            playerValueIdentifier: { target: 'self', valueName: 'health' },
           },
         }),
       );
@@ -121,9 +121,9 @@ describe('text', () => {
       const card = getCardElement(
         createCard({
           target: 'self',
-          effectBasedOnPlayerValue: {
+          effectFromPlayerValue: {
             effectName: 'dodge',
-            basedOn: { target: 'self', valueName: 'trashedCards' },
+            playerValueIdentifier: { target: 'self', valueName: 'trashedCards' },
           },
         }),
       );

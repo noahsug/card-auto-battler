@@ -114,7 +114,7 @@ function getNumericPlayerValue(value: Value<PlayerState>) {
   return value;
 }
 
-function gainEffectBasedOnPlayerValue({
+function gainEffectFromPlayerValue({
   self,
   opponent,
   cardEffects,
@@ -123,15 +123,15 @@ function gainEffectBasedOnPlayerValue({
   opponent: PlayerState;
   cardEffects: CardEffects;
 }) {
-  if (!cardEffects.effectBasedOnPlayerValue) return cardEffects;
+  if (!cardEffects.effectFromPlayerValue) return cardEffects;
 
-  const { effectName, basedOn, ratio = 1 } = cardEffects.effectBasedOnPlayerValue;
+  const { effectName, playerValueIdentifier, ratio = 1 } = cardEffects.effectFromPlayerValue;
 
-  const targetPlayer = basedOn.target === 'self' ? self : opponent;
-  const basedOnValue = getNumericPlayerValue(targetPlayer[basedOn.valueName]);
+  const targetPlayer = playerValueIdentifier.target === 'self' ? self : opponent;
+  const playerValue = getNumericPlayerValue(targetPlayer[playerValueIdentifier.valueName]);
 
   cardEffects = cloneDeep(cardEffects);
-  cardEffects[effectName] = (cardEffects[effectName] || 0) + basedOnValue * ratio;
+  cardEffects[effectName] = (cardEffects[effectName] || 0) + playerValue * ratio;
 
   return cardEffects;
 }
@@ -153,7 +153,7 @@ function applyCardEffects(
   const targetPlayer = cardEffects.target === 'self' ? self : opponent;
 
   if (!isRepeating) {
-    cardEffects = gainEffectBasedOnPlayerValue({ self, opponent, cardEffects });
+    cardEffects = gainEffectFromPlayerValue({ self, opponent, cardEffects });
   }
 
   const repeat = cardEffects.repeat || 0;
