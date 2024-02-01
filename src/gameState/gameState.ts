@@ -1,7 +1,7 @@
 import { PickType } from '../utils/types/types';
 import { createCard } from './utils';
 
-export type ScreenName = 'game-start' | 'card-selection' | 'battle' | 'battle-end' | 'game-end';
+export type ScreenName = 'gameStart' | 'cardSelection' | 'battle' | 'battleEnd' | 'gameEnd';
 
 export interface AnimationEvent {
   type: 'damage';
@@ -143,7 +143,7 @@ export function createInitialGameState(): GameState {
     turn: 0,
     wins: 0,
     losses: 0,
-    screen: 'game-start',
+    screen: 'gameStart',
     animationEvents: [],
   };
 }

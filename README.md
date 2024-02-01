@@ -101,6 +101,341 @@ shuffle deck aniation
   - cards are ordered by dmg delt (and random if they deal no dmg)
   - all cards are played twice, can only play 2 cards per turn
 
+## Example Cards
+
+```js
+// deal 10 damage and 5 damage to self
+const cardSelfDamage = {
+  target: 'opponent',
+  damage: 10,
+  then: {
+    target: 'self',
+    damage: 5,
+  },
+};
+
+// deal 1 damage for each bleed, heal 1 3 times
+const cardDamageForEachBleedAndHeal = {
+  target: 'opponent',
+  damage: 1,
+  activations: 0,
+  gainEffects: {
+    effects: { activations: 1 },
+    forEveryPlayerValue: {
+      target: 'opponent',
+      name: 'bleed',
+    },
+  },
+  then: {
+    target: 'self',
+    heal: 1,
+    activations: 3,
+  },
+};
+
+// deal 1, then 2, then 3 damage
+const cardMultiDamage = {
+  target: 'opponent',
+  damage: 1,
+  then: {
+    target: 'opponent',
+    damage: 2,
+    then: {
+      target: 'opponent',
+      damage: 3,
+    },
+  },
+};
+
+// +3 heal and +1 dodge for every 5 cards played this turn
+const cardDamageAndHealForEach = {
+  target: 'self',
+  gainEffects: {
+    effects: { heal: 3, dodge: 1 },
+    forEveryPlayerValue: {
+      target: 'self',
+      name: 'cardsPlayedThisTurn',
+    },
+    divisor: 5,
+  },
+};
+
+// deal 5 damage, +1 dodge if hit
+const cardDodgeOnHit = {
+  target: 'opponent',
+  damage: 5,
+  onHit: {
+    target: 'self',
+    dodge: 1,
+  },
+};
+
+// deal 1 damage for each opponent trashed card, heal 1 for each hit
+const cardDamageForEachTrashedCard = {
+  target: 'opponent',
+  damage: 1,
+  gainEffects: {
+    effects: { activations: 1 },
+    forEveryPlayerValue: {
+      target: 'opponent',
+      name: 'trashedCards',
+    },
+  },
+  then: {
+    target: 'self',
+    gainEffects: {
+      effects: { heal: 1 },
+      forEveryHit: true,
+    },
+  },
+};
+
+// deal 1 damage, grow: +1 damage permanently on hit
+const cardDamageAndGrowOnHit = {
+  target: 'opponent',
+  damage: 1,
+  grow: {
+    effects: { damage: 1 },
+    isPermanent: true,
+    ifDamageDealt: {
+      comparator: 'greaterThan',
+      compareToValue: 0,
+    },
+  },
+};
+
+// deal 1 damage, gain +1 strength permanently on hit
+const cardDamageAndGrowStrOnHit = {
+  target: 'opponent',
+  damage: 1,
+  and: {
+    target: 'self',
+    grow: {
+      // alawys happens after damage and other effects
+      effects: { strength: 1 },
+      isPermanent: true,
+      ifDamageDealt: {
+        comparator: 'greaterThan',
+        compareToValue: 0,
+      },
+    },
+  },
+};
+
+// deal 1 damage, +1 dodge for each damage done
+const cardDamageAndBleedForEachDmg = {
+  target: 'opponent',
+  damage: 1,
+  and: {
+    target: 'self',
+    gainEffects: {
+      effects: { dodge: 1 },
+      forEveryDamage: true,
+    },
+  },
+};
+
+// deal 2 damage, grow: damage doubles this battle
+const cardDoubleGrowth = {
+  target: 'opponent',
+  damage: 2,
+  growth: {
+    effects: { damage: 2 },
+    isMultiplicative: true,
+    isPermanent: false,
+  },
+};
+
+// 1 heal 1x times, grow: +1 heal, +1x times
+const cardHealAndGrow = {
+  target: 'self',
+  heal: 1,
+  activations: 1,
+  grow: {
+    effects: { heal: 1, activations: 1 },
+    isPermanent: true,
+  },
+};
+
+// deal 1 damage for each bleed or apply bleed 2 if opponent has no bleed
+const cardDamageOrBleed = {
+  target: 'opponent',
+  damage: 1,
+  activateForEvery: {
+    target: 'opponent',
+    name: 'bleed',
+  },
+  and: {
+    target: 'opponent',
+    bleed: 2,
+    ifPlayerValue: {
+      target: 'opponent',
+      name: 'bleed',
+      comparator: 'equals',
+      compareToValue: 0,
+    },
+  },
+};
+
+// deal 1 damage and heal 1, grow: +2 damage and +2 heal
+const cardGrowOnUse = {
+  target: 'opponent',
+  damage: 1,
+  grow: {
+    effects: { damage: 2 },
+  },
+  and: {
+    target: 'self',
+    heal: 1,
+    grow: {
+      effects: { heal: 2 },
+    },
+  },
+};
+
+// deal 2 damage +2 damage for each opponent bleed
+const cardDamagePlusDamageForEachBleed = {
+  target: 'opponent',
+  damage: 2,
+  gainEffects: {
+    effects: { damage: 2 },
+    forEveryPlayerValue: {
+      target: 'opponent',
+      name: 'bleed',
+    },
+  },
+};
+
+// deal 2 damage 2 times, affected by strength twice
+const cardDoubleStrength = {
+  damage: 2,
+  activations: 2,
+  gainEffects: {
+    effects: { damage: 1 },
+    forEveryPlayerValue: {
+      target: 'self',
+      name: 'strength',
+    },
+  },
+};
+
+// deal 1 damage and 1 bleed, repeat if opponent health < 50%
+const cardRepeatOnCondition = {
+  target: 'opponent',
+  damage: 1,
+  bleed: 1,
+  gainEffects: {
+    effects: { activations: 1 },
+    ifPlayerValue: {
+      target: 'opponent',
+      name: 'health',
+      comparator: 'lessThan',
+      compareToValue: 50,
+    },
+  },
+};
+
+// apply 1 random negative status effect and gain 1 random positive status effect
+const cardRandomStatusEffect = {
+  target: 'opponent',
+  randomNegativeStatusEffect: 1,
+  and: {
+    target: 'self',
+    gainRandomPositiveStatusEffect: 1,
+  },
+};
+
+// double your strength, trash
+const cardDoubleStrengthAndTrash = {
+  target: 'self',
+  gainEffects: {
+    effects: { strength: 1 },
+    forEveryPlayerValue: {
+      target: 'self',
+      name: 'strength',
+    },
+  },
+  trashSelf: true,
+};
+
+// gain 1 dodge, play another card if your health > opponent health
+const cardDodgeAndPlayAnother = {
+  target: 'self',
+  dodge: 1,
+  gainEffects: {
+    effects: { extraCardPlays: 1 },
+    ifPlayerValue: {
+      target: 'self',
+      name: 'health',
+      comparator: 'greaterThan',
+      compareToPlayerValue: {
+        target: 'opponent',
+        name: 'health',
+      },
+    },
+  },
+};
+
+// 1 damage for every 3 cards in deck
+const cardDamageForDeckSize = {
+  target: 'opponent',
+  gainEffects: {
+    effects: { damage: 1 },
+    forEveryPlayerValue: {
+      target: 'self',
+      name: 'cards',
+    },
+    divisor: 3,
+  },
+};
+
+// trash 2 cards, +1 heal for each card trashed this battle
+const cardTrashAndHeal = {
+  target: 'self',
+  trash: 2,
+  then: {
+    target: 'self',
+    gainEffects: {
+      effects: { heal: 1 },
+      forEveryPlayerValue: {
+        target: 'self',
+        name: 'trashedCards',
+      },
+    },
+  },
+};
+
+// lifesteal, deal 3 damage
+const cardLifestealAndDamage = {
+  target: 'opponent',
+  damage: 3,
+  then: {
+    target: 'self',
+    gainEffects: {
+      effects: { heal: 1 },
+      forEveryDamage: true,
+    },
+  },
+};
+
+// deal 5 damage, play another card of damage dealt is > 7
+const cardDamageAndPlayAnother = {
+  target: 'opponent',
+  damage: 5,
+  then: {
+    gainEffects: {
+      effects: { extraCardPlays: 1 },
+      ifDamageDealt: {
+        comparator: 'greaterThan',
+        compareToValue: 7,
+      },
+    },
+  },
+};
+```
+
+---
+
 ## Available Scripts
 
 In the project directory, you can run:

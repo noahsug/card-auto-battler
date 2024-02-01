@@ -34,7 +34,7 @@ export function startGame(game: GameState) {
 export function startCardSelection(game: GameState) {
   game.turn = 0;
 
-  game.screen = 'card-selection';
+  game.screen = 'cardSelection';
 }
 
 export function addCard(game: GameState, card: CardState) {
@@ -222,5 +222,5 @@ export function endBattle(game: GameState) {
     throw new Error('endBattle called, but neither player is dead');
   }
 
-  game.screen = game.wins >= MAX_WINS || game.losses >= MAX_LOSSES ? 'game-end' : 'battle-end';
+  game.screen = game.wins >= MAX_WINS || game.losses >= MAX_LOSSES ? 'gameEnd' : 'battleEnd';
 }

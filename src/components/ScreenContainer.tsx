@@ -15,11 +15,11 @@ type ScreenMapping = {
 const screenMapping: ScreenMapping = {
   // 'game-start': <BattleScreen />, // DEBUG
 
-  'game-start': <GameStartScreen />,
-  'card-selection': <CardSelectionScreen />,
+  gameStart: <GameStartScreen />,
+  cardSelection: <CardSelectionScreen />,
   battle: <BattleScreen />,
-  'battle-end': <BattleEndScreen />,
-  'game-end': <GameEndScreen />,
+  battleEnd: <BattleEndScreen />,
+  gameEnd: <GameEndScreen />,
 };
 
 export default function ScreenContainer() {
