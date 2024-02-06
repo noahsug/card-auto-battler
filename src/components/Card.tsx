@@ -26,8 +26,8 @@ function getGainEffectsText({
 }) {
   const {
     effects,
-    // TODO: isMultiplicative,
-    divisor,
+    // TODO: isMultiplicative = false,
+    divisor = 1,
     forEveryPlayerValue,
   } = gainEffectsOptions;
 
@@ -43,6 +43,8 @@ function getGainEffectsText({
     const effectsTextBuilder: string[] = [];
     Object.entries(numericEffects).forEach(([name, value]) => {
       const effectSymbol = CARD_TEXT_SYMBOLS[name as keyof typeof numericEffects];
+
+      // "+X effect" for every value or "X times" for every value
       const prefix = name === 'activations' && isActivatingForEveryValue ? '' : '+';
       effectsTextBuilder.push(`${prefix}${value}${effectSymbol}`);
     });

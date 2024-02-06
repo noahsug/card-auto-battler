@@ -42,37 +42,38 @@ export interface Conditional<T> {
 export type GainableCardEffects = PickByValue<Required<CardEffects>, number | boolean>;
 
 export interface GainEffectsOptions extends Conditional<GainEffectsOptions> {
-  effects: GainableCardEffects;
+  effects: Partial<GainableCardEffects>;
 
   forEveryPlayerValue?: PlayerValueIdentifier;
   forEveryDamageDealt?: boolean;
   forEveryHit?: boolean;
 
-  isMultiplicative: boolean;
-  divisor: number;
+  isMultiplicative?: boolean;
+  divisor?: number;
 }
 
 export interface CardGrowEffects
   extends Omit<GainEffectsOptions, 'else'>,
     Conditional<CardGrowEffects> {
-  isPermanent: boolean;
+  isPermanent?: boolean;
 }
 
-export interface CardEffects extends StatusEffects, Conditional<CardEffects> {
+export interface CardEffects extends Partial<StatusEffects>, Conditional<CardEffects> {
   target: Target;
-  damage: number;
-  randomNegativeStatusEffects: number;
-  randomPositiveStatusEffects: number;
+
+  damage?: number;
+  randomNegativeStatusEffects?: number;
+  randomPositiveStatusEffects?: number;
   // cause target to trash X cards
-  trash: number;
+  trash?: number;
   // trash this card after use
-  trashSelf: boolean;
-  activations: number;
+  trashSelf?: boolean;
+  activations?: number;
 
   // gain temporary effects as the card is being played
-  gainEffectsList: GainEffectsOptions[];
+  gainEffectsList?: GainEffectsOptions[];
   // gain (semi-)permanent effects after the card is played
-  growEffectsList: CardGrowEffects[];
+  growEffectsList?: CardGrowEffects[];
 }
 
 export interface CardState {

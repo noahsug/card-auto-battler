@@ -13,7 +13,7 @@ import {
   getIsBattleOver,
   getIsEnemyTurn,
 } from '../gameState';
-import { createCard, createCustomCard } from '../utils';
+import { createCard } from '../utils';
 
 function runBattle({
   user,
@@ -101,7 +101,7 @@ describe('dodge effect', () => {
 describe('trash effect', () => {
   it('trashes the played card', () => {
     const userCards = [
-      createCustomCard({ trash: true }, { target: 'opponent', damage: 3 }),
+      createCard({ trashSelf: true, target: 'opponent', damage: 3 }),
       createCard({ target: 'opponent', damage: 1 }),
     ];
     const { endingState, startingState } = runBattle({
@@ -113,7 +113,7 @@ describe('trash effect', () => {
   });
 
   it('causes a loss when no cards are left', () => {
-    const userCards = [createCustomCard({ trash: true }, { target: 'opponent', damage: 1 })];
+    const userCards = [createCard({ trashSelf: true, target: 'opponent', damage: 1 })];
     const { endingState } = runBattle({
       user: { cards: userCards },
       stopAfterTurn: 3, // 2 player turns
@@ -123,7 +123,7 @@ describe('trash effect', () => {
   });
 
   it('does not cause a loss when final trashed card wins the game', () => {
-    const userCards = [createCustomCard({ trash: true }, { target: 'opponent', damage: 10 })];
+    const userCards = [createCard({ trashSelf: true, target: 'opponent', damage: 10 })];
     const { endingState } = runBattle({
       user: { cards: userCards },
       stopAfterTurn: 3, // 2 player turns
@@ -177,21 +177,23 @@ describe('gainEffectBasedOnEffect effect', () => {
   });
 
   describe('apply strength twice', () => {
-    const strengthEffecetsTwice: CardEffects = {
+    const strengthEffectsTwice: CardEffects = {
       target: 'opponent',
-      gainEffectsList: [{
-        effects: { damage: 1 },
-        forEveryPlayerValue: {
-          target: 'self',
-          name: 'strength',
-        }],
-      },
+      gainEffectsList: [
+        {
+          effects: { damage: 1 },
+          forEveryPlayerValue: {
+            target: 'self',
+            name: 'strength',
+          },
+        },
+      ],
     };
 
     it('doubles own strength', () => {
       const { endingState, startingState } = playCards([
         createCard({ target: 'self', strength: 2 }),
-        createCard({ ...strengthEffecetsTwice, damage: 2 }),
+        createCard({ ...strengthEffectsTwice, damage: 2 }),
       ]);
       expect(startingState.enemy.health - endingState.enemy.health).toBe(6);
     });
@@ -201,13 +203,15 @@ describe('gainEffectBasedOnEffect effect', () => {
     const forEachOpponentBleed: CardEffects = {
       target: 'opponent',
       activations: 0,
-      gainEffectsList: [{
-        effects: { activations: 1 },
-        forEveryPlayerValue: {
-          target: 'opponent',
-          name: 'bleed',
-        }],
-      },
+      gainEffectsList: [
+        {
+          effects: { activations: 1 },
+          forEveryPlayerValue: {
+            target: 'opponent',
+            name: 'bleed',
+          },
+        },
+      ],
     };
 
     it('repeats card enemy bleed - 1 times', () => {
@@ -246,7 +250,7 @@ describe('gainEffectBasedOnEffect effect', () => {
 });
 
 describe('bleed status effect', () => {
-  it('deals flat damage when damage is delt', () => {
+  it('deals flat damage when damage is dealt', () => {
     const { endingState, startingState } = playCards([
       createCard({ target: 'opponent', bleed: 50 }),
       createCard({ target: 'opponent', damage: 1 }),
@@ -254,7 +258,7 @@ describe('bleed status effect', () => {
     expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE + 1);
   });
 
-  it('decreases by 1 when damage is delt', () => {
+  it('decreases by 1 when damage is dealt', () => {
     const { endingState, startingState } = playCards([
       createCard({ target: 'opponent', bleed: 2 }),
       createCard({ target: 'opponent', activations: 2, damage: 1 }), // 7 damage
@@ -263,7 +267,7 @@ describe('bleed status effect', () => {
     expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 3);
   });
 
-  it('does not apply to damage delt at the same time', () => {
+  it('does not apply to damage dealt at the same time', () => {
     const { endingState, startingState } = playCards([
       createCard({ target: 'opponent', damage: 1, bleed: 1 }),
     ]);
@@ -282,7 +286,7 @@ describe('strength status effect', () => {
     expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
   });
 
-  it('applies to damage delt at the same time, depending on effect order', () => {
+  it('applies to damage dealt at the same time, depending on effect order', () => {
     const { endingState, startingState } = playCards([
       createCard({ target: 'opponent', damage: 1 }, { target: 'self', strength: 1 }), // 1 dmg
       createCard({ target: 'self', strength: 1 }, { target: 'opponent', damage: 1 }), // 3 dmg
@@ -312,7 +316,7 @@ describe('extraCardPlays status effect', () => {
 describe('ends the game after X turns', () => {
   it('with the user winning if they have more health', () => {
     const userCards: CardState[] = [
-      createCustomCard({ trash: true }, { target: 'opponent', damage: 1 }),
+      createCard({ trashSelf: true, target: 'opponent', damage: 1 }),
       createCard({ target: 'opponent', damage: 0 }),
     ];
     const { endingState } = runBattle({

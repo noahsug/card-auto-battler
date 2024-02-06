@@ -79,12 +79,14 @@ function handleCardEffects({
     });
   });
 
-  applyCardEffects({
-    self: activePlayer,
-    opponent: nonActivePlayer,
-    cardEffects: resultingCardEffects,
-    animationEvents: game.animationEvents,
-  });
+  for (let i = 0; i < (resultingCardEffects.activations ?? 1); i++) {
+    applyCardEffects({
+      self: activePlayer,
+      opponent: nonActivePlayer,
+      cardEffects: resultingCardEffects,
+      animationEvents: game.animationEvents,
+    });
+  }
 
   return resultingCardEffects;
 }
@@ -110,9 +112,12 @@ function gainEffects({
 
   getNonNullEntries(effects).forEach(([name, value]) => {
     if (typeof value === 'boolean') {
-      cardEffects[name] = cardEffects[name] || value;
+      const boolValue = value && playerValueMultiplier > 0;
+      cardEffects[name] = cardEffects[name] || boolValue;
     } else {
-      cardEffects[name] = cardEffects[name] + value / divisor;
+      const defaultValue = name === 'activations' ? 1 : 0;
+      const currentValue = cardEffects[name] ?? defaultValue;
+      cardEffects[name] = currentValue + (value * playerValueMultiplier) / divisor;
     }
   });
 
@@ -137,28 +142,18 @@ function getPlayerValue({
   return value;
 }
 
-function applyCardEffects(
-  {
-    self,
-    opponent,
-    cardEffects,
-    animationEvents,
-  }: {
-    self: PlayerState;
-    opponent: PlayerState;
-    cardEffects: CardEffects;
-    animationEvents: AnimationEvent[];
-  },
-  isRepeating = false,
-) {
+function applyCardEffects({
+  self,
+  opponent,
+  cardEffects,
+  animationEvents,
+}: {
+  self: PlayerState;
+  opponent: PlayerState;
+  cardEffects: CardEffects;
+  animationEvents: AnimationEvent[];
+}) {
   const targetPlayer = cardEffects.target === 'self' ? self : opponent;
-
-  if (!isRepeating) {
-    cardEffects = gainEffects({ self, opponent, cardEffects });
-  }
-
-  const activations = cardEffects.activations ?? 1;
-  if (activations <= 0) return;
 
   if (cardEffects.damage != null) {
     // dodge doesn't apply to self damage
@@ -173,12 +168,6 @@ function applyCardEffects(
   statusEffectNames.forEach((statusEffect) => {
     targetPlayer[statusEffect] += cardEffects[statusEffect] || 0;
   });
-
-  if (!isRepeating) {
-    for (let i = 1; i < activations; i++) {
-      applyCardEffects({ self, opponent, cardEffects, animationEvents }, true);
-    }
-  }
 }
 
 function dealDamage({
