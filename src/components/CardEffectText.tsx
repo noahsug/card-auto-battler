@@ -2,35 +2,37 @@ import styled from 'styled-components';
 
 import { CardEffects, PlayerState } from '../gameState';
 import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
+import { Conditional } from '../gameState/gameState';
 
 interface Props {
-  effectName: keyof CardEffectsithSymbols;
+  effectName: keyof CardEffectsWithSymbols;
   value: number;
 }
 
-export type CardEffectsithSymbols = Omit<CardEffects, 'target' | 'effectBasedOnPlayerValue'>;
+export type CardEffectsWithSymbols = Omit<
+  CardEffects,
+  'target' | 'trashSelf' | 'gainEffectsList' | 'growEffectsList' | keyof Conditional<unknown>
+>;
 
-type NameWithSymbol = keyof (PlayerState & CardEffectsithSymbols);
+type NameWithSymbol = keyof (PlayerState & CardEffectsWithSymbols);
 
 export const CARD_TEXT_SYMBOLS: Record<NameWithSymbol, string> = {
   ...STATUS_EFFECT_SYMBOLS,
   damage: '⚔️',
+  randomNegativeStatusEffects: 'random negative effect',
+  randomPositiveStatusEffects: 'random positive effect',
+  activations: 'x times',
+  trash: 'trash',
   health: '❤️',
   maxHealth: 'max ❤️',
-  repeat: 'x times',
   cards: 'cards in deck',
-  trashedCards: 'trashed cards',
   currentCardIndex: 'cards in discard',
   cardsPlayedThisTurn: 'cards played this turn',
+  trashedCards: 'trashed cards',
 } as const;
 
 export default function CardEffectText({ effectName, value }: Props) {
   const symbol = CARD_TEXT_SYMBOLS[effectName];
-
-  if (effectName === 'repeat') {
-    // repeat 1 = hit two times
-    value += 1;
-  }
 
   return (
     <CardText>

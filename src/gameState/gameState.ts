@@ -1,4 +1,4 @@
-import { PickType } from '../utils/types/types';
+import { PickByValue } from '../utils/types';
 import { createCard } from './utils';
 
 export type ScreenName = 'gameStart' | 'cardSelection' | 'battle' | 'battleEnd' | 'gameEnd';
@@ -21,38 +21,71 @@ export type StatusEffects = Record<StatusEffectName, number>;
 
 export type Target = 'self' | 'opponent';
 
-// Card effects that are numbers
-export type GainableCardEffect = keyof PickType<Required<CardEffects>, number>;
-
-export interface PlayerStateValueIdentifier {
+export interface PlayerValueIdentifier {
   target: Target;
-  valueName: keyof PlayerState;
+  name: keyof PlayerState;
 }
 
-export interface CardEffects extends Partial<StatusEffects> {
+export interface Comparable {
+  comparator: '>' | '<' | '=';
+  compareToValue?: number;
+  compareToPlayerValue?: PlayerValueIdentifier;
+}
+
+export interface Conditional<T> {
+  ifDamageDealt?: Comparable;
+  ifHits?: Comparable;
+  ifPlayerValue?: PlayerValueIdentifier & Comparable;
+  else?: T;
+}
+
+export type GainableCardEffects = PickByValue<Required<CardEffects>, number | boolean>;
+
+export interface GainEffectsOptions extends Conditional<GainEffectsOptions> {
+  effects: GainableCardEffects;
+
+  forEveryPlayerValue?: PlayerValueIdentifier;
+  forEveryDamageDealt?: boolean;
+  forEveryHit?: boolean;
+
+  isMultiplicative: boolean;
+  divisor: number;
+}
+
+export interface CardGrowEffects
+  extends Omit<GainEffectsOptions, 'else'>,
+    Conditional<CardGrowEffects> {
+  isPermanent: boolean;
+}
+
+export interface CardEffects extends StatusEffects, Conditional<CardEffects> {
   target: Target;
-  damage?: number;
-  repeat?: number;
-  // gain card effect based on target, self or current card value
-  effectBasedOnPlayerValue?: {
-    effectName: GainableCardEffect;
-    basedOn: PlayerStateValueIdentifier;
-    ratio?: number;
-  };
+  damage: number;
+  randomNegativeStatusEffects: number;
+  randomPositiveStatusEffects: number;
+  // cause target to trash X cards
+  trash: number;
+  // trash this card after use
+  trashSelf: boolean;
+  activations: number;
+
+  // gain temporary effects as the card is being played
+  gainEffectsList: GainEffectsOptions[];
+  // gain (semi-)permanent effects after the card is played
+  growEffectsList: CardGrowEffects[];
 }
 
 export interface CardState {
   effects: CardEffects[];
-  trash?: boolean;
 }
 
 export interface PlayerState extends StatusEffects {
-  cards: CardState[];
-  trashedCards: CardState[];
-  currentCardIndex: number;
   health: number;
   maxHealth: number;
+  cards: CardState[];
+  currentCardIndex: number;
   cardsPlayedThisTurn: number;
+  trashedCards: CardState[];
 }
 
 export interface GameState {
@@ -71,7 +104,7 @@ export const MAX_LOSSES = 2;
 export const BLEED_DAMAGE = 3;
 
 // the player with the highest health wins after this many turns
-export const END_GAME_AFTER_TURN = 40;
+export const MAX_TURNS_IN_BATTLE = 40;
 
 function createInitialPlayerState(): PlayerState {
   const maxHealth = 300;
@@ -158,14 +191,16 @@ for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
         target: 'opponent',
         damage,
         bleed: 2,
-        repeat: -1,
-        effectBasedOnPlayerValue: {
-          effectName: 'repeat',
-          basedOn: {
-            target: 'opponent',
-            valueName: 'bleed',
+        activations: 0,
+        gainEffectsList: [
+          {
+            effects: { activations: 1 },
+            forEveryPlayerValue: {
+              target: 'opponent',
+              name: 'bleed',
+            },
           },
-        },
+        ],
       }),
     );
   }

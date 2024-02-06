@@ -89,7 +89,7 @@ shuffle deck aniation
   - 50% more likely to see cards you already own
   - can remove a card instead of taking a new card
   - healing is 50% more effective, dmg is 50% less effective, win if you reach 50 life
-  - instead of dealing dmg, trash cards equal to dmg you would have delt
+  - instead of dealing dmg, trash cards equal to dmg you would have dealt
   - trash a card each turn, randomly play a trashed card (you still loose when you run out of cards)
   - dmg shields yourself instead, the game ends on round 10
   - play two cards per turn, trash cards played
@@ -97,8 +97,8 @@ shuffle deck aniation
   - go second, start with better cards
   - bravest hero: need 10 wins to win, unlocks true ending
   - thief: play and trash an opponent card at the start of each battle
-  - cards are in alphebetical order
-  - cards are ordered by dmg delt (and random if they deal no dmg)
+  - cards are in alphabetical order
+  - cards are ordered by dmg dealt (and random if they deal no dmg)
   - all cards are played twice, can only play 2 cards per turn
 
 ## Example Cards
@@ -133,7 +133,7 @@ const cardDamageForEachBleedAndHeal = {
   },
 };
 
-// deal 1, then 2, then 3 damage
+// deal 1, 2, 3 damage
 const cardMultiDamage = {
   target: 'opponent',
   damage: 1,
@@ -164,9 +164,13 @@ const cardDamageAndHealForEach = {
 const cardDodgeOnHit = {
   target: 'opponent',
   damage: 5,
-  onHit: {
+  then: {
     target: 'self',
     dodge: 1,
+    ifDamageDealt: {
+      comparator: '>',
+      compareToValue: 0,
+    },
   },
 };
 
@@ -190,11 +194,11 @@ const cardDamageForEachTrashedCard = {
   },
 };
 
-// deal 1 damage, grow: +1 damage permanently on hit
+// 1 damage, grow: +1 damage permanently on hit
 const cardDamageAndGrowOnHit = {
   target: 'opponent',
   damage: 1,
-  grow: {
+  growEffects: {
     effects: { damage: 1 },
     isPermanent: true,
     ifDamageDealt: {
@@ -204,14 +208,14 @@ const cardDamageAndGrowOnHit = {
   },
 };
 
-// deal 1 damage, gain +1 strength permanently on hit
+// deal 1 damage, grow: +1 strength permanently on hit
 const cardDamageAndGrowStrOnHit = {
   target: 'opponent',
   damage: 1,
   and: {
     target: 'self',
     grow: {
-      // alawys happens after damage and other effects
+      // always happens after damage and other effects
       effects: { strength: 1 },
       isPermanent: true,
       ifDamageDealt: {
@@ -226,7 +230,7 @@ const cardDamageAndGrowStrOnHit = {
 const cardDamageAndBleedForEachDmg = {
   target: 'opponent',
   damage: 1,
-  and: {
+  then: {
     target: 'self',
     gainEffects: {
       effects: { dodge: 1 },
@@ -235,7 +239,7 @@ const cardDamageAndBleedForEachDmg = {
   },
 };
 
-// deal 2 damage, grow: damage doubles this battle
+// 2 damage, grow: double damage
 const cardDoubleGrowth = {
   target: 'opponent',
   damage: 2,
@@ -244,6 +248,30 @@ const cardDoubleGrowth = {
     isMultiplicative: true,
     isPermanent: false,
   },
+};
+
+// +1 damage for each card in deck, double damage if opponent health < 50%
+const cardDoublingDamage = {
+  target: 'opponent',
+  gainEffects: [
+    {
+      effects: { damage: 1 },
+      forEveryPlayerValue: {
+        target: 'self',
+        name: 'cards',
+      },
+    },
+    {
+      effects: { damage: 2 },
+      isMultiplicative: true,
+      ifPlayerValue: {
+        target: 'opponent',
+        name: 'health',
+        comparator: 'lessThan',
+        compareToValue: 50,
+      },
+    },
+  ],
 };
 
 // 1 heal 1x times, grow: +1 heal, +1x times
@@ -261,19 +289,22 @@ const cardHealAndGrow = {
 const cardDamageOrBleed = {
   target: 'opponent',
   damage: 1,
-  activateForEvery: {
-    target: 'opponent',
-    name: 'bleed',
-  },
-  and: {
-    target: 'opponent',
-    bleed: 2,
-    ifPlayerValue: {
+  gainEffects: {
+    effects: { activations: 1 },
+    forEveryPlayerValue: {
       target: 'opponent',
       name: 'bleed',
-      comparator: 'equals',
-      compareToValue: 0,
     },
+  },
+  ifPlayerValue: {
+    target: 'opponent',
+    name: 'bleed',
+    comparator: 'greaterThan',
+    compareToValue: 0,
+  },
+  else: {
+    target: 'opponent',
+    bleed: 2,
   },
 };
 
@@ -284,7 +315,7 @@ const cardGrowOnUse = {
   grow: {
     effects: { damage: 2 },
   },
-  and: {
+  then: {
     target: 'self',
     heal: 1,
     grow: {
@@ -338,8 +369,8 @@ const cardRepeatOnCondition = {
 // apply 1 random negative status effect and gain 1 random positive status effect
 const cardRandomStatusEffect = {
   target: 'opponent',
-  randomNegativeStatusEffect: 1,
-  and: {
+  randomNegativeStatusEffects: 1,
+  then: {
     target: 'self',
     gainRandomPositiveStatusEffect: 1,
   },

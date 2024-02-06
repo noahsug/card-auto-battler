@@ -6,7 +6,7 @@ import {
   BLEED_DAMAGE,
   CardEffects,
   CardState,
-  END_GAME_AFTER_TURN,
+  MAX_TURNS_IN_BATTLE,
   PlayerState,
   createInitialGameState,
   getCanPlayCard,
@@ -134,17 +134,19 @@ describe('trash effect', () => {
   });
 });
 
-describe('repeat effect', () => {
+describe('activations effect', () => {
   it('deals damage N times', () => {
     const { endingState, startingState } = playCards([
-      createCard({ target: 'opponent', damage: 1, repeat: 1 }),
+      createCard({ target: 'opponent', damage: 1, activations: 2 }),
     ]);
 
     expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
   });
 
   it('applies effects N times', () => {
-    const { endingState } = playCards([createCard({ target: 'opponent', bleed: 1, repeat: 1 })]);
+    const { endingState } = playCards([
+      createCard({ target: 'opponent', bleed: 1, activations: 2 }),
+    ]);
 
     expect(endingState.enemy.bleed).toBe(2);
   });
@@ -154,13 +156,15 @@ describe('gainEffectBasedOnEffect effect', () => {
   describe('double strength', () => {
     const doubleStrength: CardState = createCard({
       target: 'self',
-      effectBasedOnPlayerValue: {
-        effectName: 'strength',
-        basedOn: {
-          target: 'self',
-          valueName: 'strength',
+      gainEffectsList: [
+        {
+          effects: { strength: 1 },
+          forEveryPlayerValue: {
+            target: 'self',
+            name: 'strength',
+          },
         },
-      },
+      ],
     });
 
     it('doubles own strength', () => {
@@ -175,12 +179,12 @@ describe('gainEffectBasedOnEffect effect', () => {
   describe('apply strength twice', () => {
     const strengthEffecetsTwice: CardEffects = {
       target: 'opponent',
-      effectBasedOnPlayerValue: {
-        effectName: 'damage',
-        basedOn: {
+      gainEffectsList: [{
+        effects: { damage: 1 },
+        forEveryPlayerValue: {
           target: 'self',
-          valueName: 'strength',
-        },
+          name: 'strength',
+        }],
       },
     };
 
@@ -196,13 +200,13 @@ describe('gainEffectBasedOnEffect effect', () => {
   describe('damage for each bleed', () => {
     const forEachOpponentBleed: CardEffects = {
       target: 'opponent',
-      repeat: -1,
-      effectBasedOnPlayerValue: {
-        effectName: 'repeat',
-        basedOn: {
+      activations: 0,
+      gainEffectsList: [{
+        effects: { activations: 1 },
+        forEveryPlayerValue: {
           target: 'opponent',
-          valueName: 'bleed',
-        },
+          name: 'bleed',
+        }],
       },
     };
 
@@ -231,10 +235,10 @@ describe('gainEffectBasedOnEffect effect', () => {
       expect(endingState.enemy.bleed).toBe(50 * 2);
     });
 
-    it('is additive with existing repeat', () => {
+    it('is additive with existing activations', () => {
       const { endingState, startingState } = playCards([
         createCard({ target: 'opponent', bleed: 2 }),
-        createCard({ ...forEachOpponentBleed, damage: 1, repeat: 1 }),
+        createCard({ ...forEachOpponentBleed, damage: 1, activations: 2 }),
       ]);
       expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 4);
     });
@@ -253,7 +257,7 @@ describe('bleed status effect', () => {
   it('decreases by 1 when damage is delt', () => {
     const { endingState, startingState } = playCards([
       createCard({ target: 'opponent', bleed: 2 }),
-      createCard({ target: 'opponent', repeat: 1, damage: 1 }), // 7 damage
+      createCard({ target: 'opponent', activations: 2, damage: 1 }), // 7 damage
       createCard({ target: 'opponent', damage: 1 }), // 1 damage
     ]);
     expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 3);
@@ -313,7 +317,7 @@ describe('ends the game after X turns', () => {
     ];
     const { endingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: END_GAME_AFTER_TURN,
+      stopAfterTurn: MAX_TURNS_IN_BATTLE - 1,
     });
 
     expect(endingState.enemy.health).toBe(0);
@@ -321,7 +325,7 @@ describe('ends the game after X turns', () => {
 
   it('with the enemy winning if they have more or equal health', () => {
     const { endingState } = runBattle({
-      stopAfterTurn: END_GAME_AFTER_TURN,
+      stopAfterTurn: MAX_TURNS_IN_BATTLE - 1,
     });
 
     expect(endingState.user.health).toBe(0);

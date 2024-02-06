@@ -1,27 +1,19 @@
-import { cloneDeep } from 'lodash';
 import shuffle from 'lodash/shuffle';
 
 import {
-  CardEffects,
   CardState,
   createInitialGameState,
   GameState,
   getActivePlayer,
   getBattleCount,
   getCanPlayCard,
-  getCurrentCard,
   getEnemyCardsForBattle,
-  getNonActivePlayer,
   MAX_LOSSES,
   MAX_WINS,
-  PlayerState,
   statusEffectNames,
-  Target,
-  AnimationEvent,
 } from '../';
 import { assert } from '../../utils';
-import { Value } from '../../utils/types/types';
-import { END_GAME_AFTER_TURN } from '../gameState';
+import playCardHelper from './playCard';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
@@ -70,141 +62,7 @@ export function startTurn(game: GameState) {
 }
 
 export function playCard(game: GameState) {
-  const activePlayer = getActivePlayer(game);
-  const nonActivePlayer = getNonActivePlayer(game);
-  const card = getCurrentCard(activePlayer);
-
-  // die if out of cards
-  if (card == null) {
-    activePlayer.health = 0;
-    return;
-  }
-
-  if (activePlayer.cardsPlayedThisTurn > 0) {
-    assert(activePlayer.extraCardPlays > 0);
-    activePlayer.extraCardPlays -= 1;
-  }
-  activePlayer.cardsPlayedThisTurn += 1;
-
-  card.effects.forEach((cardEffects) => {
-    applyCardEffects({
-      self: activePlayer,
-      opponent: nonActivePlayer,
-      cardEffects,
-      animationEvents: game.animationEvents,
-    });
-  });
-
-  if (card.trash) {
-    activePlayer.cards.splice(activePlayer.currentCardIndex, 1);
-    activePlayer.trashedCards.push(card);
-    activePlayer.currentCardIndex = activePlayer.currentCardIndex % activePlayer.cards.length;
-  } else {
-    activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
-  }
-
-  if (game.turn >= END_GAME_AFTER_TURN) {
-    const target = game.user.health <= game.enemy.health ? game.user : game.enemy;
-    target.health = 0;
-  }
-}
-
-function getNumericPlayerValue(value: Value<PlayerState>) {
-  if (Array.isArray(value)) return value.length;
-  return value;
-}
-
-function gainEffectBasedOnPlayerValue({
-  self,
-  opponent,
-  cardEffects,
-}: {
-  self: PlayerState;
-  opponent: PlayerState;
-  cardEffects: CardEffects;
-}) {
-  if (!cardEffects.effectBasedOnPlayerValue) return cardEffects;
-
-  const { effectName, basedOn, ratio = 1 } = cardEffects.effectBasedOnPlayerValue;
-
-  const targetPlayer = basedOn.target === 'self' ? self : opponent;
-  const basedOnValue = getNumericPlayerValue(targetPlayer[basedOn.valueName]);
-
-  cardEffects = cloneDeep(cardEffects);
-  cardEffects[effectName] = (cardEffects[effectName] || 0) + basedOnValue * ratio;
-
-  return cardEffects;
-}
-
-function applyCardEffects(
-  {
-    self,
-    opponent,
-    cardEffects,
-    animationEvents,
-  }: {
-    self: PlayerState;
-    opponent: PlayerState;
-    cardEffects: CardEffects;
-    animationEvents: AnimationEvent[];
-  },
-  isRepeating = false,
-) {
-  const targetPlayer = cardEffects.target === 'self' ? self : opponent;
-
-  if (!isRepeating) {
-    cardEffects = gainEffectBasedOnPlayerValue({ self, opponent, cardEffects });
-  }
-
-  const repeat = cardEffects.repeat || 0;
-  if (repeat < 0) return;
-
-  if (cardEffects.damage != null) {
-    // dodge doesn't apply to self damage
-    if (cardEffects.target === 'opponent' && opponent.dodge > 0) {
-      opponent.dodge -= 1;
-    } else {
-      const { damage, target } = cardEffects;
-      dealDamage({ self, opponent, damage, target, animationEvents });
-    }
-  }
-
-  statusEffectNames.forEach((statusEffect) => {
-    targetPlayer[statusEffect] += cardEffects[statusEffect] || 0;
-  });
-
-  if (!isRepeating) {
-    for (let i = 0; i < repeat; i++) {
-      applyCardEffects({ self, opponent, cardEffects, animationEvents }, true);
-    }
-  }
-}
-
-function dealDamage({
-  self,
-  opponent,
-  damage,
-  target,
-  animationEvents,
-}: {
-  opponent: PlayerState;
-  self: PlayerState;
-  damage: number;
-  target: Target;
-  animationEvents: AnimationEvent[];
-}) {
-  const targetPlayer = target === 'self' ? self : opponent;
-
-  damage += self.strength;
-  if (targetPlayer.bleed) {
-    damage += 3;
-    targetPlayer.bleed -= 1;
-  }
-
-  if (damage > 0) {
-    targetPlayer.health -= damage;
-    animationEvents.push({ type: 'damage', target, value: damage });
-  }
+  playCardHelper(game);
 }
 
 export function endTurn(game: GameState) {
