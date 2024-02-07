@@ -15,6 +15,12 @@ describe('card text', () => {
     expect(card.textContent).toMatchInlineSnapshot(`"5⚔️"`);
   });
 
+  it('renders heal', () => {
+    const card = getCardElement(createCard({ target: 'self', heal: 5 }));
+
+    expect(card.textContent).toMatchInlineSnapshot(`"5❤️to self"`);
+  });
+
   it('renders self damage', () => {
     const card = getCardElement(createCard({ target: 'self', damage: 5 }));
 
@@ -106,7 +112,7 @@ describe('card text', () => {
         }),
       );
 
-      expect(card.textContent).toMatchInlineSnapshot(`"1⚔️for every self ❤️"`);
+      expect(card.textContent).toMatchInlineSnapshot(`"1⚔️for every self hp"`);
     });
 
     it('+dodge for every trashed card', () => {

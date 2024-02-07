@@ -153,16 +153,22 @@ function applyCardEffects({
   cardEffects: CardEffects;
   animationEvents: AnimationEvent[];
 }) {
-  const targetPlayer = cardEffects.target === 'self' ? self : opponent;
+  const { target, damage, heal } = cardEffects;
+  const targetPlayer = target === 'self' ? self : opponent;
 
-  if (cardEffects.damage != null) {
+  // damage
+  if (damage != null) {
     // dodge doesn't apply to self damage
     if (cardEffects.target === 'opponent' && opponent.dodge > 0) {
       opponent.dodge -= 1;
     } else {
-      const { damage, target } = cardEffects;
-      dealDamage({ self, opponent, damage, target, animationEvents });
+      doDamage({ self, opponent, damage, target, animationEvents });
     }
+  }
+
+  // heal
+  if (heal != null) {
+    doHeal({ self, opponent, heal, target, animationEvents });
   }
 
   statusEffectNames.forEach((statusEffect) => {
@@ -170,7 +176,7 @@ function applyCardEffects({
   });
 }
 
-function dealDamage({
+function doDamage({
   self,
   opponent,
   damage,
@@ -194,6 +200,27 @@ function dealDamage({
   if (damage > 0) {
     targetPlayer.health -= damage;
     animationEvents.push({ type: 'damage', target, value: damage });
+  }
+}
+
+function doHeal({
+  self,
+  opponent,
+  heal,
+  target,
+  animationEvents,
+}: {
+  opponent: PlayerState;
+  self: PlayerState;
+  heal: number;
+  target: Target;
+  animationEvents: AnimationEvent[];
+}) {
+  const targetPlayer = target === 'self' ? self : opponent;
+
+  if (heal > 0) {
+    targetPlayer.health += heal;
+    animationEvents.push({ type: 'heal', target, value: heal });
   }
 }
 

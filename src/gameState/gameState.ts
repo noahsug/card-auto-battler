@@ -4,7 +4,7 @@ import { createCard } from './utils';
 export type ScreenName = 'gameStart' | 'cardSelection' | 'battle' | 'battleEnd' | 'gameEnd';
 
 export interface AnimationEvent {
-  type: 'damage';
+  type: 'damage' | 'heal';
   target: Target;
   value: number;
 }
@@ -62,6 +62,7 @@ export interface CardEffects extends Partial<StatusEffects>, Conditional<CardEff
   target: Target;
 
   damage?: number;
+  heal?: number;
   randomNegativeStatusEffects?: number;
   randomPositiveStatusEffects?: number;
   // cause target to trash X cards
@@ -122,7 +123,7 @@ function createInitialPlayerState(): PlayerState {
 }
 
 // const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
-const userCards: CardState[] = [createCard({ target: 'opponent', damage: 1, bleed: 2 })];
+const userCards: CardState[] = [createCard({ target: 'self', heal: 3, bleed: 1 })];
 
 const enemyCardsByBattle: CardState[][] = [
   [

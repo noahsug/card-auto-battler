@@ -78,15 +78,14 @@ export default function BattleScreen() {
   useEffect(() => {
     if (game.animationEvents.length > animationEventsAddedThisTurn.current) {
       const newAnimationEvents = game.animationEvents.slice(animationEventsAddedThisTurn.current);
-      newAnimationEvents.forEach((event) => {
-        if (
-          (isEnemyTurn && event.target === 'self') ||
-          (!isEnemyTurn && event.target === 'opponent')
-        ) {
-          setEnemyDamageNumbers((current) => [...current, { value: event.value }]);
-        } else {
-          setUserDamageNumbers((current) => [...current, { value: event.value }]);
-        }
+      newAnimationEvents.forEach(({ value, target, type }) => {
+        const targetIsEnemy =
+          // enemy is doing self damage
+          (isEnemyTurn && target === 'self') ||
+          // user is doing damage to enemy
+          (!isEnemyTurn && target === 'opponent');
+        const updateFunction = targetIsEnemy ? setEnemyDamageNumbers : setUserDamageNumbers;
+        updateFunction((current) => [...current, { value, type }]);
 
         animationEventsAddedThisTurn.current = game.animationEvents.length;
       });

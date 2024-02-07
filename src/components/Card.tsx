@@ -70,9 +70,18 @@ function getCardTextItems(effects: CardEffects, index: number) {
   }
 
   // "X damage"
-  if (effects.damage != null) {
-    addEffectText('damage', effects.damage);
-  }
+  const simpleEffects = [
+    'damage',
+    'heal',
+    'randomNegativeStatusEffects',
+    'randomPositiveStatusEffects',
+  ] as const;
+  simpleEffects.forEach((effectName) => {
+    const value = effects[effectName];
+    if (value != null) {
+      addEffectText(effectName, value);
+    }
+  });
 
   // "X statusEffect"
   statusEffectNames.forEach((effectName) => {
@@ -111,7 +120,7 @@ function getCardTextItems(effects: CardEffects, index: number) {
 export default function Card({ card, isActive = false, scale = 1, className, onClick }: Props) {
   const textItemsBySection = card.effects.map(getCardTextItems);
 
-  // "trash"
+  // "trash self"
   if (card.effects.some(({ trashSelf }) => trashSelf)) {
     textItemsBySection.push([<CardText key="trash">trash</CardText>]);
   }
