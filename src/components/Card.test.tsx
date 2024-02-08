@@ -60,7 +60,7 @@ describe('card text', () => {
   it('renders trash self', () => {
     const card = getCardElement(createCard({ target: 'opponent', damage: 5, trashSelf: true }));
 
-    expect(card.textContent).toMatchInlineSnapshot(`"5⚔️trash"`);
+    expect(card.textContent).toMatchInlineSnapshot(`"5⚔️trash this card"`);
   });
 
   it('renders trash', () => {

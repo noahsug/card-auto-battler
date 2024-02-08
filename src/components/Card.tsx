@@ -32,9 +32,6 @@ function getGainEffectsTextParts({
     forEveryBattleStat,
   } = gainEffectsOptions;
 
-  // TODO: implement gaining trashSelf
-  const { trashSelf, ...numericEffects } = effects;
-
   let effectText = '';
 
   // we're activating once for each value, so only display "for every value"
@@ -42,8 +39,8 @@ function getGainEffectsTextParts({
 
   if (!skipEffectsText) {
     const effectsTextBuilder: string[] = [];
-    Object.entries(numericEffects).forEach(([name, value]) => {
-      const effectSymbol = CARD_TEXT_SYMBOLS[name as keyof typeof numericEffects];
+    Object.entries(effects).forEach(([name, value]) => {
+      const effectSymbol = CARD_TEXT_SYMBOLS[name as keyof typeof effects];
 
       // "+X effect" for every value or "X times" for every value
       const prefix = name === 'activations' && isActivatingForEveryValue ? '' : '+';
@@ -143,7 +140,7 @@ export default function Card({ card, isActive = false, scale = 1, className, onC
 
   // "trash self"
   if (card.effects.some(({ trashSelf }) => trashSelf)) {
-    textItemsBySection.push([<CardText key="trash">trash</CardText>]);
+    textItemsBySection.push([<CardText key="trash">{CARD_TEXT_SYMBOLS.trashSelf}</CardText>]);
   }
 
   return (
