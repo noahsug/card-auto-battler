@@ -10,7 +10,7 @@ import {
 
 interface Props {
   effectName: CardEffectWithSymbols;
-  value: number;
+  value?: number;
 }
 
 export type CardEffectWithSymbols = keyof Omit<
@@ -31,8 +31,8 @@ export const CARD_TEXT_SYMBOLS: Record<NameWithSymbol, string> = {
   trash: 'trash',
   trashSelf: 'trash this card',
 
-  health: 'hp',
-  maxHealth: 'max hp',
+  health: 'health',
+  maxHealth: 'max health',
   cards: 'cards in deck',
   currentCardIndex: 'cards in discard',
   cardsPlayedThisTurn: 'cards played this turn',
@@ -48,7 +48,7 @@ export default function CardEffectText({ effectName, value }: Props) {
 
   return (
     <CardText>
-      <span>{value}</span>
+      {value == null ? null : <span>{value}</span>}
       {symbol}
     </CardText>
   );

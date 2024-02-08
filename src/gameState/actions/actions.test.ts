@@ -200,6 +200,70 @@ describe('activations effect', () => {
   });
 });
 
+describe('bleed status effect', () => {
+  it('deals flat damage when damage is dealt', () => {
+    const { endingState, startingState } = playCards([
+      createCard({ target: 'opponent', bleed: 50 }),
+      createCard({ target: 'opponent', damage: 1 }),
+    ]);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE + 1);
+  });
+
+  it('decreases by 1 when damage is dealt', () => {
+    const { endingState, startingState } = playCards([
+      createCard({ target: 'opponent', bleed: 2 }),
+      createCard({ target: 'opponent', activations: 2, damage: 1 }), // 7 damage
+      createCard({ target: 'opponent', damage: 1 }), // 1 damage
+    ]);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 3);
+  });
+
+  it('does not apply to damage dealt at the same time', () => {
+    const { endingState, startingState } = playCards([
+      createCard({ target: 'opponent', damage: 1, bleed: 1 }),
+    ]);
+
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(1);
+  });
+});
+
+describe('strength status effect', () => {
+  it('increases card damage by N', () => {
+    const { endingState, startingState } = playCards([
+      createCard({ target: 'self', strength: 1 }),
+      createCard({ target: 'opponent', damage: 1 }),
+    ]);
+
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
+  });
+
+  it('applies to damage dealt at the same time, depending on effect order', () => {
+    const { endingState, startingState } = playCards([
+      createCard({ target: 'opponent', damage: 1 }, { target: 'self', strength: 1 }), // 1 dmg
+      createCard({ target: 'self', strength: 1 }, { target: 'opponent', damage: 1 }), // 3 dmg
+      createCard({ target: 'opponent', damage: 0 }), // 2 dmg
+    ]);
+
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(6);
+  });
+});
+
+describe('extraCardPlays status effect', () => {
+  it('plays an extra card', () => {
+    const userCards: CardState[] = [
+      createCard({ target: 'opponent', damage: 1 }, { target: 'self', extraCardPlays: 1 }),
+      createCard({ target: 'opponent', damage: 1 }),
+      createCard({ target: 'opponent', damage: 10 }), // should not be played
+    ];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      stopAfterTurn: 0,
+    });
+
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
+  });
+});
+
 describe('gainEffects', () => {
   it('applies strength twice', () => {
     const strengthEffectsTwice: CardEffects = {
@@ -351,70 +415,6 @@ describe('gainEffects', () => {
       createCard(damageForEachCardPlayed),
     ]);
     expect(startingState.enemy.health - endingState.enemy.health).toBe(4);
-  });
-});
-
-describe('bleed status effect', () => {
-  it('deals flat damage when damage is dealt', () => {
-    const { endingState, startingState } = playCards([
-      createCard({ target: 'opponent', bleed: 50 }),
-      createCard({ target: 'opponent', damage: 1 }),
-    ]);
-    expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE + 1);
-  });
-
-  it('decreases by 1 when damage is dealt', () => {
-    const { endingState, startingState } = playCards([
-      createCard({ target: 'opponent', bleed: 2 }),
-      createCard({ target: 'opponent', activations: 2, damage: 1 }), // 7 damage
-      createCard({ target: 'opponent', damage: 1 }), // 1 damage
-    ]);
-    expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 3);
-  });
-
-  it('does not apply to damage dealt at the same time', () => {
-    const { endingState, startingState } = playCards([
-      createCard({ target: 'opponent', damage: 1, bleed: 1 }),
-    ]);
-
-    expect(startingState.enemy.health - endingState.enemy.health).toBe(1);
-  });
-});
-
-describe('strength status effect', () => {
-  it('increases card damage by N', () => {
-    const { endingState, startingState } = playCards([
-      createCard({ target: 'self', strength: 1 }),
-      createCard({ target: 'opponent', damage: 1 }),
-    ]);
-
-    expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
-  });
-
-  it('applies to damage dealt at the same time, depending on effect order', () => {
-    const { endingState, startingState } = playCards([
-      createCard({ target: 'opponent', damage: 1 }, { target: 'self', strength: 1 }), // 1 dmg
-      createCard({ target: 'self', strength: 1 }, { target: 'opponent', damage: 1 }), // 3 dmg
-      createCard({ target: 'opponent', damage: 0 }), // 2 dmg
-    ]);
-
-    expect(startingState.enemy.health - endingState.enemy.health).toBe(6);
-  });
-});
-
-describe('extraCardPlays status effect', () => {
-  it('plays an extra card', () => {
-    const userCards: CardState[] = [
-      createCard({ target: 'opponent', damage: 1 }, { target: 'self', extraCardPlays: 1 }),
-      createCard({ target: 'opponent', damage: 1 }),
-      createCard({ target: 'opponent', damage: 10 }), // should not be played
-    ];
-    const { endingState, startingState } = runBattle({
-      user: { cards: userCards },
-      stopAfterTurn: 0,
-    });
-
-    expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
   });
 });
 

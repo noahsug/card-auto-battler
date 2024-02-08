@@ -135,7 +135,7 @@ describe('card text', () => {
         }),
       );
 
-      expect(card.textContent).toMatchInlineSnapshot(`"1⚔️for every self hp"`);
+      expect(card.textContent).toMatchInlineSnapshot(`"1⚔️for every self health"`);
     });
 
     it('renders +dodge for every trashed card', () => {

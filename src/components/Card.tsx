@@ -17,6 +17,14 @@ interface Props {
   onClick?: () => void;
 }
 
+const EFFECTS_DISPLAYED_FIRST = [
+  'damage',
+  'heal',
+  'randomNegativeStatusEffects',
+  'randomPositiveStatusEffects',
+  'trash',
+] as const;
+
 function getGainEffectsTextParts({
   gainEffectsOptions,
   isRepeatingForEveryValue: isActivatingForEveryValue,
@@ -42,8 +50,9 @@ function getGainEffectsTextParts({
     Object.entries(effects).forEach(([name, value]) => {
       const effectSymbol = CARD_TEXT_SYMBOLS[name as keyof typeof effects];
 
+      const prefix = getGainEffectPrefix(name, isActivatingForEveryValue);
+
       // "+X effect" for every value or "X times" for every value
-      const prefix = name === 'activations' && isActivatingForEveryValue ? '' : '+';
       effectsTextBuilder.push(`${prefix}${value}${effectSymbol}`);
     });
     effectText = effectsTextBuilder.join(', ');
@@ -68,24 +77,25 @@ function getGainEffectsTextParts({
   return { effectText, forEveryText };
 }
 
+function getGainEffectPrefix(name: string, isActivatingForEveryValue: boolean) {
+  // X times for every value
+  if (name === 'activations' && isActivatingForEveryValue) return '';
+  // trash self if value
+  if (name === 'trashSelf') return '';
+  // +X damage for every value
+  return '+';
+}
+
 function getCardTextItems(effects: CardEffects, index: number) {
   const textItems: React.JSX.Element[] = [];
 
-  function addEffectText(effectName: CardEffectWithSymbols, value: number) {
+  function addEffectText(effectName: CardEffectWithSymbols, value?: number) {
     const key = `${effectName}-${index}`;
     textItems.push(<CardEffectText key={key} effectName={effectName} value={value} />);
   }
 
   // "X damage"
-  // TODO: share this list with CardEffectText as numericEffects
-  const simpleEffects = [
-    'damage',
-    'heal',
-    'trash',
-    'randomNegativeStatusEffects',
-    'randomPositiveStatusEffects',
-  ] as const;
-  simpleEffects.forEach((effectName) => {
+  EFFECTS_DISPLAYED_FIRST.forEach((effectName) => {
     const value = effects[effectName];
     if (value != null) {
       addEffectText(effectName, value);
@@ -132,16 +142,16 @@ function getCardTextItems(effects: CardEffects, index: number) {
     }
   }
 
+  // trash self
+  if (effects.trashSelf) {
+    addEffectText('trashSelf');
+  }
+
   return textItems;
 }
 
 export default function Card({ card, isActive = false, scale = 1, className, onClick }: Props) {
   const textItemsBySection = card.effects.map(getCardTextItems);
-
-  // "trash self"
-  if (card.effects.some(({ trashSelf }) => trashSelf)) {
-    textItemsBySection.push([<CardText key="trash">{CARD_TEXT_SYMBOLS.trashSelf}</CardText>]);
-  }
 
   return (
     <Root $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
