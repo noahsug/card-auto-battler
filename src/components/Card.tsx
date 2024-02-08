@@ -17,7 +17,7 @@ interface Props {
   onClick?: () => void;
 }
 
-function getGainEffectsText({
+function getGainEffectsTextParts({
   gainEffectsOptions,
   isRepeatingForEveryValue: isActivatingForEveryValue,
 }: {
@@ -29,12 +29,13 @@ function getGainEffectsText({
     // TODO: isMultiplicative = false,
     divisor = 1,
     forEveryPlayerValue,
+    forEveryBattleStat,
   } = gainEffectsOptions;
-
-  const textParts = [];
 
   // TODO: implement gaining trashSelf
   const { trashSelf, ...numericEffects } = effects;
+
+  let effectText = '';
 
   // we're activating once for each value, so only display "for every value"
   const skipEffectsText = isActivatingForEveryValue && effects.activations === 1;
@@ -48,17 +49,26 @@ function getGainEffectsText({
       const prefix = name === 'activations' && isActivatingForEveryValue ? '' : '+';
       effectsTextBuilder.push(`${prefix}${value}${effectSymbol}`);
     });
-    textParts.push(effectsTextBuilder.join(', '));
+    effectText = effectsTextBuilder.join(', ');
   }
+
+  let forEveryText = '';
 
   if (forEveryPlayerValue) {
     const { target, name } = forEveryPlayerValue;
     const playerValueSymbol = CARD_TEXT_SYMBOLS[name];
     const divisorText = divisor === 1 ? '' : `${divisor} `;
-    textParts.push(`for every ${divisorText}${target} ${playerValueSymbol}`);
+    forEveryText = `for every ${divisorText}${target} ${playerValueSymbol}`;
   }
 
-  return textParts.filter(Boolean).join(' ');
+  if (forEveryBattleStat) {
+    const name = forEveryBattleStat;
+    const battleStatSymbol = CARD_TEXT_SYMBOLS[name];
+    const divisorText = divisor === 1 ? '' : `${divisor} `;
+    forEveryText = `for every ${divisorText}${battleStatSymbol}`;
+  }
+
+  return { effectText, forEveryText };
 }
 
 function getCardTextItems(effects: CardEffects, index: number) {
@@ -101,17 +111,26 @@ function getCardTextItems(effects: CardEffects, index: number) {
     addEffectText('activations', effects.activations);
   }
 
-  effects.gainEffectsList?.forEach((gainEffectsOptions, gainIndex) => {
-    // "+X effect for every value"
-    const gainEffectsText = getGainEffectsText({ gainEffectsOptions, isRepeatingForEveryValue });
-    textItems.push(
-      <CardText key={`gainEffects-${index}-${gainIndex}`}>{gainEffectsText}</CardText>,
-    );
-  });
+  const toSelfText = effects.target === 'self' ? 'to self' : '';
 
-  // "to self"
-  if (effects.target === 'self') {
-    textItems.push(<CardText key={`self-${index}`}>to self</CardText>);
+  const hasGainEffects = !!effects.gainEffectsList?.length;
+  if (hasGainEffects) {
+    effects.gainEffectsList?.forEach((gainEffectsOptions, gainIndex) => {
+      // "+X effect to self for every value"
+      const { effectText, forEveryText } = getGainEffectsTextParts({
+        gainEffectsOptions,
+        isRepeatingForEveryValue,
+      });
+      const gainEffectsText = [effectText, toSelfText, forEveryText].filter(Boolean).join(' ');
+      textItems.push(
+        <CardText key={`gainEffects-${index}-${gainIndex}`}>{gainEffectsText}</CardText>,
+      );
+    });
+  } else {
+    // "to self"
+    if (toSelfText) {
+      textItems.push(<CardText key={`self-${index}`}>{toSelfText}</CardText>);
+    }
   }
 
   return textItems;

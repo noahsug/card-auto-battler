@@ -256,10 +256,7 @@ describe('gainEffects', () => {
       gainEffectsList: [
         {
           effects: { heal: 1 },
-          forEveryEvent: {
-            type: 'damage',
-            sumValues: true,
-          },
+          forEveryBattleStat: 'damageDealt',
         },
       ],
     };
@@ -269,6 +266,30 @@ describe('gainEffects', () => {
     ]);
     expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
     expect(startingState.user.health - endingState.user.health).toBe(-2);
+  });
+
+  it('damage for each card played this turn', () => {
+    const damageForEachCardPlayed: CardEffects = {
+      target: 'opponent',
+      damage: 1,
+      gainEffectsList: [
+        {
+          effects: { damage: 1 },
+          forEveryPlayerValue: {
+            name: 'cardsPlayedThisTurn',
+            target: 'self',
+          },
+        },
+      ],
+    };
+
+    const { endingState, startingState } = playCards([
+      createCard({ target: 'self', extraCardPlays: 1 }),
+      createCard({ target: 'self', extraCardPlays: 1 }),
+      createCard({ target: 'self', extraCardPlays: 1 }),
+      createCard(damageForEachCardPlayed),
+    ]);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(4);
   });
 });
 

@@ -16,15 +16,12 @@ import {
   GainEffectsOptions,
   MAX_TURNS_IN_BATTLE,
   PlayerValueIdentifier,
-  BattleStatsIdentifier,
-  EMPTY_BATTLE_STATS,
   BattleStats,
-  BattleStatsByPhase,
+  EMPTY_BATTLE_STATS,
 } from '../gameState';
-import { Entries } from '../../utils/types';
 
 interface PlayCardResult {
-  currentCardBattleStats: BattleStats;
+  battleStats: BattleStats;
   trashSelf: boolean;
   events: AnimationEvent[];
 }
@@ -44,10 +41,9 @@ export default function playCard(game: GameState) {
     assert(activePlayer.extraCardPlays > 0);
     activePlayer.extraCardPlays -= 1;
   }
-  activePlayer.cardsPlayedThisTurn += 1;
 
   const result: PlayCardResult = {
-    currentCardBattleStats: { ...EMPTY_BATTLE_STATS },
+    battleStats: { ...EMPTY_BATTLE_STATS },
     trashSelf: false,
     events: [] as AnimationEvent[],
   };
@@ -65,13 +61,8 @@ export default function playCard(game: GameState) {
     trashCurrentCard(activePlayer);
   }
 
-  (Object.entries(result.currentCardBattleStats) as Entries<BattleStats>).forEach(
-    ([name, value]) => {
-      activePlayer.battleStatsByPhase.turn[name] += value;
-    },
-  );
-
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
+  activePlayer.cardsPlayedThisTurn += 1;
 
   game.animationEvents.push(...result.events);
 
@@ -132,20 +123,13 @@ function gainEffects({
   if (!cardEffects.gainEffectsList) return cardEffects;
 
   const { effects, forEveryPlayerValue, forEveryBattleStat, divisor = 1 } = gainEffectsOptions;
-  const { battleStatsByPhase } = self;
-  const { currentCardBattleStats } = result;
+  const { battleStats } = result;
 
   const playerValueMultiplier = forEveryPlayerValue
     ? getPlayerValue({ self, opponent, identifier: forEveryPlayerValue })
     : 1;
 
-  const battleStatMultiplier = forEveryBattleStat
-    ? getBattleStatsValue({
-        battleStatsByPhase,
-        currentCardBattleStats,
-        identifier: forEveryBattleStat,
-      })
-    : 1;
+  const battleStatMultiplier = forEveryBattleStat ? battleStats[forEveryBattleStat] : 1;
 
   const multiplier = playerValueMultiplier * battleStatMultiplier;
 
@@ -179,21 +163,6 @@ function getPlayerValue({
     return value.length;
   }
   return value;
-}
-
-function getBattleStatsValue({
-  identifier,
-  battleStatsByPhase,
-  currentCardBattleStats,
-}: {
-  identifier: BattleStatsIdentifier;
-  battleStatsByPhase: BattleStatsByPhase;
-  currentCardBattleStats: BattleStats;
-}) {
-  const { name, phase } = identifier;
-
-  const battleStats = phase === 'currentCard' ? currentCardBattleStats : battleStatsByPhase[phase];
-  return battleStats[name];
 }
 
 function applyCardEffects({
@@ -247,7 +216,7 @@ function doDamage({
   target: Target;
   result: PlayCardResult;
 }) {
-  const { events, currentCardBattleStats } = result;
+  const { events, battleStats } = result;
   const targetPlayer = target === 'self' ? self : opponent;
 
   damage += self.strength;
@@ -258,8 +227,8 @@ function doDamage({
 
   if (damage > 0) {
     targetPlayer.health -= damage;
-    currentCardBattleStats.damageDealt += damage;
-    currentCardBattleStats.numberOfHits += 1;
+    battleStats.damageDealt += damage;
+    battleStats.numberOfHits += 1;
     events.push({ type: 'damage', target, value: damage });
   }
 }
@@ -277,13 +246,12 @@ function doHeal({
   target: Target;
   result: PlayCardResult;
 }) {
-  const { events, currentCardBattleStats } = result;
+  const { events, battleStats } = result;
   const targetPlayer = target === 'self' ? self : opponent;
 
   if (heal > 0) {
     targetPlayer.health += heal;
-    currentCardBattleStats.healthRestored += heal;
-    currentCardBattleStats.numberOfHeals += 1;
+    battleStats.healthRestored += heal;
     events.push({ type: 'heal', target, value: heal });
   }
 }

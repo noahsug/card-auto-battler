@@ -9,20 +9,6 @@ export interface AnimationEvent {
   value: number;
 }
 
-export const EMPTY_BATTLE_STATS = {
-  damageDealt: 0,
-  healthRestored: 0,
-  numberOfHits: 0,
-  numberOfHeals: 0,
-  cardsPlayed: 0,
-};
-
-export type BattleStats = typeof EMPTY_BATTLE_STATS;
-
-export interface BattleStatsByPhase {
-  turn: BattleStats;
-}
-
 export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength'] as const;
 
 export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
@@ -35,7 +21,7 @@ export type StatusEffects = Record<StatusEffectName, number>;
 
 export type Target = 'self' | 'opponent';
 
-export type IdentifiablePlayerValue = keyof Omit<PlayerState, 'battleStatsByPhase'>;
+export type IdentifiablePlayerValue = keyof PlayerState;
 
 export interface PlayerValueIdentifier {
   target: Target;
@@ -55,10 +41,15 @@ export interface Conditional<T> {
   else?: T;
 }
 
-export interface BattleStatsIdentifier {
-  name: keyof BattleStats;
-  phase: keyof BattleStatsByPhase | 'currentCard';
-}
+export const EMPTY_BATTLE_STATS = {
+  damageDealt: 0,
+  healthRestored: 0,
+  numberOfHits: 0,
+};
+
+export type BattleStats = typeof EMPTY_BATTLE_STATS;
+
+export type BattleStatsIdentifier = keyof BattleStats;
 
 export type GainableCardEffects = PickByValue<Required<CardEffects>, number | boolean>;
 
@@ -108,7 +99,6 @@ export interface PlayerState extends StatusEffects {
   currentCardIndex: number;
   cardsPlayedThisTurn: number;
   trashedCards: CardState[];
-  battleStatsByPhase: BattleStatsByPhase;
 }
 
 export interface GameState {
@@ -139,15 +129,13 @@ function createInitialPlayerState(): PlayerState {
     health: maxHealth,
     maxHealth,
     cardsPlayedThisTurn: 0,
-    battleStatsByPhase: {
-      turn: { ...EMPTY_BATTLE_STATS },
-    },
     ...EMPTY_STATUS_EFFECTS,
   };
 }
 
-// const userCards = [{ dmg: 1, playAnotherCard: 1 }, { text: 'dmg 2' }];
-const userCards: CardState[] = [createCard({ target: 'self', heal: 3, bleed: 1 })];
+const userCards: CardState[] = [
+  createCard({ target: 'self', heal: 3 }, { target: 'opponent', bleed: 3 }),
+];
 
 const enemyCardsByBattle: CardState[][] = [
   [

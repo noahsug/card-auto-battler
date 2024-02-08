@@ -2,7 +2,11 @@ import styled from 'styled-components';
 
 import { CardEffects } from '../gameState';
 import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
-import { Conditional, IdentifiablePlayerValue } from '../gameState/gameState';
+import {
+  Conditional,
+  IdentifiablePlayerValue,
+  BattleStatsIdentifier,
+} from '../gameState/gameState';
 
 interface Props {
   effectName: CardEffectWithSymbols;
@@ -14,22 +18,28 @@ export type CardEffectWithSymbols = keyof Omit<
   'target' | 'trashSelf' | 'gainEffectsList' | 'growEffectsList' | keyof Conditional<unknown>
 >;
 
-type NameWithSymbol = CardEffectWithSymbols | IdentifiablePlayerValue;
+type NameWithSymbol = CardEffectWithSymbols | IdentifiablePlayerValue | BattleStatsIdentifier;
 
 export const CARD_TEXT_SYMBOLS: Record<NameWithSymbol, string> = {
   ...STATUS_EFFECT_SYMBOLS,
+
   damage: '⚔️',
   heal: '❤️',
   randomNegativeStatusEffects: 'random negative effect',
   randomPositiveStatusEffects: 'random positive effect',
   activations: 'x times',
   trash: 'trash',
+
   health: 'hp',
   maxHealth: 'max hp',
   cards: 'cards in deck',
   currentCardIndex: 'cards in discard',
   cardsPlayedThisTurn: 'cards played this turn',
   trashedCards: 'trashed cards',
+
+  damageDealt: 'damage dealt',
+  healthRestored: 'health restored',
+  numberOfHits: 'hits',
 } as const;
 
 export default function CardEffectText({ effectName, value }: Props) {

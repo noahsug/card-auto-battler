@@ -115,7 +115,7 @@ describe('card text', () => {
       expect(card.textContent).toMatchInlineSnapshot(`"1⚔️for every self hp"`);
     });
 
-    it('+dodge for every trashed card', () => {
+    it('renders +dodge for every trashed card', () => {
       const card = getCardElement(
         createCard({
           target: 'self',
@@ -128,7 +128,26 @@ describe('card text', () => {
         }),
       );
 
-      expect(card.textContent).toMatchInlineSnapshot(`"+1💨 for every self trashed cardsto self"`);
+      expect(card.textContent).toMatchInlineSnapshot(`"+1💨 to self for every self trashed cards"`);
+    });
+
+    it('renders +heal for every damage dealt', () => {
+      const card = getCardElement(
+        createCard(
+          { target: 'opponent', damage: 2 },
+          {
+            target: 'self',
+            gainEffectsList: [
+              {
+                effects: { heal: 1 },
+                forEveryBattleStat: 'damageDealt',
+              },
+            ],
+          },
+        ),
+      );
+
+      expect(card.textContent).toMatchInlineSnapshot(`"2⚔️+1❤️ to self for every damage dealt"`);
     });
   });
 });
