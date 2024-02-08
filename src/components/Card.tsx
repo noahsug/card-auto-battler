@@ -62,7 +62,7 @@ function getGainEffectsTextParts({
   }
 
   if (forEveryBattleStat) {
-    const name = forEveryBattleStat;
+    const { name } = forEveryBattleStat;
     const battleStatSymbol = CARD_TEXT_SYMBOLS[name];
     const divisorText = divisor === 1 ? '' : `${divisor} `;
     forEveryText = `for every ${divisorText}${battleStatSymbol}`;

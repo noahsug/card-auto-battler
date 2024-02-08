@@ -129,7 +129,7 @@ function gainEffects({
     ? getPlayerValue({ self, opponent, identifier: forEveryPlayerValue })
     : 1;
 
-  const battleStatMultiplier = forEveryBattleStat ? battleStats[forEveryBattleStat] : 1;
+  const battleStatMultiplier = forEveryBattleStat ? battleStats[forEveryBattleStat.name] : 1;
 
   const multiplier = playerValueMultiplier * battleStatMultiplier;
 

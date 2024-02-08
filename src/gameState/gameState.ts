@@ -28,19 +28,6 @@ export interface PlayerValueIdentifier {
   name: IdentifiablePlayerValue;
 }
 
-export interface Comparable {
-  comparator: '>' | '<' | '=';
-  compareToValue?: number;
-  compareToPlayerValue?: PlayerValueIdentifier;
-}
-
-export interface Conditional<T> {
-  ifDamageDealt?: Comparable;
-  ifHits?: Comparable;
-  ifPlayerValue?: PlayerValueIdentifier & Comparable;
-  else?: T;
-}
-
 export const EMPTY_BATTLE_STATS = {
   damageDealt: 0,
   healthRestored: 0,
@@ -49,7 +36,25 @@ export const EMPTY_BATTLE_STATS = {
 
 export type BattleStats = typeof EMPTY_BATTLE_STATS;
 
-export type BattleStatsIdentifier = keyof BattleStats;
+export type IdentifiableBattleStats = keyof BattleStats;
+
+export type BattleStatsIdentifier = {
+  name: IdentifiableBattleStats;
+};
+
+export interface Comparable {
+  comparison: '>' | '<' | '=' | '<=' | '>=';
+  compareToValue?: number;
+  compareToPercent?: number;
+  compareToPlayerValue?: PlayerValueIdentifier;
+  compareToBattleStat?: BattleStatsIdentifier;
+}
+
+export interface Conditional<T> {
+  ifBattleStat?: BattleStatsIdentifier & Comparable;
+  ifPlayerValue?: PlayerValueIdentifier & Comparable;
+  else?: T;
+}
 
 export type GainableCardEffects = PickByValue<Required<CardEffects>, number | boolean>;
 

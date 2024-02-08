@@ -69,6 +69,23 @@ describe('card text', () => {
     expect(card.textContent).toMatchInlineSnapshot(`"3⚔️2trash"`);
   });
 
+  it('renders conditionals', () => {
+    const card = getCardElement(
+      createCard({
+        target: 'opponent',
+        damage: 3,
+        ifPlayerValue: {
+          target: 'self',
+          name: 'health',
+          comparison: '<',
+          compareToPercent: 50,
+        },
+      }),
+    );
+
+    expect(card.textContent).toMatchInlineSnapshot(`"3⚔️if self health < 50%"`);
+  });
+
   describe('with effect gains', () => {
     it('renders +damage for every bleed', () => {
       const card = getCardElement(
@@ -146,7 +163,7 @@ describe('card text', () => {
             gainEffectsList: [
               {
                 effects: { heal: 1 },
-                forEveryBattleStat: 'damageDealt',
+                forEveryBattleStat: { name: 'damageDealt' },
               },
             ],
           },

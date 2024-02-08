@@ -298,7 +298,7 @@ describe('gainEffects', () => {
       gainEffectsList: [
         {
           effects: { heal: 1 },
-          forEveryBattleStat: 'damageDealt',
+          forEveryBattleStat: { name: 'damageDealt' },
         },
       ],
     };
@@ -316,7 +316,7 @@ describe('gainEffects', () => {
       gainEffectsList: [
         {
           effects: { dodge: 1 },
-          forEveryBattleStat: 'numberOfHits',
+          forEveryBattleStat: { name: 'numberOfHits' },
         },
       ],
     };

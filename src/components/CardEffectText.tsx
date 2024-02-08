@@ -6,6 +6,7 @@ import {
   Conditional,
   IdentifiablePlayerValue,
   BattleStatsIdentifier,
+  IdentifiableBattleStats,
 } from '../gameState/gameState';
 
 interface Props {
@@ -18,7 +19,7 @@ export type CardEffectWithSymbols = keyof Omit<
   'target' | 'trashSelf' | 'gainEffectsList' | 'growEffectsList' | keyof Conditional<unknown>
 >;
 
-type NameWithSymbol = CardEffectWithSymbols | IdentifiablePlayerValue | BattleStatsIdentifier;
+type NameWithSymbol = CardEffectWithSymbols | IdentifiablePlayerValue | IdentifiableBattleStats;
 
 export const CARD_TEXT_SYMBOLS: Record<NameWithSymbol, string> = {
   ...STATUS_EFFECT_SYMBOLS,
