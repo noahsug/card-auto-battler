@@ -9,6 +9,20 @@ export interface AnimationEvent {
   value: number;
 }
 
+export const EMPTY_BATTLE_STATS = {
+  damageDealt: 0,
+  healthRestored: 0,
+  numberOfHits: 0,
+  numberOfHeals: 0,
+  cardsPlayed: 0,
+};
+
+export type BattleStats = typeof EMPTY_BATTLE_STATS;
+
+export interface BattleStatsByPhase {
+  turn: BattleStats;
+}
+
 export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength'] as const;
 
 export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
@@ -21,9 +35,11 @@ export type StatusEffects = Record<StatusEffectName, number>;
 
 export type Target = 'self' | 'opponent';
 
+export type IdentifiablePlayerValue = keyof Omit<PlayerState, 'battleStatsByPhase'>;
+
 export interface PlayerValueIdentifier {
   target: Target;
-  name: keyof PlayerState;
+  name: IdentifiablePlayerValue;
 }
 
 export interface Comparable {
@@ -39,14 +55,18 @@ export interface Conditional<T> {
   else?: T;
 }
 
+export interface BattleStatsIdentifier {
+  name: keyof BattleStats;
+  phase: keyof BattleStatsByPhase | 'currentCard';
+}
+
 export type GainableCardEffects = PickByValue<Required<CardEffects>, number | boolean>;
 
 export interface GainEffectsOptions extends Conditional<GainEffectsOptions> {
   effects: Partial<GainableCardEffects>;
 
   forEveryPlayerValue?: PlayerValueIdentifier;
-  forEveryDamageDealt?: boolean;
-  forEveryHit?: boolean;
+  forEveryBattleStat?: BattleStatsIdentifier;
 
   isMultiplicative?: boolean;
   divisor?: number;
@@ -88,6 +108,7 @@ export interface PlayerState extends StatusEffects {
   currentCardIndex: number;
   cardsPlayedThisTurn: number;
   trashedCards: CardState[];
+  battleStatsByPhase: BattleStatsByPhase;
 }
 
 export interface GameState {
@@ -109,7 +130,7 @@ export const BLEED_DAMAGE = 3;
 export const MAX_TURNS_IN_BATTLE = 40;
 
 function createInitialPlayerState(): PlayerState {
-  const maxHealth = 300;
+  const maxHealth = 100;
 
   return {
     cards: [],
@@ -118,6 +139,9 @@ function createInitialPlayerState(): PlayerState {
     health: maxHealth,
     maxHealth,
     cardsPlayedThisTurn: 0,
+    battleStatsByPhase: {
+      turn: { ...EMPTY_BATTLE_STATS },
+    },
     ...EMPTY_STATUS_EFFECTS,
   };
 }

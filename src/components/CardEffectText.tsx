@@ -1,20 +1,20 @@
 import styled from 'styled-components';
 
-import { CardEffects, PlayerState } from '../gameState';
+import { CardEffects } from '../gameState';
 import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
-import { Conditional } from '../gameState/gameState';
+import { Conditional, IdentifiablePlayerValue } from '../gameState/gameState';
 
 interface Props {
-  effectName: keyof CardEffectsWithSymbols;
+  effectName: CardEffectWithSymbols;
   value: number;
 }
 
-export type CardEffectsWithSymbols = Omit<
+export type CardEffectWithSymbols = keyof Omit<
   CardEffects,
   'target' | 'trashSelf' | 'gainEffectsList' | 'growEffectsList' | keyof Conditional<unknown>
 >;
 
-type NameWithSymbol = keyof (PlayerState & CardEffectsWithSymbols);
+type NameWithSymbol = CardEffectWithSymbols | IdentifiablePlayerValue;
 
 export const CARD_TEXT_SYMBOLS: Record<NameWithSymbol, string> = {
   ...STATUS_EFFECT_SYMBOLS,

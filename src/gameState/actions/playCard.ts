@@ -12,7 +12,22 @@ import {
   statusEffectNames,
 } from '../../gameState';
 import { assert, getNonNullEntries } from '../../utils';
-import { GainEffectsOptions, MAX_TURNS_IN_BATTLE, PlayerValueIdentifier } from '../gameState';
+import {
+  GainEffectsOptions,
+  MAX_TURNS_IN_BATTLE,
+  PlayerValueIdentifier,
+  BattleStatsIdentifier,
+  EMPTY_BATTLE_STATS,
+  BattleStats,
+  BattleStatsByPhase,
+} from '../gameState';
+import { Entries } from '../../utils/types';
+
+interface PlayCardResult {
+  currentCardBattleStats: BattleStats;
+  trashSelf: boolean;
+  events: AnimationEvent[];
+}
 
 export default function playCard(game: GameState) {
   const activePlayer = getActivePlayer(game);
@@ -31,25 +46,34 @@ export default function playCard(game: GameState) {
   }
   activePlayer.cardsPlayedThisTurn += 1;
 
-  let trashSelf = false;
+  const result: PlayCardResult = {
+    currentCardBattleStats: { ...EMPTY_BATTLE_STATS },
+    trashSelf: false,
+    events: [] as AnimationEvent[],
+  };
 
   card.effects.forEach((cardEffects) => {
-    const resultingCardEffects = handleCardEffects({
+    handleCardEffects({
       activePlayer,
       nonActivePlayer,
       cardEffects,
-      game,
+      result,
     });
-    if (resultingCardEffects.trashSelf) {
-      trashSelf = true;
-    }
   });
 
-  if (trashSelf) {
+  if (result.trashSelf) {
     trashCurrentCard(activePlayer);
   }
 
+  (Object.entries(result.currentCardBattleStats) as Entries<BattleStats>).forEach(
+    ([name, value]) => {
+      activePlayer.battleStatsByPhase.turn[name] += value;
+    },
+  );
+
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
+
+  game.animationEvents.push(...result.events);
 
   // end game after max turns
   if (game.turn >= MAX_TURNS_IN_BATTLE - 1) {
@@ -62,12 +86,12 @@ function handleCardEffects({
   activePlayer,
   nonActivePlayer,
   cardEffects,
-  game,
+  result,
 }: {
   activePlayer: PlayerState;
   nonActivePlayer: PlayerState;
   cardEffects: CardEffects;
-  game: GameState;
+  result: PlayCardResult;
 }) {
   const resultingCardEffects = cloneDeep(cardEffects);
   cardEffects.gainEffectsList?.forEach((gainEffectsOptions) => {
@@ -76,6 +100,7 @@ function handleCardEffects({
       opponent: nonActivePlayer,
       cardEffects: resultingCardEffects,
       gainEffectsOptions,
+      result,
     });
   });
 
@@ -84,7 +109,7 @@ function handleCardEffects({
       self: activePlayer,
       opponent: nonActivePlayer,
       cardEffects: resultingCardEffects,
-      animationEvents: game.animationEvents,
+      result,
     });
   }
 
@@ -96,28 +121,42 @@ function gainEffects({
   opponent,
   cardEffects,
   gainEffectsOptions,
+  result,
 }: {
   self: PlayerState;
   opponent: PlayerState;
   cardEffects: CardEffects;
   gainEffectsOptions: GainEffectsOptions;
+  result: PlayCardResult;
 }) {
   if (!cardEffects.gainEffectsList) return cardEffects;
 
-  const { effects, forEveryPlayerValue, divisor = 1 } = gainEffectsOptions;
+  const { effects, forEveryPlayerValue, forEveryBattleStat, divisor = 1 } = gainEffectsOptions;
+  const { battleStatsByPhase } = self;
+  const { currentCardBattleStats } = result;
 
   const playerValueMultiplier = forEveryPlayerValue
     ? getPlayerValue({ self, opponent, identifier: forEveryPlayerValue })
     : 1;
 
+  const battleStatMultiplier = forEveryBattleStat
+    ? getBattleStatsValue({
+        battleStatsByPhase,
+        currentCardBattleStats,
+        identifier: forEveryBattleStat,
+      })
+    : 1;
+
+  const multiplier = playerValueMultiplier * battleStatMultiplier;
+
   getNonNullEntries(effects).forEach(([name, value]) => {
     if (typeof value === 'boolean') {
-      const boolValue = value && playerValueMultiplier > 0;
+      const boolValue = value && multiplier > 0;
       cardEffects[name] = cardEffects[name] || boolValue;
     } else {
       const defaultValue = name === 'activations' ? 1 : 0;
       const currentValue = cardEffects[name] ?? defaultValue;
-      cardEffects[name] = currentValue + (value * playerValueMultiplier) / divisor;
+      cardEffects[name] = currentValue + (value * multiplier) / divisor;
     }
   });
 
@@ -142,18 +181,33 @@ function getPlayerValue({
   return value;
 }
 
+function getBattleStatsValue({
+  identifier,
+  battleStatsByPhase,
+  currentCardBattleStats,
+}: {
+  identifier: BattleStatsIdentifier;
+  battleStatsByPhase: BattleStatsByPhase;
+  currentCardBattleStats: BattleStats;
+}) {
+  const { name, phase } = identifier;
+
+  const battleStats = phase === 'currentCard' ? currentCardBattleStats : battleStatsByPhase[phase];
+  return battleStats[name];
+}
+
 function applyCardEffects({
   self,
   opponent,
   cardEffects,
-  animationEvents,
+  result,
 }: {
   self: PlayerState;
   opponent: PlayerState;
   cardEffects: CardEffects;
-  animationEvents: AnimationEvent[];
+  result: PlayCardResult;
 }) {
-  const { target, damage, heal } = cardEffects;
+  const { target, damage, heal, trashSelf } = cardEffects;
   const targetPlayer = target === 'self' ? self : opponent;
 
   // damage
@@ -162,18 +216,22 @@ function applyCardEffects({
     if (cardEffects.target === 'opponent' && opponent.dodge > 0) {
       opponent.dodge -= 1;
     } else {
-      doDamage({ self, opponent, damage, target, animationEvents });
+      doDamage({ self, opponent, damage, target, result });
     }
   }
 
   // heal
   if (heal != null) {
-    doHeal({ self, opponent, heal, target, animationEvents });
+    doHeal({ self, opponent, heal, target, result });
   }
 
   statusEffectNames.forEach((statusEffect) => {
     targetPlayer[statusEffect] += cardEffects[statusEffect] || 0;
   });
+
+  if (trashSelf) {
+    result.trashSelf = true;
+  }
 }
 
 function doDamage({
@@ -181,14 +239,15 @@ function doDamage({
   opponent,
   damage,
   target,
-  animationEvents,
+  result,
 }: {
   opponent: PlayerState;
   self: PlayerState;
   damage: number;
   target: Target;
-  animationEvents: AnimationEvent[];
+  result: PlayCardResult;
 }) {
+  const { events, currentCardBattleStats } = result;
   const targetPlayer = target === 'self' ? self : opponent;
 
   damage += self.strength;
@@ -199,7 +258,9 @@ function doDamage({
 
   if (damage > 0) {
     targetPlayer.health -= damage;
-    animationEvents.push({ type: 'damage', target, value: damage });
+    currentCardBattleStats.damageDealt += damage;
+    currentCardBattleStats.numberOfHits += 1;
+    events.push({ type: 'damage', target, value: damage });
   }
 }
 
@@ -208,19 +269,22 @@ function doHeal({
   opponent,
   heal,
   target,
-  animationEvents,
+  result,
 }: {
   opponent: PlayerState;
   self: PlayerState;
   heal: number;
   target: Target;
-  animationEvents: AnimationEvent[];
+  result: PlayCardResult;
 }) {
+  const { events, currentCardBattleStats } = result;
   const targetPlayer = target === 'self' ? self : opponent;
 
   if (heal > 0) {
     targetPlayer.health += heal;
-    animationEvents.push({ type: 'heal', target, value: heal });
+    currentCardBattleStats.healthRestored += heal;
+    currentCardBattleStats.numberOfHeals += 1;
+    events.push({ type: 'heal', target, value: heal });
   }
 }
 

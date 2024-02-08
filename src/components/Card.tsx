@@ -5,7 +5,7 @@ import { CardEffects, CardState, statusEffectNames } from '../gameState';
 import CardEffectText, {
   CardText,
   CARD_TEXT_SYMBOLS,
-  CardEffectsWithSymbols,
+  CardEffectWithSymbols,
 } from './CardEffectText';
 import { GainEffectsOptions } from '../gameState/gameState';
 
@@ -64,7 +64,7 @@ function getGainEffectsText({
 function getCardTextItems(effects: CardEffects, index: number) {
   const textItems: React.JSX.Element[] = [];
 
-  function addEffectText(effectName: keyof CardEffectsWithSymbols, value: number) {
+  function addEffectText(effectName: CardEffectWithSymbols, value: number) {
     const key = `${effectName}-${index}`;
     textItems.push(<CardEffectText key={key} effectName={effectName} value={value} />);
   }

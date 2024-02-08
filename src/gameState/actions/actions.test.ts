@@ -87,7 +87,7 @@ describe('damage effect', () => {
 describe('heal effect', () => {
   const { endingState, startingState } = playCards([createCard({ target: 'self', heal: 1 })]);
 
-  expect(endingState.user.health - startingState.user.health).toBe(1);
+  expect(startingState.user.health - endingState.user.health).toBe(-1);
 });
 
 describe('dodge effect', () => {
@@ -158,31 +158,8 @@ describe('activations effect', () => {
   });
 });
 
-describe('gainEffectBasedOnEffect effect', () => {
-  describe('double strength', () => {
-    const doubleStrength: CardState = createCard({
-      target: 'self',
-      gainEffectsList: [
-        {
-          effects: { strength: 1 },
-          forEveryPlayerValue: {
-            target: 'self',
-            name: 'strength',
-          },
-        },
-      ],
-    });
-
-    it('doubles own strength', () => {
-      const { endingState } = playCards([
-        createCard({ target: 'self', strength: 2 }),
-        doubleStrength,
-      ]);
-      expect(endingState.user.strength).toBe(4);
-    });
-  });
-
-  describe('apply strength twice', () => {
+describe('gainEffects', () => {
+  it('applies strength twice', () => {
     const strengthEffectsTwice: CardEffects = {
       target: 'opponent',
       gainEffectsList: [
@@ -196,13 +173,32 @@ describe('gainEffectBasedOnEffect effect', () => {
       ],
     };
 
-    it('doubles own strength', () => {
-      const { endingState, startingState } = playCards([
-        createCard({ target: 'self', strength: 2 }),
-        createCard({ ...strengthEffectsTwice, damage: 2 }),
-      ]);
-      expect(startingState.enemy.health - endingState.enemy.health).toBe(6);
+    const { endingState, startingState } = playCards([
+      createCard({ target: 'self', strength: 2 }),
+      createCard({ ...strengthEffectsTwice, damage: 2 }),
+    ]);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(6);
+  });
+
+  it('doubles strength', () => {
+    const doubleStrength: CardState = createCard({
+      target: 'self',
+      gainEffectsList: [
+        {
+          effects: { strength: 1 },
+          forEveryPlayerValue: {
+            target: 'self',
+            name: 'strength',
+          },
+        },
+      ],
     });
+
+    const { endingState } = playCards([
+      createCard({ target: 'self', strength: 2 }),
+      doubleStrength,
+    ]);
+    expect(endingState.user.strength).toBe(4);
   });
 
   describe('damage for each bleed', () => {
@@ -252,6 +248,27 @@ describe('gainEffectBasedOnEffect effect', () => {
       ]);
       expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 4);
     });
+  });
+
+  it('heals for each damage', () => {
+    const healForEachDamage: CardEffects = {
+      target: 'self',
+      gainEffectsList: [
+        {
+          effects: { heal: 1 },
+          forEveryEvent: {
+            type: 'damage',
+            sumValues: true,
+          },
+        },
+      ],
+    };
+
+    const { endingState, startingState } = playCards([
+      createCard({ target: 'opponent', damage: 2 }, healForEachDamage),
+    ]);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
+    expect(startingState.user.health - endingState.user.health).toBe(-2);
   });
 });
 
