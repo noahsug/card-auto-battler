@@ -268,6 +268,25 @@ describe('gainEffects', () => {
     expect(startingState.user.health - endingState.user.health).toBe(-2);
   });
 
+  it('gains dodge for each hit', () => {
+    const dodgeForEachHit: CardEffects = {
+      target: 'self',
+      gainEffectsList: [
+        {
+          effects: { dodge: 1 },
+          forEveryBattleStat: 'numberOfHits',
+        },
+      ],
+    };
+
+    const { endingState, startingState } = playCards([
+      createCard({ target: 'opponent', dodge: 1 }),
+      createCard({ target: 'opponent', activations: 3, damage: 2 }, dodgeForEachHit),
+    ]);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(4);
+    expect(endingState.user.dodge).toBe(2);
+  });
+
   it('damage for each card played this turn', () => {
     const damageForEachCardPlayed: CardEffects = {
       target: 'opponent',
