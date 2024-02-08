@@ -67,7 +67,7 @@ export default function playCard(game: GameState) {
   game.animationEvents.push(...result.events);
 
   // end game after max turns
-  if (game.turn >= MAX_TURNS_IN_BATTLE - 1) {
+  if (game.turn + 1 >= MAX_TURNS_IN_BATTLE) {
     const target = game.user.health <= game.enemy.health ? game.user : game.enemy;
     target.health = 0;
   }

@@ -18,12 +18,16 @@ import { createCard } from '../utils';
 function runBattle({
   user,
   enemy,
-  stopAfterTurn = Infinity,
+  stopAfterTurns = Infinity,
+  stopAfterUserTurns = Infinity,
+  stopAfterEnemyTurns = Infinity,
   stopAfterNUserCardsPlayed = Infinity,
 }: {
   user?: Partial<PlayerState>;
   enemy?: Partial<PlayerState>;
-  stopAfterTurn?: number;
+  stopAfterTurns?: number;
+  stopAfterUserTurns?: number;
+  stopAfterEnemyTurns?: number;
   stopAfterNUserCardsPlayed?: number;
 }) {
   const game = merge(
@@ -42,8 +46,9 @@ function runBattle({
   game.enemy.cards = enemy?.cards || [createCard({ target: 'opponent', damage: 0 })];
 
   let userCardsPlayed = 0;
+  stopAfterTurns = Math.min(stopAfterTurns, stopAfterUserTurns * 2 - 1, stopAfterEnemyTurns * 2);
 
-  while (game.turn <= stopAfterTurn && userCardsPlayed < stopAfterNUserCardsPlayed) {
+  while (game.turn < stopAfterTurns && userCardsPlayed < stopAfterNUserCardsPlayed) {
     startTurn(game);
 
     while (getCanPlayCard(game) && userCardsPlayed < stopAfterNUserCardsPlayed) {
@@ -112,7 +117,7 @@ describe('trash effect', () => {
     ];
     const { endingState, startingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: 4, // 3 player turns
+      stopAfterUserTurns: 3,
     });
 
     expect(startingState.enemy.health - endingState.enemy.health).toBe(3 + 1 + 1);
@@ -154,7 +159,7 @@ describe('trash effect', () => {
     const userCards = [createCard({ trashSelf: true, target: 'opponent', damage: 1 })];
     const { endingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: 2, // 2 player turns
+      stopAfterUserTurns: 2,
     });
 
     expect(endingState.user.health).toBe(0);
@@ -164,7 +169,7 @@ describe('trash effect', () => {
     const userCards = [createCard({ target: 'opponent', trash: 1 })];
     const { endingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: 1, // 1 opponent turn
+      stopAfterEnemyTurns: 1,
     });
 
     expect(endingState.enemy.health).toBe(0);
@@ -174,7 +179,7 @@ describe('trash effect', () => {
     const userCards = [createCard({ trashSelf: true, target: 'opponent', damage: 10 })];
     const { endingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: 2, // 2 player turns
+      stopAfterUserTurns: 2,
     });
 
     expect(endingState.enemy.health).toBe(0);
@@ -257,7 +262,7 @@ describe('extraCardPlays status effect', () => {
     ];
     const { endingState, startingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: 0,
+      stopAfterUserTurns: 1,
     });
 
     expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
@@ -416,25 +421,50 @@ describe('gainEffects', () => {
     ]);
     expect(startingState.enemy.health - endingState.enemy.health).toBe(4);
   });
+
+  it('deals +X damage if health < 50%', () => {
+    const doubleDamageIfLowHealth = createCard({
+      target: 'opponent',
+      damage: 1,
+      gainEffectsList: [
+        {
+          effects: { damage: 3 },
+          ifPlayerValue: {
+            target: 'self',
+            name: 'health',
+            comparison: '<',
+            compareToPercent: 50,
+          },
+        },
+      ],
+    });
+
+    const { endingState, startingState } = runBattle({
+      user: { cards: [doubleDamageIfLowHealth] },
+      enemy: { cards: [createCard({ target: 'opponent', damage: 6 })] },
+      stopAfterUserTurns: 2,
+    });
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(1 + 4);
+  });
 });
 
-describe('ends the game after X turns', () => {
-  it('with the user winning if they have more health', () => {
+describe('max turns in battle', () => {
+  it('ends the game after X turns with the user winning if they have more health', () => {
     const userCards: CardState[] = [
       createCard({ trashSelf: true, target: 'opponent', damage: 1 }),
       createCard({ target: 'opponent', damage: 0 }),
     ];
     const { endingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: MAX_TURNS_IN_BATTLE - 1,
+      stopAfterTurns: MAX_TURNS_IN_BATTLE,
     });
 
     expect(endingState.enemy.health).toBe(0);
   });
 
-  it('with the enemy winning if they have more or equal health', () => {
+  it('ends the game after X turns with the enemy winning if they have more or equal health', () => {
     const { endingState } = runBattle({
-      stopAfterTurn: MAX_TURNS_IN_BATTLE - 1,
+      stopAfterTurns: MAX_TURNS_IN_BATTLE,
     });
 
     expect(endingState.user.health).toBe(0);
