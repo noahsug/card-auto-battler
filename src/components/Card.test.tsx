@@ -57,10 +57,16 @@ describe('card text', () => {
     expect(card.textContent).toMatchInlineSnapshot(`"2🩸"`);
   });
 
-  it('renders trash', () => {
+  it('renders trash self', () => {
     const card = getCardElement(createCard({ target: 'opponent', damage: 5, trashSelf: true }));
 
     expect(card.textContent).toMatchInlineSnapshot(`"5⚔️trash"`);
+  });
+
+  it('renders trash', () => {
+    const card = getCardElement(createCard({ target: 'opponent', damage: 3, trash: 2 }));
+
+    expect(card.textContent).toMatchInlineSnapshot(`"3⚔️2trash"`);
   });
 
   describe('with effect gains', () => {

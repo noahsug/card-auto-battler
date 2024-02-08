@@ -80,9 +80,11 @@ function getCardTextItems(effects: CardEffects, index: number) {
   }
 
   // "X damage"
+  // TODO: share this list with CardEffectText as numericEffects
   const simpleEffects = [
     'damage',
     'heal',
+    'trash',
     'randomNegativeStatusEffects',
     'randomPositiveStatusEffects',
   ] as const;

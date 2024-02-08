@@ -112,27 +112,69 @@ describe('trash effect', () => {
     ];
     const { endingState, startingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: 5, // 3 player turns
+      stopAfterTurn: 4, // 3 player turns
     });
 
-    expect(startingState.enemy.health - endingState.enemy.health).toBe(5);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(3 + 1 + 1);
+  });
+
+  it('trashes next two cards', () => {
+    const userCards = [
+      createCard({ target: 'opponent', damage: 1 }),
+      createCard({ target: 'opponent', damage: 2 }),
+      createCard({ trash: 4, target: 'self' }, { target: 'opponent', damage: 3 }),
+      createCard({ target: 'opponent', damage: 4 }),
+      createCard({ target: 'opponent', damage: 5 }),
+      createCard({ target: 'opponent', damage: 6 }),
+    ];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      stopAfterNUserCardsPlayed: 4,
+    });
+
+    expect(endingState.user.cards.length).toBe(2);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(1 + 2 + 3 + 2);
+  });
+
+  it('trash X does not trash current card', () => {
+    const userCards = [
+      createCard({ trash: 4, target: 'self' }, { target: 'opponent', damage: 3 }),
+      createCard({ target: 'opponent', damage: 1 }),
+    ];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      stopAfterNUserCardsPlayed: 2,
+    });
+
+    expect(endingState.user.cards.length).toBe(1);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(3 + 3);
   });
 
   it('causes a loss when no cards are left', () => {
     const userCards = [createCard({ trashSelf: true, target: 'opponent', damage: 1 })];
     const { endingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: 3, // 2 player turns
+      stopAfterTurn: 2, // 2 player turns
     });
 
     expect(endingState.user.health).toBe(0);
+  });
+
+  it('causes a win when the opponent has no cards left', () => {
+    const userCards = [createCard({ target: 'opponent', trash: 1 })];
+    const { endingState } = runBattle({
+      user: { cards: userCards },
+      stopAfterTurn: 1, // 1 opponent turn
+    });
+
+    expect(endingState.enemy.health).toBe(0);
   });
 
   it('does not cause a loss when final trashed card wins the game', () => {
     const userCards = [createCard({ trashSelf: true, target: 'opponent', damage: 10 })];
     const { endingState } = runBattle({
       user: { cards: userCards },
-      stopAfterTurn: 3, // 2 player turns
+      stopAfterTurn: 2, // 2 player turns
     });
 
     expect(endingState.enemy.health).toBe(0);

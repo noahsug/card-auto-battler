@@ -176,7 +176,7 @@ function applyCardEffects({
   cardEffects: CardEffects;
   result: PlayCardResult;
 }) {
-  const { target, damage, heal, trashSelf } = cardEffects;
+  const { target, damage, heal, trash, trashSelf } = cardEffects;
   const targetPlayer = target === 'self' ? self : opponent;
 
   // damage
@@ -197,6 +197,11 @@ function applyCardEffects({
   statusEffectNames.forEach((statusEffect) => {
     targetPlayer[statusEffect] += cardEffects[statusEffect] || 0;
   });
+
+  // trash
+  if (trash != null) {
+    trashCards({ self, opponent, target, trash });
+  }
 
   if (trashSelf) {
     result.trashSelf = true;
@@ -254,6 +259,40 @@ function doHeal({
     battleStats.healthRestored += heal;
     events.push({ type: 'heal', target, value: heal });
   }
+}
+
+function trashCards({
+  self,
+  opponent,
+  target,
+  trash,
+}: {
+  self: PlayerState;
+  opponent: PlayerState;
+  target: Target;
+  trash: number;
+}) {
+  const targetPlayer = target === 'self' ? self : opponent;
+  const { cards, currentCardIndex } = targetPlayer;
+
+  // don't trash the current card if it's actively being played
+  const maxCardsToTrash = target === 'self' ? cards.length - 1 : cards.length;
+  trash = Math.min(trash, maxCardsToTrash);
+
+  const trashStart = target === 'self' ? currentCardIndex + 1 : currentCardIndex;
+  const removeFromFront = trashStart + trash - cards.length;
+
+  targetPlayer.cards = cards.filter((_, i) => {
+    // trash cards after or at the current card
+    if (i >= trashStart && i < trashStart + trash) return false;
+
+    // trash cards from the front of the deck
+    if (i < removeFromFront) return false;
+
+    return true;
+  });
+
+  targetPlayer.currentCardIndex -= removeFromFront;
 }
 
 function trashCurrentCard(player: PlayerState) {
