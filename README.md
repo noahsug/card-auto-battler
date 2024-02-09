@@ -19,7 +19,6 @@ archtypes implemented
 - low hp - self damage, 50% lifesteal when < 50% health
 - heal -
 - trash -
-- growth - play another card, perm +1 dmg each time played
 
 ## simple card effects
 

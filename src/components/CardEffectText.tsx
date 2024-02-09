@@ -45,11 +45,12 @@ export const CARD_TEXT_SYMBOLS: Record<NameWithSymbol, string> = {
 
 export default function CardEffectText({ effectName, value }: Props) {
   const symbol = CARD_TEXT_SYMBOLS[effectName];
+  const symbolText = value == null || symbol.split(' ')[0].length <= 2 ? symbol : ` ${symbol}`;
 
   return (
     <CardText>
       {value == null ? null : <span>{value}</span>}
-      {symbol}
+      {symbolText}
     </CardText>
   );
 }

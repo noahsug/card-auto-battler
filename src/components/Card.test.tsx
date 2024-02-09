@@ -66,7 +66,7 @@ describe('card text', () => {
   it('renders trash', () => {
     const card = getCardElement(createCard({ target: 'opponent', damage: 3, trash: 2 }));
 
-    expect(card.textContent).toMatchInlineSnapshot(`"3⚔️2trash"`);
+    expect(card.textContent).toMatchInlineSnapshot(`"3⚔️2 trash"`);
   });
 
   it('renders conditionals', () => {
@@ -78,12 +78,16 @@ describe('card text', () => {
           target: 'self',
           name: 'health',
           comparison: '<',
-          compareToPercent: 50,
+          compareToPlayerValue: {
+            target: 'self',
+            name: 'maxHealth',
+          },
+          multiplier: 0.5,
         },
       }),
     );
 
-    expect(card.textContent).toMatchInlineSnapshot(`"3⚔️if self health < 50%"`);
+    expect(card.textContent).toMatchInlineSnapshot(`"3⚔️if self health < 50% self max health"`);
   });
 
   describe('with effect gains', () => {
@@ -171,6 +175,30 @@ describe('card text', () => {
       );
 
       expect(card.textContent).toMatchInlineSnapshot(`"2⚔️+1❤️ to self for every damage dealt"`);
+    });
+
+    it('renders conditionals', () => {
+      const card = getCardElement(
+        createCard({
+          target: 'opponent',
+          damage: 3,
+          gainEffectsList: [
+            {
+              effects: { damage: 3, trashSelf: true },
+              ifPlayerValue: {
+                target: 'opponent',
+                name: 'bleed',
+                comparison: '>=',
+                compareToValue: 3,
+              },
+            },
+          ],
+        }),
+      );
+
+      expect(card.textContent).toMatchInlineSnapshot(
+        `"3⚔️+3⚔️, trash this card if opponent 🩸 >= 3"`,
+      );
     });
   });
 });

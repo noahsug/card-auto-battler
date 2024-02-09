@@ -18,6 +18,9 @@ import {
   PlayerValueIdentifier,
   BattleStats,
   EMPTY_BATTLE_STATS,
+  IfBattleStatOptions,
+  IfPlayerValueOptions,
+  Comparable,
 } from '../gameState';
 
 interface PlayCardResult {
@@ -122,8 +125,23 @@ function gainEffects({
 }) {
   if (!cardEffects.gainEffectsList) return cardEffects;
 
-  const { effects, forEveryPlayerValue, forEveryBattleStat, divisor = 1 } = gainEffectsOptions;
+  const {
+    effects,
+    forEveryPlayerValue,
+    forEveryBattleStat,
+    ifPlayerValue,
+    ifBattleStat,
+    divisor = 1,
+  } = gainEffectsOptions;
   const { battleStats } = result;
+
+  if (ifPlayerValue && !evalPlayerValueConditional({ self, opponent, result, ifPlayerValue })) {
+    return cardEffects;
+  }
+
+  if (ifBattleStat && !evalBattleStatConditional({ self, opponent, result, ifBattleStat })) {
+    return cardEffects;
+  }
 
   const playerValueMultiplier = forEveryPlayerValue
     ? getPlayerValue({ self, opponent, identifier: forEveryPlayerValue })
@@ -145,6 +163,97 @@ function gainEffects({
   });
 
   return cardEffects;
+}
+
+function evalPlayerValueConditional({
+  self,
+  opponent,
+  result,
+  ifPlayerValue,
+}: {
+  self: PlayerState;
+  opponent: PlayerState;
+  result: PlayCardResult;
+  ifPlayerValue: IfPlayerValueOptions;
+}) {
+  const value = getPlayerValue({ self, opponent, identifier: ifPlayerValue });
+  return logicAndConditionals({ self, opponent, result, value, comparable: ifPlayerValue });
+}
+
+function evalBattleStatConditional({
+  self,
+  opponent,
+  result,
+  ifBattleStat,
+}: {
+  self: PlayerState;
+  opponent: PlayerState;
+  result: PlayCardResult;
+  ifBattleStat: IfBattleStatOptions;
+}) {
+  const { battleStats } = result;
+
+  const value = battleStats[ifBattleStat.name];
+  return logicAndConditionals({ self, opponent, result, value, comparable: ifBattleStat });
+}
+
+function logicAndConditionals({
+  self,
+  opponent,
+  result,
+  value,
+  comparable,
+}: {
+  self: PlayerState;
+  opponent: PlayerState;
+  result: PlayCardResult;
+  value: number;
+  comparable: Comparable;
+}) {
+  const { battleStats } = result;
+  const {
+    comparison,
+    multiplier = 1,
+    compareToValue,
+    compareToPlayerValue,
+    compareToBattleStat,
+  } = comparable;
+
+  if (compareToValue != null) {
+    const compareTo = compareToValue * multiplier;
+    if (!compareValues({ value, compareTo, comparison })) return false;
+  }
+
+  if (compareToPlayerValue != null) {
+    const compareTo =
+      getPlayerValue({ self, opponent, identifier: compareToPlayerValue }) * multiplier;
+    if (!compareValues({ value, compareTo, comparison })) return false;
+  }
+
+  if (compareToBattleStat != null) {
+    const compareTo = battleStats[compareToBattleStat.name] * multiplier;
+    if (!compareValues({ value, compareTo, comparison })) return false;
+  }
+
+  return true;
+}
+
+function compareValues({
+  value,
+  compareTo,
+  comparison,
+}: {
+  value: number;
+  compareTo: number;
+  comparison: Comparable['comparison'];
+}) {
+  if (comparison === '>') return value > compareTo;
+  if (comparison === '<') return value < compareTo;
+  if (comparison === '=') return value === compareTo;
+  if (comparison === '>=') return value >= compareTo;
+  if (comparison === '<=') return value <= compareTo;
+
+  throw new Error(`invalid comparison: ${comparison}`);
 }
 
 function getPlayerValue({

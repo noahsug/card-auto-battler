@@ -433,7 +433,11 @@ describe('gainEffects', () => {
             target: 'self',
             name: 'health',
             comparison: '<',
-            compareToPercent: 50,
+            compareToPlayerValue: {
+              target: 'self',
+              name: 'maxHealth',
+            },
+            multiplier: 0.5,
           },
         },
       ],

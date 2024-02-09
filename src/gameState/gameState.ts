@@ -45,14 +45,19 @@ export type BattleStatsIdentifier = {
 export interface Comparable {
   comparison: '>' | '<' | '=' | '<=' | '>=';
   compareToValue?: number;
-  compareToPercent?: number;
   compareToPlayerValue?: PlayerValueIdentifier;
   compareToBattleStat?: BattleStatsIdentifier;
+  // multiplier for the compareTo values (e.g. 0.5 = 50% of comparison value)
+  multiplier?: number;
 }
 
+export interface IfBattleStatOptions extends BattleStatsIdentifier, Comparable {}
+
+export interface IfPlayerValueOptions extends PlayerValueIdentifier, Comparable {}
+
 export interface Conditional<T> {
-  ifBattleStat?: BattleStatsIdentifier & Comparable;
-  ifPlayerValue?: PlayerValueIdentifier & Comparable;
+  ifBattleStat?: IfBattleStatOptions;
+  ifPlayerValue?: IfPlayerValueOptions;
   else?: T;
 }
 
@@ -90,6 +95,7 @@ export interface CardEffects extends Partial<StatusEffects>, Conditional<CardEff
   // gain temporary effects as the card is being played
   gainEffectsList?: GainEffectsOptions[];
   // gain (semi-)permanent effects after the card is played
+  // TODO: implement grow effects
   growEffectsList?: CardGrowEffects[];
 }
 
