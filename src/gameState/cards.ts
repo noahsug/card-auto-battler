@@ -1,3 +1,4 @@
+import { CardState } from './gameState';
 import { createCard } from './utils';
 
 // starter cards
@@ -16,9 +17,13 @@ export const multihitStarterCard = createCard({ target: 'opponent', activations:
 
 export const strengthStarterCard = createCard({ target: 'self', strength: 1 });
 
-export const healTrashStarterCard = createCard({ target: 'self', heal: 7 });
+export const healTrashStarterCard = createCard({ target: 'self', heal: 7, trashSelf: true });
 
-export const damageTrashStarterCard = createCard({ target: 'opponent', damage: 5 });
+export const damageTrashStarterCard = createCard({
+  target: 'opponent',
+  damage: 5,
+  trashSelf: true,
+});
 
 const starterCards = {
   damageStarterCard,
@@ -175,25 +180,6 @@ const strengthCards = {
 
 // bleed synergy
 
-export const damageWithoutConsumingBleedCard = createCard(
-  {
-    target: 'opponent',
-    damage: 1,
-    activations: 2,
-  },
-  {
-    target: 'opponent',
-    gainEffectsList: [
-      {
-        effects: { bleed: 1 },
-        forEveryBattleStat: {
-          name: 'numberOfHits',
-        },
-      },
-    ],
-  },
-);
-
 export const damageForEachBleedCard = createCard({
   target: 'opponent',
   damage: 1,
@@ -269,7 +255,6 @@ export const extraPlayIfBleedCard = createCard({
 });
 
 const bleedCards = {
-  damageWithoutConsumingBleedCard,
   damageForEachBleedCard,
   doubleBleedCard,
   gainStrengthForBleedCard,
@@ -519,7 +504,11 @@ const trashCards = { trashAndExtraPlayCard, damageForEachTrashedCard, healForEac
 
 // multicard synergy
 
-const extraPlaysTrashCard = createCard({ target: 'self', extraCardPlays: 2, trashSelf: true });
+export const extraPlaysTrashCard = createCard({
+  target: 'self',
+  extraCardPlays: 2,
+  trashSelf: true,
+});
 
 export const damageForEachCardPlayedCard = createCard({
   target: 'opponent',
@@ -570,7 +559,6 @@ const trashCardArray = Object.values(trashCards);
 const multicardCardArray = Object.values(multicardCards);
 
 const nonStarterCards = {
-  ...starterCards,
   ...basicCards,
   ...miscCards,
   ...strengthCards,
@@ -588,6 +576,11 @@ const allCards = {
 };
 
 const nonStarterCardArray = Object.values(nonStarterCards);
+
+export function getCardName(card: CardState) {
+  const [name] = Object.entries(allCards).find(([_, c]) => c === card) || [];
+  return name;
+}
 
 export {
   allCards as cardsByName,

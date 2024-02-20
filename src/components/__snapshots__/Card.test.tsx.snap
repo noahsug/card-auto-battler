@@ -26,9 +26,7 @@ exports[`card text renders damageSelfIfMissCard 1`] = `"7⚔️4⚔️to selfif 
 
 exports[`card text renders damageStarterCard 1`] = `"3⚔️"`;
 
-exports[`card text renders damageTrashStarterCard 1`] = `"5⚔️"`;
-
-exports[`card text renders damageWithoutConsumingBleedCard 1`] = `"1⚔️2x times+1🩸 for every hits"`;
+exports[`card text renders damageTrashStarterCard 1`] = `"5⚔️trash this card"`;
 
 exports[`card text renders dodgeAndTrashCard 1`] = `"2 trash2💨to selftrash this card2 trash2💨"`;
 
@@ -66,7 +64,7 @@ exports[`card text renders healForEachTrashedCard 1`] = `"4❤️+1❤️ for ev
 
 exports[`card text renders healStarterCard 1`] = `"4❤️to self"`;
 
-exports[`card text renders healTrashStarterCard 1`] = `"7❤️to self"`;
+exports[`card text renders healTrashStarterCard 1`] = `"7❤️to selftrash this card"`;
 
 exports[`card text renders lifestealCard 1`] = `"3⚔️+1❤️ to self for every damage dealt"`;
 

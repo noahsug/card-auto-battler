@@ -1,5 +1,3 @@
-import shuffle from 'lodash/shuffle';
-
 import { starterCards, nonStarterCards } from './cards';
 import { STARTING_CARDS, CARD_SELECTION_OPTIONS } from './constants';
 
@@ -13,5 +11,10 @@ export function getCardSelectionsForBattle() {
 }
 
 export function getStartingCards() {
-  return shuffle(starterCards).slice(STARTING_CARDS);
+  const cards = [];
+  for (let i = 0; i < STARTING_CARDS; i++) {
+    const card = starterCards[Math.floor(Math.random() * starterCards.length)];
+    cards.push(card);
+  }
+  return cards;
 }

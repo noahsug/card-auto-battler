@@ -18,8 +18,8 @@ export default function CardSelectionScreen() {
   const { addCard, startBattle } = useActions();
   const [selectedCardIndexes, setSelectedCardIndexes] = useState(new Set<number>());
   const [deckOverlayActive, setDeckOverlayActive] = useState(false);
+  const [cards] = useState(getCardSelectionsForBattle());
 
-  const cards = getCardSelectionsForBattle();
   const canAddCards = selectedCardIndexes.size < CARD_SELECTION_PICKS;
 
   const startBattleSequence: Sequence = useMemo(

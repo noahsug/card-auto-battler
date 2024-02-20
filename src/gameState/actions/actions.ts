@@ -10,10 +10,10 @@ import {
   getEnemyCardsForBattle,
   MAX_LOSSES,
   MAX_WINS,
-  statusEffectNames,
 } from '../';
 import { assert } from '../../utils';
 import playCardHelper from './playCard';
+import { resetGameStateFromBattle } from '../gameState';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
@@ -35,24 +35,12 @@ export function addCard(game: GameState, card: CardState) {
 
 export function startBattle(game: GameState) {
   game.screen = 'battle';
-  const { user, enemy } = game;
+  const { enemy } = game;
 
-  game.animationEvents = [];
-
-  user.cards = shuffle([...user.cards, ...user.trashedCards]);
-  user.trashedCards = [];
-  user.health = user.startingHealth;
-  user.currentCardIndex = 0;
+  resetGameStateFromBattle(game);
 
   const enemyCards = getEnemyCardsForBattle(getBattleCount(game));
   enemy.cards = shuffle(enemyCards);
-  enemy.health = enemy.startingHealth;
-  enemy.currentCardIndex = 0;
-
-  statusEffectNames.forEach((statusEffect) => {
-    user[statusEffect] = 0;
-    enemy[statusEffect] = 0;
-  });
 }
 
 export function startTurn(game: GameState) {
@@ -79,6 +67,8 @@ export function endBattle(game: GameState) {
   } else {
     throw new Error('endBattle called, but neither player is dead');
   }
+
+  resetGameStateFromBattle(game);
 
   game.screen = game.wins >= MAX_WINS || game.losses >= MAX_LOSSES ? 'gameEnd' : 'battleEnd';
 }

@@ -1,7 +1,7 @@
 import { PickByValue } from '../utils/types';
 import { STARTING_HEALTH } from './constants';
 import { getStartingCards } from './cardSelection';
-import { getEnemyCardsForBattle } from './enemies';
+import shuffle from 'lodash/shuffle';
 
 export type ScreenName = 'gameStart' | 'cardSelection' | 'battle' | 'battleEnd' | 'gameEnd';
 
@@ -146,7 +146,6 @@ export function createInitialGameState(): GameState {
   user.cards = getStartingCards();
 
   const enemy = createInitialPlayerState();
-  enemy.cards = getEnemyCardsForBattle(0);
 
   return {
     user,
@@ -157,6 +156,25 @@ export function createInitialGameState(): GameState {
     screen: 'gameStart',
     animationEvents: [],
   };
+}
+
+export function resetGameStateFromBattle(game: GameState) {
+  const { user, enemy } = game;
+
+  user.cards = shuffle([...user.cards, ...user.trashedCards]);
+  user.trashedCards = [];
+  user.health = user.startingHealth;
+  user.currentCardIndex = 0;
+
+  enemy.health = enemy.startingHealth;
+  enemy.currentCardIndex = 0;
+
+  statusEffectNames.forEach((statusEffect) => {
+    user[statusEffect] = 0;
+    enemy[statusEffect] = 0;
+  });
+
+  game.animationEvents = [];
 }
 
 export function getIsEnemyTurn(game: GameState) {

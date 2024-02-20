@@ -14,7 +14,6 @@ import {
   bleedTrashCard,
   strengthTrashCard,
   damageForEachBleedCard,
-  damageWithoutConsumingBleedCard,
   extraCardIfHighDamageCard,
   lifestealCard,
   damageCard,
@@ -26,6 +25,12 @@ import {
   extraPlayHealCard,
   healForEachTrashedCard,
   extraPlayIfLowHealthCard,
+  getCardName,
+  trashAndExtraPlayCard,
+  selfDamageCard,
+  damageForEachMissingHealthCard,
+  doubleDodgeIfLowHealthCard,
+  extraPlaysTrashCard,
 } from './cards';
 import { getStartingCards, getCardSelectionsForBattle } from './cardSelection';
 import { CARD_SELECTION_PICKS } from './constants';
@@ -43,60 +48,65 @@ export const enemyTypes = [
 
 export type EnemyType = (typeof enemyTypes)[number];
 
-const genericallyGoodCards = [
+const generallyGoodCards = [
+  extraPlaysTrashCard,
   damageCard,
   extraPlayCard,
   healCard,
   damageForEachCard,
   damageSelfIfMissCard,
   extraPlayHealCard,
+  trashAndExtraPlayCard,
+  selfDamageCard,
+  extraPlayIfLowHealthCard,
+  damageForEachMissingHealthCard,
+  doubleDodgeIfLowHealthCard,
+  strengthTrashCard,
+  strengthCard,
+  bleedTrashCard,
+  bleedCard,
+  multihitCard,
 ];
 
 const cardPriorityByType = {
   strength: [
-    // top priority to bottom priority
-    [...strengthCards, strengthTrashCard, strengthCard, multihitCard],
-    [extraPlayCard, damageWithoutConsumingBleedCard],
+    [...strengthCards, strengthTrashCard, strengthCard, multihitCard], // best
+    [extraPlayCard],
     [gainStrengthForBleedCard, bleedCard, bleedTrashCard, damageForEachBleedCard],
-    genericallyGoodCards,
+    generallyGoodCards,
   ],
   bleed: [
-    // top priority to bottom priority
-    [...bleedCards, bleedTrashCard, bleedCard, lifestealCard, multihitCard],
+    [...bleedCards, bleedTrashCard, bleedCard, lifestealCard, multihitCard], // best
     [extraPlayCard],
     [strengthCard, strengthTrashCard, extraCardIfHighDamageCard],
-    genericallyGoodCards,
+    generallyGoodCards,
   ],
   lowHealth: [
-    // top priority to bottom priority
-    [...lowHealthCards, damageSelfIfMissCard],
-    genericallyGoodCards,
+    [...lowHealthCards, damageSelfIfMissCard], // best
+    generallyGoodCards,
   ],
   heal: [
-    // top priority to bottom priority
-    healCards,
-    [healCard, lifestealCard],
-    genericallyGoodCards,
+    healCards, // best
+    [healCard, lifestealCard], // good
+    generallyGoodCards,
   ],
   mill: [
-    // top priority to bottom priority
-    millCards,
-    [trashCard, healForEachTrashedCard],
-    [healCard, extraPlayHealCard, extraCardIfHighHealthCard],
-    [extraPlayCard],
+    millCards, // best
+    [trashCard, healForEachTrashedCard, trashAndExtraPlayCard], // good
+    [healCard, extraPlayHealCard, extraCardIfHighHealthCard], // okay
+    [extraPlayCard], // neutral
+    [doubleDodgeIfLowHealthCard, extraPlayIfLowHealthCard, damageForEachMissingHealthCard], // bad but occasionally helpful
   ],
   trash: [
-    // top priority to bottom priority
-    trashCards,
-    [trashCard, ...millCards],
-    genericallyGoodCards,
+    [...trashCards, extraPlaysTrashCard], // best
+    [trashCard, ...millCards], // good
+    generallyGoodCards,
   ],
   multicard: [
-    // top priority to bottom priority
-    multicardCards,
-    [extraPlayCard],
-    [extraPlayIfLowHealthCard],
-    genericallyGoodCards,
+    multicardCards, // best
+    [extraPlayCard], // good
+    [extraPlayIfLowHealthCard], // okay
+    generallyGoodCards,
   ],
 };
 
@@ -104,27 +114,36 @@ export function getEnemyCardsForBattle(battleCount: number) {
   const cards = getStartingCards();
 
   const enemyType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+
   for (let i = 0; i < battleCount + 1; i++) {
     cards.push(...pickCards(enemyType));
   }
+
+  console.log('enemyType', enemyType);
 
   return cards;
 }
 
 // Returns CARD_SELECTION_PICKS cards based on enemy type.
-// Assumes "cards" is unique, as we only pick one of each type.
 function pickCards(enemyType: EnemyType) {
   const cardOptions = getCardSelectionsForBattle();
   const cardOptionsSet = new Set(cardOptions);
   const selectedCards: CardState[] = [];
 
   const cardPriority = cardPriorityByType[enemyType];
-  cardPriority.find((priorityCards) => {
+  cardPriority.find((priorityCards, i) => {
     return priorityCards.find((priorityCard) => {
       if (cardOptionsSet.has(priorityCard)) {
-        selectedCards.push(priorityCard);
+        // iterate through each priority card since there may be duplicates
+        return cardOptions.find((card) => {
+          if (card === priorityCard) {
+            console.log('pick', i, getCardName(card));
+            selectedCards.push(card);
+          }
+          return selectedCards.length >= CARD_SELECTION_PICKS;
+        });
       }
-      return selectedCards.length >= CARD_SELECTION_PICKS;
+      return false;
     });
   });
 
@@ -132,6 +151,8 @@ function pickCards(enemyType: EnemyType) {
   for (let i = selectedCards.length; i < CARD_SELECTION_PICKS; i++) {
     const randomCard = cardOptions[Math.floor(Math.random() * cardOptions.length)];
     selectedCards.push(randomCard);
+    console.log('pick', '-1', getCardName(randomCard));
+    console.log(cardOptions.map(getCardName).join(', '));
   }
 
   return selectedCards;
