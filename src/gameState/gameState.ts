@@ -3,7 +3,13 @@ import { STARTING_HEALTH } from './constants';
 import { getStartingCards } from './cardSelection';
 import { getEnemyCardsForBattle } from './enemies';
 
-export type ScreenName = 'gameStart' | 'cardSelection' | 'battle' | 'battleEnd' | 'gameEnd';
+export type ScreenName =
+  | 'gameStart'
+  | 'cardSelection'
+  | 'deck'
+  | 'battle'
+  | 'battleEnd'
+  | 'gameEnd';
 
 export interface AnimationEvent {
   type: 'damage' | 'heal';

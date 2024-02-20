@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 import GameStartScreen from './GameStartScreen';
 import CardSelectionScreen from './CardSelectionScreen';
+import DeckScreen from './DeckScreen';
 import BattleScreen from './BattleScreen';
 import GameEndScreen from './GameEndScreen';
 import BattleEndScreen from './BattleEndScreen';
@@ -17,6 +18,7 @@ const screenMapping: ScreenMapping = {
 
   gameStart: <GameStartScreen />,
   cardSelection: <CardSelectionScreen />,
+  deck: <DeckScreen />,
   battle: <BattleScreen />,
   battleEnd: <BattleEndScreen />,
   gameEnd: <GameEndScreen />,
