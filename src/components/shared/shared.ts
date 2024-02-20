@@ -18,3 +18,15 @@ export const Subtitle = styled.div`
   font-size: 30rem;
   margin-bottom: 12rem;
 `;
+
+export const TopRightButton = styled.button`
+  position: absolute;
+  top: 10rem;
+  right: 10rem;
+  font-size: 20rem;
+  padding: 1rem 2rem;
+  border: none;
+  text-decoration: underline;
+  background-color: #fff;
+  cursor: pointer;
+`;

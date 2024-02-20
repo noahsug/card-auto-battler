@@ -11,10 +11,13 @@ import { useSequence } from '../hooks';
 
 import type { Sequence } from '../hooks';
 import { CARD_SELECTION_PICKS } from '../gameState/constants';
+import DeckOverlay from './DeckOverlay';
+import { TopRightButton } from './shared/shared';
 
 export default function CardSelectionScreen() {
   const { addCard, startBattle } = useActions();
   const [selectedCardIndexes, setSelectedCardIndexes] = useState(new Set<number>());
+  const [deckOverlayActive, setDeckOverlayActive] = useState(false);
 
   const cards = getCardSelectionsForBattle();
   const canAddCards = selectedCardIndexes.size < CARD_SELECTION_PICKS;
@@ -60,9 +63,11 @@ export default function CardSelectionScreen() {
 
   return (
     <Screen>
+      <TopRightButton onClick={() => setDeckOverlayActive(true)}>deck</TopRightButton>
       <ProgressDisplay />
       <Title>Select a Card</Title>
       <CardGrid>{cardComponents}</CardGrid>
+      {deckOverlayActive && <DeckOverlay onClose={() => setDeckOverlayActive(false)} />}
     </Screen>
   );
 }

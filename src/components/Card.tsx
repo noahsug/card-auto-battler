@@ -261,6 +261,7 @@ const Root = styled.div<{ $scale: number; $isActive: boolean }>`
 
   width: ${({ $scale }) => $scale * 192}rem;
   height: ${({ $scale }) => $scale * 256}rem;
+  font-size: ${({ $scale }) => $scale * 26}rem;
 
   ${({ $isActive }) =>
     $isActive &&
