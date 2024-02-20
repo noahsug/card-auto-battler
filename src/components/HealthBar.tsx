@@ -2,19 +2,19 @@ import styled from 'styled-components';
 
 interface Props {
   health: number;
-  maxHealth: number;
+  startingHealth: number;
 }
 
-export default function HealthBar({ health, maxHealth }: Props) {
+export default function HealthBar({ health, startingHealth }: Props) {
   health = Math.max(health, 0);
 
-  const healthPercent = Math.min(health / maxHealth, 1) * 100;
+  const healthPercent = Math.min(health / startingHealth, 1) * 100;
 
   return (
     <OuterBar>
       <InnerBar $percent={healthPercent} />
       <BarText>
-        {health} / {maxHealth}
+        {health} / {startingHealth}
       </BarText>
     </OuterBar>
   );

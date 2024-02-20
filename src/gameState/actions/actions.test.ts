@@ -32,7 +32,7 @@ function runBattle({
 }) {
   const game = merge(
     createInitialGameState(),
-    { user: { maxHealth: 10 }, enemy: { maxHealth: 10 } },
+    { user: { startingHealth: 10 }, enemy: { startingHealth: 10 } },
     { user, enemy },
   );
 
@@ -435,7 +435,7 @@ describe('gainEffects', () => {
             comparison: '<',
             compareToPlayerValue: {
               target: 'self',
-              name: 'maxHealth',
+              name: 'startingHealth',
             },
             multiplier: 0.5,
           },

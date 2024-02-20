@@ -84,6 +84,7 @@ export interface CardEffects extends Partial<StatusEffects>, Conditional<CardEff
 
   damage?: number;
   heal?: number;
+  // TODO: implement random effects
   randomNegativeStatusEffects?: number;
   randomPositiveStatusEffects?: number;
   // cause target to trash X cards
@@ -105,7 +106,7 @@ export interface CardState {
 
 export interface PlayerState extends StatusEffects {
   health: number;
-  maxHealth: number;
+  startingHealth: number;
   cards: CardState[];
   currentCardIndex: number;
   cardsPlayedThisTurn: number;
@@ -130,15 +131,15 @@ export const BLEED_DAMAGE = 3;
 // the player with the highest health wins after this many turns
 export const MAX_TURNS_IN_BATTLE = 40;
 
-function createInitialPlayerState(): PlayerState {
-  const maxHealth = 100;
+export const STARTING_HEALTH = 20;
 
+function createInitialPlayerState(): PlayerState {
   return {
     cards: [],
     trashedCards: [],
     currentCardIndex: 0,
-    health: maxHealth,
-    maxHealth,
+    health: STARTING_HEALTH,
+    startingHealth: STARTING_HEALTH,
     cardsPlayedThisTurn: 0,
     ...EMPTY_STATUS_EFFECTS,
   };

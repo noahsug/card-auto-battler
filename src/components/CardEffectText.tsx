@@ -32,7 +32,7 @@ export const CARD_TEXT_SYMBOLS: Record<NameWithSymbol, string> = {
   trashSelf: 'trash this card',
 
   health: 'health',
-  maxHealth: 'max health',
+  startingHealth: 'max health',
   cards: 'cards in deck',
   currentCardIndex: 'cards in discard',
   cardsPlayedThisTurn: 'cards played this turn',

@@ -41,12 +41,12 @@ export function startBattle(game: GameState) {
 
   user.cards = shuffle([...user.cards, ...user.trashedCards]);
   user.trashedCards = [];
-  user.health = user.maxHealth;
+  user.health = user.startingHealth;
   user.currentCardIndex = 0;
 
   const enemyCards = getEnemyCardsForBattle(getBattleCount(game));
   enemy.cards = shuffle(enemyCards);
-  enemy.health = enemy.maxHealth;
+  enemy.health = enemy.startingHealth;
   enemy.currentCardIndex = 0;
 
   statusEffectNames.forEach((statusEffect) => {

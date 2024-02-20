@@ -84,8 +84,8 @@ export default function BattleScreen() {
           (isEnemyTurn && target === 'self') ||
           // user is doing damage to enemy
           (!isEnemyTurn && target === 'opponent');
-        const updateFunction = targetIsEnemy ? setEnemyDamageNumbers : setUserDamageNumbers;
-        updateFunction((current) => [...current, { value, type }]);
+        const setDamageNumbers = targetIsEnemy ? setEnemyDamageNumbers : setUserDamageNumbers;
+        setDamageNumbers((current) => [...current, { value, type }]);
 
         animationEventsAddedThisTurn.current = game.animationEvents.length;
       });

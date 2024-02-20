@@ -80,7 +80,7 @@ describe('card text', () => {
           comparison: '<',
           compareToPlayerValue: {
             target: 'self',
-            name: 'maxHealth',
+            name: 'startingHealth',
           },
           multiplier: 0.5,
         },
@@ -122,6 +122,27 @@ describe('card text', () => {
       );
 
       expect(card.textContent).toMatchInlineSnapshot(`"2⚔️+1x times for every self 💪"`);
+    });
+
+    it('renders double strength', () => {
+      const card = getCardElement(
+        createCard({
+          target: 'self',
+          gainEffectsList: [
+            {
+              effects: { strength: 1, trashSelf: true },
+              forEveryPlayerValue: {
+                target: 'self',
+                name: 'strength',
+              },
+            },
+          ],
+        }),
+      );
+
+      expect(card.textContent).toMatchInlineSnapshot(
+        `"+1💪, trash this card to self for every self 💪"`,
+      );
     });
 
     it('renders damage X times for every health', () => {

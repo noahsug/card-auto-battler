@@ -16,9 +16,11 @@ archtypes implemented
 
 - strength - multihit, double strength, applies strength twice
 - bleed - multihit, repeat, dmg for each bleed
-- low hp - self damage, 50% lifesteal when < 50% health
-- heal -
+- low hp - self damage, 50% lifesteal when < 50% health, set health to half
+- no self buffs - double damage if no self buffs, remove all self effects
+- mill (heal, dodge, trash) - heal 7 and deal damage for every health over max
 - trash -
+- multicard - +1 damage for each card played this turn
 
 ## simple card effects
 

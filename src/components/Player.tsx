@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function Player({ player, activeCard, children }: Props) {
-  const { health, maxHealth } = player;
+  const { health, startingHealth: startingHealth } = player;
   const card = activeCard || getCurrentCard(player);
 
   return (
@@ -22,7 +22,7 @@ export default function Player({ player, activeCard, children }: Props) {
         <Card card={card} isActive={!!activeCard} />
       </CardContainer>
       <StatusEffects statusEffects={player} />
-      <HealthBar health={health} maxHealth={maxHealth} />
+      <HealthBar health={health} startingHealth={startingHealth} />
       {children}
     </Root>
   );
