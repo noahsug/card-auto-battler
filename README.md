@@ -12,7 +12,7 @@ effects implemented
 - heal
 - lifesteal
 
-archtypes implemented
+archetypes implemented
 
 - strength - multihit, double strength, applies strength twice
 - bleed - multihit, repeat, dmg for each bleed
@@ -29,7 +29,7 @@ archtypes implemented
 - gain dodge whenever you deal more than X damage
 - dmg for each card played this turn
 
-## archtypes
+## archetypes
 
 - buff stacking (next dmg card is played twice, +2 dmg, applies bleed for each dmg, 2x damage, 25% lifesteal, etc)
 - ✅ bleed (hit 3 times, bleed 2, hit for each bleed, dmg causes bleed, 2x bleed)

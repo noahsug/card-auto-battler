@@ -2,26 +2,24 @@ import { cloneDeep } from 'lodash';
 
 import {
   AnimationEvent,
+  BattleStats,
   CardEffects,
+  Comparable,
+  EMPTY_BATTLE_STATS,
+  GainEffectsOptions,
   GameState,
+  IfBattleStatOptions,
+  IfPlayerValueOptions,
+  MAX_TURNS_IN_BATTLE,
   PlayerState,
+  PlayerValueIdentifier,
   Target,
   getActivePlayer,
   getCurrentCard,
   getNonActivePlayer,
   statusEffectNames,
-} from '../../gameState';
+} from '..';
 import { assert, getNonNullEntries } from '../../utils';
-import {
-  GainEffectsOptions,
-  MAX_TURNS_IN_BATTLE,
-  PlayerValueIdentifier,
-  BattleStats,
-  EMPTY_BATTLE_STATS,
-  IfBattleStatOptions,
-  IfPlayerValueOptions,
-  Comparable,
-} from '../gameState';
 
 interface PlayCardResult {
   battleStats: BattleStats;

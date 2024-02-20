@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 
 import Card from './Card';
-import { CardState, createCard } from '../gameState';
+import { CardState, createCard, cardsByName } from '../gameState';
 
 describe('card text', () => {
   function getCardElement(cardState: CardState) {
@@ -221,5 +221,11 @@ describe('card text', () => {
         `"3⚔️+3⚔️, trash this card if opponent 🩸 >= 3"`,
       );
     });
+  });
+
+  it.each(Object.entries(cardsByName))(`renders %s`, (_, cardState) => {
+    const card = getCardElement(cardState);
+
+    expect(card.textContent).toMatchSnapshot();
   });
 });

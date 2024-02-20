@@ -1,5 +1,7 @@
 import { PickByValue } from '../utils/types';
-import { createCard } from './utils';
+import { STARTING_HEALTH } from './constants';
+import { getStartingCards } from './cardSelection';
+import { getEnemyCardsForBattle } from './enemies';
 
 export type ScreenName = 'gameStart' | 'cardSelection' | 'battle' | 'battleEnd' | 'gameEnd';
 
@@ -123,16 +125,6 @@ export interface GameState {
   animationEvents: AnimationEvent[];
 }
 
-export const MAX_WINS = 3;
-export const MAX_LOSSES = 2;
-
-export const BLEED_DAMAGE = 3;
-
-// the player with the highest health wins after this many turns
-export const MAX_TURNS_IN_BATTLE = 40;
-
-export const STARTING_HEALTH = 20;
-
 function createInitialPlayerState(): PlayerState {
   return {
     cards: [],
@@ -145,53 +137,13 @@ function createInitialPlayerState(): PlayerState {
   };
 }
 
-const userCards: CardState[] = [
-  createCard({ target: 'self', heal: 3 }, { target: 'opponent', bleed: 3 }),
-];
-
-const enemyCardsByBattle: CardState[][] = [
-  [
-    createCard({ target: 'opponent', damage: 1 }),
-    createCard({ target: 'opponent', damage: 1 }),
-    createCard({ target: 'opponent', damage: 1 }),
-    createCard({ target: 'opponent', damage: 1 }),
-    createCard({ target: 'opponent', damage: 1 }),
-    createCard({ target: 'opponent', damage: 1 }),
-  ],
-  // 5 hits
-  [
-    createCard({ target: 'opponent', damage: 0 }),
-    createCard({ target: 'opponent', damage: 0 }),
-    createCard({ target: 'opponent', damage: 0 }),
-    createCard({ target: 'opponent', damage: 3 }),
-    createCard({ target: 'opponent', damage: 3 }),
-  ],
-  // 4 hits
-  [
-    createCard({ target: 'opponent', damage: 2 }),
-    createCard({ target: 'opponent', damage: 2 }),
-    createCard({ target: 'opponent', damage: 3 }),
-    createCard({ target: 'opponent', damage: 3 }),
-  ],
-  // 3 hits
-  [
-    createCard({ target: 'opponent', damage: 3 }),
-    createCard({ target: 'opponent', damage: 6 }),
-    createCard({ target: 'opponent', damage: 9 }),
-  ],
-];
-
-export function getEnemyCardsForBattle(battleCount: number) {
-  return enemyCardsByBattle[battleCount].slice();
-}
-
 export function getBattleCount(game: GameState) {
   return game.wins + game.losses;
 }
 
 export function createInitialGameState(): GameState {
   const user = createInitialPlayerState();
-  user.cards = userCards.slice();
+  user.cards = getStartingCards();
 
   const enemy = createInitialPlayerState();
   enemy.cards = getEnemyCardsForBattle(0);
@@ -205,35 +157,6 @@ export function createInitialGameState(): GameState {
     screen: 'gameStart',
     animationEvents: [],
   };
-}
-
-const cardSelectionsByBattle: CardState[][] = [];
-for (let i = 0; i < MAX_WINS + MAX_LOSSES - 1; i++) {
-  cardSelectionsByBattle[i] = [];
-  for (let j = 0; j < 6; j++) {
-    const damage = Math.round(6 * Math.random() * Math.random());
-    cardSelectionsByBattle[i].push(
-      createCard({
-        target: 'opponent',
-        damage,
-        bleed: 2,
-        activations: 0,
-        gainEffectsList: [
-          {
-            effects: { activations: 1 },
-            forEveryPlayerValue: {
-              target: 'opponent',
-              name: 'bleed',
-            },
-          },
-        ],
-      }),
-    );
-  }
-}
-
-export function getCardSelectionsForBattle(battleCount: number) {
-  return cardSelectionsByBattle[battleCount];
 }
 
 export function getIsEnemyTurn(game: GameState) {

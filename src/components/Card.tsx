@@ -141,7 +141,7 @@ function getIfText({ value, comparable }: { value: string; comparable: Comparabl
   const multiplierText = multiplier ? ` ${getMultiplierText(multiplier)}` : '';
 
   const compareToTextParts = [];
-  if (compareToValue) {
+  if (compareToValue != null) {
     compareToTextParts.push(compareToValue);
   }
 

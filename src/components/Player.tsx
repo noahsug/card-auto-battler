@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function Player({ player, activeCard, children }: Props) {
-  const { health, startingHealth: startingHealth } = player;
+  const { health, startingHealth } = player;
   const card = activeCard || getCurrentCard(player);
 
   return (

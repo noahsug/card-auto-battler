@@ -12,7 +12,7 @@ import {
   getCanPlayCard,
   getIsBattleOver,
   getIsEnemyTurn,
-} from '../gameState';
+} from '../index';
 import { createCard } from '../utils';
 
 function runBattle({

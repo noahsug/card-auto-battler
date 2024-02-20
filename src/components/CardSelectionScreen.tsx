@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import styled from 'styled-components';
 
-import { getCardSelectionsForBattle, getBattleCount } from '../gameState';
-import { useGameState, useActions } from './GameStateContext';
+import { getCardSelectionsForBattle } from '../gameState';
+import { useActions } from './GameStateContext';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen, Title } from './shared';
 import Card from './Card';
@@ -10,16 +10,14 @@ import { wait } from '../utils';
 import { useSequence } from '../hooks';
 
 import type { Sequence } from '../hooks';
-
-const CARDS_TO_SELECT = 2;
+import { CARD_SELECTION_PICKS } from '../gameState/constants';
 
 export default function CardSelectionScreen() {
-  const game = useGameState();
   const { addCard, startBattle } = useActions();
   const [selectedCardIndexes, setSelectedCardIndexes] = useState(new Set<number>());
 
-  const cards = getCardSelectionsForBattle(getBattleCount(game));
-  const canAddCards = selectedCardIndexes.size < CARDS_TO_SELECT;
+  const cards = getCardSelectionsForBattle();
+  const canAddCards = selectedCardIndexes.size < CARD_SELECTION_PICKS;
 
   const startBattleSequence: Sequence = useMemo(
     () => [
