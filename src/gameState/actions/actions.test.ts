@@ -14,6 +14,7 @@ import {
   getIsEnemyTurn,
 } from '../index';
 import { createCard } from '../utils';
+import { dodgeAndTrashCard } from '../cards';
 
 function runBattle({
   user,
@@ -153,6 +154,20 @@ describe('trash effect', () => {
 
     expect(endingState.user.cards.length).toBe(1);
     expect(startingState.enemy.health - endingState.enemy.health).toBe(3 + 3);
+  });
+
+  it('handles dodgeAndTrashCard', () => {
+    const damageCard = createCard({ target: 'opponent', damage: 1 });
+    const userCards = [dodgeAndTrashCard, damageCard, damageCard, damageCard];
+    const enemyCards = [damageCard, damageCard, damageCard, damageCard];
+    const { endingState, startingState } = runBattle({
+      user: { cards: userCards },
+      enemy: { cards: enemyCards },
+      stopAfterEnemyTurns: 1,
+    });
+
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(0);
+    expect(startingState.user.health - endingState.user.health).toBe(0);
   });
 
   it('causes a loss when no cards are left', () => {

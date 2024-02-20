@@ -43,7 +43,7 @@ export default function BattleScreen() {
     function playCardSequence() {
       setActivePlayerCard({ card: currentCard, isEnemyCard: isEnemyTurn });
       playCard();
-      return wait(1500);
+      return wait(2500);
     }
 
     return [

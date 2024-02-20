@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`card text renders appliesStrengthTwiceCard 1`] = `"3⚔️+1⚔️ to self for every self 💪"`;
+exports[`card text renders appliesStrengthTwiceCard 1`] = `"3⚔️+1⚔️ for every self 💪"`;
 
 exports[`card text renders bleedCard 1`] = `"2🩸"`;
 
@@ -22,7 +22,7 @@ exports[`card text renders damageForEachMissingHealthCard 1`] = `"12⚔️+-1⚔
 
 exports[`card text renders damageForEachTrashedCard 1`] = `"3⚔️+1⚔️ for every opponent trashed cards+1⚔️ for every self trashed cards"`;
 
-exports[`card text renders damageSelfIfMissCard 1`] = `"7⚔️4⚔️to selfif hits > 0"`;
+exports[`card text renders damageSelfIfMissCard 1`] = `"7⚔️4⚔️to selfif hits = 0"`;
 
 exports[`card text renders damageStarterCard 1`] = `"3⚔️"`;
 
@@ -50,7 +50,7 @@ exports[`card text renders extraPlayIfBleedCard 1`] = `"4⚔️+1🃏 to self if
 
 exports[`card text renders extraPlayIfExtraPlayCard 1`] = `"1⚔️1🃏+1🃏 to self if self cards played this turn > 0"`;
 
-exports[`card text renders extraPlayIfLowHealthCard 1`] = `"3⚔️+2🃏 to self if self health <= 50% self max health"`;
+exports[`card text renders extraPlayIfLowHealthCard 1`] = `"3⚔️+3🃏 to self if self health <= 50% self max health"`;
 
 exports[`card text renders extraPlayStarterCard 1`] = `"1⚔️1🃏to self"`;
 
@@ -74,7 +74,7 @@ exports[`card text renders multihitStarterCard 1`] = `"1⚔️2x times"`;
 
 exports[`card text renders plusHealForEachTrashedCard 1`] = `"4❤️+1❤️ to self for every opponent trashed cards"`;
 
-exports[`card text renders selfDamageCard 1`] = `"7⚔️to self4⚔️to selfif self health > 50% self max health"`;
+exports[`card text renders selfDamageCard 1`] = `"7⚔️4⚔️to selfif self health > 50% self max health"`;
 
 exports[`card text renders setHealthToHalfCard 1`] = `"1🃏+1⚔️ to self for every self health+1❤️ to self for every 2 self max health"`;
 

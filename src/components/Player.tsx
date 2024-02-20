@@ -4,7 +4,7 @@ import Card from './Card';
 import HealthBar from './HealthBar';
 import StatusEffects from './StatusEffects';
 import { Screen } from './shared';
-import { getCurrentCard, CardState, PlayerState } from '../gameState';
+import { getCurrentCard, CardState, PlayerState, createCard } from '../gameState';
 
 interface Props {
   player: PlayerState;
@@ -12,9 +12,11 @@ interface Props {
   children?: React.ReactNode;
 }
 
+const EMPTY_CARD = createCard();
+
 export default function Player({ player, activeCard, children }: Props) {
   const { health, startingHealth } = player;
-  const card = activeCard || getCurrentCard(player);
+  const card = activeCard || getCurrentCard(player) || EMPTY_CARD;
 
   return (
     <Root>

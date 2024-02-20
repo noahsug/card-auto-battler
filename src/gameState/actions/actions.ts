@@ -13,7 +13,7 @@ import {
 } from '../';
 import { assert } from '../../utils';
 import playCardHelper from './playCard';
-import { resetGameStateFromBattle } from '../gameState';
+import { statusEffectNames } from '../gameState';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
@@ -25,6 +25,7 @@ export function startGame(game: GameState) {
 
 export function startCardSelection(game: GameState) {
   game.turn = 0;
+  resetGameState(game);
 
   game.screen = 'cardSelection';
 }
@@ -35,9 +36,9 @@ export function addCard(game: GameState, card: CardState) {
 
 export function startBattle(game: GameState) {
   game.screen = 'battle';
-  const { enemy } = game;
+  const { enemy, user } = game;
 
-  resetGameStateFromBattle(game);
+  user.cards = shuffle(user.cards);
 
   const enemyCards = getEnemyCardsForBattle(getBattleCount(game));
   enemy.cards = shuffle(enemyCards);
@@ -68,7 +69,24 @@ export function endBattle(game: GameState) {
     throw new Error('endBattle called, but neither player is dead');
   }
 
-  resetGameStateFromBattle(game);
-
   game.screen = game.wins >= MAX_WINS || game.losses >= MAX_LOSSES ? 'gameEnd' : 'battleEnd';
+}
+
+function resetGameState(game: GameState) {
+  const { user, enemy } = game;
+
+  user.cards = [...user.cards, ...user.trashedCards];
+  user.trashedCards = [];
+  user.health = user.startingHealth;
+  user.currentCardIndex = 0;
+
+  enemy.health = enemy.startingHealth;
+  enemy.currentCardIndex = 0;
+
+  statusEffectNames.forEach((statusEffect) => {
+    user[statusEffect] = 0;
+    enemy[statusEffect] = 0;
+  });
+
+  game.animationEvents = [];
 }

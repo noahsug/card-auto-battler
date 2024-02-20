@@ -31,6 +31,7 @@ import {
   damageForEachMissingHealthCard,
   doubleDodgeIfLowHealthCard,
   extraPlaysTrashCard,
+  extraPlayIfExtraPlayCard,
 } from './cards';
 import { getStartingCards, getCardSelectionsForBattle } from './cardSelection';
 import { CARD_SELECTION_PICKS } from './constants';
@@ -58,7 +59,6 @@ const generallyGoodCards = [
   extraPlayHealCard,
   trashAndExtraPlayCard,
   selfDamageCard,
-  extraPlayIfLowHealthCard,
   damageForEachMissingHealthCard,
   doubleDodgeIfLowHealthCard,
   strengthTrashCard,
@@ -66,6 +66,7 @@ const generallyGoodCards = [
   bleedTrashCard,
   bleedCard,
   multihitCard,
+  extraPlayIfExtraPlayCard,
 ];
 
 const cardPriorityByType = {
@@ -119,7 +120,7 @@ export function getEnemyCardsForBattle(battleCount: number) {
     cards.push(...pickCards(enemyType));
   }
 
-  console.log('enemyType', enemyType);
+  console.log('enemyType', enemyType, cards.map(getCardName).join(', '));
 
   return cards;
 }

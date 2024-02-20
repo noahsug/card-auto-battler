@@ -96,7 +96,7 @@ export const damageSelfIfMissCard = createCard(
     damage: 4,
     ifBattleStat: {
       name: 'numberOfHits',
-      comparison: '>',
+      comparison: '=',
       compareToValue: 0,
     },
   },
@@ -120,7 +120,7 @@ export const doubleStrengthCard = createCard({
 });
 
 export const appliesStrengthTwiceCard = createCard({
-  target: 'self',
+  target: 'opponent',
   damage: 3,
   gainEffectsList: [
     {
@@ -238,21 +238,26 @@ export const bothBleedCard = createCard(
   },
 );
 
-export const extraPlayIfBleedCard = createCard({
-  target: 'self',
-  damage: 4,
-  gainEffectsList: [
-    {
-      effects: { extraCardPlays: 1 },
-      ifPlayerValue: {
-        target: 'opponent',
-        name: 'bleed',
-        comparison: '>',
-        compareToValue: 0,
+export const extraPlayIfBleedCard = createCard(
+  {
+    target: 'opponent',
+    damage: 4,
+  },
+  {
+    target: 'self',
+    gainEffectsList: [
+      {
+        effects: { extraCardPlays: 1 },
+        ifPlayerValue: {
+          target: 'opponent',
+          name: 'bleed',
+          comparison: '>',
+          compareToValue: 0,
+        },
       },
-    },
-  ],
-});
+    ],
+  },
+);
 
 const bleedCards = {
   damageForEachBleedCard,
@@ -265,7 +270,7 @@ const bleedCards = {
 // low HP
 
 export const selfDamageCard = createCard(
-  { target: 'self', damage: 7 },
+  { target: 'opponent', damage: 7 },
   {
     target: 'self',
     damage: 4,
@@ -307,7 +312,7 @@ export const extraPlayIfLowHealthCard = createCard({
   damage: 3,
   gainEffectsList: [
     {
-      effects: { extraCardPlays: 2 },
+      effects: { extraCardPlays: 3 },
       ifPlayerValue: {
         target: 'self',
         name: 'health',
