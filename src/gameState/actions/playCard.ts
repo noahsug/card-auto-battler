@@ -29,19 +29,19 @@ interface PlayCardResult {
 }
 
 export default function playCard(game: GameState) {
-  const activePlayer = getActivePlayer(game);
-  const nonActivePlayer = getNonActivePlayer(game);
-  const card = getCurrentCard(activePlayer);
+  const self = getActivePlayer(game);
+  const opponent = getNonActivePlayer(game);
+  const card = getCurrentCard(self);
 
   // die if out of cards
   if (card == null) {
-    activePlayer.health = 0;
+    self.health = 0;
     return;
   }
 
-  if (activePlayer.cardsPlayedThisTurn > 0) {
-    assert(activePlayer.extraCardPlays > 0);
-    activePlayer.extraCardPlays -= 1;
+  if (self.cardsPlayedThisTurn > 0) {
+    assert(self.extraCardPlays > 0);
+    self.extraCardPlays -= 1;
   }
 
   const result: PlayCardResult = {
@@ -52,27 +52,27 @@ export default function playCard(game: GameState) {
 
   card.effects.forEach((cardEffects) => {
     handleCardEffects({
-      activePlayer,
-      nonActivePlayer,
+      self: self,
+      opponent: opponent,
       cardEffects,
       result,
     });
   });
 
-  activePlayer.cardsPlayedThisTurn += 1;
+  self.cardsPlayedThisTurn += 1;
 
   game.animationEvents.push(...result.events);
 
-  if (activePlayer.cards.length === 0) return;
+  if (self.cards.length === 0) return;
 
   if (result.trashSelf) {
-    trashCurrentCard(activePlayer);
+    trashCurrentCard(self);
   }
 
-  activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
+  self.currentCardIndex = (self.currentCardIndex + 1) % self.cards.length;
 
-  if (activePlayer.currentCardIndex === 0) {
-    activePlayer.cards = shuffle(activePlayer.cards);
+  if (self.currentCardIndex === 0) {
+    self.cards = shuffle(self.cards);
   }
 
   // end game after max turns
@@ -83,21 +83,30 @@ export default function playCard(game: GameState) {
 }
 
 function handleCardEffects({
-  activePlayer,
-  nonActivePlayer,
+  self,
+  opponent,
   cardEffects,
   result,
 }: {
-  activePlayer: PlayerState;
-  nonActivePlayer: PlayerState;
+  self: PlayerState;
+  opponent: PlayerState;
   cardEffects: CardEffects;
   result: PlayCardResult;
 }) {
+  const { ifPlayerValue, ifBattleStat } = cardEffects;
+
+  if (ifPlayerValue && !evalPlayerValueConditional({ self, opponent, result, ifPlayerValue })) {
+    return cardEffects;
+  }
+  if (ifBattleStat && !evalBattleStatConditional({ self, opponent, result, ifBattleStat })) {
+    return cardEffects;
+  }
+
   const resultingCardEffects = cloneDeep(cardEffects);
   cardEffects.gainEffectsList?.forEach((gainEffectsOptions) => {
     gainEffects({
-      self: activePlayer,
-      opponent: nonActivePlayer,
+      self,
+      opponent,
       cardEffects: resultingCardEffects,
       gainEffectsOptions,
       result,
@@ -106,8 +115,8 @@ function handleCardEffects({
 
   for (let i = 0; i < (resultingCardEffects.activations ?? 1); i++) {
     applyCardEffects({
-      self: activePlayer,
-      opponent: nonActivePlayer,
+      self,
+      opponent,
       cardEffects: resultingCardEffects,
       result,
     });
@@ -144,7 +153,6 @@ function gainEffects({
   if (ifPlayerValue && !evalPlayerValueConditional({ self, opponent, result, ifPlayerValue })) {
     return cardEffects;
   }
-
   if (ifBattleStat && !evalBattleStatConditional({ self, opponent, result, ifBattleStat })) {
     return cardEffects;
   }

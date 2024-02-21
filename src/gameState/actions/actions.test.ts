@@ -14,7 +14,7 @@ import {
   getIsEnemyTurn,
 } from '../index';
 import { createCard } from '../utils';
-import { dodgeAndTrashCard, healForEachTrashedCard } from '../cards';
+import { dodgeAndTrashCard, healForEachTrashedCard, damageSelfIfMissCard } from '../cards';
 
 const damage0 = createCard({ target: 'opponent', damage: 0 });
 const damage1 = createCard({ target: 'opponent', damage: 1 });
@@ -531,4 +531,17 @@ it('handles healForEachTrashedCard', () => {
   });
 
   expect(endingState.user.health - startingState.user.health).toBe(4 + 1 * 4);
+});
+
+it('handles damageSelfIfMissCard', () => {
+  const userCards = [damageSelfIfMissCard];
+  const enemyCards = [createCard({ target: 'self', dodge: 1 })];
+
+  const { endingState, startingState } = runBattle({
+    user: { cards: userCards },
+    enemy: { cards: enemyCards },
+    stopAfterNUserCardsPlayed: 3,
+  });
+
+  expect(startingState.user.health - endingState.user.health).toBe(8);
 });

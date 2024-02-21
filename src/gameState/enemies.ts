@@ -25,7 +25,6 @@ import {
   extraPlayHealCard,
   healForEachTrashedCard,
   extraPlayIfLowHealthCard,
-  getCardName,
   trashAndExtraPlayCard,
   selfDamageCard,
   damageForEachMissingHealthCard,
