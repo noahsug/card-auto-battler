@@ -9,7 +9,10 @@ export const healStarterCard = createCard({ target: 'self', heal: 4 });
 
 export const dodgeStarterCard = createCard({ target: 'self', dodge: 1 });
 
-export const extraPlayStarterCard = createCard({ target: 'self', extraCardPlays: 1, damage: 1 });
+export const extraPlayStarterCard = createCard(
+  { target: 'opponent', damage: 1 },
+  { target: 'self', extraCardPlays: 1 },
+);
 
 export const bleedStarterCard = createCard({ target: 'opponent', bleed: 1 });
 
@@ -41,7 +44,10 @@ const starterCards = {
 
 export const damageCard = createCard({ target: 'opponent', damage: 5 });
 
-export const extraPlayCard = createCard({ target: 'self', extraCardPlays: 1, damage: 2 });
+export const extraPlayCard = createCard(
+  { target: 'opponent', damage: 2 },
+  { target: 'self', extraCardPlays: 1 },
+);
 
 export const healCard = createCard({ target: 'self', heal: 7 });
 

@@ -120,7 +120,7 @@ export function getEnemyCardsForBattle(battleCount: number) {
     cards.push(...pickCards(enemyType));
   }
 
-  console.log('enemyType', enemyType, cards.map(getCardName).join(', '));
+  // console.log('enemyType', enemyType, cards.map(getCardName).join(', '));
 
   return cards;
 }
@@ -138,7 +138,6 @@ function pickCards(enemyType: EnemyType) {
         // iterate through each priority card since there may be duplicates
         return cardOptions.find((card) => {
           if (card === priorityCard) {
-            console.log('pick', i, getCardName(card));
             selectedCards.push(card);
           }
           return selectedCards.length >= CARD_SELECTION_PICKS;
@@ -152,8 +151,6 @@ function pickCards(enemyType: EnemyType) {
   for (let i = selectedCards.length; i < CARD_SELECTION_PICKS; i++) {
     const randomCard = cardOptions[Math.floor(Math.random() * cardOptions.length)];
     selectedCards.push(randomCard);
-    console.log('pick', '-1', getCardName(randomCard));
-    console.log(cardOptions.map(getCardName).join(', '));
   }
 
   return selectedCards;

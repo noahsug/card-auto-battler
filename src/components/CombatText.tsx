@@ -28,12 +28,12 @@ const Root = styled.div<{ $xOffset: number; $yOffset: number; $type: Props['type
   right: 0;
   margin: auto;
 
-  animation: fadeOut 0.75s forwards;
+  animation: fadeOut 1s forwards;
   @keyframes fadeOut {
-    80% {
+    70% {
       opacity: 1;
     }
-    95% {
+    90% {
       opacity: 0.3;
     }
     100% {

@@ -1,4 +1,5 @@
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import shuffle from 'lodash/shuffle';
 
 import {
   AnimationEvent,
@@ -58,6 +59,8 @@ export default function playCard(game: GameState) {
     });
   });
 
+  activePlayer.cardsPlayedThisTurn += 1;
+
   game.animationEvents.push(...result.events);
 
   if (activePlayer.cards.length === 0) return;
@@ -67,7 +70,10 @@ export default function playCard(game: GameState) {
   }
 
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
-  activePlayer.cardsPlayedThisTurn += 1;
+
+  if (activePlayer.currentCardIndex === 0) {
+    activePlayer.cards = shuffle(activePlayer.cards);
+  }
 
   // end game after max turns
   if (game.turn + 1 >= MAX_TURNS_IN_BATTLE) {
@@ -289,7 +295,7 @@ function applyCardEffects({
   const targetPlayer = target === 'self' ? self : opponent;
 
   // damage
-  if (damage != null && damage > 0) {
+  if (damage != null) {
     // dodge doesn't apply to self damage
     if (cardEffects.target === 'opponent' && opponent.dodge > 0) {
       opponent.dodge -= 1;
@@ -389,13 +395,17 @@ function trashCards({
   const removeFromFront = Math.max(trashStart + trash - cards.length, 0);
 
   targetPlayer.cards = cards.filter((_, i) => {
-    // trash cards after or at the current card
-    if (i >= trashStart && i < trashStart + trash) return false;
+    const removeCard =
+      // trash cards after or at the current card
+      (i >= trashStart && i < trashStart + trash) ||
+      // trash cards from the front of the deck
+      i < removeFromFront;
 
-    // trash cards from the front of the deck
-    if (i < removeFromFront) return false;
+    if (removeCard) {
+      targetPlayer.trashedCards.push(cards[i]);
+    }
 
-    return true;
+    return !removeCard;
   });
 
   targetPlayer.currentCardIndex = Math.max(currentCardIndex - removeFromFront, 0);

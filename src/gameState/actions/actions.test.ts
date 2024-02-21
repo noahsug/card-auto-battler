@@ -1,4 +1,4 @@
-import clonedeep from 'lodash/clonedeep';
+import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
 
 import { endTurn, playCard, startGame, startBattle, startTurn } from './actions';
@@ -40,7 +40,7 @@ function runBattle({
   startGame(game);
   startBattle(game);
 
-  const startingState = clonedeep(game);
+  const startingState = cloneDeep(game);
 
   // unshuffle the cards
   game.user.cards = user?.cards || [createCard({ target: 'opponent', damage: 0 })];
@@ -130,7 +130,7 @@ describe('trash effect', () => {
     const userCards = [
       createCard({ target: 'opponent', damage: 1 }),
       createCard({ target: 'opponent', damage: 2 }),
-      createCard({ trash: 4, target: 'self' }, { target: 'opponent', damage: 3 }),
+      createCard({ trash: 4, target: 'self' }, { target: 'opponent', damage: 2 }),
       createCard({ target: 'opponent', damage: 4 }),
       createCard({ target: 'opponent', damage: 5 }),
       createCard({ target: 'opponent', damage: 6 }),
@@ -140,8 +140,8 @@ describe('trash effect', () => {
       stopAfterNUserCardsPlayed: 4,
     });
 
-    expect(endingState.user.cards.length).toBe(2);
-    expect(startingState.enemy.health - endingState.enemy.health).toBe(1 + 2 + 3 + 2);
+    expect(endingState.user.cards.length).toBeLessThanOrEqual(2); // 2 or 0
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(1 + 2 + 2 + 2);
   });
 
   it('trashes current card when no other cards are left', () => {
@@ -491,4 +491,28 @@ describe('max turns in battle', () => {
 
     expect(endingState.user.health).toBe(0);
   });
+});
+
+it('shuffles cards after playing through the deck', () => {
+  const userCards = [
+    createCard({ target: 'opponent', damage: 1 }),
+    createCard({ target: 'opponent', damage: 2 }),
+    createCard({ target: 'opponent', damage: 3 }),
+  ];
+
+  let endingState;
+  for (let i = 0; i < 100; i++) {
+    const result = runBattle({
+      user: { cards: userCards.slice() },
+      stopAfterUserTurns: 4,
+    });
+    endingState = result.endingState;
+
+    if (endingState.user.cards[0] !== userCards[0]) {
+      // run until the cards have been shuffled differently
+      break;
+    }
+  }
+
+  expect(endingState?.user.cards).not.toEqual(userCards);
 });
