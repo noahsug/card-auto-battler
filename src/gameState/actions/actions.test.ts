@@ -110,7 +110,7 @@ describe('dodge effect', () => {
   });
 });
 
-describe('trash effect', () => {
+describe('trash self effect', () => {
   it('trashes the played card', () => {
     const userCards = [
       createCard({ trashSelf: true, target: 'opponent', damage: 3 }),
@@ -123,7 +123,9 @@ describe('trash effect', () => {
 
     expect(startingState.enemy.health - endingState.enemy.health).toBe(3 + 1 + 1);
   });
+});
 
+describe('trash effect', () => {
   it('trashes next two cards', () => {
     const userCards = [
       createCard({ target: 'opponent', damage: 1 }),
@@ -142,24 +144,22 @@ describe('trash effect', () => {
     expect(startingState.enemy.health - endingState.enemy.health).toBe(1 + 2 + 3 + 2);
   });
 
-  it('trash X does not trash current card', () => {
-    const userCards = [
+  it('trashes current card when no other cards are left', () => {
+    const { endingState } = playCards([
       createCard({ trash: 4, target: 'self' }, { target: 'opponent', damage: 3 }),
       createCard({ target: 'opponent', damage: 1 }),
-    ];
-    const { endingState, startingState } = runBattle({
-      user: { cards: userCards },
-      stopAfterNUserCardsPlayed: 2,
-    });
+    ]);
 
-    expect(endingState.user.cards.length).toBe(1);
-    expect(startingState.enemy.health - endingState.enemy.health).toBe(3 + 3);
+    expect(endingState.user.cards.length).toBe(0);
+    expect(endingState.user.health).toBe(0);
   });
 
   it('handles dodgeAndTrashCard', () => {
     const damageCard = createCard({ target: 'opponent', damage: 1 });
+
     const userCards = [dodgeAndTrashCard, damageCard, damageCard, damageCard];
     const enemyCards = [damageCard, damageCard, damageCard, damageCard];
+
     const { endingState, startingState } = runBattle({
       user: { cards: userCards },
       enemy: { cards: enemyCards },
@@ -172,6 +172,7 @@ describe('trash effect', () => {
 
   it('causes a loss when no cards are left', () => {
     const userCards = [createCard({ trashSelf: true, target: 'opponent', damage: 1 })];
+
     const { endingState } = runBattle({
       user: { cards: userCards },
       stopAfterUserTurns: 2,
@@ -182,6 +183,7 @@ describe('trash effect', () => {
 
   it('causes a win when the opponent has no cards left', () => {
     const userCards = [createCard({ target: 'opponent', trash: 1 })];
+
     const { endingState } = runBattle({
       user: { cards: userCards },
       stopAfterEnemyTurns: 1,
@@ -192,6 +194,7 @@ describe('trash effect', () => {
 
   it('does not cause a loss when final trashed card wins the game', () => {
     const userCards = [createCard({ trashSelf: true, target: 'opponent', damage: 10 })];
+
     const { endingState } = runBattle({
       user: { cards: userCards },
       stopAfterUserTurns: 2,

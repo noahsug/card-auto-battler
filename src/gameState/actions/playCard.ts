@@ -58,14 +58,16 @@ export default function playCard(game: GameState) {
     });
   });
 
+  game.animationEvents.push(...result.events);
+
+  if (activePlayer.cards.length === 0) return;
+
   if (result.trashSelf) {
     trashCurrentCard(activePlayer);
   }
 
   activePlayer.currentCardIndex = (activePlayer.currentCardIndex + 1) % activePlayer.cards.length;
   activePlayer.cardsPlayedThisTurn += 1;
-
-  game.animationEvents.push(...result.events);
 
   // end game after max turns
   if (game.turn + 1 >= MAX_TURNS_IN_BATTLE) {
@@ -382,12 +384,8 @@ function trashCards({
   const targetPlayer = target === 'self' ? self : opponent;
   const { cards, currentCardIndex } = targetPlayer;
 
-  // don't trash the current card if it's actively being played
-  const maxCardsToTrash = target === 'self' ? cards.length - 1 : cards.length;
-  trash = Math.min(trash, maxCardsToTrash);
-
   const trashStart = target === 'self' ? currentCardIndex + 1 : currentCardIndex;
-  const removeFromFront = trashStart + trash - cards.length;
+  const removeFromFront = Math.max(trashStart + trash - cards.length, 0);
 
   targetPlayer.cards = cards.filter((_, i) => {
     // trash cards after or at the current card
@@ -399,7 +397,7 @@ function trashCards({
     return true;
   });
 
-  targetPlayer.currentCardIndex -= removeFromFront;
+  targetPlayer.currentCardIndex = Math.max(currentCardIndex - removeFromFront, 0);
 }
 
 function trashCurrentCard(player: PlayerState) {
