@@ -60,7 +60,7 @@ exports[`card text renders gainStrengthForBleedCard 1`] = `"+1💪 to self for e
 
 exports[`card text renders healCard 1`] = `"7❤️to self"`;
 
-exports[`card text renders healForEachTrashedCard 1`] = `"4❤️+1❤️ for every opponent trashed cards+1❤️ for every self trashed cards"`;
+exports[`card text renders healForEachTrashedCard 1`] = `"4❤️+1❤️ to self for every opponent trashed cards+1❤️ to self for every self trashed cards"`;
 
 exports[`card text renders healStarterCard 1`] = `"4❤️to self"`;
 

@@ -17,6 +17,7 @@ import { statusEffectNames } from '../gameState';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
+  game.user.trashedCards = [];
   startCardSelection(game);
 
   game.losses = 0;
@@ -80,6 +81,7 @@ function resetGameState(game: GameState) {
   user.health = user.startingHealth;
   user.currentCardIndex = 0;
 
+  enemy.trashedCards = [];
   enemy.health = enemy.startingHealth;
   enemy.currentCardIndex = 0;
 

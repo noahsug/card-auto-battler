@@ -491,7 +491,7 @@ export const damageForEachTrashedCard = createCard({
 });
 
 export const healForEachTrashedCard = createCard({
-  target: 'opponent',
+  target: 'self',
   heal: 4,
   gainEffectsList: [
     {

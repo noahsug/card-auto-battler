@@ -14,7 +14,10 @@ import {
   getIsEnemyTurn,
 } from '../index';
 import { createCard } from '../utils';
-import { dodgeAndTrashCard } from '../cards';
+import { dodgeAndTrashCard, healForEachTrashedCard } from '../cards';
+
+const damage0 = createCard({ target: 'opponent', damage: 0 });
+const damage1 = createCard({ target: 'opponent', damage: 1 });
 
 function runBattle({
   user,
@@ -43,8 +46,8 @@ function runBattle({
   const startingState = cloneDeep(game);
 
   // unshuffle the cards
-  game.user.cards = user?.cards || [createCard({ target: 'opponent', damage: 0 })];
-  game.enemy.cards = enemy?.cards || [createCard({ target: 'opponent', damage: 0 })];
+  game.user.cards = user?.cards || [damage0];
+  game.enemy.cards = enemy?.cards || [damage0];
 
   let userCardsPlayed = 0;
   stopAfterTurns = Math.min(stopAfterTurns, stopAfterUserTurns * 2 - 1, stopAfterEnemyTurns * 2);
@@ -76,9 +79,7 @@ function playCards(cards: CardState[]) {
 
 describe('damage effect', () => {
   it('reduces opponent health', () => {
-    const { endingState, startingState } = playCards([
-      createCard({ target: 'opponent', damage: 1 }),
-    ]);
+    const { endingState, startingState } = playCards([damage1]);
 
     expect(startingState.enemy.health - endingState.enemy.health).toBe(1);
   });
@@ -99,7 +100,7 @@ describe('heal effect', () => {
 describe('dodge effect', () => {
   it('dodges the next source of damage', () => {
     const userCards: CardState[] = [createCard({ target: 'self', dodge: 1 })];
-    const enemyCards: CardState[] = [createCard({ target: 'opponent', damage: 1 })];
+    const enemyCards: CardState[] = [damage1];
     const { endingState, startingState } = runBattle({
       user: { cards: userCards },
       enemy: { cards: enemyCards },
@@ -112,10 +113,7 @@ describe('dodge effect', () => {
 
 describe('trash self effect', () => {
   it('trashes the played card', () => {
-    const userCards = [
-      createCard({ trashSelf: true, target: 'opponent', damage: 3 }),
-      createCard({ target: 'opponent', damage: 1 }),
-    ];
+    const userCards = [createCard({ trashSelf: true, target: 'opponent', damage: 3 }), damage1];
     const { endingState, startingState } = runBattle({
       user: { cards: userCards },
       stopAfterUserTurns: 3,
@@ -147,7 +145,7 @@ describe('trash effect', () => {
   it('trashes current card when no other cards are left', () => {
     const { endingState } = playCards([
       createCard({ trash: 4, target: 'self' }, { target: 'opponent', damage: 3 }),
-      createCard({ target: 'opponent', damage: 1 }),
+      damage1,
     ]);
 
     expect(endingState.user.cards.length).toBe(0);
@@ -155,7 +153,7 @@ describe('trash effect', () => {
   });
 
   it('handles dodgeAndTrashCard', () => {
-    const damageCard = createCard({ target: 'opponent', damage: 1 });
+    const damageCard = damage1;
 
     const userCards = [dodgeAndTrashCard, damageCard, damageCard, damageCard];
     const enemyCards = [damageCard, damageCard, damageCard, damageCard];
@@ -227,7 +225,7 @@ describe('bleed status effect', () => {
   it('deals flat damage when damage is dealt', () => {
     const { endingState, startingState } = playCards([
       createCard({ target: 'opponent', bleed: 50 }),
-      createCard({ target: 'opponent', damage: 1 }),
+      damage1,
     ]);
     expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE + 1);
   });
@@ -236,7 +234,7 @@ describe('bleed status effect', () => {
     const { endingState, startingState } = playCards([
       createCard({ target: 'opponent', bleed: 2 }),
       createCard({ target: 'opponent', activations: 2, damage: 1 }), // 7 damage
-      createCard({ target: 'opponent', damage: 1 }), // 1 damage
+      damage1, // 1 damage
     ]);
     expect(startingState.enemy.health - endingState.enemy.health).toBe(BLEED_DAMAGE * 2 + 3);
   });
@@ -254,7 +252,7 @@ describe('strength status effect', () => {
   it('increases card damage by N', () => {
     const { endingState, startingState } = playCards([
       createCard({ target: 'self', strength: 1 }),
-      createCard({ target: 'opponent', damage: 1 }),
+      damage1,
     ]);
 
     expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
@@ -264,7 +262,7 @@ describe('strength status effect', () => {
     const { endingState, startingState } = playCards([
       createCard({ target: 'opponent', damage: 1 }, { target: 'self', strength: 1 }), // 1 dmg
       createCard({ target: 'self', strength: 1 }, { target: 'opponent', damage: 1 }), // 3 dmg
-      createCard({ target: 'opponent', damage: 0 }), // 2 dmg
+      damage0, // 2 dmg
     ]);
 
     expect(startingState.enemy.health - endingState.enemy.health).toBe(6);
@@ -275,7 +273,7 @@ describe('extraCardPlays status effect', () => {
   it('plays an extra card', () => {
     const userCards: CardState[] = [
       createCard({ target: 'opponent', damage: 1 }, { target: 'self', extraCardPlays: 1 }),
-      createCard({ target: 'opponent', damage: 1 }),
+      damage1,
       createCard({ target: 'opponent', damage: 10 }), // should not be played
     ];
     const { endingState, startingState } = runBattle({
@@ -474,7 +472,7 @@ describe('max turns in battle', () => {
   it('ends the game after X turns with the user winning if they have more health', () => {
     const userCards: CardState[] = [
       createCard({ trashSelf: true, target: 'opponent', damage: 1 }),
-      createCard({ target: 'opponent', damage: 0 }),
+      damage0,
     ];
     const { endingState } = runBattle({
       user: { cards: userCards },
@@ -515,4 +513,22 @@ it('shuffles cards after playing through the deck', () => {
   }
 
   expect(endingState?.user.cards).not.toEqual(userCards);
+});
+
+it('handles healForEachTrashedCard', () => {
+  const userCards = [
+    createCard({ target: 'opponent', trash: 2 }, { target: 'self', trash: 2 }),
+    damage1,
+    damage1,
+    healForEachTrashedCard,
+  ];
+  const enemyCards = [damage0, damage0, damage0];
+
+  const { endingState, startingState } = runBattle({
+    user: { cards: userCards },
+    enemy: { cards: enemyCards },
+    stopAfterNUserCardsPlayed: 2,
+  });
+
+  expect(endingState.user.health - startingState.user.health).toBe(4 + 1 * 4);
 });

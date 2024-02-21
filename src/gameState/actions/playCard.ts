@@ -164,7 +164,7 @@ function gainEffects({
     } else {
       const defaultValue = name === 'activations' ? 1 : 0;
       const currentValue = cardEffects[name] ?? defaultValue;
-      cardEffects[name] = currentValue + (value * multiplier) / divisor;
+      cardEffects[name] = currentValue + Math.floor((value * multiplier) / divisor);
     }
   });
 
