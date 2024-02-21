@@ -4,12 +4,15 @@ import { AnimationEvent } from '../gameState/gameState';
 
 export type Props = Omit<AnimationEvent, 'target'>;
 
-export default function DamageNumber({ value, type }: Props) {
+export default function CombatText({ value, type }: Props) {
   const [[xOffset, yOffset]] = useState([Math.random(), Math.random()]);
+
+  // "miss" or damage/heal number
+  const text = value || type;
 
   return (
     <Root $xOffset={xOffset} $yOffset={yOffset} $type={type}>
-      {value}
+      {text}
     </Root>
   );
 }

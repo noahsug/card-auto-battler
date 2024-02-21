@@ -5,9 +5,9 @@ import { getStartingCards } from './cardSelection';
 export type ScreenName = 'gameStart' | 'cardSelection' | 'battle' | 'battleEnd' | 'gameEnd';
 
 export interface AnimationEvent {
-  type: 'damage' | 'heal';
+  type: 'damage' | 'heal' | 'miss';
   target: Target;
-  value: number;
+  value?: number;
 }
 
 export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength'] as const;

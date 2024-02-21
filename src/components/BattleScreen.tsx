@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGameState, useActions } from './GameStateContext';
 import Player from './Player';
-import DamageNumber, { Props as DamageNumberProps } from './DamageNumber';
+import CombatText, { Props as CombatTextProps } from './CombatText';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen } from './shared';
 import {
@@ -24,8 +24,8 @@ export default function BattleScreen() {
   const [activePlayerCard, setActivePlayerCard] = useState<
     { card: CardState; isEnemyCard: boolean } | undefined
   >();
-  const [userDamageNumbers, setUserDamageNumbers] = useState<DamageNumberProps[]>([]);
-  const [enemyDamageNumbers, setEnemyDamageNumbers] = useState<DamageNumberProps[]>([]);
+  const [userCombatTexts, setUserCombatTexts] = useState<CombatTextProps[]>([]);
+  const [enemyCombatTexts, setEnemyCombatTexts] = useState<CombatTextProps[]>([]);
   const animationEventsAddedThisTurn = useRef(0);
 
   const isBattleOver = getIsBattleOver(game);
@@ -84,8 +84,8 @@ export default function BattleScreen() {
           (isEnemyTurn && target === 'self') ||
           // user is doing damage to enemy
           (!isEnemyTurn && target === 'opponent');
-        const setDamageNumbers = targetIsEnemy ? setEnemyDamageNumbers : setUserDamageNumbers;
-        setDamageNumbers((current) => [...current, { value, type }]);
+        const setCombatTexts = targetIsEnemy ? setEnemyCombatTexts : setUserCombatTexts;
+        setCombatTexts((current) => [...current, { value, type }]);
 
         animationEventsAddedThisTurn.current = game.animationEvents.length;
       });
@@ -100,14 +100,14 @@ export default function BattleScreen() {
     <Screen>
       <ProgressDisplay />
       <Player player={enemy} activeCard={activeEnemyCard}>
-        {enemyDamageNumbers.map((props, i) => (
-          <DamageNumber key={i} {...props} />
+        {enemyCombatTexts.map((props, i) => (
+          <CombatText key={i} {...props} />
         ))}
       </Player>
       <Divider />
       <Player player={user} activeCard={activeUserCard}>
-        {userDamageNumbers.map((props, i) => (
-          <DamageNumber key={i} {...props} />
+        {userCombatTexts.map((props, i) => (
+          <CombatText key={i} {...props} />
         ))}
       </Player>
     </Screen>

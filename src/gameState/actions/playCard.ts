@@ -289,10 +289,11 @@ function applyCardEffects({
   const targetPlayer = target === 'self' ? self : opponent;
 
   // damage
-  if (damage != null) {
+  if (damage != null && damage > 0) {
     // dodge doesn't apply to self damage
     if (cardEffects.target === 'opponent' && opponent.dodge > 0) {
       opponent.dodge -= 1;
+      result.events.push({ type: 'miss', target });
     } else {
       doDamage({ self, opponent, damage, target, result });
     }
