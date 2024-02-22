@@ -125,7 +125,7 @@ export function getEnemyCardsForBattle(battleCount: number) {
 }
 
 // Returns CARD_SELECTION_PICKS cards based on enemy type.
-function pickCards(enemyType: EnemyType) {
+export function pickCards(enemyType: EnemyType) {
   const cardOptions = getCardSelectionsForBattle();
   const cardOptionsSet = new Set(cardOptions);
   const selectedCards: CardState[] = [];

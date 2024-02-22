@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "nodenext",
+    "target": "es2021",
+    "esModuleInterop": true
+  }
+}

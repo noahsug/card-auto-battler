@@ -20,14 +20,6 @@ export const multihitStarterCard = createCard({ target: 'opponent', activations:
 
 export const strengthStarterCard = createCard({ target: 'self', strength: 1 });
 
-export const healTrashStarterCard = createCard({ target: 'self', heal: 7, trashSelf: true });
-
-export const damageTrashStarterCard = createCard({
-  target: 'opponent',
-  damage: 5,
-  trashSelf: true,
-});
-
 const starterCards = {
   damageStarterCard,
   healStarterCard,
@@ -36,8 +28,6 @@ const starterCards = {
   bleedStarterCard,
   multihitStarterCard,
   strengthStarterCard,
-  damageTrashStarterCard,
-  healTrashStarterCard,
 };
 
 // basic cards

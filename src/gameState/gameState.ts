@@ -180,7 +180,9 @@ export function getCurrentCard(playerOrGame: PlayerState | GameState) {
 
 export function getCanPlayCard(game: GameState) {
   const activePlayer = getActivePlayer(game);
-  return activePlayer.cardsPlayedThisTurn === 0 || activePlayer.extraCardPlays > 0;
+  const hasCardToPlay = activePlayer.cardsPlayedThisTurn === 0 || activePlayer.extraCardPlays > 0;
+  const isInInfiniteLoop = activePlayer.cardsPlayedThisTurn > 40;
+  return hasCardToPlay && !isInInfiniteLoop;
 }
 
 export function getIsBattleOver(game: GameState) {

@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash';
+
 import { starterCards, nonStarterCards } from './cards';
 import { STARTING_CARDS, CARD_SELECTION_OPTIONS } from './constants';
 
@@ -13,7 +15,12 @@ export function getCardSelectionsForBattle() {
 export function getStartingCards() {
   const cards = [];
   for (let i = 0; i < STARTING_CARDS; i++) {
-    const card = starterCards[Math.floor(Math.random() * starterCards.length)];
+    const card = cloneDeep(starterCards[Math.floor(Math.random() * starterCards.length)]);
+
+    if (Math.random() < 0.4) {
+      card.effects[0].trashSelf = true;
+    }
+
     cards.push(card);
   }
   return cards;
