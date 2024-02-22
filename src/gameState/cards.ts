@@ -80,6 +80,7 @@ const basicCards = {
 export const damageForEachCard = createCard({
   target: 'opponent',
   trashSelf: true,
+  damage: -1,
   gainEffectsList: [
     {
       effects: { damage: 1 },
@@ -87,7 +88,6 @@ export const damageForEachCard = createCard({
         target: 'self',
         name: 'cards',
       },
-      divisor: 2,
     },
   ],
 });
@@ -521,36 +521,48 @@ export const extraPlaysTrashCard = createCard({
   trashSelf: true,
 });
 
-export const damageForEachCardPlayedCard = createCard({
-  target: 'opponent',
-  damage: 3,
-  gainEffectsList: [
-    {
-      effects: { damage: 2 },
-      forEveryPlayerValue: {
-        target: 'self',
-        name: 'cardsPlayedThisTurn',
+export const damageForEachCardPlayedCard = createCard(
+  {
+    target: 'opponent',
+    damage: 3,
+  },
+  {
+    target: 'opponent',
+    damage: 2,
+    activations: 0,
+    gainEffectsList: [
+      {
+        effects: { activations: 1 },
+        forEveryPlayerValue: {
+          target: 'self',
+          name: 'cardsPlayedThisTurn',
+        },
       },
-    },
-  ],
-});
+    ],
+  },
+);
 
-export const extraPlayIfExtraPlayCard = createCard({
-  target: 'self',
-  damage: 1,
-  extraCardPlays: 1,
-  gainEffectsList: [
-    {
-      effects: { extraCardPlays: 1 },
-      ifPlayerValue: {
-        target: 'self',
-        name: 'cardsPlayedThisTurn',
-        comparison: '>',
-        compareToValue: 0,
+export const extraPlayIfExtraPlayCard = createCard(
+  {
+    target: 'opponent',
+    damage: 1,
+  },
+  {
+    target: 'self',
+    extraCardPlays: 1,
+    gainEffectsList: [
+      {
+        effects: { extraCardPlays: 1 },
+        ifPlayerValue: {
+          target: 'self',
+          name: 'cardsPlayedThisTurn',
+          comparison: '>',
+          compareToValue: 0,
+        },
       },
-    },
-  ],
-});
+    ],
+  },
+);
 
 const multicardCards = {
   damageForEachCardPlayedCard,

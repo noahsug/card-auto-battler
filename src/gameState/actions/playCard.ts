@@ -348,10 +348,12 @@ function doDamage({
   const { events, battleStats } = result;
   const targetPlayer = target === 'self' ? self : opponent;
 
-  damage += self.strength;
-  if (targetPlayer.bleed) {
-    damage += 3;
-    targetPlayer.bleed -= 1;
+  if (target === 'opponent') {
+    damage += self.strength;
+    if (targetPlayer.bleed) {
+      damage += 3;
+      targetPlayer.bleed -= 1;
+    }
   }
 
   if (damage > 0) {

@@ -14,9 +14,9 @@ exports[`card text renders damageCard 1`] = `"5⚔️"`;
 
 exports[`card text renders damageForEachBleedCard 1`] = `"1⚔️for every opponent 🩸"`;
 
-exports[`card text renders damageForEachCard 1`] = `"+1⚔️ for every 2 self cards in decktrash this card"`;
+exports[`card text renders damageForEachCard 1`] = `"-1⚔️+1⚔️ for every self cards in decktrash this card"`;
 
-exports[`card text renders damageForEachCardPlayedCard 1`] = `"3⚔️+2⚔️ for every self cards played this turn"`;
+exports[`card text renders damageForEachCardPlayedCard 1`] = `"3⚔️2⚔️for every self cards played this turn"`;
 
 exports[`card text renders damageForEachMissingHealthCard 1`] = `"12⚔️+-1⚔️ for every 2 self health"`;
 
