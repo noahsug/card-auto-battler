@@ -1,4 +1,5 @@
 import sample from 'lodash/sample';
+import sampleSize from 'lodash/sampleSize';
 
 import {
   createInitialGameState,
@@ -9,6 +10,7 @@ import {
   getCanPlayCard,
   getIsBattleOver,
   MAX_WINS,
+  CARD_SELECTION_PICKS,
 } from '../../src/gameState';
 import {
   addCard,
@@ -19,19 +21,23 @@ import {
   startCardSelection,
   startBattle,
 } from '../../src/gameState/actions';
+import { getCardSelectionsForBattle } from '../../src/gameState/cardSelection';
 
 interface AIContext {
-  type: EnemyType;
+  type: 'random' | 'random';
 }
+
+// const aiTypes = [...enemyTypes, 'random'] as const;
+const aiTypes = ['random'] as const;
 
 function run() {
   const data = {} as Record<EnemyType, { wins: number; losses: number }>;
-  enemyTypes.forEach((type) => {
+  aiTypes.forEach((type) => {
     data[type] = { wins: 0, losses: 0 };
   });
 
-  for (let i = 0; i < 100000; i++) {
-    const type = sample(enemyTypes);
+  for (let i = 0; i < 50000; i++) {
+    const type = sample(aiTypes);
     const isWin = runGame({ type });
     if (isWin) {
       data[type].wins += 1;
@@ -40,7 +46,7 @@ function run() {
     }
   }
 
-  enemyTypes.forEach((type) => {
+  aiTypes.forEach((type) => {
     const { wins, losses } = data[type];
     console.log(type, wins / (wins + losses));
   });
@@ -78,8 +84,15 @@ function runBattle(game: GameState) {
 
 function addNewCards({ game, aiContext }: { game: GameState; aiContext: AIContext }) {
   startCardSelection(game);
-  const cards = pickCards(aiContext.type);
-  cards.forEach((card) => addCard(game, card));
+
+  const cards = getCardSelectionsForBattle();
+
+  if (aiContext.type === 'random') {
+    sampleSize(cards, CARD_SELECTION_PICKS).forEach((card) => addCard(game, card));
+  } else {
+    const cards = pickCards(aiContext.type);
+    cards.forEach((card) => addCard(game, card));
+  }
 }
 
 (() => {
