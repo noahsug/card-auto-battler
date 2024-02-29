@@ -595,6 +595,10 @@ export function getCardName(card: CardState) {
   return name;
 }
 
+Object.entries(allCards).forEach(([name, card]) => {
+  card.name = name;
+});
+
 export {
   allCards as cardsByName,
   nonStarterCardArray as nonStarterCards,

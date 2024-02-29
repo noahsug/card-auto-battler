@@ -1,5 +1,14 @@
 # Card Auto Battler
 
+## analysis
+
+always play best card strategy
+
+- seed by playing randomly: 48% win rate
+- iteratively playing and updating card priority: 39% win rate
+
+## gameplay
+
 effects implemented
 
 - bleed: 0,

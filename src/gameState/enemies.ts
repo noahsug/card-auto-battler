@@ -119,8 +119,6 @@ export function getEnemyCardsForBattle(battleCount: number) {
     cards.push(...pickCards(enemyType));
   }
 
-  // console.log('enemyType', enemyType, cards.map(getCardName).join(', '));
-
   return cards;
 }
 

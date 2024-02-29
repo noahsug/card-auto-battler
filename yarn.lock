@@ -9900,6 +9900,11 @@ which@^2.0.1:
   dependencies:
     isexe "^2.0.0"
 
+wilson-score-rank@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/wilson-score-rank/-/wilson-score-rank-2.0.2.tgz#0ed89ae80afa691138519266f031a921c35337e5"
+  integrity sha512-e+bxi28Ui4kJacqzK2VjXut/3ffMlgjiUU9sNukNhnEHBDpV1ldM8tzEK+YZF1zgm3RuIh5tZBJJnLd5rWkDeQ==
+
 word-wrap@~1.2.3:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/word-wrap/-/word-wrap-1.2.5.tgz#d2c45c6dd4fbce621a66f136cbe328afd0410b34"

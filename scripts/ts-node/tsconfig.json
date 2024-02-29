@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
 
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "NodeNext",
     "moduleResolution": "nodenext",
     "target": "es2021",
     "esModuleInterop": true
