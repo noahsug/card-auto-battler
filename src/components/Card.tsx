@@ -241,6 +241,7 @@ export default function Card({ card, isActive = false, scale = 1, className, onC
 
   return (
     <Root $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
+      {card.rank}
       <div>
         {textItemsBySection.map((textItems, i) => (
           <CardTextSection key={i}>{textItems}</CardTextSection>

@@ -104,6 +104,7 @@ export interface CardEffects extends Partial<StatusEffects>, Conditional<CardEff
 export interface CardState {
   effects: CardEffects[];
   name: string;
+  rank?: number;
 }
 
 export interface PlayerState extends StatusEffects {
