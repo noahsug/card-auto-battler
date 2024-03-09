@@ -9,7 +9,7 @@ always play best card strategy
 - iteratively playing and updating card priority: 39% win rate
 - iteratively train neural network on input of win rate -> confidence score for each card
 - iteratively train neural network on input of confidence score for each card -> win rate then
-  iterate over random values returning best predicted score
+- iterate over random values returning best predicted score: 56.6%
 
 ## gameplay
 

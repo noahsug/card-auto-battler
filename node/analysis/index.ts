@@ -1,5 +1,6 @@
 import sample from 'lodash/sample';
 import sampleSize from 'lodash/sampleSize';
+import shuffle from 'lodash/shuffle';
 import ConfidenceScore from 'wilson-score-rank';
 import { NeuralNetwork } from 'brain.js';
 
@@ -13,8 +14,9 @@ import {
   getIsBattleOver,
   MAX_WINS,
   CARD_SELECTION_PICKS,
-  cardsByName,
   CardState,
+  cardsByName,
+  nonStarterCardsByName,
 } from '../../src/gameState';
 import {
   addCard,
@@ -26,7 +28,7 @@ import {
   startBattle,
 } from '../../src/gameState/actions';
 import { getCardSelectionsForBattle } from '../../src/gameState/cardSelection';
-import { percent } from '../../src/utils/text';
+import { percent, moveItem } from '../../src/utils';
 
 const aiTypes = [...enemyTypes, 'random', 'bestCard'] as const;
 
@@ -38,88 +40,180 @@ interface AIContext {
 
 type WinLosses<T extends PropertyKey = string> = Record<T, { wins: number; losses: number }>;
 
-const cardPriority = [
-  'trashForOpponentHealthCard',
-  'trashCard',
-  'extraPlayIfExtraPlayCard',
-  'extraPlayCard',
-  'extraPlayStarterCard',
-  'trashAndExtraPlayCard',
-  'extraPlayHealCard',
-  'extraCardIfHighHealthCard',
-  'damageSelfIfMissCard',
-  'damageForEachTrashedCard',
-  'lifestealCard',
-  'healCard',
-  'healForEachTrashedCard',
-  'trashAndTrashSelfCard',
-  'multihitCard',
-  'doubleDodgeIfLowHealthCard',
-  'extraPlayIfBleedCard',
-  'damageCard',
-  'damageForEachMissingHealthCard',
-  'strengthTrashCard',
-  'bleedTrashCard',
-  'plusHealForEachTrashedCard',
-  'strengthCard',
-  'extraPlaysTrashCard',
-  'dodgeAndTrashCard',
-  'selfDamageCard',
-  'damageForEachCard',
-  'extraCardIfHighDamageCard',
-  'damageForEachCardPlayedCard',
-  'dodgeStarterCard',
-  'appliesStrengthTwiceCard',
-  'multihitStarterCard',
-  'bleedCard',
-  'healStarterCard',
-  'damageStarterCard',
-  'gainStrengthForBleedCard',
-  'strengthStarterCard',
-  'damageForEachBleedCard',
-  'bleedStarterCard',
-  'setHealthToHalfCard',
-  'doubleBleedCard',
-  'extraPlayIfLowHealthCard',
-  'doubleStrengthCard',
-  'bothBleedCard',
-]; //.sort(() => Math.random() - 0.5);
+const cardNames = Object.keys(cardsByName) as (keyof typeof cardsByName)[];
+const nonStarterCardNames = Object.keys(
+  nonStarterCardsByName,
+) as (keyof typeof nonStarterCardsByName)[];
 
+// let cardPriority = nonStarterCardNames.slice();
+let cardPriority = [
+  'appliesStrengthTwiceCard',
+  'trashForOpponentHealthCard',
+  'lifestealCard',
+  'extraPlayCard',
+  'trashCard',
+  'dodgeAndTrashCard',
+  'extraCardIfHighHealthCard',
+  'strengthTrashCard',
+  'trashAndTrashSelfCard',
+  'healForEachTrashedCard',
+  'bleedTrashCard',
+  'extraPlayIfBleedCard',
+  'damageForEachTrashedCard',
+  'damageCard',
+  'extraPlayIfExtraPlayCard',
+  'doubleDodgeIfLowHealthCard',
+  'doubleStrengthCard',
+  'damageForEachCard',
+  'selfDamageCard',
+  'plusHealForEachTrashedCard',
+  'extraPlaysTrashCard',
+  'strengthCard',
+  'damageForEachBleedCard',
+  'bothBleedCard',
+  'bleedCard',
+  'damageSelfIfMissCard',
+  'gainStrengthForBleedCard',
+  'extraPlayIfLowHealthCard',
+  'damageForEachCardPlayedCard',
+  'multihitCard',
+  'doubleBleedCard',
+  'setHealthToHalfCard',
+  'trashAndExtraPlayCard',
+  'damageForEachMissingHealthCard',
+  'extraPlayHealCard',
+  'healCard',
+  'extraCardIfHighDamageCard',
+] as typeof nonStarterCardNames;
 let cardRanksByName = new Map(cardPriority.map((card, i) => [card, i]));
 
-const RUNS = 100000;
+let RUNS = 200;
+const DECKS_TO_TRY = 3000;
 
 function run() {
-  const net = new NeuralNetwork<number[], number[]>();
-  for (let i = 0; i < 1; i++) {
-    iterate(net);
-  }
-
-  // console.log(cardPriority);
+  testGradientDecent();
 }
 
-function iterate(net: NeuralNetwork<number[], number[]>) {
+function testGradientDecent() {
+  const MOVE = 2;
+  const MARGIN = 0.003;
+  RUNS = 50 * 1000;
+  let best = 0.62566;
+  for (let i = 0; i < cardPriority.length; i++) {
+    if (i >= MOVE) {
+      cardPriority = moveItem(cardPriority, i, i - MOVE);
+      const { wins, losses } = iterate();
+      const winRate = wins / (wins + losses);
+
+      console.log(cardPriority[i - MOVE], 'up', MOVE, ':', winRate, `(best: ${best})`);
+      if (winRate > best + MARGIN) {
+        console.log('new best:', winRate, cardPriority);
+        best = winRate;
+      } else {
+        cardPriority = moveItem(cardPriority, i - MOVE, i);
+      }
+    }
+
+    if (i + MOVE < cardPriority.length) {
+      cardPriority = moveItem(cardPriority, i, i + MOVE);
+      const { wins, losses } = iterate();
+      const winRate = wins / (wins + losses);
+
+      console.log(cardPriority[i + MOVE], 'down', MOVE, ':', winRate, `(best: ${best})`);
+      if (winRate > best + MARGIN) {
+        console.log('new best:', winRate, cardPriority);
+        best = winRate;
+      } else {
+        cardPriority = moveItem(cardPriority, i + MOVE, i);
+      }
+    }
+  }
+}
+
+function test() {
+  // RUNS = 40000;
+  // const { wins, losses } = iterate();
+  // const winRate = wins / (wins + losses);
+  // console.log(percent(winRate, 1));
+  // return;
+}
+
+function testRandomlyWithNarrowingIterations() {
+  let runs = testCardPriorities();
+
+  // take the last 20 runs and run them more times to get a more accurate winRate
+  runs.sort((a, b) => b.winRate - a.winRate);
+  runs = runs.slice(0, 30);
+  RUNS = 10000;
+
+  console.log('top:', runs[0].winRate, runs[0].cardPriority.slice(0, 5));
+
+  runs = runs.map(({ cardPriority: newCardPriority }) => {
+    cardPriority = newCardPriority;
+
+    const { wins, losses } = iterate();
+    const winRate = wins / (wins + losses);
+    return { winRate, cardPriority };
+  });
+
+  // take the last 3 runs and run them more times to get a more accurate winRate
+  runs.sort((a, b) => b.winRate - a.winRate);
+  runs = runs.slice(0, 3);
+  RUNS = 50000;
+
+  console.log('top:', runs[0].winRate, runs[0].cardPriority.slice(0, 5));
+
+  runs = runs.map(({ cardPriority: newCardPriority }) => {
+    cardPriority = newCardPriority;
+
+    const { wins, losses } = iterate();
+    const winRate = wins / (wins + losses);
+    return { winRate, cardPriority };
+  });
+
+  runs.sort((a, b) => b.winRate - a.winRate);
+  console.log(runs[0]);
+}
+
+function testCardPriorities() {
+  const net = new NeuralNetwork<number[], number[]>();
+
+  const runs = [] as { winRate: number; cardPriority: typeof nonStarterCardNames }[];
+  for (let i = 0; i < DECKS_TO_TRY; i++) {
+    cardPriority = shuffle(cardPriority);
+
+    const { wins, losses } = iterate(net);
+
+    const winRate = wins / (wins + losses);
+    runs.push({ winRate, cardPriority });
+  }
+
+  return runs;
+}
+
+function iterate(net?: NeuralNetwork<number[], number[]>) {
+  cardRanksByName = new Map(cardPriority.map((card, i) => [card, i]));
   const aiTypesForRun = ['bestCard'] as AIContext['type'][];
   // const aiTypesForRun = ['random'] as AIContext['type'][];
 
   const { cardWinLosses, aiWinLosses } = evaluateStrategies({ aiTypesForRun });
 
-  aiTypesForRun.forEach((type) => {
-    const { wins, losses } = aiWinLosses[type];
-    console.log(type, percent(wins / (wins + losses), 1), wins + losses);
-  });
+  // aiTypesForRun.forEach((type) => {
+  const type = aiTypesForRun[0];
+  const { wins, losses } = aiWinLosses[type];
+  // console.log(type, percent(wins / (wins + losses), 1));
+  // });
 
-  console.log(''); // new line
+  // console.log(''); // new line
 
-  // update cardRanksByName
-  cardPriority.sort((a, b) => {
-    const { wins: winsA, losses: lossesA } = cardWinLosses[a];
-    const { wins: winsB, losses: lossesB } = cardWinLosses[b];
-    // const confidenceA = ConfidenceScore.lowerBound(winsA, winsA + lossesA);
-    // const confidenceB = ConfidenceScore.lowerBound(winsB, winsB + lossesB);
-    // return confidenceB - confidenceA;
-    return winsB / (winsB + lossesB) - winsA / (winsA + lossesA);
-  });
+  // const cardScores = Object.fromEntries(
+  //   cardPriority.map((card) => {
+  //     const { wins, losses } = cardWinLosses[card];
+  //     return [card, ConfidenceScore.lowerBound(wins, wins + losses)];
+  //   }),
+  // );
+  // cardPriority.sort((a, b) => cardScores[b] - cardScores[a]);
+  // cardRanksByName = new Map(cardPriority.map((card, i) => [card, i]));
 
   // cardPriority //.slice(0, 5)
   //   .forEach((card) => {
@@ -129,14 +223,13 @@ function iterate(net: NeuralNetwork<number[], number[]>) {
   //     console.log(card, score);
   //   });
 
-  console.log(''); // new line
-
-  cardRanksByName = new Map(cardPriority.map((card, i) => [card, i]));
+  // console.log(''); // new line
+  return { wins, losses };
 }
 
 function evaluateStrategies({ aiTypesForRun }: { aiTypesForRun: AIContext['type'][] }) {
   const cardWinLosses = {} as WinLosses;
-  Object.keys(cardsByName).forEach((cardName) => {
+  cardNames.forEach((cardName) => {
     cardWinLosses[cardName] = { wins: 0, losses: 0 };
   });
 
@@ -213,8 +306,10 @@ function pickCards({ cards, aiContext }: { cards: CardState[]; aiContext: AICont
       cards
         // sort low to high
         .sort((a: CardState, b: CardState) => {
+          const nameA = a.name as keyof typeof nonStarterCardNames;
+          const nameB = b.name as keyof typeof nonStarterCardNames;
           return (
-            (cardRanksByName.get(a.name) || Infinity) - (cardRanksByName.get(b.name) || Infinity)
+            (cardRanksByName.get(nameA) || Infinity) - (cardRanksByName.get(nameB) || Infinity)
           );
         })
         .slice(0, CARD_SELECTION_PICKS)

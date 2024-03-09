@@ -601,6 +601,7 @@ Object.entries(allCards).forEach(([name, card]) => {
 
 export {
   allCards as cardsByName,
+  nonStarterCards as nonStarterCardsByName,
   nonStarterCardArray as nonStarterCards,
   starterCardArray as starterCards,
   basicCardArray as basicCards,

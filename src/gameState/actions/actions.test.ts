@@ -14,7 +14,12 @@ import {
   getIsEnemyTurn,
 } from '../index';
 import { createCard } from '../utils';
-import { dodgeAndTrashCard, healForEachTrashedCard, damageSelfIfMissCard } from '../cards';
+import {
+  dodgeAndTrashCard,
+  healForEachTrashedCard,
+  damageSelfIfMissCard,
+  appliesStrengthTwiceCard,
+} from '../cards';
 
 const damage0 = createCard({ target: 'opponent', damage: 0 });
 const damage1 = createCard({ target: 'opponent', damage: 1 });
@@ -287,24 +292,12 @@ describe('extraCardPlays status effect', () => {
 
 describe('gainEffects', () => {
   it('applies strength twice', () => {
-    const strengthEffectsTwice: CardEffects = {
-      target: 'opponent',
-      gainEffectsList: [
-        {
-          effects: { damage: 1 },
-          forEveryPlayerValue: {
-            target: 'self',
-            name: 'strength',
-          },
-        },
-      ],
-    };
-
     const { endingState, startingState } = playCards([
+      appliesStrengthTwiceCard, // 3
       createCard({ target: 'self', strength: 2 }),
-      createCard({ ...strengthEffectsTwice, damage: 2 }),
+      appliesStrengthTwiceCard, // 7
     ]);
-    expect(startingState.enemy.health - endingState.enemy.health).toBe(6);
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(3 + 7);
   });
 
   it('doubles strength', () => {
