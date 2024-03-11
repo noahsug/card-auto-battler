@@ -595,50 +595,8 @@ export function getCardName(card: CardState) {
   return name;
 }
 
-const cardPriority = [
-  'appliesStrengthTwiceCard',
-  'trashForOpponentHealthCard',
-  'lifestealCard',
-  'extraPlayCard',
-  'trashCard',
-  'dodgeAndTrashCard',
-  'extraCardIfHighHealthCard',
-  'strengthTrashCard',
-  'trashAndTrashSelfCard',
-  'healForEachTrashedCard',
-  'bleedTrashCard',
-  'extraPlayIfBleedCard',
-  'damageForEachTrashedCard',
-  'damageCard',
-  'extraPlayIfExtraPlayCard',
-  'doubleDodgeIfLowHealthCard',
-  'doubleStrengthCard',
-  'damageForEachCard',
-  'selfDamageCard',
-  'plusHealForEachTrashedCard',
-  'extraPlaysTrashCard',
-  'strengthCard',
-  'damageForEachBleedCard',
-  'bothBleedCard',
-  'bleedCard',
-  'damageSelfIfMissCard',
-  'gainStrengthForBleedCard',
-  'extraPlayIfLowHealthCard',
-  'damageForEachCardPlayedCard',
-  'multihitCard',
-  'doubleBleedCard',
-  'setHealthToHalfCard',
-  'trashAndExtraPlayCard',
-  'damageForEachMissingHealthCard',
-  'extraPlayHealCard',
-  'healCard',
-  'extraCardIfHighDamageCard',
-];
-let cardRanksByName = new Map(cardPriority.map((card, i) => [card, i]));
-
 Object.entries(allCards).forEach(([name, card]) => {
   card.name = name;
-  card.rank = cardRanksByName.get(name);
 });
 
 export {
