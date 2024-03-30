@@ -21,6 +21,7 @@ import {
   statusEffectNames,
 } from '..';
 import { assert, getNonNullEntries } from '../../utils';
+import { getIsEnemyTurn } from '../gameState';
 
 interface PlayCardResult {
   battleStats: BattleStats;
@@ -191,7 +192,7 @@ function evalPlayerValueConditional({
   ifPlayerValue: IfPlayerValueOptions;
 }) {
   const value = getPlayerValue({ self, opponent, identifier: ifPlayerValue });
-  return logicAndConditionals({ self, opponent, result, value, comparable: ifPlayerValue });
+  return evalConditional({ self, opponent, result, value, comparable: ifPlayerValue });
 }
 
 function evalBattleStatConditional({
@@ -208,10 +209,10 @@ function evalBattleStatConditional({
   const { battleStats } = result;
 
   const value = battleStats[ifBattleStat.name];
-  return logicAndConditionals({ self, opponent, result, value, comparable: ifBattleStat });
+  return evalConditional({ self, opponent, result, value, comparable: ifBattleStat });
 }
 
-function logicAndConditionals({
+function evalConditional({
   self,
   opponent,
   result,

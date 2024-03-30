@@ -47,7 +47,6 @@ const nonStarterCardNames = Object.keys(
 
 // let cardPriority = nonStarterCardNames.slice();
 let cardPriority = [
-  'appliesStrengthTwiceCard',
   'trashForOpponentHealthCard',
   'lifestealCard',
   'extraPlayCard',
@@ -56,34 +55,35 @@ let cardPriority = [
   'extraCardIfHighHealthCard',
   'strengthTrashCard',
   'trashAndTrashSelfCard',
+  'extraPlaysTrashCard',
   'healForEachTrashedCard',
   'bleedTrashCard',
+  'extraPlayHealCard',
   'extraPlayIfBleedCard',
   'damageForEachTrashedCard',
   'damageCard',
   'extraPlayIfExtraPlayCard',
   'doubleDodgeIfLowHealthCard',
-  'doubleStrengthCard',
   'damageForEachCard',
   'selfDamageCard',
   'plusHealForEachTrashedCard',
-  'extraPlaysTrashCard',
   'strengthCard',
-  'damageForEachBleedCard',
-  'bothBleedCard',
   'bleedCard',
   'damageSelfIfMissCard',
+  'doubleStrengthCard',
   'gainStrengthForBleedCard',
   'extraPlayIfLowHealthCard',
   'damageForEachCardPlayedCard',
   'multihitCard',
   'doubleBleedCard',
+  'damageForEachBleedCard',
   'setHealthToHalfCard',
+  'bothBleedCard',
   'trashAndExtraPlayCard',
   'damageForEachMissingHealthCard',
-  'extraPlayHealCard',
   'healCard',
   'extraCardIfHighDamageCard',
+  'appliesStrengthTwiceCard',
 ] as typeof nonStarterCardNames;
 let cardRanksByName = new Map(cardPriority.map((card, i) => [card, i]));
 
@@ -92,14 +92,15 @@ const DECKS_TO_TRY = 3000;
 
 function run() {
   testGradientDecent();
+  // test();
 }
 
 function testGradientDecent() {
-  const MOVE = 2;
+  const MOVE = 10;
   const MARGIN = 0.003;
   RUNS = 50 * 1000;
-  let best = 0.62566;
-  for (let i = 0; i < cardPriority.length; i++) {
+  let best = 0.67644;
+  for (let i = 15; i < cardPriority.length; i++) {
     if (i >= MOVE) {
       cardPriority = moveItem(cardPriority, i, i - MOVE);
       const { wins, losses } = iterate();
@@ -131,11 +132,11 @@ function testGradientDecent() {
 }
 
 function test() {
-  // RUNS = 40000;
-  // const { wins, losses } = iterate();
-  // const winRate = wins / (wins + losses);
-  // console.log(percent(winRate, 1));
-  // return;
+  RUNS = 90000;
+  const { wins, losses } = iterate();
+  const winRate = wins / (wins + losses);
+  console.log(winRate);
+  return;
 }
 
 function testRandomlyWithNarrowingIterations() {
@@ -248,6 +249,11 @@ function evaluateStrategies({ aiTypesForRun }: { aiTypesForRun: AIContext['type'
       aiWinLosses[type].losses += 1;
     }
 
+    // console.log(
+    //   isWin ? 'win' : 'loss',
+    //   [...game.user.cards, ...game.user.trashedCards].map((card) => card.name),
+    // );
+
     game.user.cards.forEach((card) => {
       const { name } = card;
       if (isWin) {
@@ -306,10 +312,10 @@ function pickCards({ cards, aiContext }: { cards: CardState[]; aiContext: AICont
       cards
         // sort low to high
         .sort((a: CardState, b: CardState) => {
-          const nameA = a.name as keyof typeof nonStarterCardNames;
-          const nameB = b.name as keyof typeof nonStarterCardNames;
+          const nameA = a.name as keyof typeof nonStarterCardsByName;
+          const nameB = b.name as keyof typeof nonStarterCardsByName;
           return (
-            (cardRanksByName.get(nameA) || Infinity) - (cardRanksByName.get(nameB) || Infinity)
+            (cardRanksByName.get(nameA) ?? Infinity) - (cardRanksByName.get(nameB) ?? Infinity)
           );
         })
         .slice(0, CARD_SELECTION_PICKS)
