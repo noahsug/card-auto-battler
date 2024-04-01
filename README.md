@@ -26,6 +26,7 @@ Train neural network at different depths to measure difficulty (aka easy win % v
 - iteratively train neural network on input of win rate -> confidence score for each card
 - iteratively train neural network on input of confidence score for each card -> win rate then
 - iterate over random values returning best predicted score: 56.6%
+- play randomly, sort by weighted win rate: 70% win rate
 
 Idea 1 (no deck knowledge)
 
