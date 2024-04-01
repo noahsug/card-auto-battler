@@ -4,6 +4,8 @@ exports[`card text renders appliesStrengthTwiceCard 1`] = `"3⚔️+1⚔️ for 
 
 exports[`card text renders bleedCard 1`] = `"2🩸"`;
 
+exports[`card text renders bleedMoreCard 1`] = `"2🩸+4🩸 if opponent 🩸 > 0"`;
+
 exports[`card text renders bleedStarterCard 1`] = `"1🩸"`;
 
 exports[`card text renders bleedTrashCard 1`] = `"3🩸trash this card"`;
@@ -56,6 +58,8 @@ exports[`card text renders extraPlaysTrashCard 1`] = `"2🃏to selftrash this ca
 
 exports[`card text renders gainStrengthForBleedCard 1`] = `"+1💪 to self for every opponent 🩸1🩸"`;
 
+exports[`card text renders healAndTrashOpponentCard 1`] = `"5❤️2 trash"`;
+
 exports[`card text renders healCard 1`] = `"7❤️to self"`;
 
 exports[`card text renders healForEachTrashedCard 1`] = `"4❤️+1❤️ to self for every opponent trashed cards+1❤️ to self for every self trashed cards"`;
@@ -74,6 +78,8 @@ exports[`card text renders selfDamageCard 1`] = `"7⚔️4⚔️to selfif self h
 
 exports[`card text renders setHealthToHalfCard 1`] = `"1🃏+1⚔️ to self for every self health+1❤️ to self for every 2 self max health"`;
 
+exports[`card text renders stabCard 1`] = `"3⚔️3🩸if hits > 0"`;
+
 exports[`card text renders strengthCard 1`] = `"2💪to self"`;
 
 exports[`card text renders strengthStarterCard 1`] = `"1💪to self"`;
@@ -87,3 +93,5 @@ exports[`card text renders trashAndTrashSelfCard 1`] = `"3 trashtrash this card"
 exports[`card text renders trashCard 1`] = `"2 trash"`;
 
 exports[`card text renders trashForOpponentHealthCard 1`] = `"+1 trash for every 5 opponent health"`;
+
+exports[`card text renders tripleBleedCard 1`] = `"+2🩸, trash this card for every opponent 🩸"`;

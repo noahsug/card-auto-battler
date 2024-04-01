@@ -14,7 +14,7 @@ export const extraPlayStarterCard = createCard(
   { target: 'self', extraCardPlays: 1 },
 );
 
-export const bleedStarterCard = createCard({ target: 'opponent', bleed: 1 });
+export const bleedStarterCard = createCard({ target: 'opponent', bleed: 2 });
 
 export const multihitStarterCard = createCard({ target: 'opponent', activations: 2, damage: 1 });
 
@@ -41,9 +41,9 @@ export const extraPlayCard = createCard(
 
 export const healCard = createCard({ target: 'self', heal: 7 });
 
-export const bleedCard = createCard({ target: 'opponent', bleed: 2 });
+export const bleedCard = createCard({ target: 'opponent', bleed: 3 });
 
-export const bleedTrashCard = createCard({ target: 'opponent', bleed: 3, trashSelf: true });
+export const bleedTrashCard = createCard({ target: 'opponent', bleed: 4, trashSelf: true });
 
 export const multihitCard = createCard({ target: 'opponent', activations: 3, damage: 1 });
 
@@ -51,7 +51,7 @@ export const strengthCard = createCard({ target: 'self', strength: 2 });
 
 export const strengthTrashCard = createCard({ target: 'self', strength: 3, trashSelf: true });
 
-export const trashCard = createCard({ target: 'opponent', trash: 2 });
+export const trashCard = createCard({ target: 'opponent', trash: 1 });
 
 export const basicCardsByName = {
   damageCard,
@@ -102,11 +102,11 @@ export const miscCardsByName = { damageForEachCard, damageSelfIfMissCard };
 
 // strength synergy
 
-export const doubleStrengthCard = createCard({
+export const tripleStrengthCard = createCard({
   target: 'self',
   gainEffectsList: [
     {
-      effects: { strength: 1, trashSelf: true },
+      effects: { strength: 2, trashSelf: true },
       forEveryPlayerValue: {
         target: 'self',
         name: 'strength',
@@ -168,7 +168,7 @@ export const extraCardIfHighDamageCard = createCard(
 );
 
 export const strengthCardsByName = {
-  doubleStrengthCard,
+  doubleStrengthCard: tripleStrengthCard,
   appliesStrengthTwiceCard,
   lifestealCard,
   extraCardIfHighDamageCard,
@@ -176,9 +176,41 @@ export const strengthCardsByName = {
 
 // bleed synergy
 
+export const stabCard = createCard(
+  {
+    target: 'opponent',
+    damage: 3,
+  },
+  {
+    target: 'opponent',
+    bleed: 3,
+    ifBattleStat: {
+      name: 'numberOfHits',
+      comparison: '>',
+      compareToValue: 0,
+    },
+  },
+);
+
+export const bleedMoreCard = createCard({
+  target: 'opponent',
+  bleed: 2,
+  gainEffectsList: [
+    {
+      effects: { bleed: 4 },
+      ifPlayerValue: {
+        target: 'opponent',
+        name: 'bleed',
+        comparison: '>',
+        compareToValue: 0,
+      },
+    },
+  ],
+});
+
 export const damageForEachBleedCard = createCard({
   target: 'opponent',
-  damage: 1,
+  damage: 2,
   activations: 0,
   gainEffectsList: [
     {
@@ -191,11 +223,11 @@ export const damageForEachBleedCard = createCard({
   ],
 });
 
-export const doubleBleedCard = createCard({
+export const tripleBleedCard = createCard({
   target: 'opponent',
   gainEffectsList: [
     {
-      effects: { bleed: 1, trashSelf: true },
+      effects: { bleed: 2, trashSelf: true },
       forEveryPlayerValue: {
         target: 'opponent',
         name: 'bleed',
@@ -226,11 +258,11 @@ export const gainStrengthForBleedCard = createCard(
 export const bothBleedCard = createCard(
   {
     target: 'opponent',
-    bleed: 3,
+    bleed: 4,
   },
   {
     target: 'self',
-    bleed: 3,
+    bleed: 4,
   },
 );
 
@@ -256,8 +288,10 @@ export const extraPlayIfBleedCard = createCard(
 );
 
 export const bleedCardsByName = {
+  stabCard,
+  bleedMoreCard,
   damageForEachBleedCard,
-  doubleBleedCard,
+  tripleBleedCard,
   gainStrengthForBleedCard,
   bothBleedCard,
   extraPlayIfBleedCard,
@@ -305,7 +339,7 @@ export const doubleDodgeIfLowHealthCard = createCard({
 
 export const extraPlayIfLowHealthCard = createCard({
   target: 'self',
-  damage: 3,
+  damage: 4,
   gainEffectsList: [
     {
       effects: { extraCardPlays: 3 },
@@ -347,7 +381,7 @@ export const setHealthToHalfCard = createCard({
 
 export const damageForEachMissingHealthCard = createCard({
   target: 'opponent',
-  damage: 12,
+  damage: 13, // 10 hp = 8 damage
   gainEffectsList: [
     {
       effects: { damage: -1 },
@@ -356,6 +390,26 @@ export const damageForEachMissingHealthCard = createCard({
         name: 'health',
       },
       divisor: 2,
+    },
+  ],
+});
+
+export const doubleDamageIfLowerHealth = createCard({
+  target: 'opponent',
+  damage: 4,
+  gainEffectsList: [
+    {
+      effects: { damage: 2 },
+      isMultiplicative: true,
+      ifPlayerValue: {
+        target: 'self',
+        name: 'health',
+        comparison: '<',
+        compareToPlayerValue: {
+          target: 'opponent',
+          name: 'health',
+        },
+      },
     },
   ],
 });
@@ -394,41 +448,33 @@ export const extraCardIfHighHealthCard = createCard(
   },
 );
 
-export const extraPlayHealCard = createCard({ target: 'self', extraCardPlays: 1, heal: 3 });
+export const extraPlayHealCard = createCard({ target: 'self', extraCardPlays: 1, heal: 2 });
 
 export const healCardsByName = { extraCardIfHighHealthCard, extraPlayHealCard };
 
 // mill synergy
 
-export const trashAndTrashSelfCard = createCard({ target: 'opponent', trash: 3, trashSelf: true });
-
-export const plusHealForEachTrashedCard = createCard({
-  target: 'self',
-  heal: 4,
-  gainEffectsList: [
-    {
-      effects: { heal: 1 },
-      forEveryPlayerValue: {
-        target: 'opponent',
-        name: 'trashedCards',
-      },
-    },
-  ],
-});
+export const trashAndTrashSelfCard = createCard({ target: 'opponent', trash: 2, trashSelf: true });
 
 export const dodgeAndTrashCard = createCard(
   {
     target: 'self',
     dodge: 2,
-    trash: 2,
+    trash: 1,
     trashSelf: true,
   },
   {
     target: 'opponent',
     dodge: 2,
-    trash: 2,
+    trash: 1,
   },
 );
+
+export const healAndTrashOpponentCard = createCard({
+  target: 'opponent',
+  heal: 5,
+  trash: 2,
+});
 
 export const trashForOpponentHealthCard = createCard({
   target: 'opponent',
@@ -439,16 +485,16 @@ export const trashForOpponentHealthCard = createCard({
         target: 'opponent',
         name: 'health',
       },
-      divisor: 5,
+      divisor: 7,
     },
   ],
 });
 
 export const millCardsByName = {
   trashAndTrashSelfCard,
-  plusHealForEachTrashedCard,
   dodgeAndTrashCard,
   trashForOpponentHealthCard,
+  healAndTrashOpponentCard,
 };
 
 // trash synergy
@@ -456,7 +502,7 @@ export const millCardsByName = {
 export const trashAndExtraPlayCard = createCard({
   target: 'self',
   extraCardPlays: 2,
-  trash: 2,
+  trash: 1,
 });
 
 export const damageForEachTrashedCard = createCard({
