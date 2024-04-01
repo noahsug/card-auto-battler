@@ -61,8 +61,13 @@ Idea 3 (combination of previous ideas)
 
 ### Idea 3 jiggles
 
-- 0.02 = 68.60%
-- 0.04 = 71%
+a completely random shuffle on each pass = bad (28% win rate)
+
+instead, jiggle randomly from current weight so current weight has an impact on order
+
+40k iterations is best for 37 cards, 6 selection candidates, 2 selections
+
+giving a 0 or a -1 for a loss doesn't matter
 
 ### Edit distance
 

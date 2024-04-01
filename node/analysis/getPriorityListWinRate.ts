@@ -1,3 +1,4 @@
+import shuffle from 'lodash/shuffle';
 import {
   CARD_SELECTION_PICKS,
   CardState,
@@ -8,34 +9,85 @@ import {
 import { assert, assertIsNonNullable, percent } from '../../src/utils';
 import runGame from './runGame';
 
+// 40k iterations gives best results
+const ITERATIONS = 40000;
+
+/**
+ * Creates a priority list of cards that determines pick order for an entire play through.
+ * The list is created as follows:
+ *  1. play a bunch of games with random priority lists
+ *  2. track card wins, weighted by it's position in the priority list
+ *  3. return cards sorted by weighted wins
+ */
 export default function getPriorityListWinRate() {
-  const priorityList = nonStarterCardNames.slice();
+  let randomPriorityList = nonStarterCardNames.slice();
+
+  for (let i = 0; i < ITERATIONS; i++) {}
+
   const weightByCard = new Map(priorityList.map((card) => [card, 0]));
-  const jiggledWeightByCard = new Map(weightByCard.entries());
+
+  // let jiggledWeightByCard = new Map(weightByCard.entries());
+  let jiggledWeightByCard = new Map();
+  for (const card of priorityList) {
+    jiggledWeightByCard.set(card, Math.random());
+  }
+
+  let randomJiggle = new Map();
+  for (const card of priorityList) {
+    randomJiggle.set(card, Math.random());
+  }
 
   const pickCards = ({ cards }: { cards: CardState[] }) => {
-    return pickByHighestWeight({ cards, weightByCard: jiggledWeightByCard });
+    return pickByHighestWeight({ cards, weightByCard: randomJiggle });
   };
 
-  const iterations = 40000;
+  const iterations = 10000;
+  const jiggleMax = 0.7;
+  const jiggleMin = 0.7;
 
   const gameHistory: boolean[] = [];
   for (let i = 0; i < iterations; i++) {
     // between 1 and 0
-    const jiggleDampening = (iterations - i) / iterations;
-    // between 1 and 0.004
-    const jiggle = 0.004 + (1 - 0.004) * jiggleDampening;
-    updateJiggledWeightByCard({
-      jiggledWeightByCard,
-      weightByCard,
-      jiggle,
-    });
+    // const jiggleDampening = (iterations - i) / iterations;
+    // between jiggleMax and jiggleMin
+    // const jiggle = jiggleMin + (jiggleMax - jiggleMin) * jiggleDampening;
+    // const jiggle = 1;
+    // updateJiggledWeightByCard({
+    //   jiggledWeightByCard,
+    //   weightByCard,
+    //   jiggle,
+    // });
+
+    jiggledWeightByCard = new Map();
+    for (const card of priorityList) {
+      jiggledWeightByCard.set(card, Math.random());
+    }
+
+    randomJiggle = new Map();
+    for (const card of priorityList) {
+      randomJiggle.set(card, Math.random());
+    }
 
     const { isWin } = runGame({ pickCards });
 
     gameHistory.push(isWin);
 
-    priorityList.sort(getCompareByHighestWeightFn(jiggledWeightByCard));
+    const randomValuesByCard = new Map();
+    for (const card of priorityList) {
+      // const value = jiggledWeightByCard.get(card);
+      const value = randomJiggle.get(card);
+      // const value = Math.random();
+      randomValuesByCard.set(card, value);
+    }
+
+    priorityList = priorityList.sort(
+      (a, b) => (randomValuesByCard.get(b) ?? 0) - (randomValuesByCard.get(a) ?? 0),
+    );
+    // priorityList = priorityList.sort(getCompareByHighestWeightFn(jiggledWeightByCard));
+    // priorityList = shuffle(priorityList);
+    // if (i > 1000 && i < 1010) {
+    //   console.log(jiggledWeightByCard, priorityList);
+    // }
     const priorityByCard = getPriorityByCardMap(priorityList);
 
     const winModifier = isWin ? 1 : -1;
@@ -74,43 +126,43 @@ export default function getPriorityListWinRate() {
     //   });
     // }
 
-    if (i % 1000 === 0) {
-      const nonJiggledPriorityList = priorityList
-        .slice()
-        .sort(getCompareByHighestWeightFn(weightByCard));
-      const highestWeight = weightByCard.get(nonJiggledPriorityList[0]) ?? 1;
-      const lowestWeight =
-        weightByCard.get(nonJiggledPriorityList[nonJiggledPriorityList.length - 1]) ?? 1;
-      const wins = gameHistory.slice(gameHistory.length - 1000).filter(Boolean).length;
-      const trashForOpponentHealthCardPriority = nonJiggledPriorityList.indexOf(
-        'trashForOpponentHealthCard',
-      );
-      const trashCardCardPriority = nonJiggledPriorityList.indexOf('trashCard');
-      console.log(
-        'win rate:',
-        percent(wins / 1000, 1),
-        'trashForOpponentHealthCardPriority:',
-        trashForOpponentHealthCardPriority,
-        'trashCardCardPriority:',
-        trashCardCardPriority,
-        'weightGap',
-        highestWeight - lowestWeight,
-        'jiggle',
-        jiggle,
-      );
-    }
+    // if (i % 1000 === 0) {
+    //   const nonJiggledPriorityList = priorityList
+    //     .slice()
+    //     .sort(getCompareByHighestWeightFn(weightByCard));
+    //   const highestWeight = weightByCard.get(nonJiggledPriorityList[0]) ?? 1;
+    //   const lowestWeight =
+    //     weightByCard.get(nonJiggledPriorityList[nonJiggledPriorityList.length - 1]) ?? 1;
+    //   const wins = gameHistory.slice(gameHistory.length - 1000).filter(Boolean).length;
+    //   const trashForOpponentHealthCardPriority = nonJiggledPriorityList.indexOf(
+    //     'trashForOpponentHealthCard',
+    //   );
+    //   const trashCardCardPriority = nonJiggledPriorityList.indexOf('trashCard');
+    //   console.log(
+    //     'win rate:',
+    //     percent(wins / 1000, 1),
+    //     'trashForOpponentHealthCardPriority:',
+    //     trashForOpponentHealthCardPriority,
+    //     'trashCardCardPriority:',
+    //     trashCardCardPriority,
+    //     'weightGap',
+    //     highestWeight - lowestWeight,
+    //     'jiggle',
+    //     jiggle,
+    //   );
+    // }
   }
 
   priorityList.sort(getCompareByHighestWeightFn(weightByCard));
 
-  const highestWeight = weightByCard.get(priorityList[0]) ?? 1;
-  const lowestWeight = weightByCard.get(priorityList[priorityList.length - 1]) ?? 1;
-  console.log('highest - lowest:', highestWeight - lowestWeight);
-
-  priorityList.forEach((card) => {
-    const weight = weightByCard.get(card) ?? 0;
-    console.log(card, (weight - lowestWeight) / (highestWeight - lowestWeight));
-  });
+  // const highestWeight = weightByCard.get(priorityList[0]) ?? 1;
+  // const lowestWeight = weightByCard.get(priorityList[priorityList.length - 1]) ?? 1;
+  // console.log('highest - lowest:', highestWeight - lowestWeight);
+  //
+  // priorityList.forEach((card) => {
+  //   const weight = weightByCard.get(card) ?? 0;
+  //   console.log(card, (weight - lowestWeight) / (highestWeight - lowestWeight));
+  // });
   evaluateWinRate(priorityList);
 }
 
@@ -123,12 +175,12 @@ function updateJiggledWeightByCard({
   weightByCard: Map<NonStarterCardName, number>;
   jiggle: number;
 }) {
-  jiggledWeightByCard.forEach((_, card) => {
+  for (const card of weightByCard.keys()) {
     const weight = weightByCard.get(card);
     assertIsNonNullable(weight);
-    const jiggledWeight = weight + (Math.random() - 0.5) * jiggle;
+    const jiggledWeight = Math.random(); // weight + (Math.random() - 0.5) * jiggle;
     jiggledWeightByCard.set(card, jiggledWeight);
-  });
+  }
 }
 
 function evaluateWinRate(priorityList: NonStarterCardNames) {
@@ -143,7 +195,7 @@ function evaluateWinRate(priorityList: NonStarterCardNames) {
 
   let games = 0;
   let wins = 0;
-  for (let i = 0; i < 40000; i++) {
+  for (let i = 0; i < 10000; i++) {
     const { isWin } = runGame({ pickCards });
     if (isWin) {
       wins += 1;
