@@ -1,11 +1,16 @@
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
-import debounce from 'lodash/debounce';
 
 const CACHE_DISK_LOCATION = '/tmp/card-auto-battler/cache';
 
-export function hashValues({ files, values }: { files: string[]; values: Array<string | number> }) {
+export function hashValues({
+  files = [],
+  values = [],
+}: {
+  files?: string[];
+  values?: (string | number)[];
+}) {
   const fileChunks = files.map((file) => fs.readFileSync(file));
   const valueChunks = values.map((value) => String(value));
   return [...fileChunks, ...valueChunks]
@@ -33,13 +38,13 @@ export function getCachedFn<T extends (...args: any[]) => any>(
 
 function getCache<R>(fileName: string) {
   const diskPath = path.join(CACHE_DISK_LOCATION, fileName);
-  fs.mkdirSync(path.dirname(diskPath));
+  fs.mkdirSync(path.dirname(diskPath), { recursive: true });
 
   const cachedData = readDataFromDisk();
 
   function set(key: string, data: R) {
     cachedData.set(key, data);
-    debounce(() => writeDataToDisk(), undefined, { trailing: true });
+    writeDataToDisk();
   }
 
   function get(key: string) {
