@@ -1,4 +1,5 @@
 import shuffle from 'lodash/shuffle';
+
 import {
   CARD_SELECTION_PICKS,
   CardState,
@@ -6,12 +7,12 @@ import {
   NonStarterCardNames,
   nonStarterCardNames,
 } from '../../src/gameState';
-import { assert, assertIsNonNullable, percent } from '../../src/utils';
+import { assertIsNonNullable, percent } from '../../src/utils';
 import runGame from './runGame';
 import getWeightByPriority from './getWeightByPriority';
 
 // 40k iterations gives best results
-const ITERATIONS = 50000;
+const ITERATIONS = 40000;
 
 /**
  * Creates a priority list of cards that determines pick order for an entire play through.
@@ -73,7 +74,7 @@ function evaluateWinRate(priorityList: NonStarterCardNames) {
 
   let games = 0;
   let wins = 0;
-  for (let i = 0; i < 80000; i++) {
+  for (let i = 0; i < 40000; i++) {
     const { isWin } = runGame({ pickCards });
     if (isWin) {
       wins += 1;

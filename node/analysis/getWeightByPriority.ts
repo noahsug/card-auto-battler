@@ -8,13 +8,7 @@ const NUM_CARDS = nonStarterCards.length;
 const ITERATIONS = 1000000;
 
 export default function getWeightByPriority(priority: number) {
-  // const weightByPriority = [
-  //   0.161508, 0.159012, 0.155414, 0.150112, 0.14283, 0.135619, 0.126885, 0.118538, 0.109247,
-  //   0.100211, 0.091074, 0.082379, 0.07295, 0.065117, 0.057448, 0.049079, 0.042697, 0.036408,
-  //   0.030216, 0.025323, 0.02081, 0.016463, 0.013067, 0.01025, 0.00773, 0.005789, 0.004072, 0.002841,
-  //   0.001939, 0.001161, 0.000692, 0.000349, 0.000136, 0.00007, 0.00002, 0.000003, 0,
-  // ];
-  const weights = getPriorityWeightArray();
+  const weights = cachedGetPriorityWeightArray();
   assert(priority < weights.length);
 
   const largestWeight = weights[0];
@@ -48,7 +42,7 @@ function getExpectedCardPicksAtPriority(priority: number) {
   return numPicks / ITERATIONS;
 }
 
-const cachedGetWeightsByPriority = getCachedFn(getPriorityWeightArray, {
+const cachedGetPriorityWeightArray = getCachedFn(getPriorityWeightArray, {
   getCacheKey,
   fileName: 'getWeightsByPriority',
 });
@@ -64,10 +58,3 @@ function getCacheKey() {
     ],
   });
 }
-
-(() => {
-  const s = Date.now();
-  const r = cachedGetWeightsByPriority();
-  const e = Date.now();
-  console.log(e - s, r);
-})();
