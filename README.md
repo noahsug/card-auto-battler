@@ -27,8 +27,6 @@ Train neural network at different depths to measure difficulty (aka easy win % v
 - iteratively train neural network on input of confidence score for each card -> win rate then
 - iterate over random values returning best predicted score: 56.6%
 
-#### creating the priority list
-
 Idea 1 (no deck knowledge)
 
 - track card -> weight = 0
@@ -60,6 +58,11 @@ Idea 3 (combination of previous ideas)
 - after each game, add (win) or subtract (loss) priority weight to each card
 - final order is a sorted list of weights
 - run for 40k iterations?
+
+### Idea 3 jiggles
+
+- 0.02 = 68.60%
+- 0.04 = 71%
 
 ### Edit distance
 

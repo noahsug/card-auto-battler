@@ -20,25 +20,32 @@ function getExpectedNumSelections({
 }) {}
 
 (() => {
-  const T = 10;
-  const S = 3;
+  const T = 37;
+  const S = 6;
   const N = 2;
-  const P = 0;
 
   const iterations = 1000000;
-  let totalPSelections = 0;
 
-  for (let i = 0; i < iterations; i++) {
-    const cards: number[] = [];
-    for (let cardIndex = 0; cardIndex < S; cardIndex++) {
-      const card = Math.floor(Math.random() * T);
-      cards.push(card);
-    }
-
-    cards.sort();
-    const selection = cards.slice(0, N);
-    totalPSelections += selection.filter((c) => c === P).length;
+  for (let i = 0; i < T; i++) {
+    expectedCardsByPriority(i);
   }
 
-  const result = totalPSelections / iterations;
+  function expectedCardsByPriority(P: number) {
+    let totalPSelections = 0;
+
+    for (let i = 0; i < iterations; i++) {
+      const cards: number[] = [];
+      for (let cardIndex = 0; cardIndex < S; cardIndex++) {
+        const card = Math.floor(Math.random() * T);
+        cards.push(card);
+      }
+
+      cards.sort((a, b) => a - b);
+      const selection = cards.slice(0, N);
+      totalPSelections += selection.filter((c) => c === P).length;
+    }
+
+    const result = totalPSelections / iterations;
+    console.log(result);
+  }
 })();

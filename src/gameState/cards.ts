@@ -20,7 +20,7 @@ export const multihitStarterCard = createCard({ target: 'opponent', activations:
 
 export const strengthStarterCard = createCard({ target: 'self', strength: 1 });
 
-const starterCards = {
+export const starterCardsByName = {
   damageStarterCard,
   healStarterCard,
   dodgeStarterCard,
@@ -53,7 +53,7 @@ export const strengthTrashCard = createCard({ target: 'self', strength: 3, trash
 
 export const trashCard = createCard({ target: 'opponent', trash: 2 });
 
-const basicCards = {
+export const basicCardsByName = {
   damageCard,
   extraPlayCard,
   healCard,
@@ -98,7 +98,7 @@ export const damageSelfIfMissCard = createCard(
   },
 );
 
-const miscCards = { damageForEachCard, damageSelfIfMissCard };
+export const miscCardsByName = { damageForEachCard, damageSelfIfMissCard };
 
 // strength synergy
 
@@ -167,7 +167,7 @@ export const extraCardIfHighDamageCard = createCard(
   },
 );
 
-const strengthCards = {
+export const strengthCardsByName = {
   doubleStrengthCard,
   appliesStrengthTwiceCard,
   lifestealCard,
@@ -255,7 +255,7 @@ export const extraPlayIfBleedCard = createCard(
   },
 );
 
-const bleedCards = {
+export const bleedCardsByName = {
   damageForEachBleedCard,
   doubleBleedCard,
   gainStrengthForBleedCard,
@@ -360,7 +360,7 @@ export const damageForEachMissingHealthCard = createCard({
   ],
 });
 
-const lowHealthCards = {
+export const lowHealthCardsByName = {
   selfDamageCard,
   doubleDodgeIfLowHealthCard,
   extraPlayIfLowHealthCard,
@@ -396,7 +396,7 @@ export const extraCardIfHighHealthCard = createCard(
 
 export const extraPlayHealCard = createCard({ target: 'self', extraCardPlays: 1, heal: 3 });
 
-const healCards = { extraCardIfHighHealthCard, extraPlayHealCard };
+export const healCardsByName = { extraCardIfHighHealthCard, extraPlayHealCard };
 
 // mill synergy
 
@@ -444,7 +444,7 @@ export const trashForOpponentHealthCard = createCard({
   ],
 });
 
-const millCards = {
+export const millCardsByName = {
   trashAndTrashSelfCard,
   plusHealForEachTrashedCard,
   dodgeAndTrashCard,
@@ -501,7 +501,11 @@ export const healForEachTrashedCard = createCard({
   ],
 });
 
-const trashCards = { trashAndExtraPlayCard, damageForEachTrashedCard, healForEachTrashedCard };
+export const trashCardsByName = {
+  trashAndExtraPlayCard,
+  damageForEachTrashedCard,
+  healForEachTrashedCard,
+};
 
 // multicard synergy
 
@@ -554,63 +558,52 @@ export const extraPlayIfExtraPlayCard = createCard(
   },
 );
 
-const multicardCards = {
+export const multicardCardsByName = {
   damageForEachCardPlayedCard,
   extraPlayIfExtraPlayCard,
   extraPlaysTrashCard,
 };
 
-const starterCardArray = Object.values(starterCards);
-const basicCardArray = Object.values(basicCards);
-const miscCardArray = Object.values(miscCards);
-const strengthCardArray = Object.values(strengthCards);
-const bleedCardArray = Object.values(bleedCards);
-const lowHealthCardArray = Object.values(lowHealthCards);
-const healCardArray = Object.values(healCards);
-const millCardArray = Object.values(millCards);
-const trashCardArray = Object.values(trashCards);
-const multicardCardArray = Object.values(multicardCards);
-
-const nonStarterCards = {
-  ...basicCards,
-  ...miscCards,
-  ...strengthCards,
-  ...bleedCards,
-  ...lowHealthCards,
-  ...healCards,
-  ...millCards,
-  ...trashCards,
-  ...multicardCards,
+export const nonStarterCardsByName = {
+  ...basicCardsByName,
+  ...miscCardsByName,
+  ...strengthCardsByName,
+  ...bleedCardsByName,
+  ...lowHealthCardsByName,
+  ...healCardsByName,
+  ...millCardsByName,
+  ...trashCardsByName,
+  ...multicardCardsByName,
 };
 
-const allCards = {
-  ...nonStarterCards,
-  ...starterCards,
+export const cardsByName = {
+  ...nonStarterCardsByName,
+  ...starterCardsByName,
 };
 
-const nonStarterCardArray = Object.values(nonStarterCards);
+export const starterCards = Object.values(starterCardsByName);
+export const basicCards = Object.values(basicCardsByName);
+export const miscCards = Object.values(miscCardsByName);
+export const strengthCards = Object.values(strengthCardsByName);
+export const bleedCards = Object.values(bleedCardsByName);
+export const lowHealthCards = Object.values(lowHealthCardsByName);
+export const healCards = Object.values(healCardsByName);
+export const millCards = Object.values(millCardsByName);
+export const trashCards = Object.values(trashCardsByName);
+export const multicardCards = Object.values(multicardCardsByName);
 
-export function getCardName(card: CardState) {
-  const [name] = Object.entries(allCards).find(([_, c]) => c === card) || [];
-  return name;
-}
+export const nonStarterCards = Object.values(nonStarterCardsByName);
 
-Object.entries(allCards).forEach(([name, card]) => {
+Object.entries(cardsByName).forEach(([name, card]) => {
   card.name = name;
 });
 
-export {
-  allCards as cardsByName,
-  nonStarterCards as nonStarterCardsByName,
-  nonStarterCardArray as nonStarterCards,
-  starterCardArray as starterCards,
-  basicCardArray as basicCards,
-  miscCardArray as miscCards,
-  strengthCardArray as strengthCards,
-  bleedCardArray as bleedCards,
-  lowHealthCardArray as lowHealthCards,
-  healCardArray as healCards,
-  millCardArray as millCards,
-  trashCardArray as trashCards,
-  multicardCardArray as multicardCards,
-};
+export const cardNames = Object.keys(cardsByName) as (keyof typeof cardsByName)[];
+export type CardName = (typeof cardNames)[number];
+export type CardNames = CardName[];
+
+export const nonStarterCardNames = Object.keys(
+  nonStarterCardsByName,
+) as (keyof typeof nonStarterCardsByName)[];
+export type NonStarterCardName = (typeof nonStarterCardNames)[number];
+export type NonStarterCardNames = NonStarterCardName[];
