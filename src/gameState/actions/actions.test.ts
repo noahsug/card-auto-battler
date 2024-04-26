@@ -19,6 +19,7 @@ import {
   healForEachTrashedCard,
   damageSelfIfMissCard,
   appliesStrengthTwiceCard,
+  gainStrengthForBleedCard,
 } from '../cards';
 
 const damage0 = createCard({ target: 'opponent', damage: 0 });
@@ -386,6 +387,16 @@ describe('gainEffects', () => {
     ]);
     expect(startingState.enemy.health - endingState.enemy.health).toBe(2);
     expect(startingState.user.health - endingState.user.health).toBe(-2);
+  });
+
+  describe('gainStrengthForBleedCard', () => {
+    it('gains strength for each bleed', () => {
+      const { endingState } = playCards([
+        createCard({ target: 'opponent', bleed: 2 }),
+        gainStrengthForBleedCard,
+      ]);
+      expect(endingState.user.strength).toBe(2);
+    });
   });
 
   it('gains dodge for each hit', () => {

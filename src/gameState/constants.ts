@@ -1,4 +1,4 @@
-export const MAX_WINS = 3;
+export const MAX_WINS = 7;
 export const MAX_LOSSES = 2;
 
 export const BLEED_DAMAGE = 3;
