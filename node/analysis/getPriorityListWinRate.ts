@@ -16,9 +16,11 @@ const ITERATIONS = 40000;
 
 /**
  * Creates a priority list of cards that determines pick order for an entire play through.
- * The list is created as follows:
+ * Priority equates to how powerful a single card is on its own.
+ *
+ * The priority list is created as follows:
  *  1. play a bunch of games with random priority lists
- *  2. track card wins, weighted by it's position in the priority list
+ *  2. track card wins, weighted by the cards position in the priority list (see `getWeightByPriority`)
  *  3. return cards sorted by weighted wins
  */
 export default function getPriorityListWinRate() {
