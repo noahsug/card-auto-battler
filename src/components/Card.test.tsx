@@ -4,73 +4,73 @@ import Card from './Card';
 import { CardState, createCard, cardsByName } from '../gameState';
 
 describe('card text', () => {
-  function getCardElement(cardState: CardState) {
+  function getCardText(cardState: CardState) {
     const { baseElement } = render(<Card card={cardState} />);
-    return baseElement;
+    return baseElement.textContent;
   }
 
   it('renders damage', () => {
-    const card = getCardElement(createCard({ target: 'opponent', damage: 5 }));
+    const cardText = getCardText(createCard({ target: 'opponent', damage: 5 }));
 
-    expect(card.textContent).toMatchInlineSnapshot(`"5⚔️"`);
+    expect(cardText).toMatchInlineSnapshot(`"5⚔️"`);
   });
 
   it('renders heal', () => {
-    const card = getCardElement(createCard({ target: 'self', heal: 5 }));
+    const cardText = getCardText(createCard({ target: 'self', heal: 5 }));
 
-    expect(card.textContent).toMatchInlineSnapshot(`"5❤️to self"`);
+    expect(cardText).toMatchInlineSnapshot(`"5❤️to self"`);
   });
 
   it('renders self damage', () => {
-    const card = getCardElement(createCard({ target: 'self', damage: 5 }));
+    const cardText = getCardText(createCard({ target: 'self', damage: 5 }));
 
-    expect(card.textContent).toMatchInlineSnapshot(`"5⚔️to self"`);
+    expect(cardText).toMatchInlineSnapshot(`"5⚔️to self"`);
   });
 
   describe('with activations', () => {
     it('renders positive activations', () => {
-      const card = getCardElement(createCard({ target: 'opponent', damage: 5, activations: 3 }));
+      const cardText = getCardText(createCard({ target: 'opponent', damage: 5, activations: 3 }));
 
-      expect(card.textContent).toMatchInlineSnapshot(`"5⚔️3x times"`);
+      expect(cardText).toMatchInlineSnapshot(`"5⚔️3x times"`);
     });
     it('renders 0 activations', () => {
-      const card = getCardElement(createCard({ target: 'opponent', damage: 5, activations: 0 }));
+      const cardText = getCardText(createCard({ target: 'opponent', damage: 5, activations: 0 }));
 
-      expect(card.textContent).toMatchInlineSnapshot(`"5⚔️0x times"`);
+      expect(cardText).toMatchInlineSnapshot(`"5⚔️0x times"`);
     });
   });
 
   it('renders multiple card effects', () => {
-    const card = getCardElement(
+    const cardText = getCardText(
       createCard(
         { target: 'opponent', damage: 5, bleed: 2 },
         { target: 'self', dodge: 1, extraCardPlays: 1, strength: 1, activations: 2 },
       ),
     );
 
-    expect(card.textContent).toMatchInlineSnapshot(`"5⚔️2🩸1🃏1💨1💪2x timesto self"`);
+    expect(cardText).toMatchInlineSnapshot(`"5⚔️2🩸1🃏1💨1💪2x timesto self"`);
   });
 
   it('renders a status effect', () => {
-    const card = getCardElement(createCard({ target: 'opponent', bleed: 2 }));
+    const cardText = getCardText(createCard({ target: 'opponent', bleed: 2 }));
 
-    expect(card.textContent).toMatchInlineSnapshot(`"2🩸"`);
+    expect(cardText).toMatchInlineSnapshot(`"2🩸"`);
   });
 
   it('renders trash self', () => {
-    const card = getCardElement(createCard({ target: 'opponent', damage: 5, trashSelf: true }));
+    const cardText = getCardText(createCard({ target: 'opponent', damage: 5, trashSelf: true }));
 
-    expect(card.textContent).toMatchInlineSnapshot(`"5⚔️trash this card"`);
+    expect(cardText).toMatchInlineSnapshot(`"5⚔️trash this card"`);
   });
 
   it('renders trash', () => {
-    const card = getCardElement(createCard({ target: 'opponent', damage: 3, trash: 2 }));
+    const cardText = getCardText(createCard({ target: 'opponent', damage: 3, trash: 2 }));
 
-    expect(card.textContent).toMatchInlineSnapshot(`"3⚔️2 trash"`);
+    expect(cardText).toMatchInlineSnapshot(`"3⚔️2 trash"`);
   });
 
   it('renders conditionals', () => {
-    const card = getCardElement(
+    const cardText = getCardText(
       createCard({
         target: 'opponent',
         damage: 3,
@@ -87,12 +87,12 @@ describe('card text', () => {
       }),
     );
 
-    expect(card.textContent).toMatchInlineSnapshot(`"3⚔️if self health < 50% self max health"`);
+    expect(cardText).toMatchInlineSnapshot(`"3⚔️if self health < 50% self max health"`);
   });
 
   describe('with effect gains', () => {
     it('renders +damage for every bleed', () => {
-      const card = getCardElement(
+      const cardText = getCardText(
         createCard({
           target: 'opponent',
           gainEffectsList: [
@@ -104,11 +104,11 @@ describe('card text', () => {
         }),
       );
 
-      expect(card.textContent).toMatchInlineSnapshot(`"+1⚔️ for every opponent 🩸"`);
+      expect(cardText).toMatchInlineSnapshot(`"+1⚔️ for every opponent 🩸"`);
     });
 
     it('renders damage and +times for every strength', () => {
-      const card = getCardElement(
+      const cardText = getCardText(
         createCard({
           target: 'opponent',
           damage: 2,
@@ -121,11 +121,11 @@ describe('card text', () => {
         }),
       );
 
-      expect(card.textContent).toMatchInlineSnapshot(`"2⚔️+1x times for every self 💪"`);
+      expect(cardText).toMatchInlineSnapshot(`"2⚔️+1x times for every self 💪"`);
     });
 
     it('renders double strength', () => {
-      const card = getCardElement(
+      const cardText = getCardText(
         createCard({
           target: 'self',
           gainEffectsList: [
@@ -140,13 +140,11 @@ describe('card text', () => {
         }),
       );
 
-      expect(card.textContent).toMatchInlineSnapshot(
-        `"+1💪, trash this card to self for every self 💪"`,
-      );
+      expect(cardText).toMatchInlineSnapshot(`"+1💪, trash this card to self for every self 💪"`);
     });
 
     it('renders damage X times for every health', () => {
-      const card = getCardElement(
+      const cardText = getCardText(
         createCard({
           target: 'opponent',
           damage: 1,
@@ -160,11 +158,11 @@ describe('card text', () => {
         }),
       );
 
-      expect(card.textContent).toMatchInlineSnapshot(`"1⚔️for every self health"`);
+      expect(cardText).toMatchInlineSnapshot(`"1⚔️for every self health"`);
     });
 
     it('renders +dodge for every trashed card', () => {
-      const card = getCardElement(
+      const cardText = getCardText(
         createCard({
           target: 'self',
           gainEffectsList: [
@@ -176,11 +174,11 @@ describe('card text', () => {
         }),
       );
 
-      expect(card.textContent).toMatchInlineSnapshot(`"+1💨 to self for every self trashed cards"`);
+      expect(cardText).toMatchInlineSnapshot(`"+1💨 to self for every self trashed cards"`);
     });
 
     it('renders +heal for every damage dealt', () => {
-      const card = getCardElement(
+      const cardText = getCardText(
         createCard(
           { target: 'opponent', damage: 2 },
           {
@@ -195,11 +193,11 @@ describe('card text', () => {
         ),
       );
 
-      expect(card.textContent).toMatchInlineSnapshot(`"2⚔️+1❤️ to self for every damage dealt"`);
+      expect(cardText).toMatchInlineSnapshot(`"2⚔️+1❤️ to self for every damage dealt"`);
     });
 
     it('renders conditionals', () => {
-      const card = getCardElement(
+      const cardText = getCardText(
         createCard({
           target: 'opponent',
           damage: 3,
@@ -217,15 +215,13 @@ describe('card text', () => {
         }),
       );
 
-      expect(card.textContent).toMatchInlineSnapshot(
-        `"3⚔️+3⚔️, trash this card if opponent 🩸 >= 3"`,
-      );
+      expect(cardText).toMatchInlineSnapshot(`"3⚔️+3⚔️, trash this card if opponent 🩸 >= 3"`);
     });
   });
 
   it.each(Object.entries(cardsByName))(`renders %s`, (_, cardState) => {
-    const card = getCardElement(cardState);
+    const cardText = getCardText(cardState);
 
-    expect(card.textContent).toMatchSnapshot();
+    expect(cardText).toMatchSnapshot();
   });
 });

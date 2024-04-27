@@ -236,11 +236,17 @@ function getCardTextItems(effects: CardEffects, index: number) {
   return textItems;
 }
 
+function getReadableCardName(name: string) {
+  return name.replace(/Card$/, '');
+}
+
 export default function Card({ card, isActive = false, scale = 1, className, onClick }: Props) {
   const textItemsBySection = card.effects.map(getCardTextItems);
+  const cardName = getReadableCardName(card.name);
 
   return (
     <Root $isActive={isActive} $scale={scale} className={className} onClick={onClick}>
+      <CardName>{cardName}</CardName>
       <div>
         {textItemsBySection.map((textItems, i) => (
           <CardTextSection key={i}>{textItems}</CardTextSection>
@@ -254,6 +260,7 @@ const Root = styled.div<{ $scale: number; $isActive: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 10rem;
@@ -275,4 +282,14 @@ const CardTextSection = styled.div`
   & + & {
     margin-top: 10rem;
   }
+`;
+
+const CardName = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  font-size: 10rem;
+  font-weight: bold;
+  margin-bottom: 10rem;
 `;

@@ -18,6 +18,41 @@ Compare priority list with deck knowledge vs no deck knowledge
 
 Train neural network at different depths to measure difficulty (aka easy win % vs hard win %)
 
+### Meta Analysis
+
+1. Priority list of all cards shows best "generally good card" list
+
+2. Priority lists of a particular strategy shows win rate for that strategy
+
+   - normal priority list generation logic, but cards form the category are always ranked highest
+   - the remaining cards are ranked according to "generally good card" list
+   - "strategy strength"
+
+3. Generate priority lists for every combination of two strategies to show strategy synergy
+
+4. Create AI that uses strategy heat map to choose best strategy priority list depending on which
+   cards it sees and has picked
+
+   - calculate % of each strategy path it's gone down so far combined with that strategies win rate
+   - show % of each strategy chosen and its win %, as well as overall win %
+   - good game health = no single strategy always dominating and smaller choose % = higher win %
+     (e.g. if a strategy wins a lot it should be niche and hard to build)
+   - can pick from single strategies and combined strategies
+
+5. Automatically find strategies (aka clusters)
+
+   - can start by using a manual function (e.g. look for cards with `bleed`)
+   - find priority list of length X that have a higher win rate when picked together
+   - can start with X = 2 and go from there
+   - for each strategy, remove / add a card and see if win rate is affected?
+
+6. Find card / strategy heuristics
+
+   - for each card, what % of the deck do we want it to make up, penalty of multiple copies?
+   - what % of cards do we want from strategy vs from 'generally good cards'
+   - what's the 'strategy pull' for each card, aka how hard to we pivot to a strategy when a
+     card is seen
+
 ## gameplay
 
 effects implemented
