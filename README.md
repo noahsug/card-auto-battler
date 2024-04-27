@@ -42,9 +42,13 @@ Train neural network at different depths to measure difficulty (aka easy win % v
 5. Automatically find strategies (aka clusters)
 
    - can start by using a manual function (e.g. look for cards with `bleed`)
-   - find priority list of length X that have a higher win rate when picked together
-   - can start with X = 2 and go from there
-   - for each strategy, remove / add a card and see if win rate is affected?
+   - find priority list of length X that have a higher win rate when picked together, start
+     with X = 2
+   - create simulation of X starter cards + Y cards to check for synergies / heuristics
+     - how well a single card does
+     - how good / bad are multiple copies of a card
+     - identify card synergy clusters
+     - how well does a synergy do early game vs late game
 
 6. Find card / strategy heuristics
 

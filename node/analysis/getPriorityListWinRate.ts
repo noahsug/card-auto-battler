@@ -1,7 +1,7 @@
 import shuffle from 'lodash/shuffle';
 
 import {
-  CARD_SELECTION_PICKS,
+  NUM_CARD_SELECTION_PICKS,
   CardState,
   NonStarterCardName,
   NonStarterCardNames,
@@ -102,7 +102,7 @@ function pickCardsByPriorityList({
       const nameB = b.name as NonStarterCardName;
       return compareFn(nameA, nameB);
     })
-    .slice(0, CARD_SELECTION_PICKS);
+    .slice(0, NUM_CARD_SELECTION_PICKS);
 }
 
 // used to sort by descending weight

@@ -13,7 +13,7 @@ import {
   getCanPlayCard,
   getIsBattleOver,
   MAX_WINS,
-  CARD_SELECTION_PICKS,
+  NUM_CARD_SELECTION_PICKS,
   CardState,
   cardsByName,
   nonStarterCardsByName,
@@ -30,6 +30,7 @@ import {
 import { getCardSelectionsForBattle } from '../../src/gameState/cardSelection';
 import { percent, moveItem } from '../../src/utils';
 import getPriorityListWinRate from './getPriorityListWinRate';
+import { findCardClusters } from './findCardClusters';
 
 const aiTypes = [...enemyTypes, 'random', 'bestCard'] as const;
 
@@ -92,9 +93,8 @@ let RUNS = 200;
 const DECKS_TO_TRY = 3000;
 
 function run() {
-  getPriorityListWinRate();
-  // testGradientDecent();
-  // test();
+  // getPriorityListWinRate();
+  findCardClusters();
 }
 
 function testGradientDecent() {
@@ -320,10 +320,10 @@ function pickCards({ cards, aiContext }: { cards: CardState[]; aiContext: AICont
             (cardRanksByName.get(nameA) ?? Infinity) - (cardRanksByName.get(nameB) ?? Infinity)
           );
         })
-        .slice(0, CARD_SELECTION_PICKS)
+        .slice(0, NUM_CARD_SELECTION_PICKS)
     );
   } else if (aiContext.type === 'random') {
-    return sampleSize(cards, CARD_SELECTION_PICKS);
+    return sampleSize(cards, NUM_CARD_SELECTION_PICKS);
   }
 
   return pickCardsByEnemyType(aiContext.type);

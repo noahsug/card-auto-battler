@@ -33,7 +33,7 @@ import {
   extraPlayIfExtraPlayCard,
 } from './cards';
 import { getStartingCards, getCardSelectionsForBattle } from './cardSelection';
-import { CARD_SELECTION_PICKS } from './constants';
+import { NUM_CARD_SELECTION_PICKS } from './constants';
 import { CardState } from './gameState';
 
 export const enemyTypes = [
@@ -137,7 +137,7 @@ export function pickCards(enemyType: EnemyType) {
           if (card === priorityCard) {
             selectedCards.push(card);
           }
-          return selectedCards.length >= CARD_SELECTION_PICKS;
+          return selectedCards.length >= NUM_CARD_SELECTION_PICKS;
         });
       }
       return false;
@@ -145,7 +145,7 @@ export function pickCards(enemyType: EnemyType) {
   });
 
   // if we didn't find enough cards we liked, pick random cards
-  for (let i = selectedCards.length; i < CARD_SELECTION_PICKS; i++) {
+  for (let i = selectedCards.length; i < NUM_CARD_SELECTION_PICKS; i++) {
     const randomCard = cardOptions[Math.floor(Math.random() * cardOptions.length)];
     selectedCards.push(randomCard);
   }

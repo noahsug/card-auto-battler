@@ -1,5 +1,8 @@
 import { nonStarterCards } from '../../src/gameState';
-import { CARD_SELECTION_OPTIONS, CARD_SELECTION_PICKS } from '../../src/gameState/constants';
+import {
+  NUM_CARD_SELECTION_OPTIONS,
+  NUM_CARD_SELECTION_PICKS,
+} from '../../src/gameState/constants';
 import { assert } from '../../src/utils';
 import { hashValues, getCachedFn } from './cache';
 
@@ -29,13 +32,13 @@ function getExpectedCardPicksAtPriority(priority: number) {
 
   for (let i = 0; i < ITERATIONS; i++) {
     const cards: number[] = [];
-    for (let cardIndex = 0; cardIndex < CARD_SELECTION_OPTIONS; cardIndex++) {
+    for (let cardIndex = 0; cardIndex < NUM_CARD_SELECTION_OPTIONS; cardIndex++) {
       const card = Math.floor(Math.random() * NUM_CARDS);
       cards.push(card);
     }
 
     cards.sort((a, b) => a - b);
-    const selection = cards.slice(0, CARD_SELECTION_PICKS);
+    const selection = cards.slice(0, NUM_CARD_SELECTION_PICKS);
     numPicks += selection.filter((c) => c === priority).length;
   }
 
@@ -53,8 +56,8 @@ function getCacheKey() {
       getPriorityWeightArray.toString(),
       NUM_CARDS,
       ITERATIONS,
-      CARD_SELECTION_OPTIONS,
-      CARD_SELECTION_PICKS,
+      NUM_CARD_SELECTION_OPTIONS,
+      NUM_CARD_SELECTION_PICKS,
     ],
   });
 }

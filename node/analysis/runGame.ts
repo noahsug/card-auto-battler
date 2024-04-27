@@ -29,7 +29,7 @@ export default function runGame({ pickCards }: { pickCards: PickCards }) {
   return { game, isWin: game.wins >= MAX_WINS };
 }
 
-function runBattle(game: GameState) {
+export function runBattle(game: GameState) {
   if (game.screen !== 'battle') {
     startBattle(game);
   }
