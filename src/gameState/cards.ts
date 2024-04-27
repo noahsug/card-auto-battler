@@ -70,7 +70,7 @@ export const basicCardsByName = {
 export const damageForEachCard = createCard({
   target: 'opponent',
   trashSelf: true,
-  damage: -1,
+  damage: -3,
   gainEffectsList: [
     {
       effects: { damage: 1 },
@@ -168,7 +168,7 @@ export const extraCardIfHighDamageCard = createCard(
 );
 
 export const strengthCardsByName = {
-  doubleStrengthCard: tripleStrengthCard,
+  tripleStrengthCard,
   appliesStrengthTwiceCard,
   lifestealCard,
   extraCardIfHighDamageCard,

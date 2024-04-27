@@ -44,7 +44,7 @@ function getExpectedCardPicksAtPriority(priority: number) {
 
 const cachedGetPriorityWeightArray = getCachedFn(getPriorityWeightArray, {
   getCacheKey,
-  fileName: 'getWeightsByPriority',
+  name: 'getPriorityWeightArray',
 });
 
 function getCacheKey() {

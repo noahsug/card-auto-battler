@@ -71,7 +71,7 @@ let cardPriority = [
   'strengthCard',
   'bleedCard',
   'damageSelfIfMissCard',
-  'doubleStrengthCard',
+  'tripleStrengthCard',
   'gainStrengthForBleedCard',
   'extraPlayIfLowHealthCard',
   'damageForEachCardPlayedCard',

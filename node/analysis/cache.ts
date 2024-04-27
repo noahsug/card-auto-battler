@@ -20,9 +20,9 @@ export function hashValues({
 
 export function getCachedFn<T extends (...args: any[]) => any>(
   fn: T,
-  { getCacheKey, fileName }: { getCacheKey: (...args: Parameters<T>) => string; fileName: string },
+  { getCacheKey, name }: { getCacheKey: (...args: Parameters<T>) => string; name: string },
 ) {
-  const cache = getCache<ReturnType<T>>(fileName);
+  const cache = getCache<ReturnType<T>>(name);
 
   return (...args: Parameters<T>) => {
     const key = getCacheKey(...args);
@@ -36,8 +36,8 @@ export function getCachedFn<T extends (...args: any[]) => any>(
   };
 }
 
-function getCache<R>(fileName: string) {
-  const diskPath = path.join(CACHE_DISK_LOCATION, fileName);
+function getCache<R>(name: string) {
+  const diskPath = path.join(CACHE_DISK_LOCATION, name);
   fs.mkdirSync(path.dirname(diskPath), { recursive: true });
 
   const cachedData = readDataFromDisk();

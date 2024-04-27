@@ -95,3 +95,5 @@ exports[`card text renders trashCard 1`] = `"2 trash"`;
 exports[`card text renders trashForOpponentHealthCard 1`] = `"+1 trash for every 5 opponent health"`;
 
 exports[`card text renders tripleBleedCard 1`] = `"+2🩸, trash this card for every opponent 🩸"`;
+
+exports[`card text renders tripleStrengthCard 1`] = `"+2💪, trash this card to self for every self 💪"`;

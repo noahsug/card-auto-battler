@@ -21,6 +21,7 @@ import {
   appliesStrengthTwiceCard,
   gainStrengthForBleedCard,
   extraPlayIfBleedCard,
+  tripleStrengthCard,
 } from '../cards';
 
 const damage0 = createCard({ target: 'opponent', damage: 0 });
@@ -302,27 +303,6 @@ describe('gainEffects', () => {
     expect(startingState.enemy.health - endingState.enemy.health).toBe(3 + 7);
   });
 
-  it('doubles strength', () => {
-    const doubleStrength: CardState = createCard({
-      target: 'self',
-      gainEffectsList: [
-        {
-          effects: { strength: 1 },
-          forEveryPlayerValue: {
-            target: 'self',
-            name: 'strength',
-          },
-        },
-      ],
-    });
-
-    const { endingState } = playCards([
-      createCard({ target: 'self', strength: 2 }),
-      doubleStrength,
-    ]);
-    expect(endingState.user.strength).toBe(4);
-  });
-
   describe('damage for each bleed', () => {
     const forEachOpponentBleed: CardEffects = {
       target: 'opponent',
@@ -470,6 +450,24 @@ describe('gainEffects', () => {
       stopAfterUserTurns: 2,
     });
     expect(startingState.enemy.health - endingState.enemy.health).toBe(1 + 4);
+  });
+});
+
+describe('tripleStrengthCard', () => {
+  it('triples strength', () => {
+    const { endingState, startingState } = playCards([
+      createCard({ target: 'self', strength: 2 }),
+      tripleStrengthCard,
+      damage1,
+    ]);
+
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(7);
+  });
+
+  it('does nothing if strength is 0', () => {
+    const { endingState, startingState } = playCards([tripleStrengthCard, damage1]);
+
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(1);
   });
 });
 
