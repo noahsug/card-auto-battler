@@ -20,6 +20,7 @@ import {
   damageSelfIfMissCard,
   appliesStrengthTwiceCard,
   gainStrengthForBleedCard,
+  extraPlayIfBleedCard,
 } from '../cards';
 
 const damage0 = createCard({ target: 'opponent', damage: 0 });
@@ -469,6 +470,29 @@ describe('gainEffects', () => {
       stopAfterUserTurns: 2,
     });
     expect(startingState.enemy.health - endingState.enemy.health).toBe(1 + 4);
+  });
+});
+
+describe('extraPlayIfBleedCard', () => {
+  it('plays an extra card if the opponent has bleed', () => {
+    const userCards = [createCard({ target: 'opponent', bleed: 1 }), extraPlayIfBleedCard, damage1];
+    const { startingState, endingState } = runBattle({
+      user: { cards: userCards },
+      stopAfterUserTurns: 2,
+    });
+
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(8);
+  });
+
+  it('does not play an extra card if the opponent has no bleed', () => {
+    const userCards = [createCard({ target: 'opponent', bleed: 0 }), extraPlayIfBleedCard, damage1];
+
+    const { startingState, endingState } = runBattle({
+      user: { cards: userCards },
+      stopAfterUserTurns: 2,
+    });
+
+    expect(startingState.enemy.health - endingState.enemy.health).toBe(4);
   });
 });
 

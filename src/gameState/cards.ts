@@ -268,10 +268,6 @@ export const bothBleedCard = createCard(
 
 export const extraPlayIfBleedCard = createCard(
   {
-    target: 'opponent',
-    damage: 4,
-  },
-  {
     target: 'self',
     gainEffectsList: [
       {
@@ -284,6 +280,10 @@ export const extraPlayIfBleedCard = createCard(
         },
       },
     ],
+  },
+  {
+    target: 'opponent',
+    damage: 4,
   },
 );
 
