@@ -18,6 +18,11 @@ export default function getWeightByPriority(priority: number) {
   return weights[priority] / largestWeight;
 }
 
+const cachedGetPriorityWeightArray = getCachedFn(getPriorityWeightArray, {
+  getCacheKey,
+  name: 'getPriorityWeightArray',
+});
+
 function getPriorityWeightArray() {
   const weightsByPriority = new Array(NUM_CARDS);
   for (let i = 0; i < NUM_CARDS; i++) {
@@ -44,11 +49,6 @@ function getExpectedCardPicksAtPriority(priority: number) {
 
   return numPicks / ITERATIONS;
 }
-
-const cachedGetPriorityWeightArray = getCachedFn(getPriorityWeightArray, {
-  getCacheKey,
-  name: 'getPriorityWeightArray',
-});
 
 function getCacheKey() {
   return hashValues({

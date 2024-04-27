@@ -14,6 +14,7 @@ import { startCardSelection, addCard, startBattle, endBattle } from '../../src/g
 import { NUM_CARD_SELECTION_OPTIONS } from '../../src/gameState/constants';
 import { runBattle } from './runGame';
 import { percent } from '../../src/utils';
+import { getCachedFn, hashValues } from './cache';
 
 const ITERATIONS = 2000;
 
@@ -27,8 +28,32 @@ export function findCardClusters() {
   const battleNumber = BATTLE_NUMBER;
   const fillerCard = FILLER_CARD;
 
-  const { numWins, numGames } = getCardsWinRate({ cards, battleNumber, fillerCard });
-  console.log('win rate:', percent(numWins / numGames, 1));
+  const winRate = cachedGetCardsWinRate({ cards, battleNumber, fillerCard });
+  console.log('win rate:', percent(winRate, 1));
+}
+
+const cachedGetCardsWinRate = getCachedFn(getCardsWinRate, {
+  getCacheKey: getCardsWinRateCacheKey,
+  name: 'getCardsWinRate',
+});
+
+function getCardsWinRateCacheKey({
+  cards,
+  battleNumber,
+  fillerCard,
+}: {
+  cards: CardState[];
+  battleNumber: number;
+  fillerCard: CardState;
+}) {
+  return hashValues({
+    values: [
+      ...cards.map((card) => JSON.stringify(card)).sort(),
+      battleNumber,
+      JSON.stringify(fillerCard),
+      ITERATIONS,
+    ],
+  });
 }
 
 function getCardsWinRate({
@@ -50,7 +75,7 @@ function getCardsWinRate({
     }
   }
 
-  return { numWins, numGames: ITERATIONS };
+  return numWins / ITERATIONS;
 }
 
 function getUserCards({
