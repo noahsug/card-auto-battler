@@ -14,7 +14,7 @@ import { runFakeBattle } from './simulationHelper';
 
 const cardIndexByName = new Map(cards.map((card, index) => [card.name, index]));
 
-const ITERATIONS = 1000;
+const ITERATIONS = 40000;
 
 export default function printBestCardsByBattle() {
   const winRatesByCardPicks = getWinRatesByCardPicks({ battleNumber: 1 });
@@ -33,7 +33,7 @@ export default function printBestCardsByBattle() {
 
   const net = new NeuralNetwork<number[], number[]>();
   console.log('training...');
-  net.train(trainingData, { iterations: 1000 });
+  net.train(trainingData, { iterations: 2 });
 
   const testInput = new Array(cards.length).fill(0);
   testInput[39] = 3; // damageStarterCard
