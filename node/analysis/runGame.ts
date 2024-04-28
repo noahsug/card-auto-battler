@@ -5,6 +5,7 @@ import {
   getCanPlayCard,
   getIsBattleOver,
   CardState,
+  getIsEnemyTurn,
 } from '../../src/gameState';
 import {
   endBattle,
@@ -32,14 +33,23 @@ export default function runGame({ pickCards }: { pickCards: PickCards }) {
 export function runBattle(game: GameState) {
   if (game.screen !== 'battle') {
     startBattle(game);
+    // console.log(
+    //   'start battle',
+    //   game.user.cards.map((c) => c.name),
+    //   game.enemy.cards.map((c) => c.name),
+    // );
   }
 
   startTurn(game);
 
   while (getCanPlayCard(game)) {
+    // if (!getIsEnemyTurn(game)) {
+    //   console.log(game.user.health, game.enemy.health);
+    // }
     playCard(game);
 
     if (getIsBattleOver(game)) {
+      // console.log(game.user.health, game.enemy.health);
       endBattle(game);
       return;
     }

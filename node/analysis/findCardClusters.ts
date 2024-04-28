@@ -1,35 +1,80 @@
 import assert from 'assert';
 import {
-  MAX_LOSSES,
   MAX_WINS,
   NUM_STARTING_CARDS,
-  bleedCard,
   damageStarterCard,
-  extraPlayIfBleedCard,
   createInitialGameState,
   CardState,
   GameState,
+  nonStarterCards,
 } from '../../src/gameState';
 import { startCardSelection, addCard, startBattle, endBattle } from '../../src/gameState/actions';
-import { NUM_CARD_SELECTION_OPTIONS } from '../../src/gameState/constants';
+import { NUM_CARD_SELECTION_PICKS } from '../../src/gameState/constants';
 import { runBattle } from './runGame';
 import { percent } from '../../src/utils';
 import { getCachedFn, hashValues } from './cache';
 
-const ITERATIONS = 2000;
+const ITERATIONS = 5000;
 
-const BATTLE_NUMBER = Math.round((MAX_LOSSES + MAX_WINS) / 2);
-const CARDS = [bleedCard, extraPlayIfBleedCard];
-// const CARDS = [] as CardState[];
+const BATTLE_NUMBER = 1;
 const FILLER_CARD = damageStarterCard;
 
 export function findCardClusters() {
-  const cards = CARDS;
-  const battleNumber = BATTLE_NUMBER;
-  const fillerCard = FILLER_CARD;
+  function getWinRate(cards: CardState[]) {
+    const battleNumber = BATTLE_NUMBER;
+    const fillerCard = FILLER_CARD;
+    return cachedGetCardsWinRate({ cards, battleNumber, fillerCard });
+  }
 
-  const winRate = cachedGetCardsWinRate({ cards, battleNumber, fillerCard });
-  console.log('win rate:', percent(winRate, 1));
+  const results = [] as any[];
+
+  for (let i = 0; i < nonStarterCards.length - 1; i++) {
+    for (let j = i + 1; j < nonStarterCards.length; j++) {
+      // i = 17; // damageForEachBleedCard
+      // i = 18; // tripleBleedCard
+      // i = 13; // lifestealCard;
+      // j = 20; // bothBleedCard
+
+      const cardA = nonStarterCards[i];
+      const cardB = nonStarterCards[j];
+
+      const cardAWinRate = getWinRate([cardA, cardA]);
+      const cardBWinRate = getWinRate([cardB, cardB]);
+      const pairWinRate = getWinRate([cardA, cardB]);
+
+      const positiveSynergy = pairWinRate - Math.max(cardAWinRate, cardBWinRate);
+      const negativeSynergy = pairWinRate - Math.min(cardAWinRate, cardBWinRate);
+      let synergyScore = 0;
+      if (positiveSynergy > 0) {
+        synergyScore = positiveSynergy;
+      } else if (negativeSynergy < 0) {
+        synergyScore = negativeSynergy;
+      }
+
+      if (synergyScore) {
+        console.log('');
+        console.log(
+          cardA.name,
+          percent(cardAWinRate, 1),
+          '&',
+          cardB.name,
+          percent(cardBWinRate, 1),
+          '=',
+          percent(synergyScore, 1),
+          `(${percent(pairWinRate, 1)})`,
+        );
+        results.push({ cardA, cardB, synergyScore });
+      }
+      // break;
+    }
+    // break;
+  }
+
+  results
+    .sort((a, b) => a.synergyScore - b.synergyScore)
+    .forEach(({ cardA, cardB, synergyScore }, i) => {
+      console.log(i, cardA.name, '&', cardB.name, percent(synergyScore, 1));
+    });
 }
 
 const cachedGetCardsWinRate = getCachedFn(getCardsWinRate, {
@@ -92,7 +137,7 @@ function getUserCards({
   const userCards = cards.slice();
 
   const numFillerCards =
-    NUM_STARTING_CARDS + battleNumber * NUM_CARD_SELECTION_OPTIONS - cards.length;
+    NUM_STARTING_CARDS + battleNumber * NUM_CARD_SELECTION_PICKS - cards.length;
   assert(numFillerCards >= 0);
 
   for (let i = 0; i < numFillerCards; i++) {
@@ -110,7 +155,7 @@ function runSimulation({ userCards }: { userCards: CardState[] }) {
 
   while (remainingUserCards.length > 0) {
     startCardSelection(game);
-    const picks = remainingUserCards.splice(0, NUM_CARD_SELECTION_OPTIONS);
+    const picks = remainingUserCards.splice(0, NUM_CARD_SELECTION_PICKS);
     picks.forEach((card) => addCard(game, card));
 
     if (remainingUserCards.length > 0) {
