@@ -1,4 +1,3 @@
-import { CardState } from './gameState';
 import { createCard } from './utils';
 
 // starter cards
@@ -638,6 +637,7 @@ export const millCards = Object.values(millCardsByName);
 export const trashCards = Object.values(trashCardsByName);
 export const multicardCards = Object.values(multicardCardsByName);
 
+export const cards = Object.values(cardsByName);
 export const nonStarterCards = Object.values(nonStarterCardsByName);
 
 Object.entries(cardsByName).forEach(([name, card]) => {
