@@ -6,10 +6,7 @@ export default function BattleEndScreen() {
   const game = useGameState();
   const { startCardSelection } = useActions();
 
-  const { user } = game;
-
-  const isWin = user.health > 0;
-  const title = isWin ? 'Victory' : 'Defeat';
+  const title = game.wonLastBattle ? 'Victory' : 'Defeat';
 
   return (
     <Screen onClick={startCardSelection}>

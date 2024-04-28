@@ -124,6 +124,7 @@ export interface GameState {
   losses: number;
   screen: ScreenName;
   animationEvents: AnimationEvent[];
+  wonLastBattle: boolean;
 }
 
 function createInitialPlayerState(): PlayerState {
@@ -156,6 +157,7 @@ export function createInitialGameState(): GameState {
     losses: 0,
     screen: 'gameStart',
     animationEvents: [],
+    wonLastBattle: false,
   };
 }
 

@@ -10,16 +10,18 @@ import {
 import { runBattle } from './runGame';
 import { addCard, startCardSelection } from '../../src/gameState/actions';
 import { getCardSelectionsForBattle } from '../../src/gameState/cardSelection';
+import { runFakeBattle } from './simulationHelper';
 
 const cardIndexByName = new Map(cards.map((card, index) => [card.name, index]));
 
-const ITERATIONS = 1;
+const ITERATIONS = 1000;
 
 export default function printBestCardsByBattle() {
   const winRatesByCardPicks = getWinRatesByCardPicks({ battleNumber: 1 });
 
   const trainingData = [] as { input: number[]; output: number[] }[];
   winRatesByCardPicks.forEach((winRate, cardPicksKey) => {
+    console.log(winRate, cardPicksKey);
     const cardIndexes = getCardIndexesFromKey(cardPicksKey);
     const input = new Array(cards.length).fill(0);
     cardIndexes.forEach((index) => {
@@ -30,10 +32,12 @@ export default function printBestCardsByBattle() {
   });
 
   const net = new NeuralNetwork<number[], number[]>();
-  net.train(trainingData);
+  console.log('training...');
+  net.train(trainingData, { iterations: 1000 });
 
   const testInput = new Array(cards.length).fill(0);
-  testInput[0] = 2;
+  testInput[39] = 3; // damageStarterCard
+  testInput[0] = 2; // damage card
   console.log(net.run(testInput));
 }
 
@@ -41,12 +45,12 @@ function getWinRatesByCardPicks({ battleNumber }: { battleNumber: number }) {
   const winLossesByCardPicks = new Map<string, { wins: number; games: number }>();
 
   for (let i = 0; i < ITERATIONS; i++) {
-    const { isWin, game } = runSimulation({ battleNumber });
+    const game = runSimulation({ battleNumber });
     const key = getKeyFromCards(game.user.cards);
 
     const winLosses = winLossesByCardPicks.get(key) || { wins: 0, games: 0 };
     winLosses.games += 1;
-    winLosses.wins += isWin ? 1 : 0;
+    winLosses.wins += game.wonLastBattle ? 1 : 0;
     winLossesByCardPicks.set(key, winLosses);
   }
 
@@ -57,23 +61,21 @@ function getWinRatesByCardPicks({ battleNumber }: { battleNumber: number }) {
   return winRatesByCardPicks;
 }
 
-// TODO: don't play all these games, just play the one game at the given battle number
 function runSimulation({ battleNumber }: { battleNumber: number }) {
   const game = createInitialGameState();
 
-  let isWin = false;
-  while (game.screen !== 'gameEnd' && game.wins + game.losses < battleNumber) {
-    addNewCards(game);
-
-    const previousWins = game.wins;
-    runBattle(game);
-    isWin = game.wins > previousWins;
+  // run fake battles until we're at the right battle number
+  while (game.wins + game.losses < battleNumber - 1) {
+    addRandomCards(game);
+    runFakeBattle(game);
   }
 
-  return { isWin, game };
+  addRandomCards(game);
+  runBattle(game);
+  return game;
 }
 
-function addNewCards(game: GameState) {
+function addRandomCards(game: GameState) {
   startCardSelection(game);
 
   const cards = getCardSelectionsForBattle();

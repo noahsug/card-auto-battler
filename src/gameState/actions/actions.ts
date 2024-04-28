@@ -26,8 +26,6 @@ export function startGame(game: GameState) {
 
 export function startCardSelection(game: GameState) {
   game.turn = 0;
-  resetGameState(game);
-
   game.screen = 'cardSelection';
 }
 
@@ -38,6 +36,8 @@ export function addCard(game: GameState, card: CardState) {
 export function startBattle(game: GameState) {
   game.screen = 'battle';
   const { enemy, user } = game;
+
+  resetGameState(game);
 
   user.cards = shuffle(user.cards);
 
@@ -64,12 +64,15 @@ export function endTurn(game: GameState) {
 export function endBattle(game: GameState) {
   if (game.user.health <= 0) {
     game.losses++;
+    game.wonLastBattle = false;
   } else if (game.enemy.health <= 0) {
     game.wins++;
+    game.wonLastBattle = true;
   } else {
     throw new Error('endBattle called, but neither player is dead');
   }
 
+  resetGameState(game);
   game.screen = game.wins >= MAX_WINS || game.losses >= MAX_LOSSES ? 'gameEnd' : 'battleEnd';
 }
 

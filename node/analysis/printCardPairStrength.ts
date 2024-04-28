@@ -4,14 +4,14 @@ import {
   damageStarterCard,
   createInitialGameState,
   CardState,
-  GameState,
   nonStarterCards,
 } from '../../src/gameState';
-import { startCardSelection, addCard, startBattle, endBattle } from '../../src/gameState/actions';
+import { startCardSelection, addCard } from '../../src/gameState/actions';
 import { NUM_CARD_SELECTION_PICKS } from '../../src/gameState/constants';
 import { runBattle } from './runGame';
 import { percent } from '../../src/utils';
 import { getCachedFn, hashValues } from './cache';
+import { runFakeBattle } from './simulationHelper';
 
 const ITERATIONS = 5000;
 
@@ -102,8 +102,8 @@ function getCardsWinRate({ cards, fillerCard }: { cards: CardState[]; fillerCard
 
   for (let i = 0; i < ITERATIONS; i++) {
     const userCards = getUserCards({ cards, fillerCard });
-    const { isWin } = runSimulation({ userCards });
-    if (isWin) {
+    const game = runSimulation({ userCards });
+    if (game.wonLastBattle) {
       numWins += 1;
     }
   }
@@ -143,21 +143,6 @@ function runSimulation({ userCards }: { userCards: CardState[] }) {
     }
   }
 
-  const previousWins = game.wins;
   runBattle(game);
-  return { game, isWin: game.wins > previousWins };
-}
-
-function runFakeBattle(game: GameState) {
-  startBattle(game);
-
-  // user wins unless they're one win away from ending the game
-  const isUserWin = game.wins < MAX_WINS - 1;
-  if (isUserWin) {
-    game.enemy.health = 0;
-  } else {
-    game.user.health = 0;
-  }
-
-  endBattle(game);
+  return game;
 }
