@@ -18,6 +18,8 @@ import {
 } from '../../src/gameState/actions';
 import { getCardSelectionsForBattle } from '../../src/gameState/cardSelection';
 
+const VERBOSE = false;
+
 export type PickCards = (args: { game: GameState; cards: CardState[] }) => CardState[];
 
 export default function runGame({ pickCards }: { pickCards: PickCards }) {
@@ -33,23 +35,27 @@ export default function runGame({ pickCards }: { pickCards: PickCards }) {
 export function runBattle(game: GameState) {
   if (game.screen !== 'battle') {
     startBattle(game);
-    // console.log(
-    //   'start battle',
-    //   game.user.cards.map((c) => c.name),
-    //   game.enemy.cards.map((c) => c.name),
-    // );
+    if (VERBOSE) {
+      console.log(
+        'start battle',
+        game.user.cards.map((c) => c.name),
+        game.enemy.cards.map((c) => c.name),
+      );
+    }
   }
 
   startTurn(game);
 
   while (getCanPlayCard(game)) {
-    // if (!getIsEnemyTurn(game)) {
-    //   console.log(game.user.health, game.enemy.health);
-    // }
+    if (VERBOSE && !getIsEnemyTurn(game)) {
+      console.log(game.user.health, game.enemy.health);
+    }
     playCard(game);
 
     if (getIsBattleOver(game)) {
-      // console.log(game.user.health, game.enemy.health);
+      if (VERBOSE) {
+        console.log(game.user.health, game.enemy.health);
+      }
       endBattle(game);
       return;
     }

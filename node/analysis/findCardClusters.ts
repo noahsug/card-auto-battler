@@ -1,4 +1,3 @@
-import assert from 'assert';
 import {
   MAX_WINS,
   NUM_STARTING_CARDS,
@@ -16,20 +15,20 @@ import { getCachedFn, hashValues } from './cache';
 
 const ITERATIONS = 5000;
 
-const BATTLE_NUMBER = 1;
 const FILLER_CARD = damageStarterCard;
 
 export function findCardClusters() {
   function getWinRate(cards: CardState[]) {
-    const battleNumber = BATTLE_NUMBER;
     const fillerCard = FILLER_CARD;
-    return cachedGetCardsWinRate({ cards, battleNumber, fillerCard });
+    return cachedGetCardsWinRate({ cards, fillerCard });
   }
 
   const results = [] as any[];
 
   for (let i = 0; i < nonStarterCards.length - 1; i++) {
     for (let j = i + 1; j < nonStarterCards.length; j++) {
+      // i = 0; // damageCard
+      // j = 3; // bleedCard
       // i = 17; // damageForEachBleedCard
       // i = 18; // tripleBleedCard
       // i = 13; // lifestealCard;
@@ -84,36 +83,25 @@ const cachedGetCardsWinRate = getCachedFn(getCardsWinRate, {
 
 function getCardsWinRateCacheKey({
   cards,
-  battleNumber,
   fillerCard,
 }: {
   cards: CardState[];
-  battleNumber: number;
   fillerCard: CardState;
 }) {
   return hashValues({
     values: [
       ...cards.map((card) => JSON.stringify(card)).sort(),
-      battleNumber,
       JSON.stringify(fillerCard),
       ITERATIONS,
     ],
   });
 }
 
-function getCardsWinRate({
-  cards,
-  battleNumber,
-  fillerCard,
-}: {
-  cards: CardState[];
-  battleNumber: number;
-  fillerCard: CardState;
-}) {
+function getCardsWinRate({ cards, fillerCard }: { cards: CardState[]; fillerCard: CardState }) {
   let numWins = 0;
 
   for (let i = 0; i < ITERATIONS; i++) {
-    const userCards = getUserCards({ cards, battleNumber, fillerCard });
+    const userCards = getUserCards({ cards, fillerCard });
     const { isWin } = runSimulation({ userCards });
     if (isWin) {
       numWins += 1;
@@ -123,22 +111,14 @@ function getCardsWinRate({
   return numWins / ITERATIONS;
 }
 
-function getUserCards({
-  cards,
-  battleNumber,
-  fillerCard,
-}: {
-  cards: CardState[];
-  battleNumber: number;
-  fillerCard: CardState;
-}) {
-  assert(battleNumber > 0);
-
+function getUserCards({ cards, fillerCard }: { cards: CardState[]; fillerCard: CardState }) {
   const userCards = cards.slice();
 
-  const numFillerCards =
-    NUM_STARTING_CARDS + battleNumber * NUM_CARD_SELECTION_PICKS - cards.length;
-  assert(numFillerCards >= 0);
+  // we need extra filler cards if cards.length is not a multiple of NUM_CARD_SELECTION_PICKS
+  const extraFillerCards =
+    (NUM_CARD_SELECTION_PICKS - (cards.length % NUM_CARD_SELECTION_PICKS)) %
+    NUM_CARD_SELECTION_PICKS;
+  const numFillerCards = NUM_STARTING_CARDS + extraFillerCards;
 
   for (let i = 0; i < numFillerCards; i++) {
     userCards.push(fillerCard);

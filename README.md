@@ -57,6 +57,15 @@ Train neural network at different depths to measure difficulty (aka easy win % v
    - what's the 'strategy pull' for each card, aka how hard to we pivot to a strategy when a
      card is seen
 
+7. Evaluate winning sets of cards are different stages of the game and use it for AI
+
+- for battles 1-N, evaluate win rates of different card picks
+- for each battle #, train neural network to give predicted win rate given cards picks
+- AI generates all possible decks and picks best path forward, balancing immediate win rate vs long
+  term win rate
+- run clustering algorithm to count # of valid strategies
+- force AI to use particular strategy and evaluate win rate vs % of desired cards acquired
+
 ## gameplay
 
 effects implemented
