@@ -23,7 +23,7 @@ const ITERATIONS = 40000;
  *  2. track card wins, weighted by the cards position in the priority list (see `getWeightByPriority`)
  *  3. return cards sorted by weighted wins
  */
-export default function getPriorityListWinRate() {
+export default function printPriorityListWinRate() {
   const weightedWinsByCard = new Map<NonStarterCardName, number>(
     nonStarterCardNames.map((card) => [card, 0]),
   );

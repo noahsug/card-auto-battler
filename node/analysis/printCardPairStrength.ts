@@ -17,7 +17,7 @@ const ITERATIONS = 5000;
 
 const FILLER_CARD = damageStarterCard;
 
-export function findCardClusters() {
+export default function printCardPairStrength() {
   function getWinRate(cards: CardState[]) {
     const fillerCard = FILLER_CARD;
     return cachedGetCardsWinRate({ cards, fillerCard });

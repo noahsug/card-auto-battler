@@ -65,6 +65,7 @@ Train neural network at different depths to measure difficulty (aka easy win % v
   term win rate
 - run clustering algorithm to count # of valid strategies
 - force AI to use particular strategy and evaluate win rate vs % of desired cards acquired
+- look at card pick %, etc
 
 ## gameplay
 

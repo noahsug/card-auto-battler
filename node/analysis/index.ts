@@ -29,8 +29,8 @@ import {
 } from '../../src/gameState/actions';
 import { getCardSelectionsForBattle } from '../../src/gameState/cardSelection';
 import { percent, moveItem } from '../../src/utils';
-import getPriorityListWinRate from './getPriorityListWinRate';
-import { findCardClusters } from './findCardClusters';
+import printPriorityListWinRate from './printPriorityListWinRate';
+import printCardPairStrength from './printCardPairStrength';
 
 const aiTypes = [...enemyTypes, 'random', 'bestCard'] as const;
 
@@ -93,8 +93,8 @@ let RUNS = 200;
 const DECKS_TO_TRY = 3000;
 
 function run() {
-  // getPriorityListWinRate();
-  findCardClusters();
+  // printPriorityListWinRate();
+  printCardPairStrength();
 }
 
 function testGradientDecent() {
