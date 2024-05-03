@@ -2,12 +2,10 @@
 
 TODO:
 
-1. face same enemy again on defeat (similar to Night of the Full Moon). This makes progression
-   feel linear and gives satisfaction of counter-picking an enemy
-2. 2-card priority list
-3. inverse priority list: try to minimize win rate. Use this to sort bottom half of priority list
+1. 2-card priority list
+2. inverse priority list: try to minimize win rate. Use this to sort bottom half of priority list
    and to find bugs (e.g. card is accidentally hitting self)
-4. make card text super easy to read (add lots of keywords?)
+3. make card text super easy to read (add lots of keywords?)
 
 ## analysis
 
@@ -93,6 +91,8 @@ Heuristic: Priority list position
 Heuristic: Card pair priority list position
 
 - tells us strength of a card pair with no regard for deck
+- simple impl: pick the two cards according to the priority list
+- complex impl: eval every resulting deck by summing priority weight of every pair
 
 Deck -> win rate prediction
 

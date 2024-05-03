@@ -652,4 +652,3 @@ export const nonStarterCardNames = Object.keys(
   nonStarterCardsByName,
 ) as (keyof typeof nonStarterCardsByName)[];
 export type NonStarterCardName = (typeof nonStarterCardNames)[number];
-export type NonStarterCardNames = NonStarterCardName[];

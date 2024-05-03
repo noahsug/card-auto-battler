@@ -4,12 +4,13 @@ import {
   NUM_CARD_SELECTION_PICKS,
   CardState,
   NonStarterCardName,
-  NonStarterCardNames,
   nonStarterCardNames,
 } from '../../src/gameState';
 import { assertIsNonNullable, percent } from '../../src/utils';
 import runGame from './runGame';
 import getWeightByPriority from './getWeightByPriority';
+
+type GetKeyFromCards = ReturnType<typeof getCardsToKeyMappingGetters>['getKeyFromCards'];
 
 // 40k iterations gives best results
 const ITERATIONS = 40000;
@@ -24,54 +25,63 @@ const ITERATIONS = 40000;
  *  3. return cards sorted by weighted wins
  */
 export default function printPriorityListWinRate() {
-  const weightedWinsByCard = new Map<NonStarterCardName, number>(
-    nonStarterCardNames.map((card) => [card, 0]),
+  const cardsList = nonStarterCardNames.map((card) => [card]);
+
+  const { getKeyFromCards } = getCardsToKeyMappingGetters(cardsList);
+
+  const weightedWinsByKey = new Map<string, number>(
+    cardsList.map((cards) => [getKeyFromCards(cards), 0]),
   );
 
-  let randomPriorityList = nonStarterCardNames.slice();
+  let priorityList = Array.from(weightedWinsByKey.keys());
 
   const pickCards = ({ cards }: { cards: CardState[] }) => {
-    return pickCardsByPriorityList({ cards, priorityList: randomPriorityList });
+    return pickCardsByPriorityList({ cards, priorityList, getKeyFromCards });
   };
 
   for (let i = 0; i < ITERATIONS; i++) {
-    randomPriorityList = shuffle(randomPriorityList);
+    priorityList = shuffle(priorityList);
     const { isWin } = runGame({ pickCards });
 
     if (isWin) {
-      updateWeightedCardWins({
-        weightedWinsByCard,
-        priorityList: randomPriorityList,
+      updateWeightedWinsByCards({
+        weightedWinsByKey,
+        priorityList,
       });
     }
   }
 
-  const priorityList = nonStarterCardNames.slice().sort(getWeightCompareFn(weightedWinsByCard));
-  evaluateWinRate(priorityList);
+  priorityList.sort(getWeightCompareFn(weightedWinsByKey));
+  evaluateWinRate({ priorityList, getKeyFromCards });
 }
 
-function updateWeightedCardWins({
-  weightedWinsByCard,
+function updateWeightedWinsByCards({
+  weightedWinsByKey,
   priorityList,
 }: {
-  weightedWinsByCard: Map<NonStarterCardName, number>;
-  priorityList: NonStarterCardNames;
+  weightedWinsByKey: Map<string, number>;
+  priorityList: string[];
 }) {
-  priorityList.forEach((card, priority) => {
+  priorityList.forEach((key, priority) => {
     const weightedWin = getWeightByPriority(priority);
-    const currentWeight = weightedWinsByCard.get(card);
+    const currentWeight = weightedWinsByKey.get(key);
     assertIsNonNullable(currentWeight);
 
-    weightedWinsByCard.set(card, currentWeight + weightedWin);
+    weightedWinsByKey.set(key, currentWeight + weightedWin);
   });
 }
 
-function evaluateWinRate(priorityList: NonStarterCardNames) {
-  console.log('evaluate:');
-  console.log(priorityList);
+function evaluateWinRate({
+  priorityList,
+  getKeyFromCards,
+}: {
+  priorityList: string[];
+  getKeyFromCards: GetKeyFromCards;
+}) {
+  console.log(priorityList.join('\n'));
 
   const pickCards = ({ cards }: { cards: CardState[] }) => {
-    return pickCardsByPriorityList({ cards, priorityList });
+    return pickCardsByPriorityList({ cards, priorityList, getKeyFromCards });
   };
 
   let games = 0;
@@ -90,9 +100,11 @@ function evaluateWinRate(priorityList: NonStarterCardNames) {
 function pickCardsByPriorityList({
   cards,
   priorityList,
+  getKeyFromCards,
 }: {
   cards: CardState[];
-  priorityList: NonStarterCardNames;
+  priorityList: string[];
+  getKeyFromCards: GetKeyFromCards;
 }) {
   const compareFn = getPriorityCompareFn(priorityList);
 
@@ -100,16 +112,19 @@ function pickCardsByPriorityList({
     .sort((a: CardState, b: CardState) => {
       const nameA = a.name as NonStarterCardName;
       const nameB = b.name as NonStarterCardName;
-      return compareFn(nameA, nameB);
+      // TODO: handle multiple cards
+      const keyA = getKeyFromCards([nameA]);
+      const keyB = getKeyFromCards([nameB]);
+      return compareFn(keyA, keyB);
     })
     .slice(0, NUM_CARD_SELECTION_PICKS);
 }
 
 // used to sort by descending weight
-function getWeightCompareFn(weightByCard: Map<NonStarterCardName, number>) {
-  return (a: NonStarterCardName, b: NonStarterCardName) => {
-    const weightA = weightByCard.get(a);
-    const weightB = weightByCard.get(b);
+function getWeightCompareFn(weightByKey: Map<string, number>) {
+  return (a: string, b: string) => {
+    const weightA = weightByKey.get(a);
+    const weightB = weightByKey.get(b);
     assertIsNonNullable(weightA);
     assertIsNonNullable(weightB);
     return weightB - weightA;
@@ -117,18 +132,37 @@ function getWeightCompareFn(weightByCard: Map<NonStarterCardName, number>) {
 }
 
 // used to sort by ascending priority
-function getPriorityCompareFn(priorityList: NonStarterCardNames) {
-  const priorityByCard = getPriorityByCardMap(priorityList);
+function getPriorityCompareFn(priorityList: string[]) {
+  const priorityByKey = getPriorityByKeyMap(priorityList);
 
-  return (a: NonStarterCardName, b: NonStarterCardName) => {
-    const weightA = priorityByCard.get(a);
-    const weightB = priorityByCard.get(b);
+  return (a: string, b: string) => {
+    const weightA = priorityByKey.get(a);
+    const weightB = priorityByKey.get(b);
     assertIsNonNullable(weightA);
     assertIsNonNullable(weightB);
     return weightA - weightB;
   };
 }
 
-function getPriorityByCardMap(priorityList: NonStarterCardNames) {
-  return new Map(priorityList.map((card, i) => [card, i]));
+function getPriorityByKeyMap(priorityList: string[]) {
+  return new Map(priorityList.map((key, i) => [key, i]));
+}
+
+// Returns functions to map from key -> cards and cards -> key
+function getCardsToKeyMappingGetters(cardsList: NonStarterCardName[][]) {
+  function getKeyFromCards(cards: NonStarterCardName[]) {
+    return cards.slice().sort().join(' ');
+  }
+
+  const cardsByKey = new Map<string, NonStarterCardName[]>(
+    cardsList.map((cards) => [getKeyFromCards(cards), cards]),
+  );
+
+  function getCardsFromKey(key: string) {
+    const cards = cardsByKey.get(key);
+    assertIsNonNullable(cards);
+    return cards;
+  }
+
+  return { getKeyFromCards, getCardsFromKey };
 }

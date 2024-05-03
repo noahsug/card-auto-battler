@@ -34,7 +34,7 @@ import {
 } from './cards';
 import { getStartingCards, getCardSelectionsForBattle } from './cardSelection';
 import { NUM_CARD_SELECTION_PICKS } from './constants';
-import { CardState, EnemyType, GameState, getCurrentBattleNumber } from './gameState';
+import { CardState, EnemyType } from './gameState';
 
 const generallyGoodCards = [
   extraPlaysTrashCard,
