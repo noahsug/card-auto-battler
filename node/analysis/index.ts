@@ -8,7 +8,7 @@ import {
   createInitialGameState,
   enemyTypes,
   GameState,
-  pickCards as pickCardsByEnemyType,
+  pickEnemyCards as pickCardsByEnemyType,
   EnemyType,
   getCanPlayCard,
   getIsBattleOver,
@@ -94,9 +94,9 @@ let RUNS = 200;
 const DECKS_TO_TRY = 3000;
 
 function run() {
-  // printPriorityListWinRate();
+  printPriorityListWinRate();
   // printCardPairStrength();
-  printBestCardsByBattle();
+  // printBestCardsByBattle();
 }
 
 function testGradientDecent() {

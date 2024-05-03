@@ -1,7 +1,13 @@
 # Card Auto Battler
 
-TODO: face same enemy again on defeat (similar to Night of the Full Moon). This makes progression
-feel linear and gives satisfaction of counter-picking an enemy
+TODO:
+
+1. face same enemy again on defeat (similar to Night of the Full Moon). This makes progression
+   feel linear and gives satisfaction of counter-picking an enemy
+2. 2-card priority list
+3. inverse priority list: try to minimize win rate. Use this to sort bottom half of priority list
+   and to find bugs (e.g. card is accidentally hitting self)
+4. make card text super easy to read (add lots of keywords?)
 
 ## analysis
 

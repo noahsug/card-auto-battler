@@ -34,19 +34,7 @@ import {
 } from './cards';
 import { getStartingCards, getCardSelectionsForBattle } from './cardSelection';
 import { NUM_CARD_SELECTION_PICKS } from './constants';
-import { CardState } from './gameState';
-
-export const enemyTypes = [
-  'strength',
-  'bleed',
-  'lowHealth',
-  'heal',
-  'mill',
-  'trash',
-  'multicard',
-] as const;
-
-export type EnemyType = (typeof enemyTypes)[number];
+import { CardState, EnemyType, GameState, getCurrentBattleNumber } from './gameState';
 
 const generallyGoodCards = [
   extraPlaysTrashCard,
@@ -110,20 +98,24 @@ const cardPriorityByType = {
   ],
 };
 
-export function getEnemyCardsForBattle(battleCount: number) {
+export function getEnemyCardsForBattle({
+  battleNumber,
+  enemyType,
+}: {
+  battleNumber: number;
+  enemyType: EnemyType;
+}) {
   const cards = getStartingCards();
 
-  const enemyType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-
-  for (let i = 0; i < battleCount + 1; i++) {
-    cards.push(...pickCards(enemyType));
+  for (let i = 0; i < battleNumber + 1; i++) {
+    cards.push(...pickEnemyCards(enemyType));
   }
 
   return cards;
 }
 
 // Returns CARD_SELECTION_PICKS cards based on enemy type.
-export function pickCards(enemyType: EnemyType) {
+export function pickEnemyCards(enemyType: EnemyType) {
   const cardOptions = getCardSelectionsForBattle();
   const cardOptionsSet = new Set(cardOptions);
   const selectedCards: CardState[] = [];

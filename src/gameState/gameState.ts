@@ -1,8 +1,21 @@
 import { PickByValue } from '../utils/types';
 import { STARTING_HEALTH } from './constants';
 import { getStartingCards } from './cardSelection';
+import sample from 'lodash/sample';
 
 export type ScreenName = 'gameStart' | 'cardSelection' | 'battle' | 'battleEnd' | 'gameEnd';
+
+export const enemyTypes = [
+  'strength',
+  'bleed',
+  'lowHealth',
+  'heal',
+  'mill',
+  'trash',
+  'multicard',
+] as const;
+
+export type EnemyType = (typeof enemyTypes)[number];
 
 export interface AnimationEvent {
   type: 'damage' | 'heal' | 'miss';
@@ -104,7 +117,6 @@ export interface CardEffects extends Partial<StatusEffects>, Conditional<CardEff
 export interface CardState {
   effects: CardEffects[];
   name: string;
-  rank?: number;
 }
 
 export interface PlayerState extends StatusEffects {
@@ -125,6 +137,7 @@ export interface GameState {
   screen: ScreenName;
   animationEvents: AnimationEvent[];
   wonLastBattle: boolean;
+  currentEnemyType: EnemyType;
 }
 
 function createInitialPlayerState(): PlayerState {
@@ -139,7 +152,7 @@ function createInitialPlayerState(): PlayerState {
   };
 }
 
-export function getBattleCount(game: GameState) {
+export function getCurrentBattleNumber(game: GameState) {
   return game.wins + game.losses;
 }
 
@@ -158,6 +171,7 @@ export function createInitialGameState(): GameState {
     screen: 'gameStart',
     animationEvents: [],
     wonLastBattle: false,
+    currentEnemyType: getRandomEnemyType(),
   };
 }
 
@@ -192,4 +206,8 @@ export function getCanPlayCard(game: GameState) {
 export function getIsBattleOver(game: GameState) {
   const { user, enemy } = game;
   return user.health <= 0 || enemy.health <= 0;
+}
+
+export function getRandomEnemyType() {
+  return sample(enemyTypes);
 }

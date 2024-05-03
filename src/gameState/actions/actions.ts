@@ -5,7 +5,7 @@ import {
   createInitialGameState,
   GameState,
   getActivePlayer,
-  getBattleCount,
+  getCurrentBattleNumber,
   getCanPlayCard,
   getEnemyCardsForBattle,
   MAX_LOSSES,
@@ -13,7 +13,8 @@ import {
 } from '../';
 import { assert } from '../../utils';
 import playCardHelper from './playCard';
-import { statusEffectNames } from '../gameState';
+import { getRandomEnemyType, statusEffectNames } from '../gameState';
+import { pickEnemyCards } from '../enemies';
 
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
@@ -41,8 +42,19 @@ export function startBattle(game: GameState) {
 
   user.cards = shuffle(user.cards);
 
-  const enemyCards = getEnemyCardsForBattle(getBattleCount(game));
-  enemy.cards = shuffle(enemyCards);
+  if (game.wonLastBattle) {
+    // fight a new enemy
+    const enemyType = getRandomEnemyType();
+    const battleNumber = getCurrentBattleNumber(game);
+    enemy.cards = getEnemyCardsForBattle({ battleNumber, enemyType });
+    game.currentEnemyType = enemyType;
+  } else {
+    // fight the same enemy
+    const newEnemyCards = pickEnemyCards(game.currentEnemyType);
+    enemy.cards.push(...newEnemyCards);
+  }
+
+  enemy.cards = shuffle(enemy.cards);
 }
 
 export function startTurn(game: GameState) {
@@ -79,18 +91,15 @@ export function endBattle(game: GameState) {
 function resetGameState(game: GameState) {
   const { user, enemy } = game;
 
-  user.cards = [...user.cards, ...user.trashedCards];
-  user.trashedCards = [];
-  user.health = user.startingHealth;
-  user.currentCardIndex = 0;
+  [user, enemy].forEach((player) => {
+    player.cards = [...player.cards, ...player.trashedCards];
+    player.trashedCards = [];
+    player.health = player.startingHealth;
+    player.currentCardIndex = 0;
 
-  enemy.trashedCards = [];
-  enemy.health = enemy.startingHealth;
-  enemy.currentCardIndex = 0;
-
-  statusEffectNames.forEach((statusEffect) => {
-    user[statusEffect] = 0;
-    enemy[statusEffect] = 0;
+    statusEffectNames.forEach((statusEffect) => {
+      player[statusEffect] = 0;
+    });
   });
 
   game.animationEvents = [];
