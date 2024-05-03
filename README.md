@@ -1,8 +1,11 @@
 # Card Auto Battler
 
+TODO: face same enemy again on defeat (similar to Night of the Full Moon). This makes progression
+feel linear and gives satisfaction of counter-picking an enemy
+
 ## analysis
 
-### Strategies that speak to balance / difficulty / complexity of game
+### Meta Analysis (balance, difficulty, complexity, etc)
 
 Start with best possible play, then remove information and measure the change of win rate
 
@@ -18,54 +21,114 @@ Compare priority list with deck knowledge vs no deck knowledge
 
 Train neural network at different depths to measure difficulty (aka easy win % vs hard win %)
 
-### Meta Analysis
+Priority list of all cards shows best "generally good card" list
 
-1. Priority list of all cards shows best "generally good card" list
+Priority lists of a particular strategy shows win rate for that strategy
 
-2. Priority lists of a particular strategy shows win rate for that strategy
+- normal priority list generation logic, but cards form the category are always ranked highest
+- the remaining cards are ranked according to "generally good card" list
+- "strategy strength"
 
-   - normal priority list generation logic, but cards form the category are always ranked highest
-   - the remaining cards are ranked according to "generally good card" list
-   - "strategy strength"
+Generate priority lists for every combination of two strategies to show strategy synergy
 
-3. Generate priority lists for every combination of two strategies to show strategy synergy
+Create AI that uses strategy heat map to choose best strategy priority list depending on which
+cards it sees and has picked
 
-4. Create AI that uses strategy heat map to choose best strategy priority list depending on which
-   cards it sees and has picked
+- calculate % of each strategy path it's gone down so far combined with that strategies win rate
+- show % of each strategy chosen and its win %, as well as overall win %
+- good game health = no single strategy always dominating and smaller choose % = higher win %
+  (e.g. if a strategy wins a lot it should be niche and hard to build)
+- can pick from single strategies and combined strategies
 
-   - calculate % of each strategy path it's gone down so far combined with that strategies win rate
-   - show % of each strategy chosen and its win %, as well as overall win %
-   - good game health = no single strategy always dominating and smaller choose % = higher win %
-     (e.g. if a strategy wins a lot it should be niche and hard to build)
-   - can pick from single strategies and combined strategies
+Automatically find strategies (aka clusters)
 
-5. Automatically find strategies (aka clusters)
+- can start by using a manual function (e.g. look for cards with `bleed`)
+- find priority list of length X that have a higher win rate when picked together, start
+  with X = 2
+- create simulation of X starter cards + Y cards to check for synergies / heuristics
+  - how well a single card does
+  - how good / bad are multiple copies of a card
+  - identify card synergy clusters
+  - how well does a synergy do early game vs late game
 
-   - can start by using a manual function (e.g. look for cards with `bleed`)
-   - find priority list of length X that have a higher win rate when picked together, start
-     with X = 2
-   - create simulation of X starter cards + Y cards to check for synergies / heuristics
-     - how well a single card does
-     - how good / bad are multiple copies of a card
-     - identify card synergy clusters
-     - how well does a synergy do early game vs late game
+Find card / strategy heuristics
 
-6. Find card / strategy heuristics
+- for each card, what % of the deck do we want it to make up, penalty of multiple copies?
+- what % of cards do we want from strategy vs from 'generally good cards'
+- what's the 'strategy pull' for each card, aka how hard to we pivot to a strategy when a
+  card is seen
 
-   - for each card, what % of the deck do we want it to make up, penalty of multiple copies?
-   - what % of cards do we want from strategy vs from 'generally good cards'
-   - what's the 'strategy pull' for each card, aka how hard to we pivot to a strategy when a
-     card is seen
-
-7. Evaluate winning sets of cards are different stages of the game and use it for AI
+Evaluate winning sets of cards are different stages of the game and use it for AI
 
 - for battles 1-N, evaluate win rates of different card picks
-- for each battle #, train neural network to give predicted win rate given cards picks
 - AI generates all possible decks and picks best path forward, balancing immediate win rate vs long
   term win rate
 - run clustering algorithm to count # of valid strategies
 - force AI to use particular strategy and evaluate win rate vs % of desired cards acquired
 - look at card pick %, etc
+
+### Heuristic evaluation
+
+1. calculate a bunch of deck / card heuristics and metrics
+2. use them to build a deck -> win rate prediction
+3. use this to choose which two cards to pick (generating every possible decks from current deck + card picks)
+4. Evaluate AI via win rate after 40k games
+
+Heuristic: X card win rate by deck %
+
+1. for 2...X cards, get win rate at different deck %s (e.g. 1/4 of deck, 1/5 of deck, etc)
+2. other cards are filler cards (random starter cards? random cards? 3 damager card?)
+
+Heuristic: Priority list position
+
+- tells us strength of single card with no regard for deck
+- this strength pertains to the success of an entire game, not just the next battle
+
+Heuristic: Card pair priority list position
+
+- tells us strength of a card pair with no regard for deck
+
+Deck -> win rate prediction
+
+1. Take average win rate for every group of X cards
+
+### Min-max evaluation
+
+Min-max search using heuristic evaluation to determine fitness for each child node
+
+Shallow min-max running simulations for best nodes
+
+### Neural network evaluation (🐌)
+
+Train a network to predict deck -> win rate:
+
+1. For each battle #, generate set of possible player cards
+2. play out battles and get win rate for those player cards
+3. train neural network on cards in deck -> win rate (e.g. [0, 1, 1, 0, 2] -> 0.75)
+
+Improving NN performance
+
+1. make training data a bool array and cap how many times each card can appear
+   - e.g. [0, 1, 1, 0, 2] becomes [false, true, true, false, true, /* array for dups */ false, false, false, false, true]
+   - Brain.js doesn't seem to have this option
+2. use a legit NN trainer written in python that's fed data form JS
+   - we can use the trained weights in the JS network
+
+This AI uses this neural net by generating all possible decks form card picks and choosing the
+picks that the NN says have the highest win rate
+
+### Fixed randomness AI (👎)
+
+1. pre-determine picks
+2. min max search w/ alpha beta pruning to find best pick in each situation
+   1. for each battle, generate possible decks given card picks
+      1. for each deck, run 500 simulations to determine win rate
+         1. for each deck sorted by win rate, make those picks
+3. cache deck -> picks
+4. repeat for another pre-determined set of enemies and picks to iteratively build up overall win rate
+
+The problem is this is super slow (36^6 nodes for each min-max search) and there are too many
+possible decks for caching to have impact.
 
 ## gameplay
 
