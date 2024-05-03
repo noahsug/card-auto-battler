@@ -6,14 +6,16 @@ import {
   NonStarterCardName,
   nonStarterCardNames,
 } from '../../src/gameState';
-import { assertIsNonNullable, percent } from '../../src/utils';
+import { assert, assertIsNonNullable, percent } from '../../src/utils';
 import runGame from './runGame';
 import getWeightByPriority from './getWeightByPriority';
 
 type GetKeyFromCards = ReturnType<typeof getCardsToKeyMappingGetters>['getKeyFromCards'];
+type PickCardsWithPriorityList = typeof pickCardsWithOneCardPriorityList;
 
-// 40k iterations gives best results
-const ITERATIONS = 40000;
+// 40k iterations gives best results for one card priority list
+// const ITERATIONS = 40000;
+const ITERATIONS = 100000;
 
 /**
  * Creates a priority list of cards that determines pick order for an entire play through.
@@ -24,9 +26,39 @@ const ITERATIONS = 40000;
  *  2. track card wins, weighted by the cards position in the priority list (see `getWeightByPriority`)
  *  3. return cards sorted by weighted wins
  */
-export default function printPriorityListWinRate() {
+export function printOneCardPriorityListWinRate() {
   const cardsList = nonStarterCardNames.map((card) => [card]);
 
+  printPriorityListWinRate({
+    cardsList,
+    pickCardsWithPriorityList: pickCardsWithOneCardPriorityList,
+  });
+}
+
+export function printTwoCardPriorityListWinRate() {
+  // Note: card order doesn't matter, so we shouldn't be including [A,B] and [B,A] - but it
+  // doesn't actually matter in this case since we convert the card[][] into a Map and the keys
+  // are the same.
+  const cardsList: NonStarterCardName[][] = [];
+  nonStarterCardNames.forEach((cardA) => {
+    nonStarterCardNames.forEach((cardB) => {
+      cardsList.push([cardA, cardB]);
+    });
+  });
+
+  printPriorityListWinRate({
+    cardsList,
+    pickCardsWithPriorityList: pickCardsWithTwoCardPriorityList,
+  });
+}
+
+function printPriorityListWinRate({
+  cardsList,
+  pickCardsWithPriorityList,
+}: {
+  cardsList: NonStarterCardName[][];
+  pickCardsWithPriorityList: PickCardsWithPriorityList;
+}) {
   const { getKeyFromCards } = getCardsToKeyMappingGetters(cardsList);
 
   const weightedWinsByKey = new Map<string, number>(
@@ -36,7 +68,7 @@ export default function printPriorityListWinRate() {
   let priorityList = Array.from(weightedWinsByKey.keys());
 
   const pickCards = ({ cards }: { cards: CardState[] }) => {
-    return pickCardsByPriorityList({ cards, priorityList, getKeyFromCards });
+    return pickCardsWithPriorityList({ cards, priorityList, getKeyFromCards });
   };
 
   for (let i = 0; i < ITERATIONS; i++) {
@@ -52,7 +84,7 @@ export default function printPriorityListWinRate() {
   }
 
   priorityList.sort(getWeightCompareFn(weightedWinsByKey));
-  evaluateWinRate({ priorityList, getKeyFromCards });
+  evaluateWinRate({ priorityList, getKeyFromCards, pickCardsWithPriorityList });
 }
 
 function updateWeightedWinsByCards({
@@ -63,7 +95,7 @@ function updateWeightedWinsByCards({
   priorityList: string[];
 }) {
   priorityList.forEach((key, priority) => {
-    const weightedWin = getWeightByPriority(priority);
+    const weightedWin = getWeightByPriority({ priority, maxPriority: priorityList.length - 1 });
     const currentWeight = weightedWinsByKey.get(key);
     assertIsNonNullable(currentWeight);
 
@@ -74,14 +106,16 @@ function updateWeightedWinsByCards({
 function evaluateWinRate({
   priorityList,
   getKeyFromCards,
+  pickCardsWithPriorityList,
 }: {
   priorityList: string[];
   getKeyFromCards: GetKeyFromCards;
+  pickCardsWithPriorityList: PickCardsWithPriorityList;
 }) {
   console.log(priorityList.join('\n'));
 
   const pickCards = ({ cards }: { cards: CardState[] }) => {
-    return pickCardsByPriorityList({ cards, priorityList, getKeyFromCards });
+    return pickCardsWithPriorityList({ cards, priorityList, getKeyFromCards });
   };
 
   let games = 0;
@@ -97,7 +131,8 @@ function evaluateWinRate({
   console.log('win rate:', percent(wins / games, 1));
 }
 
-function pickCardsByPriorityList({
+// pick by considering which individual card is best
+function pickCardsWithOneCardPriorityList({
   cards,
   priorityList,
   getKeyFromCards,
@@ -112,12 +147,44 @@ function pickCardsByPriorityList({
     .sort((a: CardState, b: CardState) => {
       const nameA = a.name as NonStarterCardName;
       const nameB = b.name as NonStarterCardName;
-      // TODO: handle multiple cards
       const keyA = getKeyFromCards([nameA]);
       const keyB = getKeyFromCards([nameB]);
       return compareFn(keyA, keyB);
     })
     .slice(0, NUM_CARD_SELECTION_PICKS);
+}
+
+// pick two cards at once, considering which pair is best
+function pickCardsWithTwoCardPriorityList({
+  cards,
+  priorityList,
+  getKeyFromCards,
+}: {
+  cards: CardState[];
+  priorityList: string[];
+  getKeyFromCards: GetKeyFromCards;
+}) {
+  const compareFn = getPriorityCompareFn(priorityList);
+
+  const cardPairs: CardState[][] = [];
+  cards.forEach((cardA) => {
+    cards.forEach((cardB) => {
+      cardPairs.push([cardA, cardB]);
+    });
+  });
+
+  cardPairs.sort((a: CardState[], b: CardState[]) => {
+    const namesA = a.map((card) => card.name as NonStarterCardName);
+    const namesB = b.map((card) => card.name as NonStarterCardName);
+    const keyA = getKeyFromCards(namesA);
+    const keyB = getKeyFromCards(namesB);
+    return compareFn(keyA, keyB);
+  });
+
+  // TODO: we need a new strategy if we want to pick more than two cards, e.g. use single card list
+  // in addition to the pair list for odd number of card picks
+  assert(NUM_CARD_SELECTION_PICKS === 2);
+  return cardPairs[0];
 }
 
 // used to sort by descending weight

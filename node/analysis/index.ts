@@ -29,10 +29,12 @@ import {
 } from '../../src/gameState/actions';
 import { getCardSelectionsForBattle } from '../../src/gameState/cardSelection';
 import { percent, moveItem } from '../../src/utils';
-import printPriorityListWinRate from './printPriorityListWinRate';
+import {
+  printOneCardPriorityListWinRate,
+  printTwoCardPriorityListWinRate,
+} from './printPriorityListWinRate';
 import printCardPairStrength from './printCardPairStrength';
 import printDeckToWinRate from './printDeckToWinRate';
-import printTwoCardPriorityListWinRate from './printTwoCardPriorityListWinRate';
 
 const aiTypes = [...enemyTypes, 'random', 'bestCard'] as const;
 
@@ -95,8 +97,8 @@ let RUNS = 200;
 const DECKS_TO_TRY = 3000;
 
 function run() {
-  printPriorityListWinRate();
-  // printTwoCardPriorityListWinRate();
+  // printOneCardPriorityListWinRate();
+  printTwoCardPriorityListWinRate();
   // printCardPairStrength();
   // printDeckToWinRate();
 }

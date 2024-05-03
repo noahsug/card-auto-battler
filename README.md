@@ -2,12 +2,60 @@
 
 TODO:
 
-1. 2-card priority list
-2. inverse priority list: try to minimize win rate. Use this to sort bottom half of priority list
+1. Use multithreading (see section below)
+2. 2-card priority list part II: try different pick strategy (e.g. look at all pairs in resulting deck)
+3. inverse priority list: try to minimize win rate. Use this to sort bottom half of priority list
    and to find bugs (e.g. card is accidentally hitting self)
-3. make card text super easy to read (add lots of keywords?)
+4. make card text super easy to read (add lots of keywords?)
 
 ## analysis
+
+### Multithreading
+
+1. shard into X workers each taking on ITERATIONS/X
+2. combine resulting cards -> win rates
+
+We can do this for priority list generation AND weights by priority.
+
+- Note: be careful about caching.
+  - We don't want to refetch from disk a bunch of times. Maybe pass cached data into jest worker
+    init?
+  - We don't want to write to disk a bunch of times either
+  - maybe call function before jest worker to ensure cache is hit, and then have each jest worker
+    call it in init to ensure it's loaded into memory?
+
+Create generic shardding function
+
+- shardWork({ doWorkFn, iterations })
+- doWorkFn(shardStartIndex, iterations)
+- returns array of shards length containing results from doWorkFn
+
+```js
+const shardedPriorityWeightArray = shardWork({
+  doWork: getPriorityWeightArrayByShard,
+  iterations: maxPriority + 1,
+});
+const priorityWeightArray = combineArraysByKey(shardedPriorityWeightArray);
+
+function getPriorityWeightArrayByShard({ startIndex, endIndex, totalIterations }) {
+  const weightsByPriority = new Array(endIndex - startIndex);
+  for (let i = startIndex; i < endIndex; i++) {
+    const weight = getExpectedCardPicksAtPriority(i, totalIterations);
+    weightsByPriority[i] = weight;
+    // console.log('getPriorityWeightArray', `${i}/${maxPriority}`, weight);
+  }
+  return weightsByPriority;
+}
+
+combineArraysByKey(arrays) {
+  const result = [];
+  arrays.forEach(array => {
+    array.forEach((index, value) => {
+      result[index] = value;
+    });
+  });
+}
+```
 
 ### Meta Analysis (balance, difficulty, complexity, etc)
 

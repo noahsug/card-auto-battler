@@ -1,4 +1,3 @@
-import { nonStarterCards } from '../../src/gameState';
 import {
   NUM_CARD_SELECTION_OPTIONS,
   NUM_CARD_SELECTION_PICKS,
@@ -6,12 +5,17 @@ import {
 import { assert } from '../../src/utils';
 import { hashValues, getCachedFn } from './cache';
 
-const NUM_CARDS = nonStarterCards.length;
-
 const ITERATIONS = 1000000;
 
-export default function getWeightByPriority(priority: number) {
-  const weights = cachedGetPriorityWeightArray();
+// Priority ranges from 0 to maxPriority, with 0 being the highest
+export default function getWeightByPriority({
+  priority,
+  maxPriority,
+}: {
+  priority: number;
+  maxPriority: number;
+}) {
+  const weights = cachedGetPriorityWeightArray(maxPriority);
   assert(priority < weights.length);
 
   const largestWeight = weights[0];
@@ -23,22 +27,23 @@ const cachedGetPriorityWeightArray = getCachedFn(getPriorityWeightArray, {
   name: 'getPriorityWeightArray',
 });
 
-function getPriorityWeightArray() {
-  const weightsByPriority = new Array(NUM_CARDS);
-  for (let i = 0; i < NUM_CARDS; i++) {
-    const weight = getExpectedCardPicksAtPriority(i);
+function getPriorityWeightArray(maxPriority: number) {
+  const weightsByPriority = new Array(maxPriority + 1);
+  for (let i = 0; i < maxPriority + 1; i++) {
+    const weight = getExpectedCardPicksAtPriority(i, maxPriority);
     weightsByPriority[i] = weight;
+    // console.log('getPriorityWeightArray', `${i}/${maxPriority}`, weight);
   }
   return weightsByPriority;
 }
 
-function getExpectedCardPicksAtPriority(priority: number) {
+function getExpectedCardPicksAtPriority(priority: number, maxPriority: number) {
   let numPicks = 0;
 
   for (let i = 0; i < ITERATIONS; i++) {
     const cards: number[] = [];
     for (let cardIndex = 0; cardIndex < NUM_CARD_SELECTION_OPTIONS; cardIndex++) {
-      const card = Math.floor(Math.random() * NUM_CARDS);
+      const card = Math.floor(Math.random() * (maxPriority + 1));
       cards.push(card);
     }
 
@@ -50,11 +55,11 @@ function getExpectedCardPicksAtPriority(priority: number) {
   return numPicks / ITERATIONS;
 }
 
-function getCacheKey() {
+function getCacheKey(numEntries) {
   return hashValues({
     values: [
       getPriorityWeightArray.toString(),
-      NUM_CARDS,
+      numEntries,
       ITERATIONS,
       NUM_CARD_SELECTION_OPTIONS,
       NUM_CARD_SELECTION_PICKS,
