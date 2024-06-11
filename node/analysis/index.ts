@@ -2,7 +2,6 @@ import sample from 'lodash/sample';
 import sampleSize from 'lodash/sampleSize';
 import shuffle from 'lodash/shuffle';
 import ConfidenceScore from 'wilson-score-rank';
-import { NeuralNetwork } from 'brain.js';
 
 import {
   createInitialGameState,
@@ -185,13 +184,11 @@ function testRandomlyWithNarrowingIterations() {
 }
 
 function testCardPriorities() {
-  const net = new NeuralNetwork<number[], number[]>();
-
   const runs = [] as { winRate: number; cardPriority: typeof nonStarterCardNames }[];
   for (let i = 0; i < DECKS_TO_TRY; i++) {
     cardPriority = shuffle(cardPriority);
 
-    const { wins, losses } = iterate(net);
+    const { wins, losses } = iterate();
 
     const winRate = wins / (wins + losses);
     runs.push({ winRate, cardPriority });
@@ -200,7 +197,7 @@ function testCardPriorities() {
   return runs;
 }
 
-function iterate(net?: NeuralNetwork<number[], number[]>) {
+function iterate() {
   cardRanksByName = new Map(cardPriority.map((card, i) => [card, i]));
   const aiTypesForRun = ['bestCard'] as AIContext['type'][];
   // const aiTypesForRun = ['random'] as AIContext['type'][];

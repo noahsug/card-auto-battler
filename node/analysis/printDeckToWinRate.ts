@@ -1,5 +1,3 @@
-import { NeuralNetwork } from 'brain.js';
-
 import { cards } from '../../src/gameState/cards';
 import {
   GameState,
@@ -31,14 +29,14 @@ export default function printBestCardsByBattle() {
     trainingData.push({ input, output: [winRate] });
   });
 
-  const net = new NeuralNetwork<number[], number[]>();
-  console.log('training...');
-  net.train(trainingData, { iterations: 2 });
+  // const net = new NeuralNetwork<number[], number[]>();
+  // console.log('training...');
+  // net.train(trainingData, { iterations: 2 });
 
-  const testInput = new Array(cards.length).fill(0);
-  testInput[39] = 3; // damageStarterCard
-  testInput[0] = 2; // damage card
-  console.log(net.run(testInput));
+  // const testInput = new Array(cards.length).fill(0);
+  // testInput[39] = 3; // damageStarterCard
+  // testInput[0] = 2; // damage card
+  // console.log(net.run(testInput));
 }
 
 function getWinRatesByCardPicks({ battleNumber }: { battleNumber: number }) {

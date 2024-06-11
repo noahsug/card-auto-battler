@@ -1,6 +1,8 @@
 import { MAX_WINS, GameState } from '../../src/gameState';
 import { startBattle, endBattle } from '../../src/gameState/actions';
 
+// Update game state so that either the user or opponent has won a battle.
+// Note: this doesn't actually play out a battle
 export function runFakeBattle(game: GameState) {
   startBattle(game);
 
