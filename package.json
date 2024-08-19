@@ -23,8 +23,10 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@inquirer/prompts": "^5.3.8",
     "@swc/core": "^1.4.2",
     "@types/lodash": "^4.14.202",
+    "chalk": "^5.3.0",
     "fix-esm": "^1.0.1",
     "ts-node": "^10.9.2"
   },
@@ -33,7 +35,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "analyze": "./scripts/ts-node/run.sh node/analysis"
+    "analyze": "./scripts/ts-node/run.sh node/analysis",
+    "deckOfCards": "./scripts/ts-node/run.sh node/deckOfCards/play --"
   },
   "eslintConfig": {
     "extends": [
