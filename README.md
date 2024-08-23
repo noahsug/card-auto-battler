@@ -288,7 +288,280 @@ shuffle deck aniation
   - cards are ordered by dmg dealt (and random if they deal no dmg)
   - all cards are played twice, can only play 2 cards per turn
 
-## Example Cards
+## Card Structure V2
+
+```js
+OpponentEffects = {
+  damage: 1,
+  bleed: 1,
+  trash: 1,
+};
+
+SelfEffects = {
+  extraCardPlays: 1,
+  dodge: 1,
+  strength: 1,
+};
+
+CardEffects = {
+  ...OpponentEffects,
+  ...SelfEffects,
+  singleUse: false,
+};
+
+CardState = {
+  ...CardEffects,
+  // self targeting effects that usually affect the opponent
+  self: OpponentEffects,
+  // opponent targeting effects that usually affect self
+  opponent: SelfEffects,
+  // effects that trigger when you're at half HP or less
+  lowHp: CardEffects, // rally
+};
+
+CardEffect = {
+  damage,
+  heal,
+  bleed,
+  dodge,
+  strength,
+  trash,
+  play,
+  times,
+}
+
+CardState = {
+  ...CardEffect,
+  trashSelf,
+}
+
+
+Card = {
+  effects: [{
+    target: 'enemy',
+    effect: 'damage',
+    value: 1,
+    times: 3,
+  },
+  modify: {
+    effect: 'damage',
+    value: 2,
+    if: {
+
+      check: 'lowHp',
+    }
+  }
+  {
+    target: 'card',
+    effect: 'damage',
+    value: 2,
+    if: {
+      check: 'lowHp',
+      value: true,
+    }
+  }],
+  modify: {
+    damage: 2,
+    ifLowHP: true,
+  },
+  repeat: {
+
+  }
+}
+
+
+// ----------- final card wording
+
+// Deal 1 damage 3 times.
+// Rally: Each hit deals 2 extra damage.
+
+// Deal 10 damage.
+// Gain 4 HP.
+// Apply 2 bleed.
+// Gain 1 poison.
+// Enemy gains 2 strength.
+// You Trash 2 cards.
+// Enemy Trashes 2 cards.
+// Play two cards.
+// Trash.
+
+// Play the top damage card of your deck.
+
+// Deal 1 damage 3 times.
+// Rally: Deals double damage.
+
+// Deal 1 damage 3 times.
+// Rally: Each hit deals 2 extra damage.
+
+// Deal 1 damage 3 times.
+// Each hit deals 2 extra damage if you have less than half HP.
+
+// Deal 5 damage.
+// Deals double damage if you have less than half HP.
+
+// Set your HP to half.
+
+// Deal 3 damage.
+// Deals extra damage for every 5 missing health.
+
+// Deal 10 damage.
+// Misses if you have more HP than the enemy.
+
+// Deal 10 damage.
+// Take 5 damage if this misses.
+
+// Deal 1 damage 3 times.
+// Momentum: Each hit deals extra damage equal to your bleed (3).
+
+// Deal 3 damage.
+// Powerful Blow: Lifesteal. // triggers if this card does double it's original damage (6)
+// Gains Lifesteal if this card deals >= 7 damage.
+// Gain HP equal to damage dealt if this card deals at least 7 damage.
+
+// Deal 3 damage.
+// Apply bleed equal to damage dealt.
+
+// Deal 3 damage.
+// Deals 5 extra damage if the enemy is bleeding.
+// is poisoned.
+// has at least 1 strength.
+
+// Deal damage equal to two times the enemy's bleed (3).
+
+// Deal 3 damage. Deals extra damage equal to the enemy's bleed (3).
+
+// Deal 2 damage. Deals extra damage equal to the number of cards you've played this turn.
+
+// Deal 1 damage.
+// Deals extra damage equal to your strength (6). // re-write to "This card is effected by strength twice"
+
+// Gain strength equal to 2 times your strength. // rewrite to "Triple your strength."
+
+// Apply bleed equal to 2 times the enemy's bleed. // rewrite to "Triple the enemy's bleed."
+
+// Apply 5 bleed and gain 5 bleed.
+
+// Heal 3 and gain 3 strength.
+
+// Deal 1 damage. Play 1 card.
+// Momentum: Play 1 card. // triggers when you've played more than one card this turn.
+
+// Gain 1 Dodge for every 4 cards you play.
+
+// Enemy cards deal 1 less damage for the next 3 turns.
+
+// ALL damage is reduced by 2 for the next 3 turns.
+
+// Deal 1 damage.
+// Repeat for each bleed you have (3).
+// Repeat for each bleed the enemy has (3).
+
+// ----------- brainstorming
+
+
+// Deal 1 damage X times.
+// X = the enemy's bleed.
+
+// Deal 1 damage for each bleed stack on the enemy.
+// Deal 1 damage for each of the enemy's bleed.
+
+// Deal 1 damage.
+// Repeat for each bleed stack on the enemy (3).
+// Repeat for each enemy bleed stack (3).
+// Repeat for each self bleed stack (3).
+// Repeat for each of your bleed stacks.
+// Repeat for each stack of bleed on you.
+
+// Deal 1 damage 3 times.
+// Rally: +3 damage.
+// - or -
+// Deal 1 + X damage 3 times.
+// X = 0.
+// Rally: X = 3.
+// Deal 1 damage 3 times.
+// Rally: Increase each damage dealt by +3.
+
+// Deal 1 + X damage.
+// X = your bleed. (BAD)
+// - or -
+// Deal 1 damage.
+// +X damage.
+// X = your bleed. (BAD)
+// - or -
+// Deal 1 damage.
+// Deal extra damage equal to your bleed. (GOOD)
+// - or -
+// Deal 1 damage.
+// Increase damage dealt by 1 for each stack of your bleed. (GOOD)
+
+// Deal 1 damage 3 times.
+// Rally:  is increased equal to your bleed. (GOOD)
+
+// Deal 2 damage X times.
+// X = Enemy's bleed. (BAD)
+// - or -
+// Deal 2 damage for each of your enemy's bleed. (BAD)
+// - or -
+// Deal 2 damage.
+// Repeat for each of your enemy's bleed. (BAD)
+// - or -
+// For each enemy bleed: Deal 2 damage. (BAD)
+
+// Deal 2 damage for each of your bleed. (BAD)
+// - or -
+// For each of your bleed: Deal 2 damage. (BAD)
+
+// Deal 2 damage.
+// Rally: Repeat for each of your enemy's bleed.
+// - or -
+// Deal 2 damage X times.
+// X = 1
+// Rally: X = enemy's bleed
+
+// Deal damage equal to 2 times your enemy's bleed.
+// - or -
+// Deal N damage.
+// N = 2 times enemy's bleed
+
+// Apply 3 bleed.
+
+// Gain strength equal to your enemy's bleed.
+// Enemy gains strength equal to their bleed.
+
+// Deal 10 damage.
+// Apply 2 bleed.
+// Enemy gains 2 strength.
+// You Trash 2 cards.
+// Enemy Trashes 2 cards.
+
+// Gain X strength.
+// X = 2x your strength.
+//  - or -
+// Gain strength equal to 2 times your strength.
+// (shorten in render to "Triple your strength.")
+
+// Inflect poison equal to your enemy's poison. (shorten to "Double the enemy's poison.")
+// Exhaust.
+
+// Deal 10 damage.
+// Take 5 damage.
+
+// Deal 1 damage.
+// Play an extra card.
+// Momentum: Play an extra card. (Momentum: triggers when this is your played more than one card has been played this turn)
+
+{
+  damage: 10,
+  self: {
+    damage: 10,
+  }
+  rally: {
+    bleed: 2
+  }
+}
+```
+
+## Card Structure V1
 
 ```js
 // deal 10 damage and 5 damage to self
