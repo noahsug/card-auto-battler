@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import CardCollectionScreen from './CardCollectionScreen';
 import GameStartScreen from './GameStartScreen';
 import CardSelectionScreen from './CardSelectionScreen';
 import BattleScreen from './BattleScreen';
@@ -13,7 +14,7 @@ type ScreenMapping = {
 };
 
 const screenMapping: ScreenMapping = {
-  // 'game-start': <BattleScreen />, // DEBUG
+  cardCollection: <CardCollectionScreen />,
 
   gameStart: <GameStartScreen />,
   cardSelection: <CardSelectionScreen />,
@@ -34,4 +35,5 @@ const Root = styled.div`
   font-size: 24rem;
   height: 100%;
   user-select: none;
+  max-width: 100vh;
 `;

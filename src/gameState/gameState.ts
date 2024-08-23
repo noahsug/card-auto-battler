@@ -3,7 +3,13 @@ import { STARTING_HEALTH } from './constants';
 import { getStartingCards } from './cardSelection';
 import sample from 'lodash/sample';
 
-export type ScreenName = 'gameStart' | 'cardSelection' | 'battle' | 'battleEnd' | 'gameEnd';
+export type ScreenName =
+  | 'cardCollection'
+  | 'gameStart'
+  | 'cardSelection'
+  | 'battle'
+  | 'battleEnd'
+  | 'gameEnd';
 
 export const enemyTypes = [
   'strength',
@@ -168,7 +174,8 @@ export function createInitialGameState(): GameState {
     turn: 0,
     wins: 0,
     losses: 0,
-    screen: 'gameStart',
+    // screen: 'gameStart',
+    screen: 'cardCollection', // DEBUG
     animationEvents: [],
     wonLastBattle: false,
     currentEnemyType: getRandomEnemyType(),
