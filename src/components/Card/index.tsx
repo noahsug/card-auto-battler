@@ -1,12 +1,12 @@
 import styled, { css } from 'styled-components';
 import React from 'react';
 
-import { CardEffects, CardState, statusEffectNames } from '../gameState';
+import { CardEffects, CardState, statusEffectNames } from '../../gameState';
 import CardEffectText, {
   CardText,
   CARD_TEXT_SYMBOLS,
   CardEffectWithSymbols,
-} from './CardEffectText';
+} from '../CardEffectText';
 import {
   GainEffectsOptions,
   Target,
@@ -14,8 +14,8 @@ import {
   IdentifiableBattleStats,
   Comparable,
   Conditional,
-} from '../gameState/gameState';
-import { joinText } from '../utils';
+} from '../../gameState/gameState';
+import { joinText } from '../../utils';
 
 interface Props {
   card: CardState;

@@ -372,9 +372,6 @@ Card = {
 
 // ----------- final card wording
 
-// Deal 1 damage 3 times.
-// Rally: Each hit deals 2 extra damage.
-
 // Deal 10 damage.
 // Gain 4 HP.
 // Apply 2 bleed.
@@ -395,6 +392,9 @@ Card = {
 
 // Deal 1 damage 3 times.
 // Each hit deals 2 extra damage if you have less than half HP.
+
+// Deal 1 damage 3 times.
+// Rally: Each hit deals 2 extra damage.
 
 // Deal 5 damage.
 // Deals double damage if you have less than half HP.

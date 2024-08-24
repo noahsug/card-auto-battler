@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 
-import Card from './Card';
-import { CardState, createCard, cardsByName } from '../gameState';
+import Card from '.';
+import { CardState, createCard, cardsByName } from '../../gameState';
 
 describe('card text', () => {
   function getCardText(cardState: CardState) {

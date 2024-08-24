@@ -16,3 +16,8 @@ export function swap<T>(arr: T[], index1: number, index2: number) {
   arr[index2] = arr[index1];
   arr[index1] = tmp;
 }
+
+// see https://github.com/microsoft/TypeScript/issues/31018
+export function readonlyIncludes<T, A extends T>(array: ReadonlyArray<A>, item: T): item is A {
+  return array.includes(item as A);
+}
