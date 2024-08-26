@@ -93,19 +93,23 @@ import getCardTextComponents, {
 // Repeat for each bleed you have (3).
 // Repeat for each bleed the enemy has (3).
 
+function renderTextComponent(component: TextComponent): string {
+  switch (component.type) {
+    case 'plain':
+    case 'keyword':
+      return component.text;
+    case 'symbol':
+      return component.symbolName;
+    case 'value':
+      return String(component.value);
+  }
+}
+
 function render(card: CardState) {
   const text = [];
   const lines = getCardTextComponents(card);
   for (const textComponents of lines) {
-    const line = [];
-    for (const textComponent of textComponents) {
-      const { value } = textComponent;
-      if (textComponent.type === 'effect' && textComponent.isPlural) {
-        line.push(`${value}es`);
-      } else {
-        line.push(value);
-      }
-    }
+    const line = textComponents.map(renderTextComponent);
     text.push(`${line.join(' ')}.`);
   }
 

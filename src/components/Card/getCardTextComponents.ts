@@ -1,11 +1,9 @@
 import {
-  StatusEffects,
   StatusEffectName,
   Target,
   IdentifiablePlayerValue,
   statusEffectNames,
 } from '../../gameState/gameState';
-import { STATUS_EFFECT_SYMBOLS } from '../StatusEffects';
 import { readonlyIncludes } from '../../utils/iterators';
 
 // Deal 1 damage. Repeat for each bleed the enemy has.
@@ -184,18 +182,50 @@ export interface CardState {
   effects: CardEffect[];
 }
 
-interface GenericTextComponent {
-  type: 'text' | 'value';
-  value: string;
+const SYMBOL_NAMES = ['damage', 'heal', ...statusEffectNames];
+const KEYWORDS = ['trash'];
+
+type SymbolName = (typeof SYMBOL_NAMES)[number];
+type Keyword = (typeof KEYWORDS)[number];
+
+interface PlainText {
+  type: 'plain';
+  text: string;
 }
 
-interface EffectTextComponent {
-  type: 'effect';
-  isPlural?: boolean;
-  value: string;
+interface SymbolText {
+  type: 'symbol';
+  symbolName: SymbolName;
 }
 
-export type TextComponent = GenericTextComponent | EffectTextComponent;
+interface KeywordText {
+  type: 'keyword';
+  keyword: Keyword;
+  text: string;
+}
+
+interface ValueText {
+  type: 'value';
+  value: number;
+}
+
+export type TextComponent = PlainText | SymbolText | KeywordText | ValueText;
+
+function getPlainText(text: string): TextComponent {
+  return { type: 'plain', text: text };
+}
+
+function getValueText(value: number): TextComponent {
+  return { type: 'value', value };
+}
+
+function getSymbolText(effectName: CardEffectName): SymbolText {
+  return { type: 'symbol', symbolName: effectName };
+}
+
+function getKeywordText(text: string, keyword: Keyword): KeywordText {
+  return { type: 'keyword', keyword, text };
+}
 
 // Given a self targeted string, transforms it into an enemy targeted string if needed.
 function targeted(text: string, target: Target) {
@@ -222,37 +252,25 @@ function getPlayerValueText(name: IdentifiablePlayerValue) {
   return name;
 }
 
-function getTextComponent(text: string): TextComponent {
-  return { type: 'text', value: text };
-}
-
-function getValueComponent(value: number): TextComponent {
-  return { type: 'value', value: `${value}` };
-}
-
-function getEffectComponent(effectName: CardEffectName): EffectTextComponent {
-  return { type: 'effect', value: effectName };
-}
-
 function getMainEffectComponents(effect: CardEffect): TextComponent[] {
   if (effect.name === 'trash') {
-    const targetComponent = getTextComponent(targeted('You', effect.target));
-    const effectComponent = getEffectComponent(effect.name);
-    effectComponent.isPlural = effect.target === 'opponent';
+    const targetComponent = getPlainText(targeted('You', effect.target));
+    const effectText = effect.target === 'self' ? 'trash' : 'trashes';
+    const effectComponent = getKeywordText(effectText, effect.name);
 
     if (effect.multiplyBy) {
       // "You trash cards" (equal to...)
-      return [targetComponent, effectComponent, getTextComponent('cards')];
+      return [targetComponent, effectComponent, getPlainText('cards')];
     }
 
     // "Enemy trashes 2"
-    const valueComponent = getValueComponent(effect.value);
+    const valueComponent = getValueText(effect.value);
     return [targetComponent, effectComponent, valueComponent];
   }
 
   const applyText = effect.name === 'damage' ? 'Take' : 'Gain';
-  const applyComponent = getTextComponent(targeted(applyText, effect.target));
-  const effectComponent = getEffectComponent(effect.name);
+  const applyComponent = getPlainText(targeted(applyText, effect.target));
+  const effectComponent = getSymbolText(effect.name);
 
   if (effect.multiplyBy) {
     // Deal damage" (equal to...)
@@ -260,7 +278,7 @@ function getMainEffectComponents(effect: CardEffect): TextComponent[] {
   }
 
   // "Deal 3 damage"
-  const valueComponent = getValueComponent(effect.value);
+  const valueComponent = getValueText(effect.value);
   return [applyComponent, valueComponent, effectComponent];
 }
 
@@ -287,13 +305,13 @@ function getMultiplyByComponents(effect: CardEffect): TextComponent[] {
   if (multiplyBy.name === 'cardsPlayedThisTurn') {
     // "the number of cards you've played this turn
     const targetText = targeted(`you've`, multiplyBy.type);
-    return [getTextComponent(`${equalToText} the number of cards ${targetText} played this turn`)];
+    return [getPlainText(`${equalToText} the number of cards ${targetText} played this turn`)];
   }
 
   if (multiplyBy.name === 'trashedCards') {
     // "the number of cards you've trashed"
     const targetText = targeted(`you've`, multiplyBy.type);
-    return [getTextComponent(`${equalToText} the number of cards ${targetText} trashed`)];
+    return [getPlainText(`${equalToText} the number of cards ${targetText} trashed`)];
   }
 
   // "your"
@@ -301,19 +319,19 @@ function getMultiplyByComponents(effect: CardEffect): TextComponent[] {
 
   if (readonlyIncludes(statusEffectNames, multiplyBy.name)) {
     // "bleed"
-    const effectComponent = getEffectComponent(multiplyBy.name);
-    return [getTextComponent(equalToText), effectComponent];
+    const effectComponent = getSymbolText(multiplyBy.name);
+    return [getPlainText(equalToText), effectComponent];
   }
 
   // "health"
-  return [getTextComponent(`${equalToText} ${getPlayerValueText(multiplyBy.name)}`)];
+  return [getPlainText(`${equalToText} ${getPlayerValueText(multiplyBy.name)}`)];
 }
 
 function getMultiHitComponents(effect: CardEffect): TextComponent[] {
   if (!effect.multiHit) return [];
 
   // "2 times"
-  return [getValueComponent(effect.multiHit), getTextComponent('times')];
+  return [getValueText(effect.multiHit), getPlainText('times')];
 }
 
 function getComparisonText(comparison: If['comparison']): string {
@@ -379,17 +397,21 @@ function getIfComponents(effect: CardEffect): TextComponent[] {
         (comparison === '>=' && compareTo.value === 1));
     const comparisonText = isCheckingGreaterThanZero ? '' : ` ${getComparisonText(comparison)}`;
 
-    const ifTargetHas = getTextComponent(`if ${targetText} ${hasText}${comparisonText}`);
+    const ifTargetHas = getPlainText(`if ${targetText} ${hasText}${comparisonText}`);
     const valueComponents = isCheckingGreaterThanZero
       ? []
-      : [getValueComponent((compareTo as CompareToValue).value)];
-    const effectComponent = getEffectComponent(ifName);
+      : [getValueText((compareTo as CompareToValue).value)];
+    const effectComponent = getSymbolText(ifName);
 
     // "if the enemy has dodge" or "if you have at least 3 dodge"
     return [ifTargetHas, ...valueComponents, effectComponent];
   }
 
   return [];
+}
+
+function cleanupTextComponents(components: TextComponent[]): TextComponent[] {
+  return components;
 }
 
 function getEffectTextComponents(effect: CardEffect): TextComponent[] {
@@ -408,7 +430,12 @@ function getEffectTextComponents(effect: CardEffect): TextComponent[] {
   // .flat(Infinity)
   // text, value, keyword
 
-  return [...mainEffectComponents, ...multiplyByComponents, ...multiHitComponents, ...ifComponents];
+  return cleanupTextComponents([
+    ...mainEffectComponents,
+    ...multiplyByComponents,
+    ...multiHitComponents,
+    ...ifComponents,
+  ]);
 }
 
 export default function getCardTextComponents(card: CardState): TextComponent[][] {
