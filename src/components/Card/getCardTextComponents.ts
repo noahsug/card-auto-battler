@@ -182,29 +182,29 @@ export interface CardState {
   effects: CardEffect[];
 }
 
-const SYMBOL_NAMES = ['damage', 'heal', ...statusEffectNames];
-const KEYWORDS = ['trash'];
+const SYMBOL_NAMES = ['damage', 'heal', ...statusEffectNames] as const;
+const KEYWORDS = ['trash'] as const;
 
 type SymbolName = (typeof SYMBOL_NAMES)[number];
 type Keyword = (typeof KEYWORDS)[number];
 
-interface PlainText {
+export interface PlainText {
   type: 'plain';
   text: string;
 }
 
-interface SymbolText {
+export interface SymbolText {
   type: 'symbol';
   symbolName: SymbolName;
 }
 
-interface KeywordText {
+export interface KeywordText {
   type: 'keyword';
   keyword: Keyword;
   text: string;
 }
 
-interface ValueText {
+export interface ValueText {
   type: 'value';
   value: number;
 }
@@ -219,11 +219,18 @@ function getValueText(value: number): ValueText {
   return { type: 'value', value };
 }
 
-function getSymbolText(effectName: CardEffectName): SymbolText {
-  return { type: 'symbol', symbolName: effectName };
+function getSymbolText(symbolName: SymbolName): SymbolText {
+  return { type: 'symbol', symbolName };
 }
 
 function getKeywordText(text: string, keyword: Keyword): KeywordText {
+  if (!text) {
+    if (readonlyIncludes(KEYWORDS, text)) {
+      keyword = text;
+    } else {
+      throw new Error(`Unknown keyword: ${text}, please specify a keyword`);
+    }
+  }
   return { type: 'keyword', keyword, text };
 }
 
@@ -247,13 +254,66 @@ function getTargetedText(text: string, target: Target) {
   return target === 'self' ? text : selfTextToEnemyText[text];
 }
 
-function getPlayerValueText(name: IdentifiablePlayerValue) {
-  if (name === 'health') return 'HP';
-  if (name === 'startingHealth') return 'max HP';
-  if (name === 'cardsPlayedThisTurn') return 'cards played this turn';
-  if (name === 'trashedCards') return 'trashed cards';
+// deal with
+//  - (if you have 3) "cards in your deck" <-- only handling this case currently
+//  - (equal to) "the number of cards in your deck"
+//  - (for each) "card in your deck"
+function getPlayerValueText(playerValue: IdentifiablePlayerValue) {
+  if (SYMBOL_NAMES.includes(playerValue as SymbolName)) {
+    return getSymbolText(playerValue as SymbolName);
+  }
 
-  return name;
+  switch (playerValue) {
+    case 'health':
+      return 'HP';
+    case 'startingHealth':
+      return 'max HP';
+    case 'cards':
+      return 'cards in your deck';
+  }
+
+  // case 'cardsPlayedThisTurn':
+  //   return 'cards played this turn';
+  // case 'trashedCards':
+  //   return 'trashed cards';
+
+  return playerValue;
+}
+
+function getMoreThanText(comparison: If['comparison']): string {
+  switch (comparison) {
+    case '>':
+      return 'more than';
+    case '<':
+      return 'less than';
+    case '=':
+      return '';
+    case '<=':
+      return 'no more than';
+    case '>=':
+      return 'at least';
+  }
+}
+
+function getMoreThanXText({ compareTo, comparison }: Pick<If, 'compareTo' | 'comparison'>) {
+  // TODO: implement compare to player value
+  if (compareTo.type !== 'value') return '';
+
+  const isCheckingExistence =
+    compareTo.type === 'value' &&
+    ((comparison === '>' && compareTo.value === 0) ||
+      (comparison === '>=' && compareTo.value === 1));
+
+  if (isCheckingExistence) {
+    // (if you have) "" (bleed)
+    return '';
+  }
+
+  const moreThan = getMoreThanText(comparison);
+  const x = getValueText(compareTo.value);
+
+  // (if you have) "more than 3" (bleed)
+  return [moreThan, x];
 }
 
 function getMainEffectComponents(effect: CardEffect): TextBuilder {
@@ -338,54 +398,25 @@ function getMultiHitComponents(effect: CardEffect): TextBuilder {
   return [getValueText(effect.multiHit), getPlainText('times')];
 }
 
-function getMoreThanText(comparison: If['comparison']): string {
-  switch (comparison) {
-    case '>':
-      return 'more than';
-    case '<':
-      return 'less than';
-    case '=':
-      return '';
-    case '<=':
-      return 'no more than';
-    case '>=':
-      return 'at least';
-  }
-}
-
-function getMoreThanXText({ compareTo, comparison }: Pick<If, 'compareTo' | 'comparison'>) {
-  // TODO: implement compare to player value
-  if (compareTo.type !== 'value') return '';
-
-  const isCheckingExistence =
-    compareTo.type === 'value' &&
-    ((comparison === '>' && compareTo.value === 0) ||
-      (comparison === '>=' && compareTo.value === 1));
-
-  if (isCheckingExistence) {
-    // (if you have) "" (bleed)
-    return '';
-  }
-
-  const moreThan = getMoreThanText(comparison);
-  const x = getValueText(compareTo.value);
-
-  // (if you have) "more than 3" (bleed)
-  return [moreThan, x];
-}
-
-function getIfComponents(effect: CardEffect): TextBuilder {
+function getIfText(effect: CardEffect): TextBuilder {
   if (!effect.if) return [];
 
   const { playerValue } = effect.if;
 
   const moreThanX = getMoreThanXText(effect.if);
 
-  if (readonlyIncludes(statusEffectNames, playerValue) || playerValue === 'health') {
-    const ifYouHave = ['if', getTargetedText('you have', effect.if.type)];
-    const playerValueText = getPlayerValueText(playerValue);
+  // used for "if you have 3 ..." (e.g. bleed, HP, max HP)
+  const isSimpleValue =
+    readonlyIncludes(statusEffectNames, playerValue) ||
+    playerValue === 'health' ||
+    playerValue === 'startingHealth' ||
+    playerValue === 'cards';
 
-    return [ifYouHave, moreThanX, playerValueText];
+  if (isSimpleValue) {
+    const ifYouHave = ['if', getTargetedText('you have', effect.if.type)];
+    const condition = getPlayerValueText(playerValue);
+
+    return [ifYouHave, moreThanX, condition];
   }
 
   const ifYouve = ['if', getTargetedText(`you've`, effect.if.type)];
@@ -412,7 +443,7 @@ function getEffectTextComponents(effect: CardEffect): TextBuilder {
   const multiHitComponents = getMultiHitComponents(effect);
 
   // "if the enemy has dodge"
-  const ifComponents = getIfComponents(effect);
+  const ifComponents = getIfText(effect);
 
   return [...mainEffectComponents, ...multiplyByComponents, ...multiHitComponents, ...ifComponents];
 }

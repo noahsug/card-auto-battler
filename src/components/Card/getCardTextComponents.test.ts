@@ -1,7 +1,11 @@
 import getCardTextComponents, {
   CardEffect,
   CardState,
+  KeywordText,
+  PlainText,
+  SymbolText,
   TextComponent,
+  ValueText,
 } from './getCardTextComponents';
 
 // Deal 1 damage 3 times.
@@ -282,6 +286,9 @@ describe('renders conditionals', () => {
     expect(render(card)).toBe('Deal 1 damage if you have at least 3 bleed.');
   });
 
+  // ... if this card deals at least 7 damage.
+  // ... if you've played two cards this turn.
+
   // test('if you have less than half HP', () => {
   //   effect.if = {
   //     type: 'percentHealth',
@@ -305,22 +312,57 @@ describe('renders conditionals', () => {
   // });
 });
 
-// it('renders conditionals', () => {
-//   // Deal 5 damage.
-//   // ... if you have less than half HP.
-//   // ... if the enemy has dodge.
-//   // ... if your bleed is less than the enemy's bleed.
-//   // ... if your strength is no more than 2.
-//   // ... if this card deals at least 7 damage.
-//   // ... if you've played two cards this turn.
+describe('indicates symbols, keywords and values', () => {
+  function getComponentValues(card: CardState, type: TextComponent['type']) {
+    const componentLists = getCardTextComponents(card);
+    const components = componentLists.flat().filter((c) => c.type === type);
 
-//   const effect = {
-//     target: 'opponent',
-//     effect: 'damage',
-//     value: 5,
-//   };
-//   const card = { effects: [effect] };
+    if (type === 'value') {
+      return components.map((c) => (c as ValueText).value);
+    }
+    if (type === 'symbol') {
+      return components.map((c) => (c as SymbolText).symbolName);
+    }
+    if (type === 'plain') {
+      return components.map((c) => (c as PlainText).text);
+    }
+    if (type === 'keyword') {
+      return components.map((c) => (c as KeywordText).keyword);
+    }
+  }
 
-//   effect.if = { type: 'maxHealth', target: 'self', comparison: '<', value: 'half' };
-//   expect(getCardText(card)).toBe('Deal 5 damage if you have less than half HP.');
-// });
+  test('deal damage', () => {
+    expect(getComponentValues(card, 'value')).toEqual([1]);
+    expect(getComponentValues(card, 'symbol')).toEqual(['damage']);
+  });
+
+  test('trash cards', () => {
+    effect.name = 'trash';
+
+    expect(getComponentValues(card, 'value')).toEqual([1]);
+    expect(getComponentValues(card, 'keyword')).toEqual(['trash']);
+  });
+
+  test('if has bleed', () => {
+    effect.if = {
+      type: 'self',
+      playerValue: 'bleed',
+      comparison: '>=',
+      compareTo: { type: 'value', value: 3 },
+    };
+
+    expect(getComponentValues(card, 'value')).toEqual([1, 3]);
+    expect(getComponentValues(card, 'symbol')).toEqual(['damage', 'bleed']);
+  });
+
+  test('equal to bleed', () => {
+    effect.multiplyBy = {
+      type: 'self',
+      name: 'bleed',
+    };
+
+    expect(getComponentValues(card, 'value')).toEqual([]);
+    expect(getComponentValues(card, 'symbol')).toEqual(['damage', 'bleed']);
+    expect(getComponentValues(card, 'keyword')).toEqual([]);
+  });
+});
