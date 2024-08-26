@@ -35,7 +35,7 @@ import { readonlyIncludes } from '../../utils/iterators';
 
 // Deal damage and gain strength equal to 2 times the enemy's bleed.
 
-// const damgeAndStrengthFromBleed = {
+// const damageAndStrengthFromBleed = {
 //   target: 'opponent',
 //   effect: 'damage',
 //   and: {
@@ -228,10 +228,10 @@ function getKeywordText(text: string, keyword: Keyword): KeywordText {
 }
 
 // Intermediate type for building text components.
-type TextBuilder = (string | TextComponent)[];
+type TextBuilder = (string | TextComponent | TextBuilder)[];
 
 // Given a self targeted string, transforms it into an enemy targeted string if needed.
-function targeted(text: string, target: Target) {
+function getTargetedText(text: string, target: Target) {
   const selfTextToEnemyText: Record<string, string> = {
     You: 'Enemy',
     Take: 'Deal',
@@ -239,6 +239,7 @@ function targeted(text: string, target: Target) {
     your: `the enemy's`,
     you: 'the enemy',
     [`you've`]: 'the enemy has',
+    'you have': 'the enemy has',
   };
 
   if (selfTextToEnemyText[text] == null) throw new Error(`Unknown targeted text: ${text}`);
@@ -255,9 +256,9 @@ function getPlayerValueText(name: IdentifiablePlayerValue) {
   return name;
 }
 
-function getMainEffectComponents(effect: CardEffect): TextComponent[] {
+function getMainEffectComponents(effect: CardEffect): TextBuilder {
   if (effect.name === 'trash') {
-    const targetComponent = getPlainText(targeted('You', effect.target));
+    const targetComponent = getPlainText(getTargetedText('You', effect.target));
     const effectText = effect.target === 'self' ? 'trash' : 'trashes';
     const effectComponent = getKeywordText(effectText, effect.name);
 
@@ -272,7 +273,7 @@ function getMainEffectComponents(effect: CardEffect): TextComponent[] {
   }
 
   const applyText = effect.name === 'damage' ? 'Take' : 'Gain';
-  const applyComponent = getPlainText(targeted(applyText, effect.target));
+  const applyComponent = getPlainText(getTargetedText(applyText, effect.target));
   const effectComponent = getSymbolText(effect.name);
 
   if (effect.multiplyBy) {
@@ -285,7 +286,7 @@ function getMainEffectComponents(effect: CardEffect): TextComponent[] {
   return [applyComponent, valueComponent, effectComponent];
 }
 
-function getMultiplyByComponents(effect: CardEffect): TextComponent[] {
+function getMultiplyByComponents(effect: CardEffect): TextBuilder {
   if (!effect.multiplyBy) return [];
 
   const { multiplyBy } = effect;
@@ -307,18 +308,18 @@ function getMultiplyByComponents(effect: CardEffect): TextComponent[] {
 
   if (multiplyBy.name === 'cardsPlayedThisTurn') {
     // "the number of cards you've played this turn
-    const targetText = targeted(`you've`, multiplyBy.type);
+    const targetText = getTargetedText(`you've`, multiplyBy.type);
     return [getPlainText(`${equalToText} the number of cards ${targetText} played this turn`)];
   }
 
   if (multiplyBy.name === 'trashedCards') {
     // "the number of cards you've trashed"
-    const targetText = targeted(`you've`, multiplyBy.type);
+    const targetText = getTargetedText(`you've`, multiplyBy.type);
     return [getPlainText(`${equalToText} the number of cards ${targetText} trashed`)];
   }
 
   // "your"
-  equalToText += ` ${targeted('your', multiplyBy.type)}`;
+  equalToText += ` ${getTargetedText('your', multiplyBy.type)}`;
 
   if (readonlyIncludes(statusEffectNames, multiplyBy.name)) {
     // "bleed"
@@ -330,14 +331,14 @@ function getMultiplyByComponents(effect: CardEffect): TextComponent[] {
   return [getPlainText(`${equalToText} ${getPlayerValueText(multiplyBy.name)}`)];
 }
 
-function getMultiHitComponents(effect: CardEffect): TextComponent[] {
+function getMultiHitComponents(effect: CardEffect): TextBuilder {
   if (!effect.multiHit) return [];
 
   // "2 times"
   return [getValueText(effect.multiHit), getPlainText('times')];
 }
 
-function getComparisonText(comparison: If['comparison']): string {
+function getMoreThanText(comparison: If['comparison']): string {
   switch (comparison) {
     case '>':
       return 'more than';
@@ -352,68 +353,55 @@ function getComparisonText(comparison: If['comparison']): string {
   }
 }
 
-function getIfComponents(effect: CardEffect): TextComponent[] {
+function getMoreThanXText({ compareTo, comparison }: Pick<If, 'compareTo' | 'comparison'>) {
+  // TODO: implement compare to player value
+  if (compareTo.type !== 'value') return '';
+
+  const isCheckingExistence =
+    compareTo.type === 'value' &&
+    ((comparison === '>' && compareTo.value === 0) ||
+      (comparison === '>=' && compareTo.value === 1));
+
+  if (isCheckingExistence) {
+    // (if you have) "" (bleed)
+    return '';
+  }
+
+  const moreThan = getMoreThanText(comparison);
+  const x = getValueText(compareTo.value);
+
+  // (if you have) "more than 3" (bleed)
+  return [moreThan, x];
+}
+
+function getIfComponents(effect: CardEffect): TextBuilder {
   if (!effect.if) return [];
 
-  // TODO: Implement
-  if (effect.if.compareTo.type !== 'value') return [];
+  const { playerValue } = effect.if;
 
-  // const { playerValue } = effect.if;
+  const moreThanX = getMoreThanXText(effect.if);
 
-  // const ifYouHave = ['if', getTargetedText('you have', effect.if.type)];
-  // const moreThanX = getMoreThanXText(effect.if);
+  if (readonlyIncludes(statusEffectNames, playerValue) || playerValue === 'health') {
+    const ifYouHave = ['if', getTargetedText('you have', effect.if.type)];
+    const playerValueText = getPlayerValueText(playerValue);
 
-  // if (readonlyIncludes(statusEffectNames, playerValue) || playerValue === 'health') {
-  //   const playerValue = getPlayerValueText(playerValue);
-  //   return [ifYouHave, moreThanX, playerValue];
-  // }
+    return [ifYouHave, moreThanX, playerValueText];
+  }
 
-  // if (playerValue === 'trashedCards') {
-  //   return [ifYouHave, 'trashed', moreThanX, 'cards'];
-  // }
+  const ifYouve = ['if', getTargetedText(`you've`, effect.if.type)];
 
-  // if (playerValue === 'cardsPlayedThisTurn') {
-  //   return [ifYouHave, 'played', moreThanX, 'cards this turn'];
-  // }
+  if (playerValue === 'trashedCards') {
+    return [ifYouve, 'trashed', moreThanX, 'cards'];
+  }
 
-  const { type: ifType, playerValue: ifName, comparison, compareTo } = effect.if;
-
-  // if you have dodge
-  // if you have 3 dodge
-  // if you have at least 3 dodge
-  // if you have trashed cards
-  // if you have trashed 3 cards
-  // if you have trashed at least 3 cards
-  // if you have played X cards this turn
-  // if you have more than 10 health
-  // if you have full health
-
-  const isCheckingStatusEffect = readonlyIncludes(statusEffectNames, ifName);
-
-  if (isCheckingStatusEffect) {
-    const targetText = targeted('you', ifType);
-    const hasText = ifType === 'self' ? 'have' : 'has';
-
-    const isCheckingGreaterThanZero =
-      compareTo.type === 'value' &&
-      ((comparison === '>' && compareTo.value === 0) ||
-        (comparison === '>=' && compareTo.value === 1));
-    const comparisonText = isCheckingGreaterThanZero ? '' : ` ${getComparisonText(comparison)}`;
-
-    const ifTargetHas = getPlainText(`if ${targetText} ${hasText}${comparisonText}`);
-    const valueComponents = isCheckingGreaterThanZero
-      ? []
-      : [getValueText((compareTo as CompareToValue).value)];
-    const effectComponent = getSymbolText(ifName);
-
-    // "if the enemy has dodge" or "if you have at least 3 dodge"
-    return [ifTargetHas, ...valueComponents, effectComponent];
+  if (playerValue === 'cardsPlayedThisTurn') {
+    return [ifYouve, 'played', moreThanX, 'cards this turn'];
   }
 
   return [];
 }
 
-function getEffectTextComponents(effect: CardEffect): TextComponent[] {
+function getEffectTextComponents(effect: CardEffect): TextBuilder {
   // "Deal 3 damage" or "Enemy trashes cards" (equal to...)
   const mainEffectComponents = getMainEffectComponents(effect);
 
@@ -434,10 +422,14 @@ function getEffectTextComponents(effect: CardEffect): TextComponent[] {
 // After:
 //   ['You ', K('trash'), ' ', V(3), ' cards']
 function buildTextComponents(textBuilder: TextBuilder): TextComponent[] {
-  textBuilder = textBuilder.flat(Infinity) as TextBuilder;
+  // remove all nested arrays
+  let flatTextBuilder = textBuilder.flat(20) as (string | TextComponent)[];
+
+  // remove empty strings
+  flatTextBuilder = flatTextBuilder.filter((part) => part !== '');
 
   // insert spaces between each element, e.g. ['you', trash'] -> ['you', ' ', 'trash']
-  textBuilder = textBuilder.reduce<TextBuilder>((result, part, i) => {
+  flatTextBuilder = flatTextBuilder.reduce<typeof flatTextBuilder>((result, part, i) => {
     if (i === 0) {
       return [part];
     }
@@ -445,7 +437,7 @@ function buildTextComponents(textBuilder: TextBuilder): TextComponent[] {
   }, []);
 
   // convert strings to plain text components
-  return textBuilder.reduce<TextComponent[]>((components, part, i) => {
+  return flatTextBuilder.reduce<TextComponent[]>((components, part, i) => {
     if (typeof part === 'string') {
       const prevComponent = components[i - 1];
       if (prevComponent && prevComponent.type === 'plain') {
