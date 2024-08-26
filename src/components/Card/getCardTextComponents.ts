@@ -163,7 +163,7 @@ interface CompareToValue {
 
 interface If {
   type: Target;
-  name: IdentifiablePlayerValue;
+  playerValue: IdentifiablePlayerValue;
   comparison: '>' | '<' | '=' | '<=' | '>=';
   compareTo: CompareToPlayerValue | CompareToValue;
 }
@@ -334,7 +334,28 @@ function getComparisonText(comparison: If['comparison']): string {
 function getIfComponents(effect: CardEffect): TextComponent[] {
   if (!effect.if) return [];
 
-  const { type: ifType, name: ifName, comparison, compareTo } = effect.if;
+  // TODO: Implement
+  if (effect.if.compareTo.type !== 'value') return [];
+
+  // const { playerValue } = effect.if;
+
+  // const ifYouHave = ['if', getTargetedText('you have', effect.if.type)];
+  // const moreThanX = getMoreThanXText(effect.if);
+
+  // if (readonlyIncludes(statusEffectNames, playerValue) || playerValue === 'health') {
+  //   const playerValue = getPlayerValueText(playerValue);
+  //   return [ifYouHave, moreThanX, playerValue];
+  // }
+
+  // if (playerValue === 'trashedCards') {
+  //   return [ifYouHave, 'trashed', moreThanX, 'cards'];
+  // }
+
+  // if (playerValue === 'cardsPlayedThisTurn') {
+  //   return [ifYouHave, 'played', moreThanX, 'cards this turn'];
+  // }
+
+  const { type: ifType, playerValue: ifName, comparison, compareTo } = effect.if;
 
   // if you have dodge
   // if you have 3 dodge
@@ -342,6 +363,9 @@ function getIfComponents(effect: CardEffect): TextComponent[] {
   // if you have trashed cards
   // if you have trashed 3 cards
   // if you have trashed at least 3 cards
+  // if you have played X cards this turn
+  // if you have more than 10 health
+  // if you have full health
 
   const isCheckingStatusEffect = readonlyIncludes(statusEffectNames, ifName);
 
@@ -380,6 +404,9 @@ function getEffectTextComponents(effect: CardEffect): TextComponent[] {
 
   // "if the enemy has dodge"
   const ifComponents = getIfComponents(effect);
+
+  // .flat(Infinity)
+  // text, value, keyword
 
   return [...mainEffectComponents, ...multiplyByComponents, ...multiHitComponents, ...ifComponents];
 }

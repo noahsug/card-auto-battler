@@ -259,7 +259,7 @@ describe('renders conditionals', () => {
   test('if the enemy has dodge', () => {
     effect.if = {
       type: 'opponent',
-      name: 'dodge',
+      playerValue: 'dodge',
       comparison: '>',
       compareTo: { type: 'value', value: 0 },
     };
@@ -270,7 +270,7 @@ describe('renders conditionals', () => {
   test('if you have at least 3 bleed', () => {
     effect.if = {
       type: 'self',
-      name: 'bleed',
+      playerValue: 'bleed',
       comparison: '>=',
       compareTo: { type: 'value', value: 3 },
     };
