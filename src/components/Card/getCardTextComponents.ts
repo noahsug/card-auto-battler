@@ -211,11 +211,11 @@ interface ValueText {
 
 export type TextComponent = PlainText | SymbolText | KeywordText | ValueText;
 
-function getPlainText(text: string): TextComponent {
+function getPlainText(text: string): PlainText {
   return { type: 'plain', text: text };
 }
 
-function getValueText(value: number): TextComponent {
+function getValueText(value: number): ValueText {
   return { type: 'value', value };
 }
 
@@ -226,6 +226,9 @@ function getSymbolText(effectName: CardEffectName): SymbolText {
 function getKeywordText(text: string, keyword: Keyword): KeywordText {
   return { type: 'keyword', keyword, text };
 }
+
+// Intermediate type for building text components.
+type TextBuilder = (string | TextComponent)[];
 
 // Given a self targeted string, transforms it into an enemy targeted string if needed.
 function targeted(text: string, target: Target) {
@@ -410,10 +413,6 @@ function getIfComponents(effect: CardEffect): TextComponent[] {
   return [];
 }
 
-function cleanupTextComponents(components: TextComponent[]): TextComponent[] {
-  return components;
-}
-
 function getEffectTextComponents(effect: CardEffect): TextComponent[] {
   // "Deal 3 damage" or "Enemy trashes cards" (equal to...)
   const mainEffectComponents = getMainEffectComponents(effect);
@@ -427,17 +426,45 @@ function getEffectTextComponents(effect: CardEffect): TextComponent[] {
   // "if the enemy has dodge"
   const ifComponents = getIfComponents(effect);
 
-  // .flat(Infinity)
-  // text, value, keyword
+  return [...mainEffectComponents, ...multiplyByComponents, ...multiHitComponents, ...ifComponents];
+}
 
-  return cleanupTextComponents([
-    ...mainEffectComponents,
-    ...multiplyByComponents,
-    ...multiHitComponents,
-    ...ifComponents,
-  ]);
+// Before:
+//   ['You', [K('trash'), ['', V(3)], 'cards']]
+// After:
+//   ['You ', K('trash'), ' ', V(3), ' cards']
+function buildTextComponents(textBuilder: TextBuilder): TextComponent[] {
+  textBuilder = textBuilder.flat(Infinity) as TextBuilder;
+
+  // insert spaces between each element, e.g. ['you', trash'] -> ['you', ' ', 'trash']
+  textBuilder = textBuilder.reduce<TextBuilder>((result, part, i) => {
+    if (i === 0) {
+      return [part];
+    }
+    return result.concat(' ', part);
+  }, []);
+
+  // convert strings to plain text components
+  return textBuilder.reduce<TextComponent[]>((components, part, i) => {
+    if (typeof part === 'string') {
+      const prevComponent = components[i - 1];
+      if (prevComponent && prevComponent.type === 'plain') {
+        // combine multiple strings in a row into a single plain text component
+        prevComponent.text = `${prevComponent.text}${part}`;
+        // remove extra spaces
+        prevComponent.text = prevComponent.text.replace(/\s+/g, ' ');
+        // TODO: remove spaces before punctuation (e.g. 'you trash , gian' -> 'you trash, gain')
+      } else {
+        components.push(getPlainText(part));
+      }
+    } else {
+      components.push(part);
+    }
+
+    return components;
+  }, []);
 }
 
 export default function getCardTextComponents(card: CardState): TextComponent[][] {
-  return card.effects.map(getEffectTextComponents);
+  return card.effects.map(getEffectTextComponents).map(buildTextComponents);
 }

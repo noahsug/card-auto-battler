@@ -110,7 +110,7 @@ function render(card: CardState) {
   const lines = getCardTextComponents(card);
   for (const textComponents of lines) {
     const line = textComponents.map(renderTextComponent);
-    text.push(`${line.join(' ')}.`);
+    text.push(`${line.join('')}.`);
   }
 
   return text.join(' ');
