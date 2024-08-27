@@ -4,6 +4,7 @@ import {
   IdentifiablePlayerValue,
   statusEffectNames,
 } from '../../gameState/gameState';
+import { assertIsNonNullable, assert } from '../../utils';
 import { readonlyIncludes } from '../../utils/iterators';
 
 // Deal 1 damage. Repeat for each bleed the enemy has.
@@ -239,284 +240,185 @@ function getKeywordText(text: string, keyword: Keyword): KeywordText {
 // Intermediate type for building text components.
 type TextBuilder = string | TextComponent | TextBuilder[];
 
-// Given a self targeted string, transforms it into an enemy targeted string if needed.
-function getTargetedText(text: string, target: Target) {
-  const selfTextToEnemyText: Record<string, string> = {
-    You: 'Enemy',
-    Take: 'Deal',
-    Gain: 'Apply',
-    your: `the enemy's`,
-    you: 'the enemy',
-    [`you've`]: 'the enemy has',
-    'you have': 'the enemy has',
+interface TranslateOverrides {
+  name?: CardEffectName | IdentifiablePlayerValue;
+  target?: Target;
+  value?: number;
+}
+
+function getTranslateMultiplyByFn(effect: CardEffect) {
+  return (text: string) => {
+    if (!effect.multiplyBy) return [];
+
+    const overrides = {
+      target: effect.multiplyBy.type,
+      name: effect.multiplyBy.name,
+    };
+
+    return translate(effect, text, overrides);
   };
+}
 
-  if (selfTextToEnemyText[text] == null) throw new Error(`Unknown targeted text: ${text}`);
+function getTranslateIfFn(effect: CardEffect) {
+  return (text: string) => {
+    if (!effect.if) return [];
 
-  return target === 'self' ? text : selfTextToEnemyText[text];
+    // TODO: implement "if you have more health than the enemy"
+    if (effect.if.compareTo.type !== 'value') return [];
+
+    const overrides = {
+      target: effect.if.type,
+      name: effect.if.playerValue,
+      value: (effect.if.compareTo as CompareToValue).value,
+    };
+
+    return translate(effect, text, overrides);
+  };
 }
 
 // TODO: deal with
 //  - (if you have 3) "cards in your deck" <-- only handling this case currently
 //  - (equal to) "the number of cards in your deck"
 //  - (for each) "card in your deck"
-function getPlayerValueText(playerValue: IdentifiablePlayerValue) {
-  if (SYMBOL_NAMES.includes(playerValue as SymbolName)) {
-    return getSymbolText(playerValue as SymbolName);
-  }
+function translate(
+  effect: CardEffect,
+  text: string,
+  overrides: TranslateOverrides = {},
+): TextBuilder {
+  const t = (text: string) => translate(effect, text, overrides);
 
-  switch (playerValue) {
-    case 'health':
-      return 'HP';
-    case 'startingHealth':
-      return 'max HP';
-    case 'cards':
-      return 'cards in your deck';
-  }
-
-  // case 'cardsPlayedThisTurn':
-  //   return 'cards played this turn';
-  // case 'trashedCards':
-  //   return 'trashed cards';
-
-  return playerValue;
-}
-
-function getMoreThanText(comparison: If['comparison']): string {
-  switch (comparison) {
-    case '>':
-      return 'more than';
-    case '<':
-      return 'less than';
-    case '=':
-      return '';
-    case '<=':
-      return 'no more than';
-    case '>=':
-      return 'at least';
-  }
-}
-
-function getMoreThanXText({ compareTo, comparison }: Pick<If, 'compareTo' | 'comparison'>) {
-  // TODO: implement compare to player value
-  if (compareTo.type !== 'value') return '';
-
-  const isCheckingExistence =
-    compareTo.type === 'value' &&
-    ((comparison === '>' && compareTo.value === 0) ||
-      (comparison === '>=' && compareTo.value === 1));
-
-  if (isCheckingExistence) {
-    // (if you have) "" (bleed)
-    return '';
-  }
-
-  const moreThan = getMoreThanText(comparison);
-  const x = getValueText(compareTo.value);
-
-  // (if you have) "more than 3" (bleed)
-  return [moreThan, x];
-}
-
-// "Deal 3 damage" or "You trash cards" (equal to)
-function getDoEffectText(effect: CardEffect): TextBuilder {
-  if (effect.name === 'trash') {
-    const targetComponent = getPlainText(getTargetedText('You', effect.target));
-    const effectText = effect.target === 'self' ? 'trash' : 'trashes';
-    const effectComponent = getKeywordText(effectText, effect.name);
-
-    if (effect.multiplyBy) {
-      // "You trash cards" (equal to...)
-      return [targetComponent, effectComponent, getPlainText('cards')];
-    }
-
-    // "Enemy trashes 2"
-    const valueComponent = getValueText(effect.value);
-    return [targetComponent, effectComponent, valueComponent];
-  }
-
-  const applyText = effect.name === 'damage' ? 'Take' : 'Gain';
-  const applyComponent = getPlainText(getTargetedText(applyText, effect.target));
-  const effectComponent = getSymbolText(effect.name);
-
-  if (effect.multiplyBy) {
-    // Deal damage" (equal to...)
-    return [applyComponent, effectComponent];
-  }
-
-  // "Deal 3 damage"
-  const valueComponent = getValueText(effect.value);
-  return [applyComponent, valueComponent, effectComponent];
-}
-
-function getMultiplyByComponents(effect: CardEffect): TextBuilder {
-  if (!effect.multiplyBy) return [];
-
-  const { multiplyBy } = effect;
-
-  // "equal to"
-  let equalToText = 'equal to';
-
-  if (effect.value > 1) {
-    // "twice" or "3 times"
-    const numberText = effect.value === 2 ? 'twice' : `${effect.value} times`;
-    equalToText += ` ${numberText}`;
-  }
-
-  if (effect.value < 1) {
-    // "half" or "1/4"
-    const numberText = effect.value === 0.5 ? 'half' : `1/${1 / effect.value}`;
-    equalToText += ` ${numberText}`;
-  }
-
-  if (multiplyBy.name === 'cardsPlayedThisTurn') {
-    // "the number of cards you've played this turn
-    const targetText = getTargetedText(`you've`, multiplyBy.type);
-    return [getPlainText(`${equalToText} the number of cards ${targetText} played this turn`)];
-  }
-
-  if (multiplyBy.name === 'trashedCards') {
-    // "the number of cards you've trashed"
-    const targetText = getTargetedText(`you've`, multiplyBy.type);
-    return [getPlainText(`${equalToText} the number of cards ${targetText} trashed`)];
-  }
-
-  // "your"
-  equalToText += ` ${getTargetedText('your', multiplyBy.type)}`;
-
-  if (readonlyIncludes(statusEffectNames, multiplyBy.name)) {
-    // "bleed"
-    const effectComponent = getSymbolText(multiplyBy.name);
-    return [getPlainText(equalToText), effectComponent];
-  }
-
-  // "health"
-  return [getPlainText(`${equalToText} ${getPlayerValueText(multiplyBy.name)}`)];
-}
-
-function getMultiHitComponents(effect: CardEffect): TextBuilder {
-  if (!effect.multiHit) return [];
-
-  // "2 times"
-  return [getValueText(effect.multiHit), getPlainText('times')];
-}
-
-function getIfText(effect: CardEffect): TextBuilder {
-  if (!effect.if) return [];
-
-  const { playerValue } = effect.if;
-
-  const moreThanX = getMoreThanXText(effect.if);
-
-  // used for "if you have 3 ..." (e.g. bleed, HP, max HP)
-  const isSimpleValue =
-    readonlyIncludes(statusEffectNames, playerValue) ||
-    playerValue === 'health' ||
-    playerValue === 'startingHealth' ||
-    playerValue === 'cards';
-
-  if (isSimpleValue) {
-    const ifYouHave = ['if', getTargetedText('you have', effect.if.type)];
-    const condition = getPlayerValueText(playerValue);
-
-    return [ifYouHave, moreThanX, condition];
-  }
-
-  const ifYouve = ['if', getTargetedText(`you've`, effect.if.type)];
-
-  if (playerValue === 'trashedCards') {
-    return [ifYouve, 'trashed', moreThanX, 'cards'];
-  }
-
-  if (playerValue === 'cardsPlayedThisTurn') {
-    return [ifYouve, 'played', moreThanX, 'cards this turn'];
-  }
-
-  return [];
-}
-
-// function getCardEffectText(effect: CardEffect): TextBuilder {
-//   // You trash 3 cards
-//   // Deal 3 damage
-//   // Apply bleed equal to
-//   // const dealDamageEqualToX = getDealDamageEqualToXText(effect);
-
-//   // "Deal 3 damage" or "Enemy trashes cards" (equal to...)
-//   const mainEffectComponents = getDoEffectText(effect);
-
-//   // "equal to the enemy's bleed"
-//   const multiplyByComponents = getMultiplyByComponents(effect);
-
-//   // "2 times"
-//   const multiHitComponents = getMultiHitComponents(effect);
-
-//   // "if the enemy has dodge"
-//   const ifComponents = getIfText(effect);
-
-//   return [...mainEffectComponents, ...multiplyByComponents, ...multiHitComponents, ...ifComponents];
-// }
-
-function translate(effect: CardEffect, text: string): TextBuilder {
-  const t = (text: string) => translate(effect, text);
+  const name = overrides.name == null ? effect.name : overrides.name;
+  const target = overrides.target == null ? effect.target : overrides.target;
+  const value = overrides.value == null ? effect.value : overrides.value;
 
   switch (text) {
     case `Deal damage equal to your bleed`:
-      return [t(`Deal damage`), t(`equal to your bleed`)];
+      if (effect.multiplyBy) {
+        return [t(`Deal damage`), t(`equal to your bleed`)];
+      }
+      return t(`Deal 3 damage`);
 
     case `Deal damage`:
-      if (effect.name === 'trash') {
+      if (name === 'trash') {
         return t(`Enemy trashes`);
       }
-      if (effect.name === 'extraCardPlays') {
+      if (name === 'extraCardPlays') {
         return ['Enemy plays cards'];
       }
       return [t(`Deal`), t(`damage`)];
 
     case `Deal 3 damage`:
-      if (effect.name === 'trash') {
+      if (name === 'trash') {
         return [t(`Enemy trashes`), t(`3`)];
       }
-      if (effect.name === 'extraCardPlays') {
+      if (name === 'extraCardPlays') {
         return [t('Enemy plays 3 extra cards next turn')];
       }
       return [t(`Deal`), t(`3`), t(`damage`)];
 
     case `equal to your bleed`:
-      return translateMultiplyBy(effect, text);
+      const tm = getTranslateMultiplyByFn(effect);
+      return ['equal to', t('twice'), tm('your bleed')];
 
-    case `if the enemy has bleed`:
-      return translateIf(effect, text);
+    case `twice`:
+      if (value === 1) {
+        return '';
+      }
+      if (value === 2) {
+        return 'twice';
+      }
+      if (value > 1) {
+        return `${value} times`;
+      }
+      if (value === 0.5) {
+        return 'half';
+      }
+      // 1/4
+      return `1/${1 / value}`;
+
+    case `your bleed`:
+      if (name === 'trashedCards') {
+        return [`the number of cards`, t(`you've`), `trashed`];
+      }
+      if (name === 'cardsPlayedThisTurn') {
+        return [`the number of cards`, t(`you've`), `played this turn`];
+      }
+      return [t(`your`), t('bleed')];
+
+    case `if the enemy has more than 3 bleed`:
+      if (!effect.if) return [];
+
+      const ti = getTranslateIfFn(effect);
+      if (name === 'trashedCards') {
+        return ['if', ti(`you've`), 'trashed', t('more than 3'), 'cards'];
+      }
+      if (name === 'cardsPlayedThisTurn') {
+        return ['if', ti(`you've`), 'played', ti('more than 3'), 'cards this turn'];
+      }
+      return ['if', ti('you have'), ti('more than 3'), ti('bleed')];
+
+    case `more than 3`:
+      assertIsNonNullable(effect.if);
+      const { comparison } = effect.if;
+      assert(effect.if.compareTo.type === 'value');
+
+      const isCheckingExistence =
+        (comparison === '>' && value === 0) || (comparison === '>=' && value === 1);
+      if (isCheckingExistence) {
+        // (if you have) "" (bleed)
+        return '';
+      }
+      return [t(`more than`), t(`3`)];
+
+    case `more than`:
+      switch (effect.if?.comparison) {
+        case '>':
+          return 'more than';
+        case '<':
+          return 'less than';
+        case '=':
+          return '';
+        case '<=':
+          return 'no more than';
+        case '>=':
+          return 'at least';
+      }
+      throw new Error(`Unknown comparison: ${effect.if?.comparison}`);
 
     case `Enemy trashes`:
-      return effect.target === 'self'
+      return target === 'self'
         ? ['You', getKeywordText('trash', 'trash')]
         : ['Enemy', getKeywordText('trashes', 'trash')];
 
     case `Deal`:
-      if (effect.target === 'self') {
+      if (target === 'self') {
         return effect.name === 'damage' ? 'Take' : 'Gain';
       }
       return effect.name === 'damage' ? 'Deal' : 'Apply';
 
     case `you've`:
-      return effect.target === 'self' ? `you've` : `the enemy has`;
+      return target === 'self' ? `you've` : `the enemy has`;
+
+    case `you have`:
+      return target === 'self' ? `you have` : `the enemy has`;
 
     case `your`:
-      return effect.target === 'self' ? `your` : `the enemy's`;
+      return target === 'self' ? `your` : `the enemy's`;
 
     case 'bleed':
     case `damage`:
-      if (SYMBOL_NAMES.includes(effect.name as SymbolName)) {
-        return getSymbolText(effect.name as SymbolName);
+      if (SYMBOL_NAMES.includes(name as SymbolName)) {
+        return getSymbolText(name as SymbolName);
       }
-    // if (effect.name === 'health') {
-    //   return 'HP';
-    // }
-    // if (effect.name === 'startingHealth') {
-    // }
+      // if (effect.name === 'health') {
+      //   return 'HP';
+      // }
+      // if (effect.name === 'startingHealth') {
+      // }
+      return '';
 
     case `3`:
-      return getValueText(effect.value);
+      return getValueText(value);
 
     case `2 times`:
       if (!effect.multiHit) return [];
@@ -526,97 +428,13 @@ function translate(effect: CardEffect, text: string): TextBuilder {
   return [];
 }
 
-function translateMultiplyBy(effect: CardEffect, text: string): TextBuilder {
-  const { multiplyBy } = effect;
-  if (!multiplyBy) return [];
-
-  const t = (text: string) => {
-    const multiplyByEffect = Object.assign({}, effect, {
-      target: multiplyBy.type,
-      name: multiplyBy.name,
-    });
-    return translate(multiplyByEffect, text);
-  };
-
-  const tm = (text: string) => translateMultiplyBy(effect, text);
-
-  switch (text) {
-    case `equal to your bleed`:
-      return ['equal to', tm('twice'), tm('your bleed')];
-
-    case `twice`:
-      if (effect.value === 1) {
-        return '';
-      }
-      if (effect.value === 2) {
-        return 'twice';
-      }
-      if (effect.value > 1) {
-        return `${effect.value} times`;
-      }
-      if (effect.value === 0.5) {
-        return 'half';
-      }
-      // 1/4
-      return `1/${1 / effect.value}`;
-
-    case `your bleed`:
-      if (multiplyBy.name === 'trashedCards') {
-        return [`the number of cards`, t(`you've`), `trashed`];
-      }
-      if (multiplyBy.name === 'cardsPlayedThisTurn') {
-        return [`the number of cards`, t(`you've`), `played this turn`];
-      }
-      return [t(`your`), t('bleed')];
-  }
-
-  return [];
-}
-
-function translateIf(effect: CardEffect, text: string): TextBuilder {
-  const { if: ifOptions } = effect;
-  if (!ifOptions) return [];
-
-  // TODO: implement "if you have more health than the enemy"
-  // if (ifOptions.compareTo.type !== 'value') return [];
-
-  const { playerValue } = ifOptions;
-
-  const t = (text: string) => {
-    const ifEffect = Object.assign({}, effect, {
-      target: ifOptions.type,
-      name: playerValue,
-      value: (ifOptions.compareTo as CompareToValue).value,
-    });
-    return translate(ifEffect, text);
-  };
-
-  const ti = (text: string) => translateIf(effect, text);
-
-  switch (text) {
-    case `if the enemy has bleed`:
-      // used for "if you have 3 ..." (e.g. bleed, HP, max HP)
-      const isSimpleValue =
-        readonlyIncludes(statusEffectNames, playerValue) ||
-        playerValue === 'health' ||
-        playerValue === 'startingHealth' ||
-        playerValue === 'cards';
-
-      if (isSimpleValue) {
-        return ['if', t('you have'), t('bleed')];
-      }
-  }
-
-  return [];
-}
-
 function getCardEffectText(effect: CardEffect): TextBuilder {
   const t = (text: string) => translate(effect, text);
 
   return [
-    effect.multiplyBy ? t(`Deal damage equal to your bleed`) : t(`Deal 3 damage`),
+    t(`Deal damage equal to your bleed`),
     t(`2 times`),
-    t(`if the enemy has dodge`),
+    t(`if the enemy has more than 3 bleed`),
   ];
 }
 
