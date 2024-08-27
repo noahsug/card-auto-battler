@@ -142,6 +142,8 @@ import { readonlyIncludes } from '../../utils/iterators';
 // };
 // }
 
+// Deal damage equal to the turn number.
+
 // Deal damage and apply bleed equal to the number of cards you've played this turn.
 
 // BAD: confusing, do not support
@@ -254,7 +256,7 @@ function getTargetedText(text: string, target: Target) {
   return target === 'self' ? text : selfTextToEnemyText[text];
 }
 
-// deal with
+// TODO: deal with
 //  - (if you have 3) "cards in your deck" <-- only handling this case currently
 //  - (equal to) "the number of cards in your deck"
 //  - (for each) "card in your deck"
@@ -316,7 +318,8 @@ function getMoreThanXText({ compareTo, comparison }: Pick<If, 'compareTo' | 'com
   return [moreThan, x];
 }
 
-function getMainEffectComponents(effect: CardEffect): TextBuilder {
+// "Deal 3 damage" or "You trash cards" (equal to)
+function getDoEffectText(effect: CardEffect): TextBuilder {
   if (effect.name === 'trash') {
     const targetComponent = getPlainText(getTargetedText('You', effect.target));
     const effectText = effect.target === 'self' ? 'trash' : 'trashes';
@@ -432,9 +435,14 @@ function getIfText(effect: CardEffect): TextBuilder {
   return [];
 }
 
-function getEffectTextComponents(effect: CardEffect): TextBuilder {
+function getCardEffectText(effect: CardEffect): TextBuilder {
+  // You trash 3 cards
+  // Deal 3 damage
+  // Apply bleed equal to
+  // const dealDamageEqualToX = getDealDamageEqualToXText(effect);
+
   // "Deal 3 damage" or "Enemy trashes cards" (equal to...)
-  const mainEffectComponents = getMainEffectComponents(effect);
+  const mainEffectComponents = getDoEffectText(effect);
 
   // "equal to the enemy's bleed"
   const multiplyByComponents = getMultiplyByComponents(effect);
@@ -489,5 +497,5 @@ function buildTextComponents(textBuilder: TextBuilder): TextComponent[] {
 }
 
 export default function getCardTextComponents(card: CardState): TextComponent[][] {
-  return card.effects.map(getEffectTextComponents).map(buildTextComponents);
+  return card.effects.map(getCardEffectText).map(buildTextComponents);
 }
