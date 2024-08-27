@@ -1,6 +1,6 @@
 import { StatusEffectName, Target, IdentifiablePlayerValue, statusEffectNames } from '../gameState';
 import { PlayerState, AnimationEvent } from '../../gameState';
-import { readonlyIncludes } from '../../utils';
+import { assert, readonlyIncludes } from '../../utils';
 
 export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
 
@@ -59,18 +59,27 @@ export default function playCard(
 }
 
 function applyCardEffect(effect: CardEffect, context: PlayCardContext) {
-  if (effect.name === 'damage') {
-    const dodgedDamage = dodgeDamage(effect, context);
-    if (!dodgedDamage) {
-      dealDamage(effect.value, effect.target, context);
-    }
-  } else if (effect.name === 'heal') {
-    applyHeal(effect.value, effect.target, context);
-  } else if (effect.name === 'trash') {
-    trashCards(effect.value, effect.target, context);
-  } else if (readonlyIncludes(statusEffectNames, effect.name)) {
-    // apply status effects (bleed, extraCardPlays, etc)
-    context[effect.target][effect.name] += effect.value;
+  switch (effect.name) {
+    case 'damage':
+      const dodgedDamage = dodgeDamage(effect, context);
+      if (!dodgedDamage) {
+        dealDamage(effect.value, effect.target, context);
+      }
+      return;
+
+    case 'heal':
+      applyHeal(effect.value, effect.target, context);
+      return;
+
+    case 'trash':
+      trashCards(effect.value, effect.target, context);
+      return;
+
+    // status effects
+    default:
+      assert(readonlyIncludes(statusEffectNames, effect.name));
+      context[effect.target][effect.name] += effect.value;
+      return;
   }
 }
 
@@ -93,6 +102,7 @@ function dealDamage(damage: number, target: Target, { self, opponent, events }: 
     // bleed
     if (opponent.bleed > 0) {
       damage += BLEED_DAMAGE;
+      opponent.bleed -= 1;
     }
   }
 
@@ -100,6 +110,7 @@ function dealDamage(damage: number, target: Target, { self, opponent, events }: 
 
   const targetPlayer = target === 'self' ? self : opponent;
   targetPlayer.health -= damage;
+
   events.push({ type: 'damage', target, value: damage });
 }
 
@@ -108,6 +119,7 @@ function applyHeal(heal: number, target: Target, { self, opponent, events }: Pla
 
   const targetPlayer = target === 'self' ? self : opponent;
   targetPlayer.health += heal;
+
   events.push({ type: 'heal', target, value: heal });
 }
 

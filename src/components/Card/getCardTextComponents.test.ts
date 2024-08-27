@@ -120,13 +120,8 @@ function render(card: CardState) {
   return text.join(' ');
 }
 
-let effect = {
-  target: 'opponent',
-  name: 'damage',
-  value: 1,
-} as CardEffect;
-
-let card = { effects: [effect] };
+let card: CardState;
+let effect: CardEffect;
 
 beforeEach(() => {
   effect = {

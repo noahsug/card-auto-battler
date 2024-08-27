@@ -16,6 +16,11 @@ import playCardHelper from './playCard';
 import { getRandomEnemyType, statusEffectNames } from '../gameState';
 import { pickEnemyCards } from '../enemies';
 
+/**
+ * Every function in this file is automatically picked up and converted into a reducer function
+ * that's accessible via the useActions() hook (see GameStateContext).
+ */
+
 export function startGame(game: GameState) {
   game.user.cards = createInitialGameState().user.cards;
   game.user.trashedCards = [];
