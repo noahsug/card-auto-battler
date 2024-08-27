@@ -1,12 +1,12 @@
 import getCardTextComponents, {
-  CardEffect,
-  CardState,
   KeywordText,
   PlainText,
   SymbolText,
   TextComponent,
   ValueText,
 } from './getCardTextComponents';
+
+import { CardEffect, CardState } from '../../gameState/actions/playCardV2';
 
 // Deal 1 damage 3 times.
 // Rally: Each hit deals 2 extra damage.
@@ -153,6 +153,36 @@ describe('renders damage', () => {
   });
 });
 
+describe('renders heal', () => {
+  beforeEach(() => {
+    effect.name = 'bleed';
+  });
+
+  test('give HP', () => {
+    expect(render(card)).toBe('Apply 1 bleed.');
+  });
+
+  test('gain HP', () => {
+    effect.target = 'self';
+    expect(render(card)).toBe('Gain 1 bleed.');
+  });
+});
+
+describe('renders bleed', () => {
+  beforeEach(() => {
+    effect.name = 'heal';
+  });
+
+  test('give HP', () => {
+    expect(render(card)).toBe('Enemy gains 1 heal.');
+  });
+
+  test('gain HP', () => {
+    effect.target = 'self';
+    expect(render(card)).toBe('Gain 1 heal.');
+  });
+});
+
 describe('renders trash', () => {
   beforeEach(() => {
     effect.name = 'trash';
@@ -289,7 +319,7 @@ describe('renders effects based on another value', () => {
     expect(render(card)).toBe(`Deal damage equal to the number of cards the enemy has trashed.`);
   });
 
-  test('equal to missing health', () => {});
+  // test('equal to missing health', () => {});
 });
 
 describe('renders conditionals', () => {

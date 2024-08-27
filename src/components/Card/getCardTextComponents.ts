@@ -1,11 +1,12 @@
-import {
-  StatusEffectName,
-  Target,
-  IdentifiablePlayerValue,
-  statusEffectNames,
-} from '../../gameState/gameState';
+import { Target, IdentifiablePlayerValue, statusEffectNames } from '../../gameState/gameState';
 import { assertIsNonNullable, assert } from '../../utils';
 import { readonlyIncludes } from '../../utils/iterators';
+import {
+  CardEffectName,
+  CardEffect,
+  CompareToValue,
+  CardState,
+} from '../../gameState/actions/playCardV2';
 
 // Deal 1 damage. Repeat for each bleed the enemy has.
 
@@ -149,41 +150,6 @@ import { readonlyIncludes } from '../../utils/iterators';
 
 // BAD: confusing, do not support
 // Deal 3 damage and gain 2 strength if you have full HP.
-
-type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
-
-interface CompareToPlayerValue {
-  type: Target;
-  name: IdentifiablePlayerValue;
-}
-
-interface CompareToValue {
-  type: 'value';
-  value: number;
-}
-
-interface If {
-  type: Target;
-  playerValue: IdentifiablePlayerValue;
-  comparison: '>' | '<' | '=' | '<=' | '>=';
-  compareTo: CompareToPlayerValue | CompareToValue;
-}
-
-export interface CardEffect {
-  target: Target;
-  name: CardEffectName;
-  value: number;
-  multiHit?: number;
-  multiplyBy?: {
-    type: Target;
-    name: IdentifiablePlayerValue;
-  };
-  if?: If;
-}
-
-export interface CardState {
-  effects: CardEffect[];
-}
 
 const SYMBOL_NAMES = ['damage', 'heal', ...statusEffectNames] as const;
 const KEYWORDS = ['trash'] as const;
@@ -400,10 +366,18 @@ function translate(
         : ['Enemy', getKeywordText('trashes', 'trash')];
 
     case `Deal`:
-      if (target === 'self') {
-        return effect.name === 'damage' ? 'Take' : 'Gain';
+      if (effect.name === 'damage') {
+        return target === 'self' ? 'Take' : 'Deal';
       }
-      return effect.name === 'damage' ? 'Deal' : 'Apply';
+      if (effect.target === 'self') {
+        return 'Gain';
+      }
+      const isFriendlyEffect =
+        effect.name === 'heal' || effect.name === 'strength' || effect.name === 'dodge';
+      if (isFriendlyEffect) {
+        return 'Enemy gains';
+      }
+      return 'Apply';
 
     case `you've`:
       return target === 'self' ? `you've` : `the enemy has`;
