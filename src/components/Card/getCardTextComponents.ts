@@ -237,7 +237,7 @@ function getKeywordText(text: string, keyword: Keyword): KeywordText {
 }
 
 // Intermediate type for building text components.
-type TextBuilder = (string | TextComponent | TextBuilder)[];
+type TextBuilder = string | TextComponent | TextBuilder[];
 
 // Given a self targeted string, transforms it into an enemy targeted string if needed.
 function getTargetedText(text: string, target: Target) {
@@ -435,25 +435,189 @@ function getIfText(effect: CardEffect): TextBuilder {
   return [];
 }
 
+// function getCardEffectText(effect: CardEffect): TextBuilder {
+//   // You trash 3 cards
+//   // Deal 3 damage
+//   // Apply bleed equal to
+//   // const dealDamageEqualToX = getDealDamageEqualToXText(effect);
+
+//   // "Deal 3 damage" or "Enemy trashes cards" (equal to...)
+//   const mainEffectComponents = getDoEffectText(effect);
+
+//   // "equal to the enemy's bleed"
+//   const multiplyByComponents = getMultiplyByComponents(effect);
+
+//   // "2 times"
+//   const multiHitComponents = getMultiHitComponents(effect);
+
+//   // "if the enemy has dodge"
+//   const ifComponents = getIfText(effect);
+
+//   return [...mainEffectComponents, ...multiplyByComponents, ...multiHitComponents, ...ifComponents];
+// }
+
+function translate(effect: CardEffect, text: string): TextBuilder {
+  const t = (text: string) => translate(effect, text);
+
+  switch (text) {
+    case `Deal damage equal to your bleed`:
+      return [t(`Deal damage`), t(`equal to your bleed`)];
+
+    case `Deal damage`:
+      if (effect.name === 'trash') {
+        return t(`Enemy trashes`);
+      }
+      if (effect.name === 'extraCardPlays') {
+        return ['Enemy plays cards'];
+      }
+      return [t(`Deal`), t(`damage`)];
+
+    case `Deal 3 damage`:
+      if (effect.name === 'trash') {
+        return [t(`Enemy trashes`), t(`3`)];
+      }
+      if (effect.name === 'extraCardPlays') {
+        return [t('Enemy plays 3 extra cards next turn')];
+      }
+      return [t(`Deal`), t(`3`), t(`damage`)];
+
+    case `equal to your bleed`:
+      return translateMultiplyBy(effect, text);
+
+    case `if the enemy has bleed`:
+      return translateIf(effect, text);
+
+    case `Enemy trashes`:
+      return effect.target === 'self'
+        ? ['You', getKeywordText('trash', 'trash')]
+        : ['Enemy', getKeywordText('trashes', 'trash')];
+
+    case `Deal`:
+      if (effect.target === 'self') {
+        return effect.name === 'damage' ? 'Take' : 'Gain';
+      }
+      return effect.name === 'damage' ? 'Deal' : 'Apply';
+
+    case `you've`:
+      return effect.target === 'self' ? `you've` : `the enemy has`;
+
+    case `your`:
+      return effect.target === 'self' ? `your` : `the enemy's`;
+
+    case 'bleed':
+    case `damage`:
+      if (SYMBOL_NAMES.includes(effect.name as SymbolName)) {
+        return getSymbolText(effect.name as SymbolName);
+      }
+    // if (effect.name === 'health') {
+    //   return 'HP';
+    // }
+    // if (effect.name === 'startingHealth') {
+    // }
+
+    case `3`:
+      return getValueText(effect.value);
+
+    case `2 times`:
+      if (!effect.multiHit) return [];
+      return [getValueText(effect.multiHit), 'times'];
+  }
+
+  return [];
+}
+
+function translateMultiplyBy(effect: CardEffect, text: string): TextBuilder {
+  const { multiplyBy } = effect;
+  if (!multiplyBy) return [];
+
+  const t = (text: string) => {
+    const multiplyByEffect = Object.assign({}, effect, {
+      target: multiplyBy.type,
+      name: multiplyBy.name,
+    });
+    return translate(multiplyByEffect, text);
+  };
+
+  const tm = (text: string) => translateMultiplyBy(effect, text);
+
+  switch (text) {
+    case `equal to your bleed`:
+      return ['equal to', tm('twice'), tm('your bleed')];
+
+    case `twice`:
+      if (effect.value === 1) {
+        return '';
+      }
+      if (effect.value === 2) {
+        return 'twice';
+      }
+      if (effect.value > 1) {
+        return `${effect.value} times`;
+      }
+      if (effect.value === 0.5) {
+        return 'half';
+      }
+      // 1/4
+      return `1/${1 / effect.value}`;
+
+    case `your bleed`:
+      if (multiplyBy.name === 'trashedCards') {
+        return [`the number of cards`, t(`you've`), `trashed`];
+      }
+      if (multiplyBy.name === 'cardsPlayedThisTurn') {
+        return [`the number of cards`, t(`you've`), `played this turn`];
+      }
+      return [t(`your`), t('bleed')];
+  }
+
+  return [];
+}
+
+function translateIf(effect: CardEffect, text: string): TextBuilder {
+  const { if: ifOptions } = effect;
+  if (!ifOptions) return [];
+
+  // TODO: implement "if you have more health than the enemy"
+  // if (ifOptions.compareTo.type !== 'value') return [];
+
+  const { playerValue } = ifOptions;
+
+  const t = (text: string) => {
+    const ifEffect = Object.assign({}, effect, {
+      target: ifOptions.type,
+      name: playerValue,
+      value: (ifOptions.compareTo as CompareToValue).value,
+    });
+    return translate(ifEffect, text);
+  };
+
+  const ti = (text: string) => translateIf(effect, text);
+
+  switch (text) {
+    case `if the enemy has bleed`:
+      // used for "if you have 3 ..." (e.g. bleed, HP, max HP)
+      const isSimpleValue =
+        readonlyIncludes(statusEffectNames, playerValue) ||
+        playerValue === 'health' ||
+        playerValue === 'startingHealth' ||
+        playerValue === 'cards';
+
+      if (isSimpleValue) {
+        return ['if', t('you have'), t('bleed')];
+      }
+  }
+
+  return [];
+}
+
 function getCardEffectText(effect: CardEffect): TextBuilder {
-  // You trash 3 cards
-  // Deal 3 damage
-  // Apply bleed equal to
-  // const dealDamageEqualToX = getDealDamageEqualToXText(effect);
+  const t = (text: string) => translate(effect, text);
 
-  // "Deal 3 damage" or "Enemy trashes cards" (equal to...)
-  const mainEffectComponents = getDoEffectText(effect);
-
-  // "equal to the enemy's bleed"
-  const multiplyByComponents = getMultiplyByComponents(effect);
-
-  // "2 times"
-  const multiHitComponents = getMultiHitComponents(effect);
-
-  // "if the enemy has dodge"
-  const ifComponents = getIfText(effect);
-
-  return [...mainEffectComponents, ...multiplyByComponents, ...multiHitComponents, ...ifComponents];
+  return [
+    effect.multiplyBy ? t(`Deal damage equal to your bleed`) : t(`Deal 3 damage`),
+    t(`2 times`),
+    t(`if the enemy has dodge`),
+  ];
 }
 
 // Before:
@@ -461,6 +625,15 @@ function getCardEffectText(effect: CardEffect): TextBuilder {
 // After:
 //   ['You ', K('trash'), ' ', V(3), ' cards']
 function buildTextComponents(textBuilder: TextBuilder): TextComponent[] {
+  if (typeof textBuilder === 'string') {
+    // textBuilder is just plain text
+    return [getPlainText(textBuilder)];
+  }
+  if ('type' in textBuilder) {
+    // textBuilder is already a TextComponent
+    return [textBuilder];
+  }
+
   // remove all nested arrays
   let flatTextBuilder = textBuilder.flat(20) as (string | TextComponent)[];
 

@@ -180,7 +180,7 @@ describe('renders trash', () => {
 //   test('the enemy plays multiple extra cards', () => {
 //     effect.value = 3;
 
-//     expect(render(card)).toBe('The enemy plays 3 extra cards next turn.');
+//     expect(render(card)).toBe('Enemy plays 3 extra cards next turn.');
 //   });
 
 //   test('you play extra cards', () => {
