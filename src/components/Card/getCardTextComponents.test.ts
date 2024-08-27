@@ -168,34 +168,34 @@ describe('renders trash', () => {
   });
 });
 
-// describe('renders play extra cards', () => {
-//   beforeEach(() => {
-//     effect.name = 'extraCardPlays';
-//   });
+describe('renders play extra cards', () => {
+  beforeEach(() => {
+    effect.name = 'extraCardPlays';
+  });
 
-//   test('the enemy plays an extra card', () => {
-//     expect(render(card)).toBe('Enemy plays 1 extra card next turn.');
-//   });
+  test('the enemy plays an extra card', () => {
+    expect(render(card)).toBe('Enemy plays 1 extra card next turn.');
+  });
 
-//   test('the enemy plays multiple extra cards', () => {
-//     effect.value = 3;
+  test('the enemy plays multiple extra cards', () => {
+    effect.value = 3;
 
-//     expect(render(card)).toBe('Enemy plays 3 extra cards next turn.');
-//   });
+    expect(render(card)).toBe('Enemy plays 3 extra cards next turn.');
+  });
 
-//   test('you play extra cards', () => {
-//     effect.target = 'self';
+  test('you play extra cards', () => {
+    effect.target = 'self';
 
-//     expect(render(card)).toBe('Play 1 card.');
-//   });
+    expect(render(card)).toBe('Play 1 card.');
+  });
 
-//   test('you play multiple extra cards', () => {
-//     effect.target = 'self';
-//     effect.value = 3;
+  test('you play multiple extra cards', () => {
+    effect.target = 'self';
+    effect.value = 3;
 
-//     expect(render(card)).toBe('Play 3 cards.');
-//   });
-// });
+    expect(render(card)).toBe('Play 3 cards.');
+  });
+});
 
 it('renders multi-hits', () => {
   effect.multiHit = 2;

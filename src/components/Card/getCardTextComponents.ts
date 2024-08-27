@@ -316,6 +316,15 @@ function translate(
       }
       return [t(`Deal`), t(`3`), t(`damage`)];
 
+    case 'Enemy plays 3 extra cards next turn':
+      if (target === 'self') {
+        return ['Play', t('3'), t('cards')];
+      }
+      return ['Enemy plays', t('3'), 'extra', t('cards'), 'next turn'];
+
+    case 'cards':
+      return value === 1 ? 'card' : 'cards';
+
     case `equal to your bleed`:
       const tm = getTranslateMultiplyByFn(effect);
       return ['equal to', t('twice'), tm('your bleed')];
