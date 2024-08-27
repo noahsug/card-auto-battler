@@ -174,8 +174,8 @@ export function createInitialGameState(): GameState {
     turn: 0,
     wins: 0,
     losses: 0,
-    // screen: 'gameStart',
-    screen: 'cardCollection', // DEBUG
+    screen: 'gameStart',
+    // screen: 'cardCollection', // DEBUG
     animationEvents: [],
     wonLastBattle: false,
     currentEnemyType: getRandomEnemyType(),

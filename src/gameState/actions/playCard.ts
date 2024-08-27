@@ -21,7 +21,6 @@ import {
   statusEffectNames,
 } from '..';
 import { assert, getNonNullEntries } from '../../utils';
-import { getIsEnemyTurn } from '../gameState';
 
 interface PlayCardResult {
   battleStats: BattleStats;
