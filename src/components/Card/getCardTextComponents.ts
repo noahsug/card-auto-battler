@@ -287,6 +287,8 @@ function translate(
 
     case `if the enemy has more than 3 bleed`:
       if (!effect.if) return [];
+      assert(effect.if.compareTo.type === 'value');
+      assert(effect.if.multiplier == null);
 
       const ti = getTranslateFn(effect, effect.if);
       const tc = getTranslateFn(effect, effect.if.compareTo);
@@ -300,7 +302,6 @@ function translate(
 
     case `more than 3`:
       assertIsNonNullable(effect.if);
-      assert(effect.if.compareTo.type === 'value');
 
       const { comparison } = effect.if;
       const isCheckingExistence =
@@ -356,6 +357,8 @@ function translate(
 
     case 'bleed':
     case 'damage':
+      if (name === 'health') return 'HP';
+
       assert(SYMBOL_NAMES.includes(name as SymbolName));
       return getSymbolText(name as SymbolName);
 
@@ -417,7 +420,7 @@ function buildTextComponents(textBuilder: TextBuilder): TextComponent[] {
         prevComponent.text = `${prevComponent.text}${part}`;
         // remove extra spaces
         prevComponent.text = prevComponent.text.replace(/\s+/g, ' ');
-        // TODO: remove spaces before punctuation (e.g. 'you trash , gian' -> 'you trash, gain')
+        // TODO: remove spaces before punctuation (e.g. 'you trash , gain' -> 'you trash, gain')
       } else {
         components.push(getPlainText(part));
       }

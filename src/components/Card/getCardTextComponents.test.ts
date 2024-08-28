@@ -371,6 +371,18 @@ describe('renders if statements', () => {
     expect(render(card)).toBe(`Deal 1 damage if the enemy has trashed at least 2 cards.`);
   });
 
+  test('if you have less than 10 HP', () => {
+    effect.if = {
+      type: 'playerValue',
+      target: 'self',
+      name: 'health',
+      comparison: '<',
+      compareTo: { type: 'value', value: 10 },
+    };
+
+    expect(render(card)).toBe('Deal 1 damage if you have less than 10 HP.');
+  });
+
   // ... if this card deals at least 7 damage.
 
   // test('if you have less than half HP', () => {
