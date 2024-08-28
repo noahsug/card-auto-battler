@@ -1,15 +1,15 @@
 import { StatusEffectName, Target, IdentifiablePlayerValue, statusEffectNames } from '../gameState';
-import { PlayerState, AnimationEvent } from '../../gameState';
+import { PlayerState, AnimationEvent, Comparable } from '../../gameState';
 import { assert, readonlyIncludes } from '../../utils';
 
 export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
 
-export interface CompareToValue {
+export interface ValueDescriptor {
   type: 'value';
   value: number;
 }
 
-interface PlayerValueIdentifier {
+interface PlayerValueDescriptor {
   type: 'playerValue';
   target: Target;
   playerValue: IdentifiablePlayerValue;
@@ -17,10 +17,10 @@ interface PlayerValueIdentifier {
 
 interface BaseIf {
   comparison: '>' | '<' | '=' | '<=' | '>=';
-  compareTo: PlayerValueIdentifier | CompareToValue;
+  compareTo: PlayerValueDescriptor | ValueDescriptor;
 }
 
-type IfPlayerValue = PlayerValueIdentifier & BaseIf;
+type IfPlayerValue = PlayerValueDescriptor & BaseIf;
 
 // interface IfPlayerValue extends BaseIf {
 //   type: 'percentHealth';
@@ -34,7 +34,7 @@ export interface CardEffect {
   name: CardEffectName;
   value: number;
   multiHit?: number;
-  multiplyBy?: PlayerValueIdentifier;
+  multiplyBy?: PlayerValueDescriptor;
   if?: If;
 }
 
@@ -64,6 +64,11 @@ export default function playCard(
 }
 
 function applyCardEffect(effect: CardEffect, context: PlayCardContext) {
+  if (effect.if) {
+    const success = evaluateIf(effect.if, context);
+    if (!success) return;
+  }
+
   switch (effect.name) {
     case 'damage':
       const dodgedDamage = dodgeDamage(effect, context);
@@ -86,6 +91,12 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext) {
       context[effect.target][effect.name] += effect.value;
       return;
   }
+}
+
+function evaluateIf(ifStatement: If, context: PlayCardContext) {
+  const value1 = getDescribedValue(ifStatement, context);
+  const value2 = getDescribedValue(ifStatement.compareTo, context);
+  return compareValues(value1, ifStatement.comparison, value2);
 }
 
 function dodgeDamage(effect: CardEffect, { opponent, events }: PlayCardContext) {
@@ -128,6 +139,7 @@ function applyHeal(heal: number, target: Target, { self, opponent, events }: Pla
   events.push({ type: 'heal', target, value: heal });
 }
 
+// TODO: use deck.ts
 function trashCards(value: number, target: Target, context: PlayCardContext) {
   const targetPlayer = context[target];
   const { cards, currentCardIndex } = targetPlayer;
@@ -150,4 +162,36 @@ function trashCards(value: number, target: Target, context: PlayCardContext) {
   });
 
   targetPlayer.currentCardIndex = Math.max(currentCardIndex - removeFromFront, 0);
+}
+
+function getDescribedValue(descriptor: If['compareTo'], context: PlayCardContext): number {
+  switch (descriptor.type) {
+    case 'value':
+      return descriptor.value;
+
+    case 'playerValue':
+      return getPlayerValue(descriptor, context);
+  }
+}
+
+// const playerValue = getPlayerValue(ifStatement, context);
+
+function getPlayerValue(descriptor: PlayerValueDescriptor, context: PlayCardContext): number {
+  const value = context[descriptor.target][descriptor.playerValue];
+
+  if (Array.isArray(value)) {
+    // e.g. number of trashed cards
+    return value.length;
+  }
+  return value;
+}
+
+function compareValues(value1: number, comparison: If['comparison'], value2: number) {
+  if (comparison === '>') return value1 > value2;
+  if (comparison === '<') return value1 < value2;
+  if (comparison === '=') return value1 === value2;
+  if (comparison === '>=') return value1 >= value2;
+  if (comparison === '<=') return value1 <= value2;
+
+  throw new Error(`invalid comparison: ${comparison}`);
 }

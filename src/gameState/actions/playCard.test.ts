@@ -154,3 +154,27 @@ describe('trash cards', () => {
     expect(opponent.currentCardIndex).toBe(0);
   });
 });
+
+describe('conditionals', () => {
+  beforeEach(() => {
+    effect.if = {
+      type: 'playerValue',
+      target: 'opponent',
+      playerValue: 'bleed',
+      comparison: '=',
+      compareTo: { type: 'value', value: 0 },
+    };
+  });
+
+  test('does nothing if the player has bleed', () => {
+    const { diff } = getPlayCardResult({ opponent: { bleed: 1 } });
+
+    expect(diff).toEqual({});
+  });
+
+  test('does something if the player does not have bleed', () => {
+    const { diff } = getPlayCardResult();
+
+    expect(diff).toEqual({ opponent: { health: -1 } });
+  });
+});

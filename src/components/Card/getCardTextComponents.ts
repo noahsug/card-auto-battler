@@ -4,7 +4,7 @@ import { readonlyIncludes } from '../../utils/iterators';
 import {
   CardEffectName,
   CardEffect,
-  CompareToValue,
+  ValueDescriptor,
   CardState,
 } from '../../gameState/actions/playCardV2';
 
@@ -235,7 +235,7 @@ function getTranslateIfFn(effect: CardEffect) {
     const overrides = {
       target: effect.if.target,
       name: effect.if.playerValue,
-      value: (effect.if.compareTo as CompareToValue).value,
+      value: (effect.if.compareTo as ValueDescriptor).value,
     };
 
     return translate(effect, text, overrides);
