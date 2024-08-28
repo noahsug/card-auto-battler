@@ -228,6 +228,7 @@ it('renders multi-hits', () => {
   expect(render(card)).toBe('Deal 1 damage 2 times.');
 });
 
+// TODO
 // // used to combine two effects under the same if statement or multiplier
 // describe('renders two effects on the same line', () => {
 //   beforeEach(() => {
