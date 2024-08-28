@@ -324,6 +324,6 @@ function fixSpacing(text: string): string {
   return text.trim().replace(/\s+/g, ' ');
 }
 
-export default function getCardTextComponents(card: CardState): string[] {
+export default function getCardText(card: CardState): string[] {
   return card.effects.map(getCardEffectText).map(fixSpacing);
 }

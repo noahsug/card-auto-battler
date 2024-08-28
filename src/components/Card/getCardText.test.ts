@@ -1,4 +1,4 @@
-import getCardTextComponents from './getCardTextComponents';
+import getCardText from './getCardText';
 
 import { CardEffect, CardState } from '../../gameState/actions/playCardV2';
 
@@ -92,7 +92,7 @@ import { CardEffect, CardState } from '../../gameState/actions/playCardV2';
 // Repeat for each bleed the enemy has (3).
 
 function render(card: CardState) {
-  const lines = getCardTextComponents(card);
+  const lines = getCardText(card);
   return lines.join('. ') + '.';
 }
 
