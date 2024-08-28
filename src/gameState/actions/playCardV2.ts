@@ -16,9 +16,9 @@ interface PlayerValueDescriptor {
 }
 
 interface BaseIf {
+  multiplier?: number;
   comparison: '>' | '<' | '=' | '<=' | '>=';
   compareTo: PlayerValueDescriptor | ValueDescriptor;
-  compareToMultiplier?: number;
 }
 
 type IfPlayerValue = PlayerValueDescriptor & BaseIf;
@@ -100,7 +100,9 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitC
 function evaluateIf(ifStatement: If, context: PlayCardContext) {
   const value1 = getDescribedValue(ifStatement, context);
   const value2 = getDescribedValue(ifStatement.compareTo, context);
-  return compareValues(value1, ifStatement.comparison, value2);
+  const value1Multiplier = ifStatement.multiplier || 1;
+
+  return compareValues(value1 * value1Multiplier, ifStatement.comparison, value2);
 }
 
 function dodgeDamage(effect: CardEffect, { opponent, events }: PlayCardContext) {

@@ -183,7 +183,20 @@ describe('if', () => {
   });
 
   it('compares to max health', () => {
-    //
+    effect.if = {
+      type: 'playerValue',
+      target: 'self',
+      name: 'health',
+      multiplier: 2,
+      comparison: '<',
+      compareTo: { type: 'playerValue', target: 'self', name: 'startingHealth' },
+    };
+
+    const halfHealth = getPlayCardResult({ self: { health: 10, startingHealth: 20 } });
+    expect(halfHealth.diff).toEqual({});
+
+    const lessThanHalfHealth = getPlayCardResult({ self: { health: 9, startingHealth: 20 } });
+    expect(lessThanHalfHealth.diff).toEqual({ opponent: { health: -1 } });
   });
 });
 
