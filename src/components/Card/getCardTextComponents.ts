@@ -217,8 +217,8 @@ function getTranslateMultiplyByFn(effect: CardEffect) {
     if (!effect.multiplyBy) return [];
 
     const overrides = {
-      target: effect.multiplyBy.type,
-      name: effect.multiplyBy.name,
+      target: effect.multiplyBy.target,
+      name: effect.multiplyBy.playerValue,
     };
 
     return translate(effect, text, overrides);
@@ -233,7 +233,7 @@ function getTranslateIfFn(effect: CardEffect) {
     if (effect.if.compareTo.type !== 'value') return [];
 
     const overrides = {
-      target: effect.if.type,
+      target: effect.if.target,
       name: effect.if.playerValue,
       value: (effect.if.compareTo as CompareToValue).value,
     };

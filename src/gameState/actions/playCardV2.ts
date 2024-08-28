@@ -4,25 +4,23 @@ import { assert, readonlyIncludes } from '../../utils';
 
 export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
 
-interface CompareToPlayerValue {
-  type: Target;
-  name: IdentifiablePlayerValue;
-}
-
 export interface CompareToValue {
   type: 'value';
   value: number;
 }
 
-interface BaseIf {
-  comparison: '>' | '<' | '=' | '<=' | '>=';
-  compareTo: CompareToPlayerValue | CompareToValue;
-}
-
-interface IfPlayerValue extends BaseIf {
-  type: Target;
+interface PlayerValueIdentifier {
+  type: 'playerValue';
+  target: Target;
   playerValue: IdentifiablePlayerValue;
 }
+
+interface BaseIf {
+  comparison: '>' | '<' | '=' | '<=' | '>=';
+  compareTo: PlayerValueIdentifier | CompareToValue;
+}
+
+type IfPlayerValue = PlayerValueIdentifier & BaseIf;
 
 // interface IfPlayerValue extends BaseIf {
 //   type: 'percentHealth';
@@ -36,10 +34,7 @@ export interface CardEffect {
   name: CardEffectName;
   value: number;
   multiHit?: number;
-  multiplyBy?: {
-    type: Target;
-    name: IdentifiablePlayerValue;
-  };
+  multiplyBy?: PlayerValueIdentifier;
   if?: If;
 }
 

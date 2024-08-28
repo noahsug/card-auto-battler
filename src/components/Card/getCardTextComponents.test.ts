@@ -245,7 +245,8 @@ it('renders multi-hits', () => {
 
 //   test('deal damage and apply bleed equal to enemy bleed', () => {
 //     effect.multiplyBy = {
-//       type: 'opponent',
+//       type: 'playerValue',
+//       target: 'opponent',
 //       name: 'bleed',
 //     };
 
@@ -257,8 +258,9 @@ it('renders multi-hits', () => {
 describe('renders effects based on another value', () => {
   beforeEach(() => {
     effect.multiplyBy = {
-      type: 'opponent',
-      name: 'bleed',
+      type: 'playerValue',
+      target: 'opponent',
+      playerValue: 'bleed',
     };
   });
 
@@ -273,7 +275,7 @@ describe('renders effects based on another value', () => {
   });
 
   test('equal to self bleed', () => {
-    effect.multiplyBy!.type = 'self';
+    effect.multiplyBy!.target = 'self';
     expect(render(card)).toBe(`Deal damage equal to your bleed.`);
   });
 
@@ -299,8 +301,9 @@ describe('renders effects based on another value', () => {
 
   test('equal to cards played', () => {
     effect.multiplyBy = {
-      type: 'self',
-      name: 'cardsPlayedThisTurn',
+      type: 'playerValue',
+      target: 'self',
+      playerValue: 'cardsPlayedThisTurn',
     };
 
     expect(render(card)).toBe(`Deal damage equal to the number of cards you've played this turn.`);
@@ -308,8 +311,9 @@ describe('renders effects based on another value', () => {
 
   test('equal to cards trashed', () => {
     effect.multiplyBy = {
-      type: 'opponent',
-      name: 'trashedCards',
+      type: 'playerValue',
+      target: 'opponent',
+      playerValue: 'trashedCards',
     };
 
     expect(render(card)).toBe(`Deal damage equal to the number of cards the enemy has trashed.`);
@@ -321,7 +325,8 @@ describe('renders effects based on another value', () => {
 describe('renders conditionals', () => {
   test('if the enemy has dodge', () => {
     effect.if = {
-      type: 'opponent',
+      type: 'playerValue',
+      target: 'opponent',
       playerValue: 'dodge',
       comparison: '>',
       compareTo: { type: 'value', value: 0 },
@@ -332,7 +337,8 @@ describe('renders conditionals', () => {
 
   test('if you have 3 bleed', () => {
     effect.if = {
-      type: 'self',
+      type: 'playerValue',
+      target: 'self',
       playerValue: 'bleed',
       comparison: '=',
       compareTo: { type: 'value', value: 3 },
@@ -343,7 +349,8 @@ describe('renders conditionals', () => {
 
   test('if you have played more than 2 cards this turn', () => {
     effect.if = {
-      type: 'self',
+      type: 'playerValue',
+      target: 'self',
       playerValue: 'cardsPlayedThisTurn',
       comparison: '>',
       compareTo: { type: 'value', value: 2 },
@@ -354,7 +361,8 @@ describe('renders conditionals', () => {
 
   test('if the enemy has trashed 2 at least cards', () => {
     effect.if = {
-      type: 'opponent',
+      type: 'playerValue',
+      target: 'opponent',
       playerValue: 'trashedCards',
       comparison: '>=',
       compareTo: { type: 'value', value: 2 },
@@ -377,7 +385,8 @@ describe('renders conditionals', () => {
 
   // test('if you have less HP than the enemy', () => {
   //   effect.if = {
-  //     type: 'self',
+  //     type: 'playerValue',
+  //     target: 'self',
   //     name: 'health',
   //     comparison: '<',
   //     compareTo: { type: 'opponent' },
@@ -420,7 +429,8 @@ describe('indicates symbols, keywords and values', () => {
 
   test('if has bleed', () => {
     effect.if = {
-      type: 'self',
+      type: 'playerValue',
+      target: 'self',
       playerValue: 'bleed',
       comparison: '>=',
       compareTo: { type: 'value', value: 3 },
@@ -432,8 +442,9 @@ describe('indicates symbols, keywords and values', () => {
 
   test('equal to bleed', () => {
     effect.multiplyBy = {
-      type: 'self',
-      name: 'bleed',
+      type: 'playerValue',
+      target: 'self',
+      playerValue: 'bleed',
     };
 
     expect(getComponentValues(card, 'value')).toEqual([]);
