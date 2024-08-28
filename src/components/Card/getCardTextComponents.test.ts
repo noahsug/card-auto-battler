@@ -330,19 +330,39 @@ describe('renders conditionals', () => {
     expect(render(card)).toBe('Deal 1 damage if the enemy has dodge.');
   });
 
-  test('if you have at least 3 bleed', () => {
+  test('if you have 3 bleed', () => {
     effect.if = {
       type: 'self',
       playerValue: 'bleed',
-      comparison: '>=',
+      comparison: '=',
       compareTo: { type: 'value', value: 3 },
     };
 
-    expect(render(card)).toBe('Deal 1 damage if you have at least 3 bleed.');
+    expect(render(card)).toBe('Deal 1 damage if you have 3 bleed.');
   });
 
+  test('if you have played more than 2 cards this turn', () => {
+    effect.if = {
+      type: 'self',
+      playerValue: 'cardsPlayedThisTurn',
+      comparison: '>',
+      compareTo: { type: 'value', value: 2 },
+    };
+
+    expect(render(card)).toBe(`Deal 1 damage if you've played more than 2 cards this turn.`);
+  });
+
+  test('if the enemy has trashed 2 at least cards', () => {
+    effect.if = {
+      type: 'opponent',
+      playerValue: 'trashedCards',
+      comparison: '>=',
+      compareTo: { type: 'value', value: 2 },
+    };
+
+    expect(render(card)).toBe(`Deal 1 damage if the enemy has trashed at least 2 cards.`);
+  });
   // ... if this card deals at least 7 damage.
-  // ... if you've played two cards this turn.
 
   // test('if you have less than half HP', () => {
   //   effect.if = {

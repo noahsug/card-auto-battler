@@ -324,10 +324,10 @@ function translate(
       if (!effect.if) return [];
 
       const ti = getTranslateIfFn(effect);
-      if (name === 'trashedCards') {
-        return ['if', ti(`you've`), 'trashed', t('more than 3'), 'cards'];
+      if (effect.if.playerValue === 'trashedCards') {
+        return ['if', ti(`you've`), 'trashed', ti('more than 3'), 'cards'];
       }
-      if (name === 'cardsPlayedThisTurn') {
+      if (effect.if.playerValue === 'cardsPlayedThisTurn') {
         return ['if', ti(`you've`), 'played', ti('more than 3'), 'cards this turn'];
       }
       return ['if', ti('you have'), ti('more than 3'), ti('bleed')];

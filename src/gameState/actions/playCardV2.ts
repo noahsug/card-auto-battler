@@ -14,12 +14,22 @@ export interface CompareToValue {
   value: number;
 }
 
-interface If {
-  type: Target;
-  playerValue: IdentifiablePlayerValue;
+interface BaseIf {
   comparison: '>' | '<' | '=' | '<=' | '>=';
   compareTo: CompareToPlayerValue | CompareToValue;
 }
+
+interface IfPlayerValue extends BaseIf {
+  type: Target;
+  playerValue: IdentifiablePlayerValue;
+}
+
+// interface IfPlayerValue extends BaseIf {
+//   type: 'percentHealth';
+//   target: Target;
+// }
+
+type If = IfPlayerValue;
 
 export interface CardEffect {
   target: Target;

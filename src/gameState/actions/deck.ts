@@ -1,4 +1,4 @@
-import { PlayerState } from './gameState';
+import { PlayerState } from '../gameState';
 import shuffle from 'lodash/shuffle';
 
 function maybeShuffleDiscardIntoDeck(player: PlayerState) {

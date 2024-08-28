@@ -1,11 +1,6 @@
-import { PlayerState, CardState, createInitialGameState } from './gameState';
-import {
-  getCurrentCard,
-  discardCurrentCard,
-  trashCurrentCard,
-  trashNextCards,
-} from './playerCards';
-import { createCard } from './utils';
+import { PlayerState, CardState, createInitialGameState } from '../gameState';
+import { getCurrentCard, discardCurrentCard, trashCurrentCard, trashNextCards } from './deck';
+import { createCard } from '../utils';
 
 const STARTER_CARD: CardState = createCard({ target: 'opponent', damage: 0 });
 
