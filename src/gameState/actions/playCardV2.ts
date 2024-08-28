@@ -69,26 +69,32 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext) {
     if (!success) return;
   }
 
+  let value = effect.value;
+
+  if (effect.multiplyBy) {
+    value *= getDescribedValue(effect.multiplyBy, context);
+  }
+
   switch (effect.name) {
     case 'damage':
       const dodgedDamage = dodgeDamage(effect, context);
       if (!dodgedDamage) {
-        dealDamage(effect.value, effect.target, context);
+        dealDamage(value, effect.target, context);
       }
       return;
 
     case 'heal':
-      applyHeal(effect.value, effect.target, context);
+      applyHeal(value, effect.target, context);
       return;
 
     case 'trash':
-      trashCards(effect.value, effect.target, context);
+      trashCards(value, effect.target, context);
       return;
 
     // status effects
     default:
       assert(readonlyIncludes(statusEffectNames, effect.name));
-      context[effect.target][effect.name] += effect.value;
+      context[effect.target][effect.name] += value;
       return;
   }
 }

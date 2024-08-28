@@ -155,7 +155,7 @@ describe('trash cards', () => {
   });
 });
 
-describe('conditionals', () => {
+describe('if', () => {
   beforeEach(() => {
     effect.if = {
       type: 'playerValue',
@@ -179,18 +179,18 @@ describe('conditionals', () => {
   });
 });
 
-// describe('multiply by', () => {
-//   beforeEach(() => {
-//     effect.multiplyBy = {
-//       type: 'playerValue',
-//       target: 'opponent',
-//       playerValue: 'strength',
-//     };
-//   });
+describe('multiply by', () => {
+  beforeEach(() => {
+    effect.multiplyBy = {
+      type: 'playerValue',
+      target: 'opponent',
+      playerValue: 'strength',
+    };
+  });
 
-//   test('deal damage equal to strength', () => {
-//     const { diff } = getPlayCardResult({ opponent: { strength: 2 } });
+  test('deal damage equal to strength', () => {
+    const { diff } = getPlayCardResult({ opponent: { strength: 2 } });
 
-//     expect(diff).toEqual({ opponent: { health: -2 } });
-//   });
-// });
+    expect(diff).toEqual({ opponent: { health: -2 } });
+  });
+});
