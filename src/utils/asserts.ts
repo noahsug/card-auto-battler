@@ -10,6 +10,19 @@ export function assert(condition: boolean): asserts condition is true {
   }
 }
 
+// Usage:
+//   const animal = { type: 'dog', bark };
+//   assertType(animal, 'dog' as const);
+//   animal.bark(); // animal is now known to be of type dog
+export function assertType<T, R extends T>(
+  object: { type: T } | undefined,
+  type: R,
+): asserts object is { type: R } {
+  if (object?.type !== type) {
+    throw new Error(`expected type ${type}, got ${object?.type}`);
+  }
+}
+
 export function fail(message?: string): never {
   throw new Error(message);
 }
