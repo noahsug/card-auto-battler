@@ -9,3 +9,7 @@ export function assert(condition: boolean): asserts condition is true {
     throw new Error('assertion failed');
   }
 }
+
+export function fail(message?: string): never {
+  throw new Error(message);
+}

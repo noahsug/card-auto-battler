@@ -366,6 +366,15 @@ describe('renders if statements', () => {
   // });
 });
 
+// it('renders repeat', () => {
+//   card.repeat = {
+//     type: 'playerValue',
+//     target: 'opponent',
+//     name: 'bleed',
+//   };
+//   expect(render(card)).toBe('Deal 1 damage. Repeat for each bleed the enemy has.');
+// });
+
 describe('indicates symbols, keywords and values', () => {
   function getComponentValues(card: CardState, type: TextComponent['type']) {
     const componentLists = getCardTextComponents(card);
@@ -406,7 +415,7 @@ describe('indicates symbols, keywords and values', () => {
       compareTo: { type: 'value', value: 3 },
     };
 
-    expect(getComponentValues(card, 'value')).toEqual([1, 3]);
+    expect(getComponentValues(card, 'value')).toEqual([1]);
     expect(getComponentValues(card, 'symbol')).toEqual(['damage', 'bleed']);
   });
 

@@ -1,5 +1,5 @@
 import { Target, PlayerValueName, statusEffectNames } from '../../gameState/gameState';
-import { assertIsNonNullable, assert } from '../../utils';
+import { assertIsNonNullable, assert, fail } from '../../utils';
 import { readonlyIncludes } from '../../utils/iterators';
 import { CardEffectName, CardEffect, CardState } from '../../gameState/actions/playCardV2';
 
@@ -291,26 +291,27 @@ function translate(
       assert(effect.if.multiplier == null);
 
       const ti = getTranslateFn(effect, effect.if);
-      const tc = getTranslateFn(effect, effect.if.compareTo);
       if (effect.if.name === 'trashedCards') {
-        return ['if', ti(`you've`), 'trashed', tc('more than 3'), 'cards'];
+        return ['if', ti(`you've`), 'trashed', t('more than 3'), 'cards'];
       }
       if (effect.if.name === 'cardsPlayedThisTurn') {
-        return ['if', ti(`you've`), 'played', tc('more than 3'), 'cards this turn'];
+        return ['if', ti(`you've`), 'played', t('more than 3'), 'cards this turn'];
       }
-      return ['if', ti('you have'), tc('more than 3'), ti('bleed')];
+      return ['if', ti('you have'), t('more than 3'), ti('bleed')];
 
     case `more than 3`:
-      assertIsNonNullable(effect.if);
+      // TODO: use assert type
+      if (effect.if?.compareTo.type !== 'value') fail();
+      const { comparison, compareTo } = effect.if;
 
-      const { comparison } = effect.if;
       const isCheckingExistence =
-        (comparison === '>' && value === 0) || (comparison === '>=' && value === 1);
+        (comparison === '>' && compareTo.value === 0) ||
+        (comparison === '>=' && compareTo.value === 1);
       if (isCheckingExistence) {
         // (if you have) "" (bleed)
         return '';
       }
-      return [t(`more than`), t(`3`)];
+      return [t(`more than`), `${compareTo.value}`];
 
     case `more than`:
       switch (effect.if?.comparison) {
