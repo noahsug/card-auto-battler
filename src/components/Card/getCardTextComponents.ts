@@ -1,12 +1,7 @@
 import { Target, PlayerValueName, statusEffectNames } from '../../gameState/gameState';
 import { assertIsNonNullable, assert } from '../../utils';
 import { readonlyIncludes } from '../../utils/iterators';
-import {
-  CardEffectName,
-  CardEffect,
-  ValueDescriptor,
-  CardState,
-} from '../../gameState/actions/playCardV2';
+import { CardEffectName, CardEffect, CardState } from '../../gameState/actions/playCardV2';
 
 // Deal 1 damage. Repeat for each bleed the enemy has.
 
@@ -212,34 +207,8 @@ interface TranslateOverrides {
   value?: number;
 }
 
-function getTranslateMultiplyByFn(effect: CardEffect) {
-  return (text: string) => {
-    if (!effect.multiplyBy) return [];
-
-    const overrides = {
-      target: effect.multiplyBy.target,
-      name: effect.multiplyBy.name,
-    };
-
-    return translate(effect, text, overrides);
-  };
-}
-
-function getTranslateIfFn(effect: CardEffect) {
-  return (text: string) => {
-    if (!effect.if) return [];
-
-    // TODO: implement "if you have more health than the enemy"
-    if (effect.if.compareTo.type !== 'value') return [];
-
-    const overrides = {
-      target: effect.if.target,
-      name: effect.if.name,
-      value: (effect.if.compareTo as ValueDescriptor).value,
-    };
-
-    return translate(effect, text, overrides);
-  };
+function getTranslateFn(effect: CardEffect, overrides: TranslateOverrides = {}) {
+  return (text: string) => translate(effect, text, overrides);
 }
 
 function translate(
@@ -247,11 +216,11 @@ function translate(
   text: string,
   overrides: TranslateOverrides = {},
 ): TextBuilder {
-  const t = (text: string) => translate(effect, text, overrides);
+  const t = getTranslateFn(effect, overrides);
 
-  const name = overrides.name == null ? effect.name : overrides.name;
-  const target = overrides.target == null ? effect.target : overrides.target;
-  const value = overrides.value == null ? effect.value : overrides.value;
+  const name = overrides.name ?? effect.name;
+  const target = overrides.target ?? effect.target;
+  const value = overrides.value ?? effect.value;
 
   switch (text) {
     case `Deal damage equal to your bleed`:
@@ -288,7 +257,7 @@ function translate(
       return value === 1 ? 'card' : 'cards';
 
     case `equal to your bleed`:
-      const tm = getTranslateMultiplyByFn(effect);
+      const tm = getTranslateFn(effect, effect.multiplyBy);
       return ['equal to', t('twice'), tm('your bleed')];
 
     case `twice`:
@@ -319,15 +288,15 @@ function translate(
     case `if the enemy has more than 3 bleed`:
       if (!effect.if) return [];
 
-      const ti = getTranslateIfFn(effect);
+      const ti = getTranslateFn(effect, effect.if);
+      const tc = getTranslateFn(effect, effect.if.compareTo);
       if (effect.if.name === 'trashedCards') {
-        return ['if', ti(`you've`), 'trashed', ti('more than 3'), 'cards'];
+        return ['if', ti(`you've`), 'trashed', tc('more than 3'), 'cards'];
       }
       if (effect.if.name === 'cardsPlayedThisTurn') {
-        return ['if', ti(`you've`), 'played', ti('more than 3'), 'cards this turn'];
+        return ['if', ti(`you've`), 'played', tc('more than 3'), 'cards this turn'];
       }
-      // TODO: implement percent health
-      return ['if', ti('you have'), ti('more than 3'), ti('bleed')];
+      return ['if', ti('you have'), tc('more than 3'), ti('bleed')];
 
     case `more than 3`:
       assertIsNonNullable(effect.if);
