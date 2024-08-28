@@ -255,7 +255,7 @@ it('renders multi-hits', () => {
 //   });
 // });
 
-describe('renders effects based on another value', () => {
+describe('renders multiply by', () => {
   beforeEach(() => {
     effect.multiplyBy = {
       type: 'playerValue',
@@ -322,7 +322,7 @@ describe('renders effects based on another value', () => {
   // test('equal to missing health', () => {});
 });
 
-describe('renders conditionals', () => {
+describe('renders if statements', () => {
   test('if the enemy has dodge', () => {
     effect.if = {
       type: 'playerValue',
@@ -370,6 +370,7 @@ describe('renders conditionals', () => {
 
     expect(render(card)).toBe(`Deal 1 damage if the enemy has trashed at least 2 cards.`);
   });
+
   // ... if this card deals at least 7 damage.
 
   // test('if you have less than half HP', () => {

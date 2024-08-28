@@ -36,39 +36,43 @@ function getPlayCardResult({
 }
 
 describe('damage', () => {
-  test('deal damage', () => {
+  it('reduces opponent health', () => {
     const { diff } = getPlayCardResult();
 
     expect(diff).toEqual({ opponent: { health: -1 } });
   });
 
-  test('take damage', () => {
-    effect.target = 'self';
-    const { diff } = getPlayCardResult();
-
-    expect(diff).toEqual({ self: { health: -1 } });
-  });
-
-  test('opponent dodges damage', () => {
+  it('can be dodged', () => {
     const { diff } = getPlayCardResult({ opponent: { dodge: 1 } });
 
     expect(diff).toEqual({ opponent: { dodge: -1 } });
   });
 
-  test('strength increases damage', () => {
+  it('is increased by strength', () => {
     const { diff } = getPlayCardResult({ self: { strength: 1 } });
 
     expect(diff).toEqual({ opponent: { health: -2 } });
   });
 
-  test('bleed increases damage', () => {
+  it('triggers bleed', () => {
     const { diff } = getPlayCardResult({ opponent: { bleed: 1 } });
 
     expect(diff).toEqual({ opponent: { health: -4, bleed: -1 } });
   });
+});
 
-  test('self damage is not effected by dodge, strength or bleed', () => {
+describe('self damage', () => {
+  beforeEach(() => {
     effect.target = 'self';
+  });
+
+  it('reduces own health', () => {
+    const { diff } = getPlayCardResult();
+
+    expect(diff).toEqual({ self: { health: -1 } });
+  });
+
+  it('is not effected by dodge, strength or bleed', () => {
     const { diff } = getPlayCardResult({ self: { dodge: 1, strength: 1, bleed: 1 } });
 
     expect(diff).toEqual({ self: { health: -1 } });
@@ -80,13 +84,13 @@ describe('heal', () => {
     effect.name = 'heal';
   });
 
-  test('give hp', () => {
+  it('increases opponent hp', () => {
     const { diff } = getPlayCardResult();
 
     expect(diff).toEqual({ opponent: { health: 1 } });
   });
 
-  test('gain hp', () => {
+  it('increases self hp', () => {
     effect.target = 'self';
     const { diff } = getPlayCardResult();
 
@@ -99,13 +103,13 @@ describe('dodge', () => {
     effect.name = 'dodge';
   });
 
-  test('give dodge', () => {
+  it('increases opponent dodge', () => {
     const { diff } = getPlayCardResult();
 
     expect(diff).toEqual({ opponent: { dodge: 1 } });
   });
 
-  test('gain dodge', () => {
+  it('increases self dodge', () => {
     effect.target = 'self';
     const { diff } = getPlayCardResult();
 
@@ -118,7 +122,7 @@ describe('trash cards', () => {
     effect.name = 'trash';
   });
 
-  test('trash opponent cards', () => {
+  it('trashes opponent cards', () => {
     const { init, opponent } = getPlayCardResult();
     const [c1, c2, c3] = init.opponent.cards;
 
@@ -127,7 +131,7 @@ describe('trash cards', () => {
   });
 
   // TODO
-  // test('trash own cards', () => {
+  // it('trash own cards', () => {
   //   effect.target = 'self';
   //   const { init, self } = getPlayCardResult();
   //   const [c1, c2, c3] = init.self.cards;
@@ -136,7 +140,7 @@ describe('trash cards', () => {
   //   expect(self.trashedCards).toEqual([c1, c3]);
   // });
 
-  // test(`trash opponent cards from the discard pile`, () => {
+  // it(`trash opponent cards from the discard pile`, () => {
   //   effect.value = 2;
   //   const { init, opponent } = getPlayCardResult({ opponent: { currentCardIndex: 1 } });
   //   const [c1, c2, c3] = init.opponent.cards;
@@ -146,7 +150,7 @@ describe('trash cards', () => {
   //   expect(opponent.currentCardIndex).toBe(0);
   // });
 
-  test('trash entire opponent deck', () => {
+  it('trashes entire opponent deck', () => {
     effect.value = 10;
     const { opponent } = getPlayCardResult({ opponent: { currentCardIndex: 1 } });
 
@@ -166,13 +170,13 @@ describe('if', () => {
     };
   });
 
-  test('do nothing if the player has bleed', () => {
+  it('skips the effect when false', () => {
     const { diff } = getPlayCardResult({ opponent: { bleed: 1 } });
 
     expect(diff).toEqual({});
   });
 
-  test('do something if the player does not have bleed', () => {
+  it('does the effect when true', () => {
     const { diff } = getPlayCardResult();
 
     expect(diff).toEqual({ opponent: { health: -1 } });
@@ -188,9 +192,21 @@ describe('multiply by', () => {
     };
   });
 
-  test('deal damage equal to strength', () => {
+  it('multiplies damage by strength', () => {
     const { diff } = getPlayCardResult({ opponent: { strength: 2 } });
 
     expect(diff).toEqual({ opponent: { health: -2 } });
+  });
+});
+
+describe('multi-hit', () => {
+  beforeEach(() => {
+    effect.multiHit = 2;
+  });
+
+  it('deals damage twice', () => {
+    const { diff } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
+
+    expect(diff).toEqual({ opponent: { health: -12, bleed: -2 } });
   });
 });
