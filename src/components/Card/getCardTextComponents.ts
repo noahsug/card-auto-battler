@@ -218,7 +218,7 @@ function getTranslateMultiplyByFn(effect: CardEffect) {
 
     const overrides = {
       target: effect.multiplyBy.target,
-      name: effect.multiplyBy.playerValue,
+      name: effect.multiplyBy.name,
     };
 
     return translate(effect, text, overrides);
@@ -234,7 +234,7 @@ function getTranslateIfFn(effect: CardEffect) {
 
     const overrides = {
       target: effect.if.target,
-      name: effect.if.playerValue,
+      name: effect.if.name,
       value: (effect.if.compareTo as ValueDescriptor).value,
     };
 
@@ -242,10 +242,6 @@ function getTranslateIfFn(effect: CardEffect) {
   };
 }
 
-// TODO: deal with
-//  - (if you have 3) "cards in your deck" <-- only handling this case currently
-//  - (equal to) "the number of cards in your deck"
-//  - (for each) "card in your deck"
 function translate(
   effect: CardEffect,
   text: string,
@@ -324,19 +320,20 @@ function translate(
       if (!effect.if) return [];
 
       const ti = getTranslateIfFn(effect);
-      if (effect.if.playerValue === 'trashedCards') {
+      if (effect.if.name === 'trashedCards') {
         return ['if', ti(`you've`), 'trashed', ti('more than 3'), 'cards'];
       }
-      if (effect.if.playerValue === 'cardsPlayedThisTurn') {
+      if (effect.if.name === 'cardsPlayedThisTurn') {
         return ['if', ti(`you've`), 'played', ti('more than 3'), 'cards this turn'];
       }
+      // TODO: implement percent health
       return ['if', ti('you have'), ti('more than 3'), ti('bleed')];
 
     case `more than 3`:
       assertIsNonNullable(effect.if);
-      const { comparison } = effect.if;
       assert(effect.if.compareTo.type === 'value');
 
+      const { comparison } = effect.if;
       const isCheckingExistence =
         (comparison === '>' && value === 0) || (comparison === '>=' && value === 1);
       if (isCheckingExistence) {
@@ -389,16 +386,9 @@ function translate(
       return target === 'self' ? `your` : `the enemy's`;
 
     case 'bleed':
-    case `damage`:
-      if (SYMBOL_NAMES.includes(name as SymbolName)) {
-        return getSymbolText(name as SymbolName);
-      }
-      // if (effect.name === 'health') {
-      //   return 'HP';
-      // }
-      // if (effect.name === 'startingHealth') {
-      // }
-      return '';
+    case 'damage':
+      assert(SYMBOL_NAMES.includes(name as SymbolName));
+      return getSymbolText(name as SymbolName);
 
     case `3`:
       return getValueText(value);
@@ -408,7 +398,7 @@ function translate(
       return [getValueText(effect.multiHit), 'times'];
   }
 
-  return [];
+  throw new Error(`cannot translate text: ${text}`);
 }
 
 function getCardEffectText(effect: CardEffect): TextBuilder {

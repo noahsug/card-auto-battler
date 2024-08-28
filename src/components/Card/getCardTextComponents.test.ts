@@ -260,7 +260,7 @@ describe('renders multiply by', () => {
     effect.multiplyBy = {
       type: 'playerValue',
       target: 'opponent',
-      playerValue: 'bleed',
+      name: 'bleed',
     };
   });
 
@@ -303,7 +303,7 @@ describe('renders multiply by', () => {
     effect.multiplyBy = {
       type: 'playerValue',
       target: 'self',
-      playerValue: 'cardsPlayedThisTurn',
+      name: 'cardsPlayedThisTurn',
     };
 
     expect(render(card)).toBe(`Deal damage equal to the number of cards you've played this turn.`);
@@ -313,7 +313,7 @@ describe('renders multiply by', () => {
     effect.multiplyBy = {
       type: 'playerValue',
       target: 'opponent',
-      playerValue: 'trashedCards',
+      name: 'trashedCards',
     };
 
     expect(render(card)).toBe(`Deal damage equal to the number of cards the enemy has trashed.`);
@@ -327,7 +327,7 @@ describe('renders if statements', () => {
     effect.if = {
       type: 'playerValue',
       target: 'opponent',
-      playerValue: 'dodge',
+      name: 'dodge',
       comparison: '>',
       compareTo: { type: 'value', value: 0 },
     };
@@ -339,7 +339,7 @@ describe('renders if statements', () => {
     effect.if = {
       type: 'playerValue',
       target: 'self',
-      playerValue: 'bleed',
+      name: 'bleed',
       comparison: '=',
       compareTo: { type: 'value', value: 3 },
     };
@@ -351,7 +351,7 @@ describe('renders if statements', () => {
     effect.if = {
       type: 'playerValue',
       target: 'self',
-      playerValue: 'cardsPlayedThisTurn',
+      name: 'cardsPlayedThisTurn',
       comparison: '>',
       compareTo: { type: 'value', value: 2 },
     };
@@ -359,11 +359,11 @@ describe('renders if statements', () => {
     expect(render(card)).toBe(`Deal 1 damage if you've played more than 2 cards this turn.`);
   });
 
-  test('if the enemy has trashed 2 at least cards', () => {
+  test('if the enemy has trashed at least 2 cards', () => {
     effect.if = {
       type: 'playerValue',
       target: 'opponent',
-      playerValue: 'trashedCards',
+      name: 'trashedCards',
       comparison: '>=',
       compareTo: { type: 'value', value: 2 },
     };
@@ -375,10 +375,11 @@ describe('renders if statements', () => {
 
   // test('if you have less than half HP', () => {
   //   effect.if = {
-  //     type: 'percentHealth',
+  //     type: 'playerValue',
   //     target: 'self',
+  //     name: 'health',
   //     comparison: '<',
-  //     compareTo: { type: 'value', value: 0.5 },
+  //     compareTo: { type: 'percentHealth', value: 0.5 },
   //   };
 
   //   expect(render(card)).toBe('Deal 1 damage if you have less than half HP.');
@@ -432,7 +433,7 @@ describe('indicates symbols, keywords and values', () => {
     effect.if = {
       type: 'playerValue',
       target: 'self',
-      playerValue: 'bleed',
+      name: 'bleed',
       comparison: '>=',
       compareTo: { type: 'value', value: 3 },
     };
@@ -445,7 +446,7 @@ describe('indicates symbols, keywords and values', () => {
     effect.multiplyBy = {
       type: 'playerValue',
       target: 'self',
-      playerValue: 'bleed',
+      name: 'bleed',
     };
 
     expect(getComponentValues(card, 'value')).toEqual([]);

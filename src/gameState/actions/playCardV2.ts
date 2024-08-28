@@ -12,20 +12,16 @@ export interface ValueDescriptor {
 interface PlayerValueDescriptor {
   type: 'playerValue';
   target: Target;
-  playerValue: PlayerValueName;
+  name: PlayerValueName;
 }
 
 interface BaseIf {
   comparison: '>' | '<' | '=' | '<=' | '>=';
   compareTo: PlayerValueDescriptor | ValueDescriptor;
+  compareToMultiplier?: number;
 }
 
 type IfPlayerValue = PlayerValueDescriptor & BaseIf;
-
-// interface IfPlayerValue extends BaseIf {
-//   type: 'percentHealth';
-//   target: Target;
-// }
 
 type If = IfPlayerValue;
 
@@ -185,12 +181,14 @@ function getDescribedValue(descriptor: If['compareTo'], context: PlayCardContext
 // const playerValue = getPlayerValue(ifStatement, context);
 
 function getPlayerValue(descriptor: PlayerValueDescriptor, context: PlayCardContext): number {
-  const value = context[descriptor.target][descriptor.playerValue];
+  const player = context[descriptor.target];
+  const value = player[descriptor.name];
 
   if (Array.isArray(value)) {
     // e.g. number of trashed cards
     return value.length;
   }
+
   return value;
 }
 

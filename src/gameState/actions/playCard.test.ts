@@ -164,7 +164,7 @@ describe('if', () => {
     effect.if = {
       type: 'playerValue',
       target: 'opponent',
-      playerValue: 'bleed',
+      name: 'bleed',
       comparison: '=',
       compareTo: { type: 'value', value: 0 },
     };
@@ -181,6 +181,10 @@ describe('if', () => {
 
     expect(diff).toEqual({ opponent: { health: -1 } });
   });
+
+  it('compares to max health', () => {
+    //
+  });
 });
 
 describe('multiply by', () => {
@@ -188,7 +192,7 @@ describe('multiply by', () => {
     effect.multiplyBy = {
       type: 'playerValue',
       target: 'opponent',
-      playerValue: 'strength',
+      name: 'strength',
     };
   });
 
