@@ -100,7 +100,7 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitC
 function evaluateIf(ifStatement: If, context: PlayCardContext) {
   const value1 = getDescribedValue(ifStatement, context);
   const value2 = getDescribedValue(ifStatement.compareTo, context);
-  const value1Multiplier = ifStatement.multiplier || 1;
+  const value1Multiplier = ifStatement.multiplier ?? 1;
 
   return compareValues(value1 * value1Multiplier, ifStatement.comparison, value2);
 }

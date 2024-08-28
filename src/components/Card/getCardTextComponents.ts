@@ -146,61 +146,6 @@ import { CardEffectName, CardEffect, CardState } from '../../gameState/actions/p
 // BAD: confusing, do not support
 // Deal 3 damage and gain 2 strength if you have full HP.
 
-const SYMBOL_NAMES = ['damage', 'heal', ...statusEffectNames] as const;
-const KEYWORDS = ['trash'] as const;
-
-type SymbolName = (typeof SYMBOL_NAMES)[number];
-type Keyword = (typeof KEYWORDS)[number];
-
-export interface PlainText {
-  type: 'plain';
-  text: string;
-}
-
-export interface SymbolText {
-  type: 'symbol';
-  symbolName: SymbolName;
-}
-
-export interface KeywordText {
-  type: 'keyword';
-  keyword: Keyword;
-  text: string;
-}
-
-export interface ValueText {
-  type: 'value';
-  value: number;
-}
-
-export type TextComponent = PlainText | SymbolText | KeywordText | ValueText;
-
-function getPlainText(text: string): PlainText {
-  return { type: 'plain', text: text };
-}
-
-function getValueText(value: number): ValueText {
-  return { type: 'value', value };
-}
-
-function getSymbolText(symbolName: SymbolName): SymbolText {
-  return { type: 'symbol', symbolName };
-}
-
-function getKeywordText(text: string, keyword: Keyword): KeywordText {
-  if (!text) {
-    if (readonlyIncludes(KEYWORDS, text)) {
-      keyword = text;
-    } else {
-      throw new Error(`Unknown keyword: ${text}, please specify a keyword`);
-    }
-  }
-  return { type: 'keyword', keyword, text };
-}
-
-// Intermediate type for building text components.
-type TextBuilder = string | TextComponent | TextBuilder[];
-
 interface TranslateOverrides {
   name?: CardEffectName | PlayerValueName;
   target?: Target;
@@ -211,95 +156,91 @@ function getTranslateFn(effect: CardEffect, overrides: TranslateOverrides = {}) 
   return (text: string) => translate(effect, text, overrides);
 }
 
-function translate(
-  effect: CardEffect,
-  text: string,
-  overrides: TranslateOverrides = {},
-): TextBuilder {
+function translate(effect: CardEffect, text: string, overrides: TranslateOverrides = {}): string {
   const t = getTranslateFn(effect, overrides);
 
   const name = overrides.name ?? effect.name;
   const target = overrides.target ?? effect.target;
-  const value = overrides.value ?? effect.value;
+  const X = overrides.value ?? effect.value;
 
   switch (text) {
     case `Deal damage equal to your bleed`:
       if (effect.multiplyBy) {
-        return [t(`Deal damage`), t(`equal to your bleed`)];
+        return `${t(`Deal damage`)} ${t(`equal to your bleed`)}`;
       }
-      return t(`Deal 3 damage`);
+      return t(`Deal X damage`);
 
     case `Deal damage`:
       if (name === 'trash') {
         return t(`Enemy trashes`);
       }
       if (name === 'extraCardPlays') {
-        return ['Enemy plays cards'];
+        return 'Enemy plays cards';
       }
-      return [t(`Deal`), t(`damage`)];
+      return `${t(`Deal`)} ${t(`damage`)}`;
 
-    case `Deal 3 damage`:
+    case `Deal X damage`:
       if (name === 'trash') {
-        return [t(`Enemy trashes`), t(`3`)];
+        return `${t(`Enemy trashes`)} ${X}`;
       }
       if (name === 'extraCardPlays') {
-        return [t('Enemy plays 3 extra cards next turn')];
+        return `${t('Enemy plays X extra cards next turn')}`;
       }
-      return [t(`Deal`), t(`3`), t(`damage`)];
+      return `${t(`Deal`)} ${X} ${t(`damage`)}`;
 
-    case 'Enemy plays 3 extra cards next turn':
+    case 'Enemy plays X extra cards next turn':
       if (target === 'self') {
-        return ['Play', t('3'), t('cards')];
+        return `Play ${X} ${t('cards')}`;
       }
-      return ['Enemy plays', t('3'), 'extra', t('cards'), 'next turn'];
+      return `Enemy plays ${X} extra ${t('cards')} next turn`;
 
     case 'cards':
-      return value === 1 ? 'card' : 'cards';
+      return X === 1 ? 'card' : 'cards';
 
     case `equal to your bleed`:
       const tm = getTranslateFn(effect, effect.multiplyBy);
-      return ['equal to', t('twice'), tm('your bleed')];
+      return `equal to ${t('twice')} ${tm('your bleed')}`;
 
     case `twice`:
-      if (value === 1) {
-        return '';
+      switch (X) {
+        case 1:
+          return '';
+        case 2:
+          return 'twice';
+        case 0.5:
+          return 'half';
+        default:
+          if (X > 1) {
+            return `${X} times`;
+          }
+          // 1/4
+          return `1/${1 / X}`;
       }
-      if (value === 2) {
-        return 'twice';
-      }
-      if (value > 1) {
-        return `${value} times`;
-      }
-      if (value === 0.5) {
-        return 'half';
-      }
-      // 1/4
-      return `1/${1 / value}`;
 
     case `your bleed`:
       if (name === 'trashedCards') {
-        return [`the number of cards`, t(`you've`), `trashed`];
+        return `the number of cards ${t(`you've`)} trashed`;
       }
       if (name === 'cardsPlayedThisTurn') {
-        return [`the number of cards`, t(`you've`), `played this turn`];
+        return `the number of cards ${t(`you've`)} played this turn`;
       }
-      return [t(`your`), t('bleed')];
+      return `${t(`your`)} ${t('bleed')}`;
 
-    case `if the enemy has more than 3 bleed`:
-      if (!effect.if) return [];
+    case `if the enemy has more than X bleed`:
+      if (!effect.if) return '';
       assert(effect.if.compareTo.type === 'value');
       assert(effect.if.multiplier == null);
 
       const ti = getTranslateFn(effect, effect.if);
       if (effect.if.name === 'trashedCards') {
-        return ['if', ti(`you've`), 'trashed', t('more than 3'), 'cards'];
+        return `if ${ti(`you've`)} trashed ${t('more than X')} cards`;
       }
       if (effect.if.name === 'cardsPlayedThisTurn') {
-        return ['if', ti(`you've`), 'played', t('more than 3'), 'cards this turn'];
+        return `if ${ti(`you've`)} played ${t('more than X')} cards this turn`;
       }
-      return ['if', ti('you have'), t('more than 3'), ti('bleed')];
+      return `if ${ti('you have')} ${t('more than X')} ${ti('bleed')}`;
 
-    case `more than 3`:
+    case `more than X`:
       // TODO: use assert type
       if (effect.if?.compareTo.type !== 'value') fail();
       const { comparison, compareTo } = effect.if;
@@ -311,7 +252,8 @@ function translate(
         // (if you have) "" (bleed)
         return '';
       }
-      return [t(`more than`), `${compareTo.value}`];
+
+      return `${t('more than')} ${compareTo.value}`;
 
     case `more than`:
       switch (effect.if?.comparison) {
@@ -329,9 +271,7 @@ function translate(
       throw new Error(`Unknown comparison: ${effect.if?.comparison}`);
 
     case `Enemy trashes`:
-      return target === 'self'
-        ? ['You', getKeywordText('trash', 'trash')]
-        : ['Enemy', getKeywordText('trashes', 'trash')];
+      return target === 'self' ? `You trash` : `Enemy trashes`;
 
     case `Deal`:
       if (effect.name === 'damage') {
@@ -359,80 +299,31 @@ function translate(
     case 'bleed':
     case 'damage':
       if (name === 'health') return 'HP';
+      return name;
 
-      assert(SYMBOL_NAMES.includes(name as SymbolName));
-      return getSymbolText(name as SymbolName);
-
-    case `3`:
-      return getValueText(value);
-
-    case `2 times`:
-      if (!effect.multiHit) return [];
-      return [getValueText(effect.multiHit), 'times'];
+    case `X times`:
+      if (effect.multiHit == null || effect.multiHit === 1) return '';
+      return `${effect.multiHit} times`;
   }
 
   throw new Error(`cannot translate text: ${text}`);
 }
 
-function getCardEffectText(effect: CardEffect): TextBuilder {
-  const t = (text: string) => translate(effect, text);
+function getCardEffectText(effect: CardEffect): string {
+  const t = getTranslateFn(effect);
 
   return [
     t(`Deal damage equal to your bleed`),
-    t(`2 times`),
-    t(`if the enemy has more than 3 bleed`),
-  ];
+    t(`X times`),
+    t(`if the enemy has more than X bleed`),
+  ].join(' ');
 }
 
-// Before:
-//   ['You', [K('trash'), ['', V(3)], 'cards']]
-// After:
-//   ['You ', K('trash'), ' ', V(3), ' cards']
-function buildTextComponents(textBuilder: TextBuilder): TextComponent[] {
-  if (typeof textBuilder === 'string') {
-    // textBuilder is just plain text
-    return [getPlainText(textBuilder)];
-  }
-  if ('type' in textBuilder) {
-    // textBuilder is already a TextComponent
-    return [textBuilder];
-  }
-
-  // remove all nested arrays
-  let flatTextBuilder = textBuilder.flat(20) as (string | TextComponent)[];
-
-  // remove empty strings
-  flatTextBuilder = flatTextBuilder.filter((part) => part !== '');
-
-  // insert spaces between each element, e.g. ['you', trash'] -> ['you', ' ', 'trash']
-  flatTextBuilder = flatTextBuilder.reduce<typeof flatTextBuilder>((result, part, i) => {
-    if (i === 0) {
-      return [part];
-    }
-    return result.concat(' ', part);
-  }, []);
-
-  // convert strings to plain text components
-  return flatTextBuilder.reduce<TextComponent[]>((components, part, i) => {
-    if (typeof part === 'string') {
-      const prevComponent = components[i - 1];
-      if (prevComponent && prevComponent.type === 'plain') {
-        // combine multiple strings in a row into a single plain text component
-        prevComponent.text = `${prevComponent.text}${part}`;
-        // remove extra spaces
-        prevComponent.text = prevComponent.text.replace(/\s+/g, ' ');
-        // TODO: remove spaces before punctuation (e.g. 'you trash , gain' -> 'you trash, gain')
-      } else {
-        components.push(getPlainText(part));
-      }
-    } else {
-      components.push(part);
-    }
-
-    return components;
-  }, []);
+// Remove extra spaces
+function fixSpacing(text: string): string {
+  return text.trim().replace(/\s+/g, ' ');
 }
 
-export default function getCardTextComponents(card: CardState): TextComponent[][] {
-  return card.effects.map(getCardEffectText).map(buildTextComponents);
+export default function getCardTextComponents(card: CardState): string[] {
+  return card.effects.map(getCardEffectText).map(fixSpacing);
 }

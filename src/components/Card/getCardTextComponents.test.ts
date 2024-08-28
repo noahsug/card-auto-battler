@@ -1,10 +1,4 @@
-import getCardTextComponents, {
-  KeywordText,
-  PlainText,
-  SymbolText,
-  TextComponent,
-  ValueText,
-} from './getCardTextComponents';
+import getCardTextComponents from './getCardTextComponents';
 
 import { CardEffect, CardState } from '../../gameState/actions/playCardV2';
 
@@ -97,27 +91,9 @@ import { CardEffect, CardState } from '../../gameState/actions/playCardV2';
 // Repeat for each bleed you have (3).
 // Repeat for each bleed the enemy has (3).
 
-function renderTextComponent(component: TextComponent): string {
-  switch (component.type) {
-    case 'plain':
-    case 'keyword':
-      return component.text;
-    case 'symbol':
-      return component.symbolName;
-    case 'value':
-      return String(component.value);
-  }
-}
-
 function render(card: CardState) {
-  const text = [];
   const lines = getCardTextComponents(card);
-  for (const textComponents of lines) {
-    const line = textComponents.map(renderTextComponent);
-    text.push(`${line.join('')}.`);
-  }
-
-  return text.join(' ');
+  return lines.join('. ') + '.';
 }
 
 let card: CardState;
@@ -374,60 +350,3 @@ describe('renders if statements', () => {
 //   };
 //   expect(render(card)).toBe('Deal 1 damage. Repeat for each bleed the enemy has.');
 // });
-
-describe('indicates symbols, keywords and values', () => {
-  function getComponentValues(card: CardState, type: TextComponent['type']) {
-    const componentLists = getCardTextComponents(card);
-    const components = componentLists.flat().filter((c) => c.type === type);
-
-    if (type === 'value') {
-      return components.map((c) => (c as ValueText).value);
-    }
-    if (type === 'symbol') {
-      return components.map((c) => (c as SymbolText).symbolName);
-    }
-    if (type === 'plain') {
-      return components.map((c) => (c as PlainText).text);
-    }
-    if (type === 'keyword') {
-      return components.map((c) => (c as KeywordText).keyword);
-    }
-  }
-
-  test('deal damage', () => {
-    expect(getComponentValues(card, 'value')).toEqual([1]);
-    expect(getComponentValues(card, 'symbol')).toEqual(['damage']);
-  });
-
-  test('trash cards', () => {
-    effect.name = 'trash';
-
-    expect(getComponentValues(card, 'value')).toEqual([1]);
-    expect(getComponentValues(card, 'keyword')).toEqual(['trash']);
-  });
-
-  test('if has bleed', () => {
-    effect.if = {
-      type: 'playerValue',
-      target: 'self',
-      name: 'bleed',
-      comparison: '>=',
-      compareTo: { type: 'value', value: 3 },
-    };
-
-    expect(getComponentValues(card, 'value')).toEqual([1]);
-    expect(getComponentValues(card, 'symbol')).toEqual(['damage', 'bleed']);
-  });
-
-  test('equal to bleed', () => {
-    effect.multiplyBy = {
-      type: 'playerValue',
-      target: 'self',
-      name: 'bleed',
-    };
-
-    expect(getComponentValues(card, 'value')).toEqual([]);
-    expect(getComponentValues(card, 'symbol')).toEqual(['damage', 'bleed']);
-    expect(getComponentValues(card, 'keyword')).toEqual([]);
-  });
-});
