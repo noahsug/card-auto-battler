@@ -41,12 +41,11 @@ export type StatusEffects = Record<StatusEffectName, number>;
 
 export type Target = 'self' | 'opponent';
 
-// TODO: Rename to PlayerValueName
-export type IdentifiablePlayerValue = keyof PlayerState;
+export type PlayerValueName = keyof PlayerState;
 
 export interface PlayerValueIdentifier {
   target: Target;
-  name: IdentifiablePlayerValue;
+  name: PlayerValueName;
 }
 
 export const EMPTY_BATTLE_STATS = {

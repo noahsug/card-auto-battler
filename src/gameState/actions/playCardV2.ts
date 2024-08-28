@@ -1,5 +1,5 @@
-import { StatusEffectName, Target, IdentifiablePlayerValue, statusEffectNames } from '../gameState';
-import { PlayerState, AnimationEvent, Comparable } from '../../gameState';
+import { StatusEffectName, Target, PlayerValueName, statusEffectNames } from '../gameState';
+import { PlayerState, AnimationEvent } from '../../gameState';
 import { assert, readonlyIncludes } from '../../utils';
 
 export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
@@ -12,7 +12,7 @@ export interface ValueDescriptor {
 interface PlayerValueDescriptor {
   type: 'playerValue';
   target: Target;
-  playerValue: IdentifiablePlayerValue;
+  playerValue: PlayerValueName;
 }
 
 interface BaseIf {

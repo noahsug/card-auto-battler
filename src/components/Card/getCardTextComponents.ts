@@ -1,4 +1,4 @@
-import { Target, IdentifiablePlayerValue, statusEffectNames } from '../../gameState/gameState';
+import { Target, PlayerValueName, statusEffectNames } from '../../gameState/gameState';
 import { assertIsNonNullable, assert } from '../../utils';
 import { readonlyIncludes } from '../../utils/iterators';
 import {
@@ -207,7 +207,7 @@ function getKeywordText(text: string, keyword: Keyword): KeywordText {
 type TextBuilder = string | TextComponent | TextBuilder[];
 
 interface TranslateOverrides {
-  name?: CardEffectName | IdentifiablePlayerValue;
+  name?: CardEffectName | PlayerValueName;
   target?: Target;
   value?: number;
 }

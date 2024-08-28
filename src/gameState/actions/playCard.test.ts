@@ -1,6 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
-import { createInitialGameState, PlayerState, trashForOpponentHealthCard } from '../index';
+import { createInitialGameState, PlayerState } from '../index';
 import playCard, { CardEffect, CardState } from './playCardV2';
 import { diffValues } from '../../utils';
 
@@ -166,15 +166,31 @@ describe('conditionals', () => {
     };
   });
 
-  test('does nothing if the player has bleed', () => {
+  test('do nothing if the player has bleed', () => {
     const { diff } = getPlayCardResult({ opponent: { bleed: 1 } });
 
     expect(diff).toEqual({});
   });
 
-  test('does something if the player does not have bleed', () => {
+  test('do something if the player does not have bleed', () => {
     const { diff } = getPlayCardResult();
 
     expect(diff).toEqual({ opponent: { health: -1 } });
   });
 });
+
+// describe('multiply by', () => {
+//   beforeEach(() => {
+//     effect.multiplyBy = {
+//       type: 'playerValue',
+//       target: 'opponent',
+//       playerValue: 'strength',
+//     };
+//   });
+
+//   test('deal damage equal to strength', () => {
+//     const { diff } = getPlayCardResult({ opponent: { strength: 2 } });
+
+//     expect(diff).toEqual({ opponent: { health: -2 } });
+//   });
+// });

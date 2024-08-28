@@ -10,7 +10,7 @@ import CardEffectText, {
 import {
   GainEffectsOptions,
   Target,
-  IdentifiablePlayerValue,
+  PlayerValueName,
   IdentifiableBattleStats,
   Comparable,
   Conditional,
@@ -104,7 +104,7 @@ function getForEveryText({
   target,
   divisor,
 }: {
-  name: IdentifiablePlayerValue | IdentifiableBattleStats;
+  name: PlayerValueName | IdentifiableBattleStats;
   target?: Target;
   divisor: number;
 }) {

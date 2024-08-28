@@ -2,11 +2,7 @@ import styled from 'styled-components';
 
 import { CardEffects } from '../gameState';
 import { STATUS_EFFECT_SYMBOLS } from './StatusEffects';
-import {
-  Conditional,
-  IdentifiablePlayerValue,
-  IdentifiableBattleStats,
-} from '../gameState/gameState';
+import { Conditional, PlayerValueName, IdentifiableBattleStats } from '../gameState/gameState';
 
 interface Props {
   effectName: CardEffectWithSymbols;
@@ -18,7 +14,7 @@ export type CardEffectWithSymbols = keyof Omit<
   'target' | 'gainEffectsList' | 'growEffectsList' | keyof Conditional<unknown>
 >;
 
-type NameWithSymbol = CardEffectWithSymbols | IdentifiablePlayerValue | IdentifiableBattleStats;
+type NameWithSymbol = CardEffectWithSymbols | PlayerValueName | IdentifiableBattleStats;
 
 export const CARD_TEXT_SYMBOLS: Record<NameWithSymbol, string> = {
   ...STATUS_EFFECT_SYMBOLS,
