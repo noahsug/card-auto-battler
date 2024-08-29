@@ -2,11 +2,14 @@
 
 TODO:
 
-1. Use multithreading (see section below)
-2. 2-card priority list part II: try different pick strategy (e.g. look at all pairs in resulting deck)
-3. inverse priority list: try to minimize win rate. Use this to sort bottom half of priority list
+1. switch to vite? https://github.com/facebook/create-react-app/issues/13289
+2. upgrade typescript?
+
+3. Use multithreading (see section below)
+4. 2-card priority list part II: try different pick strategy (e.g. look at all pairs in resulting deck)
+5. inverse priority list: try to minimize win rate. Use this to sort bottom half of priority list
    and to find bugs (e.g. card is accidentally hitting self)
-4. make card text super easy to read (add lots of keywords?)
+6. make card text super easy to read (add lots of keywords?)
 
 ## analysis
 

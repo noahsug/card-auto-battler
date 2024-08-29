@@ -1,6 +1,10 @@
 import getCardText from './getCardText';
 
-import { CardEffect, CardState } from '../../gameState/actions/playCardV2';
+import {
+  CardEffect,
+  CardState,
+  getValueDescriptor as vd,
+} from '../../gameState/actions/playCardV2';
 
 // Deal 1 damage 3 times.
 // Rally: Each hit deals 2 extra damage.
@@ -103,14 +107,14 @@ beforeEach(() => {
   effect = {
     target: 'opponent',
     name: 'damage',
-    value: 1,
+    value: vd(1),
   } as CardEffect;
 
   card = { effects: [effect] };
 });
 
 it('renders damage', () => {
-  effect.value = 3;
+  effect.value = vd(3);
   expect(render(card)).toBe('Deal 3 damage.');
 
   effect.target = 'self';
@@ -266,7 +270,7 @@ describe('renders if statements', () => {
       target: 'opponent',
       name: 'dodge',
       comparison: '>',
-      compareTo: { type: 'value', value: 0 },
+      compareTo: { type: 'basicValue', value: 0 },
     };
     expect(render(card)).toBe('Deal 1 damage if the enemy has dodge.');
   });
@@ -277,7 +281,7 @@ describe('renders if statements', () => {
       target: 'self',
       name: 'bleed',
       comparison: '=',
-      compareTo: { type: 'value', value: 3 },
+      compareTo: { type: 'basicValue', value: 3 },
     };
     expect(render(card)).toBe('Deal 1 damage if you have 3 bleed.');
   });
@@ -288,7 +292,7 @@ describe('renders if statements', () => {
       target: 'self',
       name: 'cardsPlayedThisTurn',
       comparison: '>',
-      compareTo: { type: 'value', value: 2 },
+      compareTo: { type: 'basicValue', value: 2 },
     };
     expect(render(card)).toBe(`Deal 1 damage if you've played more than 2 cards this turn.`);
   });
@@ -299,7 +303,7 @@ describe('renders if statements', () => {
       target: 'opponent',
       name: 'trashedCards',
       comparison: '>=',
-      compareTo: { type: 'value', value: 2 },
+      compareTo: { type: 'basicValue', value: 2 },
     };
     expect(render(card)).toBe(`Deal 1 damage if the enemy has trashed at least 2 cards.`);
   });
@@ -310,7 +314,7 @@ describe('renders if statements', () => {
       target: 'self',
       name: 'health',
       comparison: '<',
-      compareTo: { type: 'value', value: 10 },
+      compareTo: { type: 'basicValue', value: 10 },
     };
     expect(render(card)).toBe('Deal 1 damage if you have less than 10 HP.');
   });

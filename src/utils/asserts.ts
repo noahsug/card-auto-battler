@@ -23,6 +23,7 @@ export function assertType<T, R extends T>(
   }
 }
 
-export function fail(message?: string): never {
-  throw new Error(message);
+// TODO: remove in favor of satisfies never
+export function unreachable(): never {
+  throw new Error('unreachable');
 }

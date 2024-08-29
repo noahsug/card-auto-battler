@@ -1,11 +1,11 @@
 import { StatusEffectName, Target, PlayerValueName, statusEffectNames } from '../gameState';
 import { PlayerState, AnimationEvent } from '../../gameState';
-import { assert, readonlyIncludes } from '../../utils';
+import { assert, assertIsNonNullable, readonlyIncludes } from '../../utils';
 
 export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
 
-export interface ValueDescriptor {
-  type: 'value';
+export interface BasicValueDescriptor {
+  type: 'basicValue';
   value: number;
 }
 
@@ -13,42 +13,58 @@ interface PlayerValueDescriptor {
   type: 'playerValue';
   target: Target;
   name: PlayerValueName;
-}
-
-interface BaseIf {
   multiplier?: number;
-  comparison: '>' | '<' | '=' | '<=' | '>=';
-  compareTo: PlayerValueDescriptor | ValueDescriptor;
 }
 
-type IfPlayerValue = PlayerValueDescriptor & BaseIf;
+type ValueDescriptor = BasicValueDescriptor | PlayerValueDescriptor;
 
-type If = IfPlayerValue;
+export interface If {
+  value: ValueDescriptor;
+  comparison: '>' | '<' | '=' | '<=' | '>=';
+  value2: ValueDescriptor;
+}
 
 export interface CardEffect {
   target: Target;
   name: CardEffectName;
-  value: number;
-  multiplyBy?: PlayerValueDescriptor;
+  value: ValueDescriptor;
   multiHit?: number;
   if?: If;
 }
 
 export interface Repeat {
-  value: number;
-  multiplyBy?: PlayerValueDescriptor;
+  value: ValueDescriptor;
   if?: If;
 }
 
 export interface CardState {
   effects: CardEffect[];
-  repeat: Repeat;
+  repeat?: Repeat;
 }
 
 export interface PlayCardContext {
   self: PlayerState;
   opponent: PlayerState;
   events: AnimationEvent[];
+}
+
+// Helper function for quickly creating cards
+export function getValueDescriptor(
+  target: Target,
+  name: PlayerValueName,
+  multiplier?: number,
+): PlayerValueDescriptor;
+export function getValueDescriptor(value: number): BasicValueDescriptor;
+export function getValueDescriptor(
+  valueOrTarget: number | Target,
+  name?: PlayerValueName,
+  multiplier?: number,
+): ValueDescriptor {
+  if (typeof valueOrTarget === 'number') {
+    return { type: 'basicValue', value: valueOrTarget };
+  }
+  assertIsNonNullable(name);
+  return { type: 'playerValue', target: valueOrTarget, name, multiplier };
 }
 
 const BLEED_DAMAGE = 3;
@@ -72,10 +88,7 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitC
     if (!success) return;
   }
 
-  let value = effect.value;
-  if (effect.multiplyBy) {
-    value *= getDescribedValue(effect.multiplyBy, context);
-  }
+  const value = getDescribedValue(effect.value, context);
 
   switch (effect.name) {
     case 'damage':
@@ -105,11 +118,42 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitC
 }
 
 function evaluateIf(ifStatement: If, context: PlayCardContext) {
-  const value1 = getDescribedValue(ifStatement, context);
-  const value2 = getDescribedValue(ifStatement.compareTo, context);
-  const value1Multiplier = ifStatement.multiplier ?? 1;
+  const value1 = getDescribedValue(ifStatement.value, context);
+  const value2 = getDescribedValue(ifStatement.value2, context);
+  return compareValues(value1, ifStatement.comparison, value2);
+}
 
-  return compareValues(value1 * value1Multiplier, ifStatement.comparison, value2);
+function getDescribedValue(descriptor: ValueDescriptor, context: PlayCardContext): number {
+  switch (descriptor.type) {
+    case 'basicValue':
+      return descriptor.value;
+
+    case 'playerValue':
+      const multiplier = descriptor.multiplier ?? 1;
+      return getPlayerValue(descriptor, context) * multiplier;
+  }
+}
+
+function getPlayerValue({ target, name }: PlayerValueDescriptor, context: PlayCardContext): number {
+  const player = context[target];
+  const value = player[name];
+
+  if (Array.isArray(value)) {
+    // e.g. number of trashed cards
+    return value.length;
+  }
+
+  return value;
+}
+
+function compareValues(value1: number, comparison: If['comparison'], value2: number) {
+  if (comparison === '>') return value1 > value2;
+  if (comparison === '<') return value1 < value2;
+  if (comparison === '=') return value1 === value2;
+  if (comparison === '>=') return value1 >= value2;
+  if (comparison === '<=') return value1 <= value2;
+
+  throw new Error(`invalid comparison: ${comparison}`);
 }
 
 function dodgeDamage(effect: CardEffect, { opponent, events }: PlayCardContext) {
@@ -175,38 +219,4 @@ function trashCards(value: number, target: Target, context: PlayCardContext) {
   });
 
   targetPlayer.currentCardIndex = Math.max(currentCardIndex - removeFromFront, 0);
-}
-
-function getDescribedValue(descriptor: If['compareTo'], context: PlayCardContext): number {
-  switch (descriptor.type) {
-    case 'value':
-      return descriptor.value;
-
-    case 'playerValue':
-      return getPlayerValue(descriptor, context);
-  }
-}
-
-// const playerValue = getPlayerValue(ifStatement, context);
-
-function getPlayerValue(descriptor: PlayerValueDescriptor, context: PlayCardContext): number {
-  const player = context[descriptor.target];
-  const value = player[descriptor.name];
-
-  if (Array.isArray(value)) {
-    // e.g. number of trashed cards
-    return value.length;
-  }
-
-  return value;
-}
-
-function compareValues(value1: number, comparison: If['comparison'], value2: number) {
-  if (comparison === '>') return value1 > value2;
-  if (comparison === '<') return value1 < value2;
-  if (comparison === '=') return value1 === value2;
-  if (comparison === '>=') return value1 >= value2;
-  if (comparison === '<=') return value1 <= value2;
-
-  throw new Error(`invalid comparison: ${comparison}`);
 }

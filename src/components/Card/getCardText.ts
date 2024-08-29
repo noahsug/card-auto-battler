@@ -1,6 +1,7 @@
 import { Target, PlayerValueName } from '../../gameState/gameState';
 import { assert, assertType } from '../../utils';
 import { CardEffectName, CardEffect, CardState } from '../../gameState/actions/playCardV2';
+import { unreachable } from '../../utils/asserts';
 
 // Deal 1 damage. Repeat for each bleed the enemy has.
 
@@ -164,10 +165,14 @@ function translate(effect: CardEffect, text: string, overrides: TranslateOverrid
 
   switch (text) {
     case `Deal damage equal to your bleed`:
-      if (effect.multiplyBy) {
-        return `${t(`Deal damage`)} ${t(`equal to your bleed`)}`;
+      switch (effect.value.type) {
+        case 'playerValue':
+          return `${t(`Deal damage`)} ${t(`equal to your bleed`)}`;
+        case 'basicValue':
+          return t(`Deal X damage`);
       }
-      return t(`Deal X damage`);
+      // TODO: effect.value.type satisfies never
+      return unreachable();
 
     case `Deal damage`:
       if (name === 'trash') {
@@ -240,7 +245,7 @@ function translate(effect: CardEffect, text: string, overrides: TranslateOverrid
       return `if ${ti('you have')} ${t('more than X')} ${ti('bleed')}`;
 
     case `more than X`:
-      assertType(effect.if?.compareTo, 'value' as const);
+      assertType(effect.if?.compareTo, 'basicValue' as const);
       const { comparison, compareTo } = effect.if;
 
       const isCheckingExistence =

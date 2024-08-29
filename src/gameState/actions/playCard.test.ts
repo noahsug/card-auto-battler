@@ -1,10 +1,12 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import { createInitialGameState, PlayerState } from '../index';
-import playCard, { CardEffect, CardState } from './playCardV2';
+import playCard, { CardEffect, CardState, getValueDescriptor as v } from './playCardV2';
 import { diffValues } from '../../utils';
 
-const STARTER_CARD: CardState = { effects: [{ target: 'opponent', name: 'damage', value: 1 }] };
+const STARTER_CARD: CardState = {
+  effects: [{ target: 'opponent', name: 'damage', value: v(1) }],
+};
 
 let card: CardState;
 let effect: CardEffect;
@@ -151,7 +153,7 @@ describe('trash cards', () => {
   // });
 
   it('trashes entire opponent deck', () => {
-    effect.value = 10;
+    effect.value = v(10);
     const { opponent } = getPlayCardResult({ opponent: { currentCardIndex: 1 } });
 
     expect(opponent.cards.length).toBe(0);
@@ -162,11 +164,9 @@ describe('trash cards', () => {
 describe('if', () => {
   beforeEach(() => {
     effect.if = {
-      type: 'playerValue',
-      target: 'opponent',
-      name: 'bleed',
+      value: v('opponent', 'bleed'),
       comparison: '=',
-      compareTo: { type: 'value', value: 0 },
+      value2: v(0),
     };
   });
 
@@ -182,37 +182,37 @@ describe('if', () => {
     expect(diff).toEqual({ opponent: { health: -1 } });
   });
 
-  it('compares to max health', () => {
+  it('compares to health', () => {
     effect.if = {
-      type: 'playerValue',
-      target: 'self',
-      name: 'health',
-      multiplier: 2,
+      value: v('self', 'health'),
       comparison: '<',
-      compareTo: { type: 'playerValue', target: 'self', name: 'startingHealth' },
+      value2: v(10),
     };
 
-    const halfHealth = getPlayCardResult({ self: { health: 10, startingHealth: 20 } });
+    const halfHealth = getPlayCardResult({ self: { health: 10 } });
     expect(halfHealth.diff).toEqual({});
 
-    const lessThanHalfHealth = getPlayCardResult({ self: { health: 9, startingHealth: 20 } });
+    const lessThanHalfHealth = getPlayCardResult({ self: { health: 9 } });
     expect(lessThanHalfHealth.diff).toEqual({ opponent: { health: -1 } });
   });
 });
 
-describe('multiply by', () => {
+describe('effect based on player value', () => {
   beforeEach(() => {
-    effect.multiplyBy = {
-      type: 'playerValue',
-      target: 'opponent',
-      name: 'strength',
-    };
+    effect.value = v('opponent', 'strength');
   });
 
-  it('multiplies damage by strength', () => {
+  it('deals damage equal to opponent strength', () => {
     const { diff } = getPlayCardResult({ opponent: { strength: 2 } });
 
     expect(diff).toEqual({ opponent: { health: -2 } });
+  });
+
+  it('multiplies the player value by the multiplier', () => {
+    effect.value = v('opponent', 'strength', 3);
+    const { diff } = getPlayCardResult({ opponent: { strength: 2 } });
+
+    expect(diff).toEqual({ opponent: { health: -6 } });
   });
 });
 
