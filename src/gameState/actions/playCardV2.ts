@@ -29,13 +29,20 @@ export interface CardEffect {
   target: Target;
   name: CardEffectName;
   value: number;
+  multiplyBy?: PlayerValueDescriptor;
   multiHit?: number;
+  if?: If;
+}
+
+export interface Repeat {
+  value: number;
   multiplyBy?: PlayerValueDescriptor;
   if?: If;
 }
 
 export interface CardState {
   effects: CardEffect[];
+  repeat: Repeat;
 }
 
 export interface PlayCardContext {

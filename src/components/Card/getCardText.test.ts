@@ -344,9 +344,12 @@ describe('renders if statements', () => {
 
 // it('renders repeat', () => {
 //   card.repeat = {
-//     type: 'playerValue',
-//     target: 'opponent',
-//     name: 'bleed',
+//     value: 1,
+//     multiplyBy: {
+//       type: 'playerValue',
+//       target: 'opponent',
+//       name: 'bleed',
+//     },
 //   };
 //   expect(render(card)).toBe('Deal 1 damage. Repeat for each bleed the enemy has.');
 // });
