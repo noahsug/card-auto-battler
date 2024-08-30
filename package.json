@@ -49,12 +49,7 @@
     "analyze": "./scripts/ts-node/run.sh node/analysis",
     "deckOfCards": "./scripts/ts-node/run.sh node/deckOfCards/play --"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
+  "type": "module",
   "browserslist": {
     "production": [
       ">0.2%",
