@@ -12,4 +12,8 @@ export default defineConfig({
       include: '**/*.svg?react',
     }),
   ],
+  server: {
+    // automatically open the app in the browser on server start
+    open: true,
+  },
 });

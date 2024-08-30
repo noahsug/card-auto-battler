@@ -1,7 +1,6 @@
 {
   "name": "card-auto-battler",
   "version": "0.1.0",
-  "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
@@ -25,9 +24,17 @@
     "@inquirer/prompts": "^5.3.8",
     "@swc/core": "^1.4.2",
     "@types/lodash": "^4.14.202",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "chalk": "^5.3.0",
+    "eslint": "^9.9.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-react": "^7.35.0",
     "fix-esm": "^1.0.1",
+    "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "vite": "^5.4.2",
     "vite-plugin-svgr": "^4.2.0",
@@ -38,6 +45,7 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "test": "react-scripts test",
+    "lint": "eslint . --ext .ts,.tsx",
     "analyze": "./scripts/ts-node/run.sh node/analysis",
     "deckOfCards": "./scripts/ts-node/run.sh node/deckOfCards/play --"
   },
