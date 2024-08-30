@@ -310,7 +310,7 @@ describe('renders if statements', () => {
   // ... if this card deals at least 7 damage.
 });
 
-// it('renders repeat', () => {
-//   card.repeat = { value: v('opponent', 'bleed') };
-//   expect(render(card)).toBe('Deal 1 damage. Repeats for each bleed the enemy has.');
-// });
+it('renders repeat', () => {
+  card.repeat = { value: v('opponent', 'bleed') };
+  expect(render(card)).toBe('Deal 1 damage. Repeat for each bleed the enemy has.');
+});
