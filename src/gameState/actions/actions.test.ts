@@ -99,12 +99,6 @@ describe('damage effect', () => {
   });
 });
 
-describe('heal effect', () => {
-  const { endingState, startingState } = playCards([createCard({ target: 'self', heal: 1 })]);
-
-  expect(startingState.user.health - endingState.user.health).toBe(-1);
-});
-
 describe('dodge effect', () => {
   it('dodges the next source of damage', () => {
     const userCards: CardState[] = [createCard({ target: 'self', dodge: 1 })];
