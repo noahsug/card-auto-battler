@@ -308,40 +308,9 @@ describe('renders if statements', () => {
   });
 
   // ... if this card deals at least 7 damage.
-
-  // test('if you have less than half HP', () => {
-  //   effect.if = {
-  //     type: 'playerValue',
-  //     target: 'self',
-  //     name: 'health',
-  //     comparison: '<',
-  //     compareTo: { type: 'percentHealth', value: 0.5 },
-  //   };
-
-  //   expect(render(card)).toBe('Deal 1 damage if you have less than half HP.');
-  // });
-
-  // test('if you have less HP than the enemy', () => {
-  //   effect.if = {
-  //     type: 'playerValue',
-  //     target: 'self',
-  //     name: 'health',
-  //     comparison: '<',
-  //     compareTo: { type: 'opponent' },
-  //   };
-
-  //   expect(render(card)).toBe('Deal 1 damage if you have less HP than the enemy.');
-  // });
 });
 
 // it('renders repeat', () => {
-//   card.repeat = {
-//     value: 1,
-//     multiplyBy: {
-//       type: 'playerValue',
-//       target: 'opponent',
-//       name: 'bleed',
-//     },
-//   };
-//   expect(render(card)).toBe('Deal 1 damage. Repeat for each bleed the enemy has.');
+//   card.repeat = { value: v('opponent', 'bleed') };
+//   expect(render(card)).toBe('Deal 1 damage. Repeats for each bleed the enemy has.');
 // });

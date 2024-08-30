@@ -1,8 +1,15 @@
 import { Target, PlayerValueName } from '../../gameState/gameState';
 import { assert, assertType } from '../../utils';
-import { CardEffectName, CardEffect, CardState } from '../../gameState/actions/playCardV2';
+import {
+  CardEffectName,
+  CardEffect,
+  CardState,
+  ValueDescriptor,
+  Repeat,
+  BasicValueDescriptor,
+  PlayerValueDescriptor,
+} from '../../gameState/actions/playCardV2';
 import { assertIsNonNullable, unreachable } from '../../utils/asserts';
-import { ValueDescriptor } from '../../gameState/actions/playCardV2';
 
 // Deal 1 damage. Repeat for each bleed the enemy has.
 
@@ -147,29 +154,33 @@ import { ValueDescriptor } from '../../gameState/actions/playCardV2';
 // BAD: confusing, do not support
 // Deal 3 damage and gain 2 strength if you have full HP.
 
-interface TranslateOverrides {
-  name?: CardEffectName | PlayerValueName;
-  target?: Target;
-  value?: ValueDescriptor;
+// helper function to get a particular translation function, supports currying
+function translate(subject: CardEffect | ValueDescriptor | Repeat): (text: string) => string;
+function translate(subject: CardEffect | ValueDescriptor | Repeat, text: string): string;
+function translate(effect: CardEffect | ValueDescriptor | Repeat, text?: string) {
+  const t = (text: string) => translate(effect, text);
+  if (text == null) return t;
 }
 
-function getTranslateFn(effect: CardEffect, currentValue?: ValueDescriptor) {
-  const overrides: TranslateOverrides = {
-    value: currentValue,
-  };
-  if (currentValue?.type === 'playerValue') {
-    overrides.name = currentValue.name;
-    overrides.target = currentValue.target;
+function translateCardEffect(effect: CardEffect, text: string): string {
+  const t = (text: string) => translate(effect, text);
+
+  switch (text) {
+    case `Deal damage equal to your bleed`:
+      switch (effect.value.type) {
+        case 'playerValue':
+          return `${t(`Deal damage`)} ${t(`equal to your bleed`)}`;
+        case 'basicValue':
+          return t(`Deal 3 damage`);
+      }
   }
-  return (text: string) => translate(effect, text, overrides);
+
+  throw new Error(`cannot translate text: ${text}`);
 }
 
-function translate(effect: CardEffect, text: string, overrides: TranslateOverrides = {}): string {
-  const t = (text: string) => translate(effect, text, overrides);
-
-  const name = overrides.name ?? effect.name;
-  const target = overrides.target ?? effect.target;
-  const value = overrides.value ?? effect.value;
+function translate(effect: CardEffect | ValueDescriptor | Repeat, text?: string) {
+  const t = (text: string) => translate(effect, text);
+  if (text == null) return t;
 
   switch (text) {
     case `Deal damage equal to your bleed`:
@@ -210,9 +221,10 @@ function translate(effect: CardEffect, text: string, overrides: TranslateOverrid
       assertType(value, 'basicValue' as const);
       return value.value === 1 ? 'card' : 'cards';
 
-    case `equal to your bleed`:
+    case `equal to your bleed`: {
       const tm = getTranslateFn(effect, effect.value);
       return `equal to ${t('twice')} ${tm('your bleed')}`;
+    }
 
     case `twice`:
       assertType(value, 'playerValue' as const);
@@ -242,7 +254,7 @@ function translate(effect: CardEffect, text: string, overrides: TranslateOverrid
       }
       return `${t(`your`)} ${t('bleed')}`;
 
-    case `if the enemy has more than X bleed`:
+    case `if the enemy has more than X bleed`: {
       if (!effect.if) return '';
       // not supported yet
       assert(effect.if.value.multiplier == null);
@@ -258,8 +270,9 @@ function translate(effect: CardEffect, text: string, overrides: TranslateOverrid
         default:
           return `if ${tv('you have')} ${t('more than 3')} ${tv('bleed')}`;
       }
+    }
 
-    case `more than 3`:
+    case `more than 3`: {
       assertIsNonNullable(effect.if);
       const { comparison, value2 } = effect.if;
       const isCheckingExistence =
@@ -270,6 +283,7 @@ function translate(effect: CardEffect, text: string, overrides: TranslateOverrid
       }
       const tv2 = getTranslateFn(effect, effect.if.value2);
       return `${t('more than')} ${tv2(`3`)}`;
+    }
 
     case `more than`:
       switch (effect.if?.comparison) {
@@ -289,7 +303,7 @@ function translate(effect: CardEffect, text: string, overrides: TranslateOverrid
     case `Enemy trashes`:
       return target === 'self' ? `You trash` : `Enemy trashes`;
 
-    case `Deal`:
+    case `Deal`: {
       if (effect.name === 'damage') {
         return target === 'self' ? 'Take' : 'Deal';
       }
@@ -302,6 +316,7 @@ function translate(effect: CardEffect, text: string, overrides: TranslateOverrid
         return 'Enemy gains';
       }
       return 'Apply';
+    }
 
     case `you've`:
       return target === 'self' ? `you've` : `the enemy has`;
@@ -345,5 +360,9 @@ function fixSpacing(text: string): string {
 }
 
 export default function getCardText(card: CardState): string[] {
+  // const text = [
+  //   ...card.effects.map(getCardEffectText),
+  //   getRepeatText(card),
+  // ]
   return card.effects.map(getCardEffectText).map(fixSpacing);
 }

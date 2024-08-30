@@ -67,7 +67,7 @@ export function getValueDescriptor(
   return { type: 'playerValue', target: valueOrTarget, name, multiplier };
 }
 
-const BLEED_DAMAGE = 3;
+export const BLEED_DAMAGE = 3;
 
 export default function playCard(
   card: CardState,
@@ -75,9 +75,16 @@ export default function playCard(
 ) {
   const events: AnimationEvent[] = [];
 
-  card.effects.forEach((effect) => {
-    applyCardEffect(effect, { self, opponent, events });
-  });
+  let activations = 1;
+  if (card.repeat) {
+    activations += evaluateRepeat(card.repeat, { self, opponent, events });
+  }
+
+  for (let i = 0; i < activations; i++) {
+    card.effects.forEach((effect) => {
+      applyCardEffect(effect, { self, opponent, events });
+    });
+  }
 
   return events;
 }
@@ -88,15 +95,16 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitC
     if (!success) return;
   }
 
-  const value = getDescribedValue(effect.value, context);
+  const value = getValue(effect.value, context);
 
   switch (effect.name) {
-    case 'damage':
+    case 'damage': {
       const dodgedDamage = dodgeDamage(effect, context);
       if (!dodgedDamage) {
         dealDamage(value, effect.target, context);
       }
       break;
+    }
 
     case 'heal':
       applyHeal(value, effect.target, context);
@@ -118,19 +126,28 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitC
 }
 
 function evaluateIf(ifStatement: If, context: PlayCardContext) {
-  const value1 = getDescribedValue(ifStatement.value, context);
-  const value2 = getDescribedValue(ifStatement.value2, context);
+  const value1 = getValue(ifStatement.value, context);
+  const value2 = getValue(ifStatement.value2, context);
   return compareValues(value1, ifStatement.comparison, value2);
 }
 
-function getDescribedValue(descriptor: ValueDescriptor, context: PlayCardContext): number {
+function evaluateRepeat(repeat: Repeat, context: PlayCardContext): number {
+  if (repeat.if) {
+    const success = evaluateIf(repeat.if, context);
+    if (!success) return 0;
+  }
+  return getValue(repeat.value, context);
+}
+
+function getValue(descriptor: ValueDescriptor, context: PlayCardContext): number {
   switch (descriptor.type) {
     case 'basicValue':
       return descriptor.value;
 
-    case 'playerValue':
+    case 'playerValue': {
       const multiplier = descriptor.multiplier ?? 1;
       return getPlayerValue(descriptor, context) * multiplier;
+    }
   }
 }
 

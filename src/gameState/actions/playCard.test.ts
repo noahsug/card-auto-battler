@@ -1,7 +1,12 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import { createInitialGameState, PlayerState } from '../index';
-import playCard, { CardEffect, CardState, getValueDescriptor as v } from './playCardV2';
+import playCard, {
+  BLEED_DAMAGE,
+  CardEffect,
+  CardState,
+  getValueDescriptor as v,
+} from './playCardV2';
 import { diffValues } from '../../utils';
 
 const STARTER_CARD: CardState = {
@@ -59,7 +64,7 @@ describe('damage', () => {
   it('triggers bleed', () => {
     const { diff } = getPlayCardResult({ opponent: { bleed: 1 } });
 
-    expect(diff).toEqual({ opponent: { health: -4, bleed: -1 } });
+    expect(diff).toEqual({ opponent: { health: -1 - BLEED_DAMAGE, bleed: -1 } });
   });
 });
 
@@ -224,6 +229,34 @@ describe('multi-hit', () => {
   it('deals damage twice', () => {
     const { diff } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
 
-    expect(diff).toEqual({ opponent: { health: -12, bleed: -2 } });
+    expect(diff).toEqual({ opponent: { health: -6 - BLEED_DAMAGE * 2, bleed: -2 } });
+  });
+});
+
+describe('repeat', () => {
+  beforeEach(() => {
+    card.repeat = {
+      value: v('opponent', 'bleed'),
+    };
+  });
+
+  it('repeats effect for each opponent bleed', () => {
+    const { diff } = getPlayCardResult({ opponent: { bleed: 2 } });
+
+    // runs 3 times total (1 initial + 2 repeats for the 2 opponent bleed)
+    expect(diff).toEqual({ opponent: { health: -3 - BLEED_DAMAGE * 2, bleed: -2 } });
+  });
+
+  it(`doesn't repeat when the if statement returns false`, () => {
+    card.repeat!.if = {
+      value: v('opponent', 'bleed'),
+      comparison: '=',
+      value2: v(1),
+    };
+
+    const { diff } = getPlayCardResult({ opponent: { bleed: 2 } });
+
+    // note that the if statement is evaluated before the effect is done
+    expect(diff).toEqual({ opponent: { health: -1 - BLEED_DAMAGE, bleed: -1 } });
   });
 });
