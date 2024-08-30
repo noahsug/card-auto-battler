@@ -1,7 +1,11 @@
 import getCardText from './getCardText';
 
-import { CardEffect, CardState, getValueDescriptor as v } from '../../gameState/actions/playCardV2';
-import { PlayerValueDescriptor } from '../../gameState/actions/playCardV2';
+import {
+  CardEffect,
+  CardState,
+  getValueDescriptor as v,
+  PlayerValueDescriptor,
+} from '../../gameState/actions/playCardV2';
 
 // Deal 1 damage 3 times.
 // Rally: Each hit deals 2 extra damage.

@@ -1,4 +1,96 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`card text > renders appliesStrengthTwiceCard 1`] = `"appliesStrengthTwice3⚔️+1⚔️ for every self 💪"`;
+
+exports[`card text > renders bleedCard 1`] = `"bleed3🩸"`;
+
+exports[`card text > renders bleedMoreCard 1`] = `"bleedMore2🩸+4🩸 if opponent 🩸 > 0"`;
+
+exports[`card text > renders bleedStarterCard 1`] = `"bleedStarter2🩸"`;
+
+exports[`card text > renders bleedTrashCard 1`] = `"bleedTrash4🩸trash this card"`;
+
+exports[`card text > renders bothBleedCard 1`] = `"bothBleed4🩸4🩸to self"`;
+
+exports[`card text > renders damageCard 1`] = `"damage5⚔️"`;
+
+exports[`card text > renders damageForEachBleedCard 1`] = `"damageForEachBleed2⚔️for every opponent 🩸"`;
+
+exports[`card text > renders damageForEachCard 1`] = `"damageForEach-3⚔️+1⚔️ for every self cards in decktrash this card"`;
+
+exports[`card text > renders damageForEachCardPlayedCard 1`] = `"damageForEachCardPlayed3⚔️2⚔️for every self cards played this turn"`;
+
+exports[`card text > renders damageForEachMissingHealthCard 1`] = `"damageForEachMissingHealth13⚔️+-1⚔️ for every 2 self health"`;
+
+exports[`card text > renders damageForEachTrashedCard 1`] = `"damageForEachTrashed3⚔️+1⚔️ for every opponent trashed cards+1⚔️ for every self trashed cards"`;
+
+exports[`card text > renders damageSelfIfMissCard 1`] = `"damageSelfIfMiss7⚔️4⚔️to selfif hits = 0"`;
+
+exports[`card text > renders damageStarterCard 1`] = `"damageStarter3⚔️"`;
+
+exports[`card text > renders dodgeAndTrashCard 1`] = `"dodgeAndTrash1 trash2💨to selftrash this card1 trash2💨"`;
+
+exports[`card text > renders dodgeStarterCard 1`] = `"dodgeStarter1💨to self"`;
+
+exports[`card text > renders doubleDodgeIfLowHealthCard 1`] = `"doubleDodgeIfLowHealth1💨+1💨 to self if self health <= 50% self max health"`;
+
+exports[`card text > renders extraCardIfHighDamageCard 1`] = `"extraCardIfHighDamage3⚔️+1🃏, +1💨 to self if damage dealt >= 7"`;
+
+exports[`card text > renders extraCardIfHighHealthCard 1`] = `"extraCardIfHighHealth3❤️to self+2🃏 to self if self health >= self max health"`;
+
+exports[`card text > renders extraPlayCard 1`] = `"extraPlay2⚔️1🃏to self"`;
+
+exports[`card text > renders extraPlayHealCard 1`] = `"extraPlayHeal2❤️1🃏to self"`;
+
+exports[`card text > renders extraPlayIfBleedCard 1`] = `"extraPlayIfBleed+1🃏 to self if opponent 🩸 > 04⚔️"`;
+
+exports[`card text > renders extraPlayIfExtraPlayCard 1`] = `"extraPlayIfExtraPlay1⚔️1🃏+1🃏 to self if self cards played this turn > 0"`;
+
+exports[`card text > renders extraPlayIfLowHealthCard 1`] = `"extraPlayIfLowHealth4⚔️+3🃏 to self if self health <= 50% self max health"`;
+
+exports[`card text > renders extraPlayStarterCard 1`] = `"extraPlayStarter1⚔️1🃏to self"`;
+
+exports[`card text > renders extraPlaysTrashCard 1`] = `"extraPlaysTrash2🃏to selftrash this card"`;
+
+exports[`card text > renders gainStrengthForBleedCard 1`] = `"gainStrengthForBleed+1💪 to self for every opponent 🩸1🩸"`;
+
+exports[`card text > renders healAndTrashOpponentCard 1`] = `"healAndTrashOpponent5❤️2 trash"`;
+
+exports[`card text > renders healCard 1`] = `"heal7❤️to self"`;
+
+exports[`card text > renders healForEachTrashedCard 1`] = `"healForEachTrashed4❤️+1❤️ to self for every opponent trashed cards+1❤️ to self for every self trashed cards"`;
+
+exports[`card text > renders healStarterCard 1`] = `"healStarter4❤️to self"`;
+
+exports[`card text > renders lifestealCard 1`] = `"lifesteal3⚔️+1❤️ to self for every damage dealt"`;
+
+exports[`card text > renders multihitCard 1`] = `"multihit1⚔️3x times"`;
+
+exports[`card text > renders multihitStarterCard 1`] = `"multihitStarter1⚔️2x times"`;
+
+exports[`card text > renders selfDamageCard 1`] = `"selfDamage7⚔️4⚔️to selfif self health > 50% self max health"`;
+
+exports[`card text > renders setHealthToHalfCard 1`] = `"setHealthToHalf1🃏+1⚔️ to self for every self health+1❤️ to self for every 2 self max health"`;
+
+exports[`card text > renders stabCard 1`] = `"stab3⚔️3🩸if hits > 0"`;
+
+exports[`card text > renders strengthCard 1`] = `"strength2💪to self"`;
+
+exports[`card text > renders strengthStarterCard 1`] = `"strengthStarter1💪to self"`;
+
+exports[`card text > renders strengthTrashCard 1`] = `"strengthTrash3💪to selftrash this card"`;
+
+exports[`card text > renders trashAndExtraPlayCard 1`] = `"trashAndExtraPlay1 trash2🃏to self"`;
+
+exports[`card text > renders trashAndTrashSelfCard 1`] = `"trashAndTrashSelf2 trashtrash this card"`;
+
+exports[`card text > renders trashCard 1`] = `"trash1 trash"`;
+
+exports[`card text > renders trashForOpponentHealthCard 1`] = `"trashForOpponentHealth+1 trash for every 7 opponent health"`;
+
+exports[`card text > renders tripleBleedCard 1`] = `"tripleBleed+2🩸, trash this card for every opponent 🩸"`;
+
+exports[`card text > renders tripleStrengthCard 1`] = `"tripleStrength+2💪, trash this card to self for every self 💪"`;
 
 exports[`card text renders appliesStrengthTwiceCard 1`] = `"appliesStrengthTwice3⚔️+1⚔️ for every self 💪"`;
 
