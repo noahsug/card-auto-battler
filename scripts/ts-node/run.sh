@@ -2,5 +2,5 @@
 
 node \
   --unhandled-rejections=strict \
-  -r ./scripts/ts-node/register \
+  -r ./scripts/ts-node/register.cjs \
   "$@"

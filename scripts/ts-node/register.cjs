@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+
 require('ts-node').register({
   project: 'scripts/ts-node/tsconfig.json',
   transpileOnly: true,
