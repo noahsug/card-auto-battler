@@ -9,7 +9,7 @@ import {
   PlayerValueDescriptor,
   If,
 } from '../../gameState/actions/playCardV2';
-import { assertIsNonNullable, unreachable } from '../../utils/asserts';
+import { unreachable } from '../../utils/asserts';
 
 // Deal 1 damage. Repeat for each bleed the enemy has.
 
@@ -163,13 +163,13 @@ function translate(subject: TranslateSubject, text?: string): string | ((text: s
   // curry subject
   if (text == null) return (text: string) => translate(subject, text);
 
-  const translation = getTranslationOrNull(subject, text);
+  const translation = getTranslationForSubject(subject, text);
   if (translation != null) return translation;
 
   throw new Error(`cannot translate "${text}" from subject: ${JSON.stringify(subject, null, 2)}`);
 }
 
-function getTranslationOrNull(subject: TranslateSubject, text: string): string | null {
+function getTranslationForSubject(subject: TranslateSubject, text: string): string | undefined {
   // if
   if ('comparison' in subject) {
     const translation = translateIf(subject, text);
@@ -200,6 +200,12 @@ function getTranslationOrNull(subject: TranslateSubject, text: string): string |
     if (translation != null) return translation;
   }
 
+  // repeat
+  if (hasValue && typeof subject.value === 'object') {
+    const translation = translateRepeat(subject as Repeat, text);
+    if (translation != null) return translation;
+  }
+
   // target
   if (hasTarget) {
     const translation = translateTarget(subject.target, text);
@@ -208,17 +214,15 @@ function getTranslationOrNull(subject: TranslateSubject, text: string): string |
 
   // subject.value
   if (hasValue && typeof subject.value === 'object') {
-    const translation = getTranslationOrNull(subject.value, text);
+    const translation = getTranslationForSubject(subject.value, text);
     if (translation != null) return translation;
   }
 
   // subject.if
   if ('if' in subject && subject.if) {
-    const translation = getTranslationOrNull(subject.if, text);
+    const translation = getTranslationForSubject(subject.if, text);
     if (translation != null) return translation;
   }
-
-  return null;
 }
 
 function translateTarget(target: Target, text: string) {
@@ -232,8 +236,6 @@ function translateTarget(target: Target, text: string) {
     case `your`:
       return target === 'self' ? `your` : `the enemy's`;
   }
-
-  return null;
 }
 
 function translateBasicValue({ value }: BasicValueDescriptor, text: string) {
@@ -244,12 +246,14 @@ function translateBasicValue({ value }: BasicValueDescriptor, text: string) {
     case '3':
       return String(value);
   }
-
-  return null;
 }
 
 function translatePlayerValue(playerValue: PlayerValueDescriptor, text: string) {
   const t = translate(playerValue);
+
+  // not supported yet
+  assert(playerValue.name != 'currentCardIndex');
+  assert(playerValue.name != 'startingHealth');
 
   switch (text) {
     case `your bleed`:
@@ -282,8 +286,6 @@ function translatePlayerValue(playerValue: PlayerValueDescriptor, text: string) 
           return `1/${1 / playerValue.multiplier}`;
       }
   }
-
-  return null;
 }
 
 function translateIf(ifStatement: If, text: string) {
@@ -291,6 +293,9 @@ function translateIf(ifStatement: If, text: string) {
 
   switch (text) {
     case `if the enemy has more than 3 bleed`: {
+      // not supported yet
+      assert(ifStatement.value.multiplier == null);
+
       switch (ifStatement.value.name) {
         case 'trashedCards':
           return `if ${t(`you've`)} trashed ${t('more than 3')} cards`;
@@ -330,8 +335,6 @@ function translateIf(ifStatement: If, text: string) {
       }
       unreachable();
   }
-
-  return null;
 }
 
 function translateCardEffect(effect: CardEffect, text: string) {
@@ -402,14 +405,28 @@ function translateCardEffect(effect: CardEffect, text: string) {
       if (effect.multiHit == null || effect.multiHit === 1) return '';
       return `${effect.multiHit} times`;
   }
+}
 
-  return null;
+function translateRepeat(repeat: Repeat, text: string) {
+  const t = translate(repeat);
+
+  switch (text) {
+    case `Repeat for each bleed you have`:
+      // not supported yet
+      assertType(repeat.value, 'playerValue' as const);
+      assert(repeat.value.multiplier == null);
+      assert(repeat.value.name != 'cardsPlayedThisTurn');
+      assert(repeat.value.name != 'currentCardIndex');
+      assert(repeat.value.name != 'extraCardPlays');
+      assert(repeat.value.name != 'startingHealth');
+      assert(repeat.value.name != 'trashedCards');
+
+      return `Repeat for each ${t('bleed')} ${t('you have')}`;
+  }
 }
 
 function getCardEffectText(effect: CardEffect): string {
   const t = translate(effect);
-
-  const xTimes = effect.multiHit ? t(`3 times`) : '';
 
   return [
     t(`Deal damage equal to your bleed`),
@@ -422,9 +439,9 @@ function getRepeatText(repeat: Repeat): string {
   const t = translate(repeat);
 
   return [
-    t(`Repeat for each bleed the enemy has`),
+    t(`Repeat for each bleed you have`),
     repeat.if ? t(`if the enemy has more than 3 bleed`) : '',
-  ].join();
+  ].join(' ');
 }
 
 // Remove extra spaces
