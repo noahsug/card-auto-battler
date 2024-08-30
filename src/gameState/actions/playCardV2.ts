@@ -9,19 +9,19 @@ export interface BasicValueDescriptor {
   value: number;
 }
 
-interface PlayerValueDescriptor {
+export interface PlayerValueDescriptor {
   type: 'playerValue';
   target: Target;
   name: PlayerValueName;
   multiplier?: number;
 }
 
-type ValueDescriptor = BasicValueDescriptor | PlayerValueDescriptor;
+export type ValueDescriptor = BasicValueDescriptor | PlayerValueDescriptor;
 
 export interface If {
-  value: ValueDescriptor;
+  value: PlayerValueDescriptor;
   comparison: '>' | '<' | '=' | '<=' | '>=';
-  value2: ValueDescriptor;
+  value2: BasicValueDescriptor;
 }
 
 export interface CardEffect {

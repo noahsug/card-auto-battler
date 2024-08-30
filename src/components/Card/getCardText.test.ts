@@ -1,10 +1,7 @@
 import getCardText from './getCardText';
 
-import {
-  CardEffect,
-  CardState,
-  getValueDescriptor as vd,
-} from '../../gameState/actions/playCardV2';
+import { CardEffect, CardState, getValueDescriptor as v } from '../../gameState/actions/playCardV2';
+import { PlayerValueDescriptor } from '../../gameState/actions/playCardV2';
 
 // Deal 1 damage 3 times.
 // Rally: Each hit deals 2 extra damage.
@@ -107,14 +104,14 @@ beforeEach(() => {
   effect = {
     target: 'opponent',
     name: 'damage',
-    value: vd(1),
+    value: v(1),
   } as CardEffect;
 
   card = { effects: [effect] };
 });
 
 it('renders damage', () => {
-  effect.value = vd(3);
+  effect.value = v(3);
   expect(render(card)).toBe('Deal 3 damage.');
 
   effect.target = 'self';
@@ -125,7 +122,7 @@ it('renders multiple effects', () => {
   card.effects.push({
     target: 'self',
     name: 'damage',
-    value: 1,
+    value: v(1),
   });
   expect(render(card)).toBe('Deal 1 damage. Take 1 damage.');
 });
@@ -167,7 +164,7 @@ describe('renders play extra cards', () => {
   });
 
   test('play multiple extra cards', () => {
-    effect.value = 3;
+    effect.value = v(3);
     expect(render(card)).toBe('Enemy plays 3 extra cards next turn.');
 
     effect.target = 'self';
@@ -207,19 +204,15 @@ it('renders multi-hits', () => {
 //   });
 // });
 
-describe('renders multiply by', () => {
+describe('renders effect based on player value', () => {
   beforeEach(() => {
-    effect.multiplyBy = {
-      type: 'playerValue',
-      target: 'opponent',
-      name: 'bleed',
-    };
+    effect.value = v('opponent', 'bleed');
   });
 
   test('equal to bleed', () => {
     expect(render(card)).toBe(`Deal damage equal to the enemy's bleed.`);
 
-    effect.multiplyBy!.target = 'self';
+    effect.value = v('self', 'bleed');
     expect(render(card)).toBe(`Deal damage equal to your bleed.`);
   });
 
@@ -229,34 +222,35 @@ describe('renders multiply by', () => {
   });
 
   test('equal to multiples of bleed', () => {
-    effect.value = 2;
+    const playerValue = effect.value as PlayerValueDescriptor;
+    playerValue.multiplier = 2;
     expect(render(card)).toBe(`Deal damage equal to twice the enemy's bleed.`);
 
-    effect.value = 3;
+    playerValue.multiplier = 3;
     expect(render(card)).toBe(`Deal damage equal to 3 times the enemy's bleed.`);
 
-    effect.value = 0.5;
+    playerValue.multiplier = 0.5;
     expect(render(card)).toBe(`Deal damage equal to half the enemy's bleed.`);
 
-    effect.value = 0.25;
+    playerValue.multiplier = 0.25;
     expect(render(card)).toBe(`Deal damage equal to 1/4 the enemy's bleed.`);
   });
 
   test('equal to cards played', () => {
-    effect.multiplyBy!.name = 'cardsPlayedThisTurn';
+    effect.value = v('opponent', 'cardsPlayedThisTurn');
     expect(render(card)).toBe(
       `Deal damage equal to the number of cards the enemy has played this turn.`,
     );
 
-    effect.multiplyBy!.target = 'self';
+    effect.value = v('self', 'cardsPlayedThisTurn');
     expect(render(card)).toBe(`Deal damage equal to the number of cards you've played this turn.`);
   });
 
   test('equal to cards trashed', () => {
-    effect.multiplyBy!.name = 'trashedCards';
+    effect.value = v('opponent', 'trashedCards');
     expect(render(card)).toBe(`Deal damage equal to the number of cards the enemy has trashed.`);
 
-    effect.multiplyBy!.target = 'self';
+    effect.value = v('self', 'trashedCards');
     expect(render(card)).toBe(`Deal damage equal to the number of cards you've trashed.`);
   });
 
@@ -266,55 +260,45 @@ describe('renders multiply by', () => {
 describe('renders if statements', () => {
   test('if the enemy has dodge', () => {
     effect.if = {
-      type: 'playerValue',
-      target: 'opponent',
-      name: 'dodge',
+      value: v('opponent', 'dodge'),
       comparison: '>',
-      compareTo: { type: 'basicValue', value: 0 },
+      value2: v(0),
     };
     expect(render(card)).toBe('Deal 1 damage if the enemy has dodge.');
   });
 
   test('if you have 3 bleed', () => {
     effect.if = {
-      type: 'playerValue',
-      target: 'self',
-      name: 'bleed',
+      value: v('self', 'bleed'),
       comparison: '=',
-      compareTo: { type: 'basicValue', value: 3 },
+      value2: v(3),
     };
     expect(render(card)).toBe('Deal 1 damage if you have 3 bleed.');
   });
 
   test('if you have played more than 2 cards this turn', () => {
     effect.if = {
-      type: 'playerValue',
-      target: 'self',
-      name: 'cardsPlayedThisTurn',
+      value: v('self', 'cardsPlayedThisTurn'),
       comparison: '>',
-      compareTo: { type: 'basicValue', value: 2 },
+      value2: v(2),
     };
     expect(render(card)).toBe(`Deal 1 damage if you've played more than 2 cards this turn.`);
   });
 
   test('if the enemy has trashed at least 2 cards', () => {
     effect.if = {
-      type: 'playerValue',
-      target: 'opponent',
-      name: 'trashedCards',
+      value: v('opponent', 'trashedCards'),
       comparison: '>=',
-      compareTo: { type: 'basicValue', value: 2 },
+      value2: v(2),
     };
     expect(render(card)).toBe(`Deal 1 damage if the enemy has trashed at least 2 cards.`);
   });
 
   test('if you have less than 10 HP', () => {
     effect.if = {
-      type: 'playerValue',
-      target: 'self',
-      name: 'health',
+      value: v('self', 'health'),
       comparison: '<',
-      compareTo: { type: 'basicValue', value: 10 },
+      value2: v(10),
     };
     expect(render(card)).toBe('Deal 1 damage if you have less than 10 HP.');
   });
