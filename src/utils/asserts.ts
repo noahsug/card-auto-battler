@@ -22,8 +22,3 @@ export function assertType<T, R extends T>(
     throw new Error(`expected type ${type}, got ${object?.type}`);
   }
 }
-
-// TODO: remove in favor of satisfies never
-export function unreachable(): never {
-  throw new Error('unreachable');
-}

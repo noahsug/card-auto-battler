@@ -9,7 +9,6 @@ import {
   PlayerValueDescriptor,
   If,
 } from '../../gameState/actions/playCardV2';
-import { unreachable } from '../../utils/asserts';
 
 // Deal 1 damage. Repeat for each bleed the enemy has.
 
@@ -333,7 +332,7 @@ function translateIf(ifStatement: If, text: string) {
         case '>=':
           return 'at least';
       }
-      unreachable();
+      return ifStatement.comparison satisfies never;
   }
 }
 
@@ -348,8 +347,7 @@ function translateCardEffect(effect: CardEffect, text: string) {
         case 'basicValue':
           return t(`Deal 3 damage`);
       }
-      // TODO: effect.value.type satisfies never
-      return unreachable();
+      return effect.value satisfies never;
 
     case `Deal damage`:
       if (effect.name === 'trash') {
