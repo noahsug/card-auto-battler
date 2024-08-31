@@ -41,3 +41,11 @@ export type Require<T, Key extends keyof T> = Omit<T, Key> & { [P in Key]-?: T[P
 export type MakeOptional<T, Key extends keyof T> = Omit<T, Key> & { [P in Key]?: T[P] };
 
 export type ExtendUnion<T, U> = T extends unknown ? U & T : never;
+
+/**
+ * Returns all keys on a union type.
+ *
+ * Usage:
+ *   KeysOfUnion<{ a: 1 } | { b: 2 }> => 'a' | 'b'
+ */
+export type KeysOfUnion<T> = T extends T ? keyof T : never;
