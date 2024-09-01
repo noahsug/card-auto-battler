@@ -156,6 +156,8 @@ import { KeysOfUnion } from '../../utils/types';
 
 type Translations = { [key: string]: () => string };
 
+// note: We need getTranslationsList to be a function (rather that simply passing in the
+// translations list) to avoid an infinite loop.
 function getTranslationFn<T extends Translations>(getTranslationsList: () => T[]) {
   return (text: KeysOfUnion<T>): string => {
     const translations = getTranslationsList().find((t) => text in t);
