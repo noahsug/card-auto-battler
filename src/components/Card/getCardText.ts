@@ -399,7 +399,7 @@ function getRepeatTranslations(repeat: Repeat): Translations {
   const t = getTranslationFn(() => getNestedRepeatTranslations(repeat));
 
   // not supported yet
-  assertType(repeat.value, 'playerValue' as const);
+  assertType(repeat.value, 'playerValue');
   assert(repeat.value.multiplier == null);
   assert(repeat.value.name != 'cardsPlayedThisTurn');
   assert(repeat.value.name != 'currentCardIndex');
