@@ -14,7 +14,7 @@ export function assert(condition: boolean): asserts condition is true {
 //   const animal = { type: 'dog', bark };
 //   assertType(animal, 'dog' as const);
 //   animal.bark(); // animal is now known to be of type dog
-export function assertType<T, R extends T>(
+export function assertType<const T, R extends T>(
   object: { type: T } | undefined,
   type: R,
 ): asserts object is { type: R } {
