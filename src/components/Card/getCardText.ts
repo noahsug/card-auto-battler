@@ -175,6 +175,165 @@ function getTranslateFn(...getTranslationsFns: (() => Translations)[]) {
   };
 }
 
+function getTranslateEffectFn(effect: CardEffect) {
+  return (text: keyof ReturnType<typeof getEffectTranslations>): string => {
+    const translations = getEffectTranslations(effect);
+    return translations[text]();
+  };
+}
+
+function getTranslateTargetFn(target: Target) {
+  return (text: keyof ReturnType<typeof getTargetTranslations>): string => {
+    const translations = getTargetTranslations(target);
+    return translations[text]();
+  };
+}
+
+function translateEffectAndTarget(effect: CardEffect) {
+  const translateEffect = getTranslateEffectFn(effect);
+  const translateTarget = getTranslateTargetFn(effect.target);
+
+  return (
+    text: Parameters<typeof translateEffect>[0] | Parameters<typeof translateTarget>[0],
+  ): string => {
+    if (text in getEffectTranslations(effect)) {
+      return translateEffect(text as Parameters<typeof translateEffect>[0]);
+    }
+    return translateTarget(text as Parameters<typeof translateTarget>[0]);
+  };
+}
+
+// type EffectText = keyof ReturnType<typeof getEffectTranslations>;
+// type RepeatText = keyof ReturnType<typeof getRepeatTranslations>;
+// type IfText = keyof ReturnType<typeof getIfTranslations>;
+// type PlayerValueText = keyof ReturnType<typeof getPlayerValueTranslations>;
+// type BasicValueText = keyof ReturnType<typeof getBasicValueTranslations>;
+// type ValueText = PlayerValueText | BasicValueText;
+// type TargetText = keyof ReturnType<typeof getTargetTranslations>;
+
+// type TranslatePlayerValueText = PlayerValueText | TargetText;
+// type TranslateIfText = IfText | TranslatePlayerValueText;
+
+type Translations = { [key: string]: () => string };
+
+function getNestedPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
+  return [getPlayerValueTranslations(playerValue), getTargetTranslations(playerValue.target)];
+}
+
+function getNestedValueTranslations(value: ValueDescriptor) {
+  return value.type === 'basicValue'
+    ? [getBasicValueTranslations(value)]
+    : getNestedPlayerValueTranslations(value);
+}
+
+function getNestedIfTranslations(ifStatement: If) {
+  return [
+    getIfTranslations(ifStatement),
+    ...getNestedPlayerValueTranslations(ifStatement.value),
+    getBasicValueTranslations(ifStatement.value2),
+  ];
+}
+
+function getNestedRepeatTranslations(repeat: Repeat) {
+  return [
+    getRepeatTranslations(repeat),
+    ...getNestedValueTranslations(repeat.value),
+    ...(repeat.if ? getNestedIfTranslations(repeat.if) : []),
+  ];
+}
+
+function getNestedEffectTranslations(effect: CardEffect) {
+  return [
+    getEffectTranslations(effect),
+    getTargetTranslations(effect.target),
+    ...getNestedValueTranslations(effect.value),
+    ...(effect.if ? getNestedIfTranslations(effect.if) : []),
+  ];
+}
+
+function getTranslationFn<T extends { [key: string]: () => string }>(getTranslations: () => T[]) {
+  return (text: KeysOfUnion<T>): string => {
+    const translation = getTranslations().find((t) => text in t);
+    if (!translation) throw new Error(`no translation found for "${text as string}"`);
+
+    return translation[text]();
+  };
+}
+
+type GetElementType<T extends any[]> = T extends (infer U)[] ? U : never;
+type NestedValueTranslations = KeysOfUnion<
+  GetElementType<ReturnType<typeof getNestedValueTranslations>>
+>;
+
+// function getNestedIfTranslations(ifStatement: If) {
+//   return [
+//     getIfTranslations(ifStatement),
+//     ...getNestedPlayerValueTranslations(ifStatement.value),
+//     ...getNestedPlayerValueTranslations(ifStatement.value2),
+//   ];
+// }
+
+function getTranslatePlayerValueFn(playerValue: PlayerValueDescriptor) {
+  return (text: TranslatePlayerValueText): string | undefined => {
+    const playerValueTranslations = getPlayerValueTranslations(playerValue);
+    const targetTranslations = getTargetTranslations(playerValue.target);
+    const translateText =
+      playerValueTranslations[text as PlayerValueText] || targetTranslations[text as TargetText];
+    return translateText && translateText();
+  };
+}
+
+function getTranslateBasicValueFn(basicValue: BasicValueDescriptor) {
+  return (text: keyof ReturnType<typeof getBasicValueTranslations>): string => {
+    const basicValueTranslations = getBasicValueTranslations(basicValue);
+    return basicValueTranslations[text]();
+  };
+}
+
+function getTranslateIfFn(ifStatement: If) {
+  return (text: TranslateIfText): string | undefined => {
+    const ifTranslations = getIfTranslations(ifStatement);
+    const translatePlayerValue = getTranslatePlayerValueFn(ifStatement.value);
+    const translateText = ifTranslations[text as IfText];
+    return translateText ? translateText() : translatePlayerValue(text as TranslatePlayerValueText);
+  };
+}
+
+function getTranslateValueFn(
+  value: ValueDescriptor,
+): (
+  text:
+    | Parameters<ReturnType<typeof getTranslateBasicValueFn>>[0]
+    | Parameters<ReturnType<typeof getTranslatePlayerValueFn>>[0],
+) => string {
+  switch (value.type) {
+    case 'basicValue':
+      return getTranslateBasicValueFn(value) as ReturnType<typeof getTranslateValueFn>;
+    case 'playerValue':
+      return getTranslatePlayerValueFn(value) as ReturnType<typeof getTranslateValueFn>;
+  }
+}
+
+function getTranslateEffectFn(effect: CardEffect) {
+  return (
+    text:
+      | keyof ReturnType<typeof getEffectTranslations>
+      | keyof ReturnType<typeof getTranslateValueFn>
+      | keyof ReturnType<typeof getTargetTranslations>,
+  ): string => {
+    const effectTranslations = getEffectTranslations(effect);
+    const valueTranslations = getValueTranslations(effect.value);
+    const targetTranslations = getTargetTranslations(effect.target);
+    if (text in effectTranslations) {
+      return effectTranslations[text as keyof typeof effectTranslations]();
+    }
+    if (text in valueTranslations) {
+      // return getTranslateValueFn(effect.value)(text as );
+    }
+    return targetTranslations[text as keyof typeof targetTranslations]();
+  };
+}
+
 function getTargetTranslations(target: Target) {
   return {
     [`you've`]: () => {
@@ -204,17 +363,14 @@ function getBasicValueTranslations({ value }: BasicValueDescriptor) {
 }
 
 function getPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
-  const t = getTranslateFn(
-    () => getPlayerValueTranslations(playerValue),
-    () => getTargetTranslations(playerValue.target),
-  );
+  const t = getTranslatePlayerValueFn(playerValue);
+
+  // not supported yet
+  assert(playerValue.name != 'currentCardIndex');
+  assert(playerValue.name != 'startingHealth');
 
   return {
     [`your bleed`]: () => {
-      // not supported yet
-      assert(playerValue.name != 'currentCardIndex');
-      assert(playerValue.name != 'startingHealth');
-
       if (playerValue.name === 'trashedCards') {
         return `the number of cards ${t(`you've`)} trashed`;
       }
@@ -260,7 +416,6 @@ function getIfTranslations(ifStatement: If) {
     () => getPlayerValueTranslations(ifStatement.value),
     () => getTargetTranslations(ifStatement.value.target),
   );
-  const t2 = getTranslateFn(() => getBasicValueTranslations(ifStatement.value2));
 
   return {
     [`if the enemy has more than 3 bleed`]: () => {
@@ -287,6 +442,7 @@ function getIfTranslations(ifStatement: If) {
         // (if you have) "" (bleed)
         return '';
       }
+      const t2 = getTranslateFn(() => getBasicValueTranslations(ifStatement.value2));
       return `${t('more than')} ${t2(`3`)}`;
     },
 
@@ -308,12 +464,8 @@ function getIfTranslations(ifStatement: If) {
   };
 }
 
-function getEffectTranslations(effect: CardEffect) {
-  const t = getTranslateFn(
-    () => getEffectTranslations(effect),
-    () => getValueTranslations(effect.value),
-    () => getTargetTranslations(effect.target),
-  );
+function getEffectTranslations(effect: CardEffect): { [key: string]: () => string } {
+  const t = getTranslationFn(() => getNestedEffectTranslations(effect));
 
   return {
     [`Deal damage equal to your bleed`]: () => {
@@ -411,13 +563,12 @@ function getRepeatTranslations(repeat: Repeat) {
 }
 
 function getCardEffectText(effect: CardEffect): string {
-  const t = getTranslateFn(() => getEffectTranslations(effect));
-  const ti = effect.if ? getTranslateFn(() => getIfTranslations(effect.if!)) : () => '';
+  const t = getEffectTranslateFn(effect);
 
   return [
     t(`Deal damage equal to your bleed`),
-    effect.multiHit ? t(`3 times`) : '',
-    effect.if ? ti(`if the enemy has more than 3 bleed`) : '',
+    t(`3 times`),
+    effect.if ? t(`if the enemy has more than 3 bleed`) : '',
   ].join(' ');
 }
 
