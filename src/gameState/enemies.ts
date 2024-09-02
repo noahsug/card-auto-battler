@@ -6,93 +6,93 @@ import {
   millCards,
   trashCards,
   multicardCards,
-  strengthCard,
-  multihitCard,
-  extraPlayCard,
-  gainStrengthForBleedCard,
-  bleedCard,
-  bleedTrashCard,
-  strengthTrashCard,
+  // strengthCard,
+  // multihitCard,
+  // extraPlayCard,
+  // gainStrengthForBleedCard,
+  // bleedCard,
+  // bleedTrashCard,
+  // strengthTrashCard,
   damageForEachBleedCard,
-  extraCardIfHighDamageCard,
-  lifestealCard,
+  // extraCardIfHighDamageCard,
+  // lifestealCard,
   damageCard,
-  healCard,
-  damageForEachCard,
-  damageSelfIfMissCard,
-  trashCard,
-  extraCardIfHighHealthCard,
-  extraPlayHealCard,
-  healForEachTrashedCard,
+  // healCard,
+  // damageForEachCard,
+  // damageSelfIfMissCard,
+  // trashCard,
+  // extraCardIfHighHealthCard,
+  // extraPlayHealCard,
+  // healForEachTrashedCard,
   extraPlayIfLowHealthCard,
-  trashAndExtraPlayCard,
-  selfDamageCard,
-  damageForEachMissingHealthCard,
-  doubleDodgeIfLowHealthCard,
-  extraPlaysTrashCard,
-  extraPlayIfExtraPlayCard,
+  // trashAndExtraPlayCard,
+  // selfDamageCard,
+  // damageForEachMissingHealthCard,
+  // doubleDodgeIfLowHealthCard,
+  // extraPlaysTrashCard,
+  // extraPlayIfExtraPlayCard,
 } from './cards';
 import { getStartingCards, getCardSelectionsForBattle } from './cardSelection';
 import { NUM_CARD_SELECTION_PICKS } from './constants';
 import { CardState, EnemyType } from './gameState';
 
 const generallyGoodCards = [
-  extraPlaysTrashCard,
+  // extraPlaysTrashCard,
   damageCard,
-  extraPlayCard,
-  healCard,
-  damageForEachCard,
-  damageSelfIfMissCard,
-  extraPlayHealCard,
-  trashAndExtraPlayCard,
-  selfDamageCard,
-  damageForEachMissingHealthCard,
-  doubleDodgeIfLowHealthCard,
-  strengthTrashCard,
-  strengthCard,
-  bleedTrashCard,
-  bleedCard,
-  multihitCard,
-  extraPlayIfExtraPlayCard,
+  // extraPlayCard,
+  // healCard,
+  // damageForEachCard,
+  // damageSelfIfMissCard,
+  // extraPlayHealCard,
+  // trashAndExtraPlayCard,
+  // selfDamageCard,
+  // damageForEachMissingHealthCard,
+  // doubleDodgeIfLowHealthCard,
+  // strengthTrashCard,
+  // strengthCard,
+  // bleedTrashCard,
+  // bleedCard,
+  // multihitCard,
+  // extraPlayIfExtraPlayCard,
 ];
 
 const cardPriorityByType = {
   strength: [
-    [...strengthCards, strengthTrashCard, strengthCard, multihitCard], // best
-    [extraPlayCard],
-    [gainStrengthForBleedCard, bleedCard, bleedTrashCard, damageForEachBleedCard],
+    [...strengthCards /*strengthTrashCard, strengthCard, multihitCard*/], // best
+    // [extraPlayCard],
+    [/*gainStrengthForBleedCard, bleedCard, bleedTrashCard, */ damageForEachBleedCard],
     generallyGoodCards,
   ],
   bleed: [
-    [...bleedCards, bleedTrashCard, bleedCard, lifestealCard, multihitCard], // best
-    [extraPlayCard],
-    [strengthCard, strengthTrashCard, extraCardIfHighDamageCard],
+    [...bleedCards /*bleedTrashCard, bleedCard, lifestealCard, multihitCard*/], // best
+    // [extraPlayCard],
+    // [strengthCard, strengthTrashCard, extraCardIfHighDamageCard],
     generallyGoodCards,
   ],
   lowHealth: [
-    [...lowHealthCards, damageSelfIfMissCard], // best
+    [...lowHealthCards /*damageSelfIfMissCard*/], // best
     generallyGoodCards,
   ],
   heal: [
     healCards, // best
-    [healCard, lifestealCard], // good
+    // [healCard, lifestealCard], // good
     generallyGoodCards,
   ],
   mill: [
     millCards, // best
-    [trashCard, healForEachTrashedCard, trashAndExtraPlayCard], // good
-    [healCard, extraPlayHealCard, extraCardIfHighHealthCard], // okay
-    [extraPlayCard], // neutral
-    [doubleDodgeIfLowHealthCard, extraPlayIfLowHealthCard, damageForEachMissingHealthCard], // bad but occasionally helpful
+    // [trashCard, healForEachTrashedCard, trashAndExtraPlayCard], // good
+    // [healCard, extraPlayHealCard, extraCardIfHighHealthCard], // okay
+    // [extraPlayCard], // neutral
+    [/*doubleDodgeIfLowHealthCard,*/ extraPlayIfLowHealthCard /*damageForEachMissingHealthCard*/], // bad but occasionally helpful
   ],
   trash: [
-    [...trashCards, extraPlaysTrashCard], // best
-    [trashCard, ...millCards], // good
+    [...trashCards /*extraPlaysTrashCard*/], // best
+    [/*trashCard,*/ ...millCards], // good
     generallyGoodCards,
   ],
   multicard: [
     multicardCards, // best
-    [extraPlayCard], // good
+    // [extraPlayCard], // good
     [extraPlayIfLowHealthCard], // okay
     generallyGoodCards,
   ],
@@ -121,7 +121,7 @@ export function pickEnemyCards(enemyType: EnemyType) {
   const selectedCards: CardState[] = [];
 
   const cardPriority = cardPriorityByType[enemyType];
-  cardPriority.find((priorityCards, i) => {
+  cardPriority.find((priorityCards) => {
     return priorityCards.find((priorityCard) => {
       if (cardOptionsSet.has(priorityCard)) {
         // iterate through each priority card since there may be duplicates

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import CardCollectionScreen from './CardCollectionScreen';
 import GameStartScreen from './GameStartScreen';

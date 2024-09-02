@@ -3,7 +3,8 @@
 module.exports = {
   extends: [
     'eslint:recommended',
-    'plugin:react/recommended',
+    // TODO: uncomment and figure out what to do about the "React must be required with jsx" errors
+    // 'plugin:react/recommended',
     'plugin:import/recommended',
     'plugin:jsx-a11y/recommended',
     'plugin:@typescript-eslint/recommended',
