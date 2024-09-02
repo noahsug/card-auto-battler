@@ -326,3 +326,29 @@ it('renders add', () => {
   };
   expect(render(card)).toBe('Deal 1 damage. Deals 3 extra damage if the enemy has bleed.');
 });
+
+it('renders multiply', () => {
+  const basicValue = v(2);
+  effect.multiply = {
+    value: basicValue,
+    if: {
+      value: v('opponent', 'bleed'),
+      comparison: '>',
+      value2: v(0),
+    },
+  };
+
+  expect(render(card)).toBe('Deal 1 damage. Deals double damage if the enemy has bleed.');
+
+  basicValue.value = 3;
+  expect(render(card)).toBe('Deal 1 damage. Deals triple damage if the enemy has bleed.');
+
+  basicValue.value = 4;
+  expect(render(card)).toBe('Deal 1 damage. Deals quadruple damage if the enemy has bleed.');
+
+  basicValue.value = 0.5;
+  expect(render(card)).toBe('Deal 1 damage. Deals 50% damage if the enemy has bleed.');
+
+  basicValue.value = 1.5;
+  expect(render(card)).toBe('Deal 1 damage. Deals 150% damage if the enemy has bleed.');
+});

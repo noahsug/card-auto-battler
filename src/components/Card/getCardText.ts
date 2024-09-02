@@ -1,5 +1,5 @@
 import { Target } from '../../gameState/gameState';
-import { assert, assertType } from '../../utils';
+import { assert, assertIsNonNullable, assertType } from '../../utils';
 import {
   CardEffect,
   CardState,
@@ -366,9 +366,20 @@ function getEffectTranslations(effect: CardEffect) {
 
       // not supported
       assert(effect.name === 'damage');
+      assert(add.value.value > 0);
 
       const tv = getTranslationFn(() => [getBasicValueTranslations(add.value)]);
       return `Deals ${tv('3')} extra ${t(`damage`)}`;
+    },
+
+    ['Deals double damage']: (): string => {
+      const { multiply } = effect;
+      if (multiply == null) return '';
+
+      // not supported
+      assert(effect.name === 'damage');
+
+      return `Deals ${t('double')} ${t(`damage`)}`;
     },
 
     ['Enemy plays 3 extra cards next turn']: (): string => {
@@ -409,6 +420,24 @@ function getEffectTranslations(effect: CardEffect) {
       if (effect.multiHit == null || effect.multiHit === 1) return '';
       return `${effect.multiHit} times`;
     },
+
+    ['double']: () => {
+      const basicValue = effect.multiply?.value;
+      assertIsNonNullable(basicValue);
+
+      switch (basicValue.value) {
+        case 2:
+          return 'double';
+        case 3:
+          return 'triple';
+        case 4:
+          return 'quadruple';
+        default: {
+          const percent = (basicValue.value * 100).toFixed(0);
+          return `${percent}%`;
+        }
+      }
+    },
   };
 }
 
@@ -442,7 +471,10 @@ function getCardEffectText(effect: CardEffect) {
   const ta = getTranslationFn(() => getNestedIfTranslations(effect.add?.if));
   const addText = `${t('Deals 3 extra damage')} ${ta('if the enemy has more than 3 bleed')}`;
 
-  return [effectText, addText];
+  const tm = getTranslationFn(() => getNestedIfTranslations(effect.multiply?.if));
+  const multiplyText = `${t('Deals double damage')} ${tm('if the enemy has more than 3 bleed')}`;
+
+  return [effectText, addText, multiplyText];
 }
 
 function getRepeatText(repeat?: MaybeValue) {
