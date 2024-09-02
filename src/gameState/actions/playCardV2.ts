@@ -24,22 +24,23 @@ export interface If {
   value2: BasicValueDescriptor;
 }
 
+export interface MaybeValue<T = ValueDescriptor> {
+  value: T;
+  if?: If;
+}
+
 export interface CardEffect {
   target: Target;
   name: CardEffectName;
   value: ValueDescriptor;
+  add?: Required<MaybeValue<BasicValueDescriptor>>;
   multiHit?: number;
-  if?: If;
-}
-
-export interface Repeat {
-  value: ValueDescriptor;
   if?: If;
 }
 
 export interface CardState {
   effects: CardEffect[];
-  repeat?: Repeat;
+  repeat?: MaybeValue;
 }
 
 export interface PlayCardContext {
@@ -74,15 +75,16 @@ export default function playCard(
   { self, opponent }: { self: PlayerState; opponent: PlayerState },
 ) {
   const events: AnimationEvent[] = [];
+  const context = { self, opponent, events };
 
   let activations = 1;
   if (card.repeat) {
-    activations += evaluateRepeat(card.repeat, { self, opponent, events });
+    activations += maybeGetValue(card.repeat, context) || 0;
   }
 
   for (let i = 0; i < activations; i++) {
     card.effects.forEach((effect) => {
-      applyCardEffect(effect, { self, opponent, events });
+      applyCardEffect(effect, context);
     });
   }
 
@@ -95,7 +97,11 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitC
     if (!success) return;
   }
 
-  const value = getValue(effect.value, context);
+  let value = getValue(effect.value, context);
+
+  if (effect.add) {
+    value += maybeGetValue(effect.add, context) || 0;
+  }
 
   switch (effect.name) {
     case 'damage': {
@@ -131,12 +137,12 @@ function evaluateIf(ifStatement: If, context: PlayCardContext) {
   return compareValues(value1, ifStatement.comparison, value2);
 }
 
-function evaluateRepeat(repeat: Repeat, context: PlayCardContext): number {
-  if (repeat.if) {
-    const success = evaluateIf(repeat.if, context);
-    if (!success) return 0;
+function maybeGetValue({ value, if: ifStatement }: MaybeValue, context: PlayCardContext) {
+  if (ifStatement) {
+    const success = evaluateIf(ifStatement, context);
+    if (!success) return null;
   }
-  return getValue(repeat.value, context);
+  return getValue(value, context);
 }
 
 function getValue(descriptor: ValueDescriptor, context: PlayCardContext): number {

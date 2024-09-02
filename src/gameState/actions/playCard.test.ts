@@ -260,3 +260,21 @@ describe('repeat', () => {
     expect(diff).toEqual({ opponent: { health: -1 - BLEED_DAMAGE, bleed: -1 } });
   });
 });
+
+describe('add', () => {
+  beforeEach(() => {
+    effect.add = {
+      value: v(3),
+      if: {
+        value: v('opponent', 'bleed'),
+        comparison: '>',
+        value2: v(0),
+      },
+    };
+  });
+
+  it('adds damage if the opponent is bleeding', () => {
+    const { diff } = getPlayCardResult({ opponent: { bleed: 2 } });
+    expect(diff).toEqual({ opponent: { health: -4 - BLEED_DAMAGE, bleed: -1 } });
+  });
+});

@@ -4,7 +4,7 @@ import {
   CardEffect,
   CardState,
   ValueDescriptor,
-  Repeat,
+  MaybeValue,
   BasicValueDescriptor,
   PlayerValueDescriptor,
   If,
@@ -185,7 +185,7 @@ function getNestedIfTranslations(ifStatement: If) {
   ];
 }
 
-function getNestedRepeatTranslations(repeat: Repeat) {
+function getNestedRepeatTranslations(repeat: MaybeValue) {
   return [
     getRepeatTranslations(repeat),
     ...getNestedValueTranslations(repeat.value),
@@ -397,7 +397,7 @@ function getEffectTranslations(effect: CardEffect): Translations {
   };
 }
 
-function getRepeatTranslations(repeat: Repeat): Translations {
+function getRepeatTranslations(repeat: MaybeValue): Translations {
   const t = getTranslationFn(() => getNestedRepeatTranslations(repeat));
 
   // not supported yet
@@ -426,7 +426,7 @@ function getCardEffectText(effect: CardEffect): string {
   ].join(' ');
 }
 
-function getRepeatText(repeat: Repeat): string {
+function getRepeatText(repeat: MaybeValue): string {
   const t = getTranslationFn(() => getNestedRepeatTranslations(repeat));
 
   return [
