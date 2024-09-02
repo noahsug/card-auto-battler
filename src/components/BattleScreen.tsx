@@ -36,8 +36,16 @@ export default function BattleScreen() {
 
   const battleSequence: Sequence = useMemo(() => {
     function startTurnSequence() {
+      if (isBattleOver) {
+        return endBattleSequence();
+      }
       startTurn();
       animationEventsAddedThisTurn.current = 0;
+    }
+
+    function endBattleSequence() {
+      endBattle();
+      return wait(750);
     }
 
     function playCardSequence() {
@@ -52,8 +60,7 @@ export default function BattleScreen() {
       playCardSequence,
       (goTo) => {
         if (isBattleOver) {
-          endBattle();
-          return wait(750);
+          return endBattleSequence();
         } else if (canPlayCard) {
           goTo(playCardSequence);
         } else {

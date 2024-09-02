@@ -10,11 +10,18 @@ import {
   getEnemyCardsForBattle,
   MAX_LOSSES,
   MAX_WINS,
+  MAX_TURNS_IN_BATTLE,
 } from '../';
 import { assert } from '../../utils';
-import playCardHelper from './playCard';
-import { getRandomEnemyType, statusEffectNames } from '../gameState';
+import applyCardEffects from './applyCardEffects';
+import {
+  getNonActivePlayer,
+  getRandomEnemyType,
+  statusEffectNames,
+  getCurrentCard,
+} from '../gameState';
 import { pickEnemyCards } from '../enemies';
+import { discardCurrentCard } from './deck';
 
 /**
  * Every function in this file is automatically picked up and converted into a reducer function
@@ -69,13 +76,44 @@ export function startTurn(game: GameState) {
 }
 
 export function playCard(game: GameState) {
-  playCardHelper(game);
+  const self = getActivePlayer(game);
+  const opponent = getNonActivePlayer(game);
+  const card = getCurrentCard(self);
+
+  // die if out of cards
+  if (card == null) {
+    self.health = 0;
+    return;
+  }
+
+  if (self.cardsPlayedThisTurn > 0) {
+    assert(self.extraCardPlays > 0);
+    self.extraCardPlays -= 1;
+  }
+
+  self.cardsPlayedThisTurn += 1;
+
+  const events = applyCardEffects(card, { self, opponent });
+
+  game.battleEvents.push(...events);
+
+  // if (card.trashSelf) {
+  //   trashCurrentCard(self);
+  // } else {
+  discardCurrentCard(self);
+  // }
 }
 
 export function endTurn(game: GameState) {
   assert(!getCanPlayCard(game));
 
   game.turn++;
+
+  // end game after max turns
+  if (game.turn >= MAX_TURNS_IN_BATTLE) {
+    const loser = game.user.health <= game.enemy.health ? game.user : game.enemy;
+    loser.health = 0;
+  }
 }
 
 export function endBattle(game: GameState) {

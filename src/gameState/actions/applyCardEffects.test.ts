@@ -1,7 +1,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import { createInitialGameState, PlayerState } from '../index';
-import playCard from './playCardV2';
+import applyCardEffects from './applyCardEffects';
 import { CardEffect, CardState } from '../gameState';
 import { BLEED_DAMAGE } from '../constants';
 import { getValueDescriptor as v, DEAL_1_DAMAGE } from '../utils';
@@ -30,7 +30,7 @@ function getPlayCardResult({
   const opponent = Object.assign(enemy, opponentOverrides);
   const init = cloneDeep({ self, opponent });
 
-  const events = playCard(card, { self, opponent });
+  const events = applyCardEffects(card, { self, opponent });
 
   const diff = diffValues(init, { self, opponent });
   return { self, opponent, init, diff, events };

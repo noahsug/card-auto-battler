@@ -8,11 +8,8 @@ function maybeShuffleDiscardIntoDeck(player: PlayerState) {
   }
 }
 
-export function getCurrentCard(player: PlayerState) {
-  return player.cards[player.currentCardIndex];
-}
-
 export function discardCurrentCard(player: PlayerState) {
+  if (player.cards.length === 0) return;
   player.currentCardIndex += 1;
   maybeShuffleDiscardIntoDeck(player);
 }

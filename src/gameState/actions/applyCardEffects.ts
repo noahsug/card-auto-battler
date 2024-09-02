@@ -26,7 +26,7 @@ interface EffectOptions {
   multiplier?: number;
 }
 
-export default function playCard(
+export default function applyCardEffects(
   card: CardState,
   { self, opponent }: { self: PlayerState; opponent: PlayerState },
 ) {
@@ -40,14 +40,14 @@ export default function playCard(
 
   for (let i = 0; i < activations; i++) {
     card.effects.forEach((effect) => {
-      applyCardEffect(effect, context);
+      applyEffect(effect, context);
     });
   }
 
   return events;
 }
 
-function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitCount: number = 1) {
+function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitCount: number = 1) {
   if (effect.if) {
     const success = evaluateIf(effect.if, context);
     if (!success) return;
@@ -87,7 +87,7 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitC
   }
 
   if (effect.multiHit && multiHitCount < effect.multiHit) {
-    applyCardEffect(effect, context, multiHitCount + 1);
+    applyEffect(effect, context, multiHitCount + 1);
   }
 }
 

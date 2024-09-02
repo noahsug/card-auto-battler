@@ -1,22 +1,14 @@
-import { PlayerState, CardState, createInitialGameState } from '../gameState';
-import { getCurrentCard, discardCurrentCard, trashCurrentCard, trashNextCards } from './deck';
-import { createCard } from '../utils';
-
-const STARTER_CARD: CardState = createCard({ target: 'opponent', damage: 0 });
+import { PlayerState, createInitialGameState, getCurrentCard } from '../gameState';
+import { discardCurrentCard, trashCurrentCard, trashNextCards } from './deck';
+import { DEAL_1_DAMAGE } from '../utils';
 
 let player: PlayerState;
-let [c1, c2, c3] = [STARTER_CARD, STARTER_CARD, STARTER_CARD];
+const [c1, c2, c3] = [DEAL_1_DAMAGE, DEAL_1_DAMAGE, DEAL_1_DAMAGE];
 
 beforeEach(() => {
   const { user } = createInitialGameState();
   user.cards = [c1, c2, c3];
   player = user;
-});
-
-describe('getCurrentCard', () => {
-  it('returns the current card', () => {
-    expect(getCurrentCard(player)).toBe(c1);
-  });
 });
 
 describe('discardCurrentCard', () => {
