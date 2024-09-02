@@ -297,20 +297,17 @@ describe('multiply', () => {
   });
 });
 
-describe('returns battle events', () => {
-  beforeEach(() => {
-    effect.multiply = {
-      value: v(2),
-      if: {
-        value: v('opponent', 'bleed'),
-        comparison: '>',
-        value2: v(0),
-      },
-    };
+it('returns battle events', () => {
+  card.effects.push({
+    name: 'heal',
+    target: 'self',
+    value: v(5),
   });
 
-  it('deals double damage if the opponent is bleeding', () => {
-    const { diff } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
-    expect(diff).toEqual({ opponent: { health: -6 - BLEED_DAMAGE, bleed: -1 } });
-  });
+  const { events } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
+  expect(events).toEqual([
+    { type: 'damage', value: 3, target: 'opponent' },
+    { type: 'damage', value: BLEED_DAMAGE, target: 'opponent' },
+    { type: 'heal', value: 5, target: 'self' },
+  ]);
 });
