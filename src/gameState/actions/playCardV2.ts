@@ -12,6 +12,7 @@ import {
 } from '../gameState';
 import { BLEED_DAMAGE } from '../constants';
 import { assert, readonlyIncludes } from '../../utils';
+import { trashNextCards } from './deck';
 
 interface PlayCardContext {
   self: PlayerState;
@@ -185,32 +186,14 @@ function applyHeal(
   events.push({ type: 'heal', target, value });
 }
 
-// TODO: use deck.ts
 function trashCards({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
   value = updateValue(value, multiplier);
   if (value <= 0) return;
 
-  const targetPlayer = context[target];
-  const { cards, currentCardIndex } = targetPlayer;
+  const player = context[target];
+  const isActivePlayer = target === 'self';
 
-  const trashStart = target === 'self' ? currentCardIndex + 1 : currentCardIndex;
-  const removeFromFront = Math.max(trashStart + value - cards.length, 0);
-
-  targetPlayer.cards = cards.filter((_, i) => {
-    const removeCard =
-      // trash cards after or at the current card
-      (i >= trashStart && i < trashStart + value) ||
-      // trash cards from the front of the deck
-      i < removeFromFront;
-
-    if (removeCard) {
-      targetPlayer.trashedCards.push(cards[i]);
-    }
-
-    return !removeCard;
-  });
-
-  targetPlayer.currentCardIndex = Math.max(currentCardIndex - removeFromFront, 0);
+  trashNextCards({ player, isActivePlayer, numCardsToTrash: value });
 }
 
 function updateValue(value: number, multiplier: number = 1) {

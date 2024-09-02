@@ -159,25 +159,24 @@ describe('trash cards', () => {
     expect(opponent.trashedCards).toEqual([c1]);
   });
 
-  // TODO
-  // it('trash own cards', () => {
-  //   effect.target = 'self';
-  //   const { init, self } = getPlayCardResult();
-  //   const [c1, c2, c3] = init.self.cards;
+  it('trash own cards', () => {
+    effect.target = 'self';
+    const { init, self } = getPlayCardResult();
+    const [c1, c2, c3] = init.self.cards;
 
-  //   expect(self.cards).toEqual([c2]);
-  //   expect(self.trashedCards).toEqual([c1, c3]);
-  // });
+    expect(self.cards).toEqual([c1, c3]);
+    expect(self.trashedCards).toEqual([c2]);
+  });
 
-  // it(`trash opponent cards from the discard pile`, () => {
-  //   effect.value = 2;
-  //   const { init, opponent } = getPlayCardResult({ opponent: { currentCardIndex: 1 } });
-  //   const [c1, c2, c3] = init.opponent.cards;
+  it(`trash opponent cards from the discard pile`, () => {
+    effect.value = v(2);
+    const { init, opponent } = getPlayCardResult({ opponent: { currentCardIndex: 1 } });
+    const [c1, c2, c3] = init.opponent.cards;
 
-  //   expect(opponent.cards).toEqual([c2]);
-  //   expect(opponent.trashedCards).toEqual([c3, c1]);
-  //   expect(opponent.currentCardIndex).toBe(0);
-  // });
+    expect(opponent.cards).toEqual([c2]);
+    expect(opponent.trashedCards).toEqual([c3, c1]);
+    expect(opponent.currentCardIndex).toBe(0);
+  });
 
   it('trashes entire opponent deck', () => {
     effect.value = v(10);
