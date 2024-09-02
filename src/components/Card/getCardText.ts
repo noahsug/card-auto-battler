@@ -161,7 +161,10 @@ type Translations = { [key: string]: () => string };
 function getTranslationFn<T extends Translations>(getTranslationsList: () => T[]) {
   return (text: KeysOfUnion<T>): string => {
     const translations = getTranslationsList().find((t) => text in t);
-    if (!translations) throw new Error(`no translation found for "${text as string}"`);
+
+    // return an empty string when an optional property is missing, e.g. when we see
+    // t('if the enemy has more than 3 bleed') but `effect.if` is undefined
+    if (!translations) return '';
 
     return translations[text]();
   };
@@ -202,7 +205,7 @@ function getNestedEffectTranslations(effect: CardEffect) {
   ];
 }
 
-function getTargetTranslations(target: Target): Translations {
+function getTargetTranslations(target: Target) {
   return {
     [`you've`]: () => {
       return target === 'self' ? `you've` : `the enemy has`;
@@ -218,7 +221,7 @@ function getTargetTranslations(target: Target): Translations {
   };
 }
 
-function getBasicValueTranslations({ value }: BasicValueDescriptor): Translations {
+function getBasicValueTranslations({ value }: BasicValueDescriptor) {
   return {
     ['cards']: () => {
       return value === 1 ? 'card' : 'cards';
@@ -230,7 +233,7 @@ function getBasicValueTranslations({ value }: BasicValueDescriptor): Translation
   };
 }
 
-function getPlayerValueTranslations(playerValue: PlayerValueDescriptor): Translations {
+function getPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
   const t = getTranslationFn(() => getNestedPlayerValueTranslations(playerValue));
 
   // not supported yet
@@ -238,7 +241,7 @@ function getPlayerValueTranslations(playerValue: PlayerValueDescriptor): Transla
   assert(playerValue.name != 'startingHealth');
 
   return {
-    [`your bleed`]: () => {
+    [`your bleed`]: (): string => {
       if (playerValue.name === 'trashedCards') {
         return `the number of cards ${t(`you've`)} trashed`;
       }
@@ -273,14 +276,15 @@ function getPlayerValueTranslations(playerValue: PlayerValueDescriptor): Transla
   };
 }
 
-function getIfTranslations(ifStatement: If): Translations {
+function getIfTranslations(ifStatement?: If) {
+  if (ifStatement == null) return {} as Translations;
   const t = getTranslationFn(() => getNestedIfTranslations(ifStatement));
 
   // not supported yet
   assert(ifStatement.value.multiplier == null);
 
   return {
-    [`if the enemy has more than 3 bleed`]: () => {
+    [`if the enemy has more than 3 bleed`]: (): string => {
       switch (ifStatement.value.name) {
         case 'trashedCards':
           return `if ${t(`you've`)} trashed ${t('more than 3')} cards`;
@@ -293,7 +297,7 @@ function getIfTranslations(ifStatement: If): Translations {
       }
     },
 
-    [`more than 3`]: () => {
+    [`more than 3`]: (): string => {
       const { comparison, value2 } = ifStatement;
       const isCheckingExistence =
         (comparison === '>' && value2.value === 0) || (comparison === '>=' && value2.value === 1);
@@ -322,11 +326,11 @@ function getIfTranslations(ifStatement: If): Translations {
   };
 }
 
-function getEffectTranslations(effect: CardEffect): Translations {
+function getEffectTranslations(effect: CardEffect) {
   const t = getTranslationFn(() => getNestedEffectTranslations(effect));
 
   return {
-    [`Deal damage equal to your bleed`]: () => {
+    [`Deal damage equal to your bleed`]: (): string => {
       switch (effect.value.type) {
         case 'playerValue':
           return `${t(`Deal damage`)} ${t(`equal to your bleed`)}`;
@@ -346,7 +350,7 @@ function getEffectTranslations(effect: CardEffect): Translations {
       return `${t(`Deal`)} ${t(`damage`)}`;
     },
 
-    [`Deal 3 damage`]: () => {
+    [`Deal 3 damage`]: (): string => {
       if (effect.name === 'trash') {
         return `${t(`Enemy trashes`)} ${t('3')}`;
       }
@@ -356,14 +360,14 @@ function getEffectTranslations(effect: CardEffect): Translations {
       return `${t(`Deal`)} ${t('3')} ${t(`damage`)}`;
     },
 
-    ['Enemy plays 3 extra cards next turn']: () => {
+    ['Enemy plays 3 extra cards next turn']: (): string => {
       if (effect.target === 'self') {
         return `Play ${t('3')} ${t('cards')}`;
       }
       return `Enemy plays ${t('3')} extra ${t('cards')} next turn`;
     },
 
-    [`equal to your bleed`]: () => {
+    [`equal to your bleed`]: (): string => {
       return `equal to ${t('twice')} ${t('your bleed')}`;
     },
 
@@ -397,7 +401,7 @@ function getEffectTranslations(effect: CardEffect): Translations {
   };
 }
 
-function getRepeatTranslations(repeat: MaybeValue): Translations {
+function getRepeatTranslations(repeat: MaybeValue) {
   const t = getTranslationFn(() => getNestedRepeatTranslations(repeat));
 
   // not supported yet
@@ -410,7 +414,7 @@ function getRepeatTranslations(repeat: MaybeValue): Translations {
   assert(repeat.value.name != 'trashedCards');
 
   return {
-    [`Repeat for each bleed you have`]: () => {
+    [`Repeat for each bleed you have`]: (): string => {
       return `Repeat for each ${t('bleed')} ${t('you have')}`;
     },
   };
@@ -418,24 +422,24 @@ function getRepeatTranslations(repeat: MaybeValue): Translations {
 
 function getCardEffectText(effect: CardEffect) {
   const t = getTranslationFn(() => getNestedEffectTranslations(effect));
-
-  const text = [
+  const effectText = [
     t(`Deal damage equal to your bleed`),
     t(`3 times`),
-    effect.if && t(`if the enemy has more than 3 bleed`),
+    t(`if the enemy has more than 3 bleed`),
   ].join(' ');
 
-  return [text];
+  // const addText = [
+  //   t(`Deals 3 extra damage if the enemy has more than 3 bleed`)
+  // ].join(' ');
+
+  return [effectText];
 }
 
 function getRepeatText(repeat?: MaybeValue) {
   if (!repeat) return [];
 
   const t = getTranslationFn(() => getNestedRepeatTranslations(repeat));
-  const text = [
-    t(`Repeat for each bleed you have`),
-    repeat.if && t(`if the enemy has more than 3 bleed`),
-  ].join(' ');
+  const text = `${t(`Repeat for each bleed you have`)} ${t(`if the enemy has more than 3 bleed`)}`;
 
   return [text];
 }
