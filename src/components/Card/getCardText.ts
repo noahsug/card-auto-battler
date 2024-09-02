@@ -416,23 +416,28 @@ function getRepeatTranslations(repeat: MaybeValue): Translations {
   };
 }
 
-function getCardEffectText(effect: CardEffect): string {
+function getCardEffectText(effect: CardEffect) {
   const t = getTranslationFn(() => getNestedEffectTranslations(effect));
 
-  return [
+  const text = [
     t(`Deal damage equal to your bleed`),
     t(`3 times`),
     effect.if && t(`if the enemy has more than 3 bleed`),
   ].join(' ');
+
+  return [text];
 }
 
-function getRepeatText(repeat: MaybeValue): string {
-  const t = getTranslationFn(() => getNestedRepeatTranslations(repeat));
+function getRepeatText(repeat?: MaybeValue) {
+  if (!repeat) return [];
 
-  return [
+  const t = getTranslationFn(() => getNestedRepeatTranslations(repeat));
+  const text = [
     t(`Repeat for each bleed you have`),
     repeat.if && t(`if the enemy has more than 3 bleed`),
   ].join(' ');
+
+  return [text];
 }
 
 // Remove extra spaces
@@ -441,11 +446,7 @@ function fixSpacing(text: string): string {
 }
 
 export default function getCardText(card: CardState): string[] {
-  const linesOfText = card.effects.map(getCardEffectText);
-
-  if (card.repeat) {
-    linesOfText.push(getRepeatText(card.repeat));
-  }
-
-  return linesOfText.map(fixSpacing);
+  return [...card.effects.flatMap(getCardEffectText), ...getRepeatText(card.repeat)].map(
+    fixSpacing,
+  );
 }
