@@ -8,7 +8,7 @@ import {
   BasicValueDescriptor,
   PlayerValueDescriptor,
   If,
-} from '../../gameState/actions/playCardV2';
+} from '../../gameState/gameState';
 import { KeysOfUnion } from '../../utils/types';
 
 // Deal 1 damage. Repeat for each bleed the enemy has.
@@ -266,12 +266,14 @@ function getPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
           return 'twice';
         case 0.5:
           return 'half';
-        default:
+        default: {
           if (playerValue.multiplier > 1) {
             return `${playerValue.multiplier} times`;
           }
           // 1/4
-          return `1/${1 / playerValue.multiplier}`;
+          const denominator = (1 / playerValue.multiplier).toFixed(0);
+          return `1/${denominator}`;
+        }
       }
     },
   };

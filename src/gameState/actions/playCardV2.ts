@@ -1,50 +1,19 @@
-import { StatusEffectName, Target, PlayerValueName, statusEffectNames } from '../gameState';
-import { PlayerState, BattleEvent } from '../../gameState';
-import { assert, assertIsNonNullable, readonlyIncludes } from '../../utils';
+import {
+  CardEffect,
+  CardState,
+  If,
+  MaybeValue,
+  PlayerValueDescriptor,
+  statusEffectNames,
+  Target,
+  ValueDescriptor,
+  PlayerState,
+  BattleEvent,
+} from '../gameState';
+import { BLEED_DAMAGE } from '../constants';
+import { assert, readonlyIncludes } from '../../utils';
 
-export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
-
-export interface BasicValueDescriptor {
-  type: 'basicValue';
-  value: number;
-}
-
-export interface PlayerValueDescriptor {
-  type: 'playerValue';
-  target: Target;
-  name: PlayerValueName;
-  multiplier?: number;
-}
-
-export type ValueDescriptor = BasicValueDescriptor | PlayerValueDescriptor;
-
-export interface If {
-  value: PlayerValueDescriptor;
-  comparison: '>' | '<' | '=' | '<=' | '>=';
-  value2: BasicValueDescriptor;
-}
-
-export interface MaybeValue<T = ValueDescriptor> {
-  value: T;
-  if?: If;
-}
-
-export interface CardEffect {
-  target: Target;
-  name: CardEffectName;
-  value: ValueDescriptor;
-  add?: MaybeValue<BasicValueDescriptor>;
-  multiply?: MaybeValue<BasicValueDescriptor>;
-  multiHit?: number;
-  if?: If;
-}
-
-export interface CardState {
-  effects: CardEffect[];
-  repeat?: MaybeValue;
-}
-
-export interface PlayCardContext {
+interface PlayCardContext {
   self: PlayerState;
   opponent: PlayerState;
   events: BattleEvent[];
@@ -55,27 +24,6 @@ interface EffectOptions {
   target: Target;
   multiplier?: number;
 }
-
-// Helper function for quickly creating cards
-export function getValueDescriptor(
-  target: Target,
-  name: PlayerValueName,
-  multiplier?: number,
-): PlayerValueDescriptor;
-export function getValueDescriptor(value: number): BasicValueDescriptor;
-export function getValueDescriptor(
-  valueOrTarget: number | Target,
-  name?: PlayerValueName,
-  multiplier?: number,
-): ValueDescriptor {
-  if (typeof valueOrTarget === 'number') {
-    return { type: 'basicValue', value: valueOrTarget };
-  }
-  assertIsNonNullable(name);
-  return { type: 'playerValue', target: valueOrTarget, name, multiplier };
-}
-
-export const BLEED_DAMAGE = 3;
 
 export default function playCard(
   card: CardState,
@@ -133,6 +81,7 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitC
     // status effects
     default:
       assert(readonlyIncludes(statusEffectNames, effect.name));
+      value = updateValue(value);
       context[effect.target][effect.name] += value;
   }
 
@@ -209,8 +158,7 @@ function dealDamage(
     value += self.strength;
   }
 
-  value *= multiplier;
-  if (value <= 0) return;
+  value = updateValue(value, multiplier);
 
   const targetPlayer = target === 'self' ? self : opponent;
   targetPlayer.health -= value;
@@ -218,7 +166,7 @@ function dealDamage(
   events.push({ type: 'damage', target, value });
 
   // bleed
-  if (target === 'opponent' && opponent.bleed > 0) {
+  if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
     opponent.health -= BLEED_DAMAGE;
     opponent.bleed -= 1;
     events.push({ type: 'damage', target, value });
@@ -229,8 +177,7 @@ function applyHeal(
   { value, multiplier = 1, target }: EffectOptions,
   { self, opponent, events }: PlayCardContext,
 ) {
-  value *= multiplier;
-  if (value <= 0) return;
+  value = updateValue(value, multiplier);
 
   const targetPlayer = target === 'self' ? self : opponent;
   targetPlayer.health += value;
@@ -240,7 +187,7 @@ function applyHeal(
 
 // TODO: use deck.ts
 function trashCards({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
-  value *= multiplier;
+  value = updateValue(value, multiplier);
   if (value <= 0) return;
 
   const targetPlayer = context[target];
@@ -264,4 +211,9 @@ function trashCards({ value, multiplier = 1, target }: EffectOptions, context: P
   });
 
   targetPlayer.currentCardIndex = Math.max(currentCardIndex - removeFromFront, 0);
+}
+
+function updateValue(value: number, multiplier: number = 1) {
+  value *= multiplier;
+  return Math.floor(value);
 }

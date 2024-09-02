@@ -1,4 +1,3 @@
-import { PickByValue } from '../utils/types';
 import { STARTING_HEALTH } from './constants';
 import { getStartingCards } from './cardSelection';
 import sample from 'lodash/sample';
@@ -30,98 +29,57 @@ export interface BattleEvent {
 }
 
 export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength'] as const;
+export type StatusEffectName = (typeof statusEffectNames)[number];
+export type StatusEffects = Record<StatusEffectName, number>;
 
 export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
   statusEffectNames.map((effectName) => [effectName, 0]),
 ) as StatusEffects;
 
-export type StatusEffectName = (typeof statusEffectNames)[number];
-
-export type StatusEffects = Record<StatusEffectName, number>;
-
 export type Target = 'self' | 'opponent';
 
 export type PlayerValueName = keyof PlayerState;
 
-export interface PlayerValueIdentifier {
-  target: Target;
-  name: PlayerValueName;
+export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
+
+export interface BasicValueDescriptor {
+  type: 'basicValue';
+  value: number;
 }
 
-export const EMPTY_BATTLE_STATS = {
-  damageDealt: 0,
-  healthRestored: 0,
-  numberOfHits: 0,
-};
-
-export type BattleStats = typeof EMPTY_BATTLE_STATS;
-
-export type IdentifiableBattleStats = keyof BattleStats;
-
-export type BattleStatsIdentifier = {
-  name: IdentifiableBattleStats;
-};
-
-export interface Comparable {
-  comparison: '>' | '<' | '=' | '<=' | '>=';
-  compareToValue?: number;
-  compareToPlayerValue?: PlayerValueIdentifier;
-  compareToBattleStat?: BattleStatsIdentifier;
-  // multiplier for the compareTo values (e.g. 0.5 = 50% of comparison value)
+export interface PlayerValueDescriptor {
+  type: 'playerValue';
+  target: Target;
+  name: PlayerValueName;
   multiplier?: number;
 }
 
-export interface IfBattleStatOptions extends BattleStatsIdentifier, Comparable {}
+export type ValueDescriptor = BasicValueDescriptor | PlayerValueDescriptor;
 
-export interface IfPlayerValueOptions extends PlayerValueIdentifier, Comparable {}
-
-export interface Conditional<T> {
-  ifBattleStat?: IfBattleStatOptions;
-  ifPlayerValue?: IfPlayerValueOptions;
-  else?: T;
+export interface If {
+  value: PlayerValueDescriptor;
+  comparison: '>' | '<' | '=' | '<=' | '>=';
+  value2: BasicValueDescriptor;
 }
 
-export type GainableCardEffects = PickByValue<Required<CardEffects>, number | boolean>;
-
-export interface GainEffectsOptions extends Conditional<GainEffectsOptions> {
-  effects: Partial<GainableCardEffects>;
-
-  forEveryPlayerValue?: PlayerValueIdentifier;
-  forEveryBattleStat?: BattleStatsIdentifier;
-
-  isMultiplicative?: boolean;
-  divisor?: number;
+export interface MaybeValue<T = ValueDescriptor> {
+  value: T;
+  if?: If;
 }
 
-export interface CardGrowEffects
-  extends Omit<GainEffectsOptions, 'else'>,
-    Conditional<CardGrowEffects> {
-  isPermanent?: boolean;
-}
-
-export interface CardEffects extends Partial<StatusEffects>, Conditional<CardEffects> {
+export interface CardEffect {
   target: Target;
-
-  damage?: number;
-  heal?: number;
-  // TODO: implement random effects
-  randomNegativeStatusEffects?: number;
-  randomPositiveStatusEffects?: number;
-  // cause target to trash X cards
-  trash?: number;
-  // trash this card after use
-  trashSelf?: boolean;
-  activations?: number;
-
-  // gain temporary effects as the card is being played
-  gainEffectsList?: GainEffectsOptions[];
-  // gain (semi-)permanent effects after the card is played
-  // TODO: implement grow effects
-  growEffectsList?: CardGrowEffects[];
+  name: CardEffectName;
+  value: ValueDescriptor;
+  add?: MaybeValue<BasicValueDescriptor>;
+  multiply?: MaybeValue<BasicValueDescriptor>;
+  multiHit?: number;
+  if?: If;
 }
 
 export interface CardState {
-  effects: CardEffects[];
+  effects: CardEffect[];
+  repeat?: MaybeValue;
   name: string;
 }
 

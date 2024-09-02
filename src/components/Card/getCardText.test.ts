@@ -1,11 +1,7 @@
 import getCardText from './getCardText';
 
-import {
-  CardEffect,
-  CardState,
-  getValueDescriptor as v,
-  PlayerValueDescriptor,
-} from '../../gameState/actions/playCardV2';
+import { createCard, getValueDescriptor as v } from '../../gameState/utils';
+import { CardEffect, CardState, PlayerValueDescriptor } from '../../gameState/gameState';
 
 // Deal 1 damage 3 times.
 // Rally: Each hit deals 2 extra damage.
@@ -105,13 +101,12 @@ let card: CardState;
 let effect: CardEffect;
 
 beforeEach(() => {
-  effect = {
+  card = createCard({
     target: 'opponent',
     name: 'damage',
     value: v(1),
-  } as CardEffect;
-
-  card = { effects: [effect] };
+  });
+  effect = card.effects[0];
 });
 
 it('renders damage', () => {
@@ -256,8 +251,28 @@ describe('renders effect based on player value', () => {
 
     effect.value = v('self', 'trashedCards');
     expect(render(card)).toBe(`Deal damage equal to the number of cards you've trashed.`);
+
+    effect.value = v('self', 'trashedCards', 2);
+    expect(render(card)).toBe(`Deal damage equal to twice the number of cards you've trashed.`);
   });
 
+  test('equal to current health', () => {
+    effect.value = v('self', 'health', 0.5);
+    expect(render(card)).toBe(`Deal damage equal to half your HP.`);
+
+    effect.value.target = 'opponent';
+    expect(render(card)).toBe(`Deal damage equal to half the enemy's HP.`);
+
+    effect.value.multiplier = 1 / 3;
+    expect(render(card)).toBe(`Deal damage equal to 1/3 the enemy's HP.`);
+  });
+
+  test('triple your strength', () => {
+    card = createCard({ target: 'self', name: 'strength', value: v('self', 'strength', 2) });
+    expect(render(card)).toBe(`Gain strength equal to twice your strength.`);
+  });
+
+  // TODO:
   // test('equal to missing health', () => {});
 });
 

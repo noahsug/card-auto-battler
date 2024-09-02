@@ -1,23 +1,17 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import { createInitialGameState, PlayerState } from '../index';
-import playCard, {
-  BLEED_DAMAGE,
-  CardEffect,
-  CardState,
-  getValueDescriptor as v,
-} from './playCardV2';
+import playCard from './playCardV2';
+import { CardEffect, CardState } from '../gameState';
+import { BLEED_DAMAGE } from '../constants';
+import { getValueDescriptor as v, DEAL_1_DAMAGE } from '../utils';
 import { diffValues } from '../../utils';
-
-const STARTER_CARD: CardState = {
-  effects: [{ target: 'opponent', name: 'damage', value: v(1) }],
-};
 
 let card: CardState;
 let effect: CardEffect;
 
 beforeEach(() => {
-  card = cloneDeep(STARTER_CARD);
+  card = cloneDeep(DEAL_1_DAMAGE);
   effect = card.effects[0];
 });
 
@@ -29,8 +23,8 @@ function getPlayCardResult({
   opponent?: Partial<PlayerState>;
 } = {}) {
   const { user, enemy } = createInitialGameState();
-  user.cards = new Array(3).fill(STARTER_CARD);
-  enemy.cards = new Array(3).fill(STARTER_CARD);
+  user.cards = new Array(3).fill(DEAL_1_DAMAGE);
+  enemy.cards = new Array(3).fill(DEAL_1_DAMAGE);
 
   const self = Object.assign(user, selfOverrides);
   const opponent = Object.assign(enemy, opponentOverrides);
@@ -65,6 +59,20 @@ describe('damage', () => {
     const { diff } = getPlayCardResult({ opponent: { bleed: 1 } });
 
     expect(diff).toEqual({ opponent: { health: -1 - BLEED_DAMAGE, bleed: -1 } });
+  });
+
+  it('dealing 0 damage does not trigger bleed', () => {
+    effect.value = v(0);
+    const { diff } = getPlayCardResult({ opponent: { bleed: 1 } });
+
+    expect(diff).toEqual({});
+  });
+
+  it('rounds damage down', () => {
+    effect.value = v(1.5);
+    const { diff } = getPlayCardResult();
+
+    expect(diff).toEqual({ opponent: { health: -1 } });
   });
 });
 
@@ -103,6 +111,13 @@ describe('heal', () => {
 
     expect(diff).toEqual({ self: { health: 1 } });
   });
+
+  it('rounds heal down', () => {
+    effect.value = v(1.5);
+    const { diff } = getPlayCardResult();
+
+    expect(diff).toEqual({ self: { health: 1 } });
+  });
 });
 
 describe('dodge', () => {
@@ -118,6 +133,13 @@ describe('dodge', () => {
 
   it('increases self dodge', () => {
     effect.target = 'self';
+    const { diff } = getPlayCardResult();
+
+    expect(diff).toEqual({ self: { dodge: 1 } });
+  });
+
+  it('rounds dodge down', () => {
+    effect.value = v(1.5);
     const { diff } = getPlayCardResult();
 
     expect(diff).toEqual({ self: { dodge: 1 } });
@@ -297,17 +319,26 @@ describe('multiply', () => {
   });
 });
 
-it('returns battle events', () => {
-  card.effects.push({
-    name: 'heal',
-    target: 'self',
-    value: v(5),
+describe('battle events', () => {
+  it('returns battle events', () => {
+    card.effects.push({
+      name: 'heal',
+      target: 'self',
+      value: v(5),
+    });
+
+    const { events } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
+    expect(events).toEqual([
+      { type: 'damage', value: 3, target: 'opponent' },
+      { type: 'damage', value: BLEED_DAMAGE, target: 'opponent' },
+      { type: 'heal', value: 5, target: 'self' },
+    ]);
   });
 
-  const { events } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
-  expect(events).toEqual([
-    { type: 'damage', value: 3, target: 'opponent' },
-    { type: 'damage', value: BLEED_DAMAGE, target: 'opponent' },
-    { type: 'heal', value: 5, target: 'self' },
-  ]);
+  it('returns a battle event when 0 damage is done', () => {
+    effect.value = v(0);
+
+    const { events } = getPlayCardResult();
+    expect(events).toEqual([{ type: 'damage', value: 0, target: 'opponent' }]);
+  });
 });
