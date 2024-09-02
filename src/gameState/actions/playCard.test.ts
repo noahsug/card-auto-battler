@@ -278,3 +278,39 @@ describe('add', () => {
     expect(diff).toEqual({ opponent: { health: -4 - BLEED_DAMAGE, bleed: -1 } });
   });
 });
+
+describe('multiply', () => {
+  beforeEach(() => {
+    effect.multiply = {
+      value: v(2),
+      if: {
+        value: v('opponent', 'bleed'),
+        comparison: '>',
+        value2: v(0),
+      },
+    };
+  });
+
+  it('deals double damage if the opponent is bleeding', () => {
+    const { diff } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
+    expect(diff).toEqual({ opponent: { health: -6 - BLEED_DAMAGE, bleed: -1 } });
+  });
+});
+
+describe('returns battle events', () => {
+  beforeEach(() => {
+    effect.multiply = {
+      value: v(2),
+      if: {
+        value: v('opponent', 'bleed'),
+        comparison: '>',
+        value2: v(0),
+      },
+    };
+  });
+
+  it('deals double damage if the opponent is bleeding', () => {
+    const { diff } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
+    expect(diff).toEqual({ opponent: { health: -6 - BLEED_DAMAGE, bleed: -1 } });
+  });
+});

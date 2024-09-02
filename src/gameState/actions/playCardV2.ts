@@ -1,5 +1,5 @@
 import { StatusEffectName, Target, PlayerValueName, statusEffectNames } from '../gameState';
-import { PlayerState, AnimationEvent } from '../../gameState';
+import { PlayerState, BattleEvent } from '../../gameState';
 import { assert, assertIsNonNullable, readonlyIncludes } from '../../utils';
 
 export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
@@ -33,7 +33,8 @@ export interface CardEffect {
   target: Target;
   name: CardEffectName;
   value: ValueDescriptor;
-  add?: Required<MaybeValue<BasicValueDescriptor>>;
+  add?: MaybeValue<BasicValueDescriptor>;
+  multiply?: MaybeValue<BasicValueDescriptor>;
   multiHit?: number;
   if?: If;
 }
@@ -46,7 +47,13 @@ export interface CardState {
 export interface PlayCardContext {
   self: PlayerState;
   opponent: PlayerState;
-  events: AnimationEvent[];
+  events: BattleEvent[];
+}
+
+interface EffectOptions {
+  value: number;
+  target: Target;
+  multiplier?: number;
 }
 
 // Helper function for quickly creating cards
@@ -74,7 +81,7 @@ export default function playCard(
   card: CardState,
   { self, opponent }: { self: PlayerState; opponent: PlayerState },
 ) {
-  const events: AnimationEvent[] = [];
+  const events: BattleEvent[] = [];
   const context = { self, opponent, events };
 
   let activations = 1;
@@ -103,21 +110,24 @@ function applyCardEffect(effect: CardEffect, context: PlayCardContext, multiHitC
     value += maybeGetValue(effect.add, context) || 0;
   }
 
+  const multiplier = effect.multiply && maybeGetValue(effect.multiply, context);
+  const effectOptions = { value, multiplier, target: effect.target };
+
   switch (effect.name) {
     case 'damage': {
       const dodgedDamage = dodgeDamage(effect, context);
       if (!dodgedDamage) {
-        dealDamage(value, effect.target, context);
+        dealDamage(effectOptions, context);
       }
       break;
     }
 
     case 'heal':
-      applyHeal(value, effect.target, context);
+      applyHeal(effectOptions, context);
       break;
 
     case 'trash':
-      trashCards(value, effect.target, context);
+      trashCards(effectOptions, context);
       break;
 
     // status effects
@@ -140,7 +150,7 @@ function evaluateIf(ifStatement: If, context: PlayCardContext) {
 function maybeGetValue({ value, if: ifStatement }: MaybeValue, context: PlayCardContext) {
   if (ifStatement) {
     const success = evaluateIf(ifStatement, context);
-    if (!success) return null;
+    if (!success) return undefined;
   }
   return getValue(value, context);
 }
@@ -190,37 +200,49 @@ function dodgeDamage(effect: CardEffect, { opponent, events }: PlayCardContext) 
   return true;
 }
 
-function dealDamage(damage: number, target: Target, { self, opponent, events }: PlayCardContext) {
-  // bleed and strength only apply when damaging the opponent
+function dealDamage(
+  { value, multiplier = 1, target }: EffectOptions,
+  { self, opponent, events }: PlayCardContext,
+) {
+  // strength
   if (target === 'opponent') {
-    // strength
-    damage += self.strength;
-    // bleed
-    if (opponent.bleed > 0) {
-      damage += BLEED_DAMAGE;
-      opponent.bleed -= 1;
-    }
+    value += self.strength;
   }
 
-  if (damage <= 0) return;
+  value *= multiplier;
+  if (value <= 0) return;
 
   const targetPlayer = target === 'self' ? self : opponent;
-  targetPlayer.health -= damage;
+  targetPlayer.health -= value;
 
-  events.push({ type: 'damage', target, value: damage });
+  events.push({ type: 'damage', target, value });
+
+  // bleed
+  if (target === 'opponent' && opponent.bleed > 0) {
+    opponent.health -= BLEED_DAMAGE;
+    opponent.bleed -= 1;
+    events.push({ type: 'damage', target, value });
+  }
 }
 
-function applyHeal(heal: number, target: Target, { self, opponent, events }: PlayCardContext) {
-  if (heal <= 0) return;
+function applyHeal(
+  { value, multiplier = 1, target }: EffectOptions,
+  { self, opponent, events }: PlayCardContext,
+) {
+  value *= multiplier;
+  if (value <= 0) return;
 
   const targetPlayer = target === 'self' ? self : opponent;
-  targetPlayer.health += heal;
+  targetPlayer.health += value;
 
-  events.push({ type: 'heal', target, value: heal });
+  events.push({ type: 'heal', target, value });
 }
 
 // TODO: use deck.ts
-function trashCards(value: number, target: Target, context: PlayCardContext) {
+function trashCards({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
+  value *= multiplier;
+  if (value <= 0) return;
+
   const targetPlayer = context[target];
   const { cards, currentCardIndex } = targetPlayer;
 

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { AnimationEvent } from '../gameState/gameState';
+import { BattleEvent } from '../gameState/gameState';
 
-export type Props = Omit<AnimationEvent, 'target'>;
+export type Props = Omit<BattleEvent, 'target'>;
 
 export default function CombatText({ value, type }: Props) {
   const [[xOffset, yOffset]] = useState([Math.random(), Math.random()]);

@@ -76,8 +76,8 @@ export default function BattleScreen() {
   useSequence(battleSequence);
 
   useEffect(() => {
-    if (game.animationEvents.length > animationEventsAddedThisTurn.current) {
-      const newAnimationEvents = game.animationEvents.slice(animationEventsAddedThisTurn.current);
+    if (game.battleEvents.length > animationEventsAddedThisTurn.current) {
+      const newAnimationEvents = game.battleEvents.slice(animationEventsAddedThisTurn.current);
       newAnimationEvents.forEach(({ value, target, type }) => {
         const targetIsEnemy =
           // enemy is doing self damage
@@ -87,10 +87,10 @@ export default function BattleScreen() {
         const setCombatTexts = targetIsEnemy ? setEnemyCombatTexts : setUserCombatTexts;
         setCombatTexts((current) => [...current, { value, type }]);
 
-        animationEventsAddedThisTurn.current = game.animationEvents.length;
+        animationEventsAddedThisTurn.current = game.battleEvents.length;
       });
     }
-  }, [game.animationEvents, isEnemyTurn]);
+  }, [game.battleEvents, isEnemyTurn]);
 
   const [activeUserCard, activeEnemyCard] = activePlayerCard?.isEnemyCard
     ? [undefined, activePlayerCard.card]

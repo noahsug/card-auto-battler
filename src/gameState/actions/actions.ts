@@ -65,7 +65,7 @@ export function startBattle(game: GameState) {
 export function startTurn(game: GameState) {
   const activePlayer = getActivePlayer(game);
   activePlayer.cardsPlayedThisTurn = 0;
-  game.animationEvents = [];
+  game.battleEvents = [];
 }
 
 export function playCard(game: GameState) {
@@ -107,5 +107,5 @@ function resetGameState(game: GameState) {
     });
   });
 
-  game.animationEvents = [];
+  game.battleEvents = [];
 }

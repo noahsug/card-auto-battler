@@ -2,7 +2,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import shuffle from 'lodash/shuffle';
 
 import {
-  AnimationEvent,
+  BattleEvent,
   BattleStats,
   CardEffects,
   Comparable,
@@ -25,7 +25,7 @@ import { assert, getNonNullEntries } from '../../utils';
 interface PlayCardResult {
   battleStats: BattleStats;
   trashSelf: boolean;
-  events: AnimationEvent[];
+  events: BattleEvent[];
 }
 
 export default function playCard(game: GameState) {
@@ -47,7 +47,7 @@ export default function playCard(game: GameState) {
   const result: PlayCardResult = {
     battleStats: { ...EMPTY_BATTLE_STATS },
     trashSelf: false,
-    events: [] as AnimationEvent[],
+    events: [] as BattleEvent[],
   };
 
   card.effects.forEach((cardEffects) => {
@@ -61,7 +61,7 @@ export default function playCard(game: GameState) {
 
   self.cardsPlayedThisTurn += 1;
 
-  game.animationEvents.push(...result.events);
+  game.battleEvents.push(...result.events);
 
   if (self.cards.length === 0) return;
 

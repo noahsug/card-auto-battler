@@ -23,7 +23,7 @@ export const enemyTypes = [
 
 export type EnemyType = (typeof enemyTypes)[number];
 
-export interface AnimationEvent {
+export interface BattleEvent {
   type: 'damage' | 'heal' | 'miss';
   target: Target;
   value?: number;
@@ -141,7 +141,7 @@ export interface GameState {
   wins: number;
   losses: number;
   screen: ScreenName;
-  animationEvents: AnimationEvent[];
+  battleEvents: BattleEvent[];
   wonLastBattle: boolean;
   currentEnemyType: EnemyType;
 }
@@ -176,7 +176,7 @@ export function createInitialGameState(): GameState {
     losses: 0,
     screen: 'gameStart',
     // screen: 'cardCollection', // DEBUG
-    animationEvents: [],
+    battleEvents: [],
     wonLastBattle: false,
     currentEnemyType: getRandomEnemyType(),
   };
