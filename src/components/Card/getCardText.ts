@@ -180,7 +180,8 @@ function getNestedValueTranslations(value: ValueDescriptor) {
     : getNestedPlayerValueTranslations(value);
 }
 
-function getNestedIfTranslations(ifStatement: If) {
+function getNestedIfTranslations(ifStatement?: If) {
+  if (ifStatement == null) return [];
   return [
     getIfTranslations(ifStatement),
     ...getNestedPlayerValueTranslations(ifStatement.value),
@@ -192,7 +193,7 @@ function getNestedRepeatTranslations(repeat: MaybeValue) {
   return [
     getRepeatTranslations(repeat),
     ...getNestedValueTranslations(repeat.value),
-    ...(repeat.if ? getNestedIfTranslations(repeat.if) : []),
+    ...getNestedIfTranslations(repeat.if),
   ];
 }
 
@@ -201,7 +202,7 @@ function getNestedEffectTranslations(effect: CardEffect) {
     getEffectTranslations(effect),
     getTargetTranslations(effect.target),
     ...getNestedValueTranslations(effect.value),
-    ...(effect.if ? getNestedIfTranslations(effect.if) : []),
+    ...getNestedIfTranslations(effect.if),
   ];
 }
 
@@ -236,7 +237,7 @@ function getBasicValueTranslations({ value }: BasicValueDescriptor) {
 function getPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
   const t = getTranslationFn(() => getNestedPlayerValueTranslations(playerValue));
 
-  // not supported yet
+  // not supported
   assert(playerValue.name != 'currentCardIndex');
   assert(playerValue.name != 'startingHealth');
 
@@ -276,11 +277,10 @@ function getPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
   };
 }
 
-function getIfTranslations(ifStatement?: If) {
-  if (ifStatement == null) return {} as Translations;
+function getIfTranslations(ifStatement: If) {
   const t = getTranslationFn(() => getNestedIfTranslations(ifStatement));
 
-  // not supported yet
+  // not supported
   assert(ifStatement.value.multiplier == null);
 
   return {
@@ -342,7 +342,7 @@ function getEffectTranslations(effect: CardEffect) {
 
     [`Deal damage`]: () => {
       if (effect.name === 'trash') {
-        return t(`Enemy trashes`);
+        return t(`You trash`);
       }
       if (effect.name === 'extraCardPlays') {
         return 'Enemy plays cards';
@@ -352,12 +352,23 @@ function getEffectTranslations(effect: CardEffect) {
 
     [`Deal 3 damage`]: (): string => {
       if (effect.name === 'trash') {
-        return `${t(`Enemy trashes`)} ${t('3')}`;
+        return `${t(`You trash`)} ${t('3')}`;
       }
       if (effect.name === 'extraCardPlays') {
         return `${t('Enemy plays 3 extra cards next turn')}`;
       }
       return `${t(`Deal`)} ${t('3')} ${t(`damage`)}`;
+    },
+
+    ['Deals 3 extra damage']: (): string => {
+      const { add } = effect;
+      if (add == null) return '';
+
+      // not supported
+      assert(effect.name === 'damage');
+
+      const tv = getTranslationFn(() => [getBasicValueTranslations(add.value)]);
+      return `Deals ${tv('3')} extra ${t(`damage`)}`;
     },
 
     ['Enemy plays 3 extra cards next turn']: (): string => {
@@ -371,7 +382,7 @@ function getEffectTranslations(effect: CardEffect) {
       return `equal to ${t('twice')} ${t('your bleed')}`;
     },
 
-    [`Enemy trashes`]: () => {
+    [`You trash`]: () => {
       return effect.target === 'self' ? `You trash` : `Enemy trashes`;
     },
 
@@ -404,7 +415,7 @@ function getEffectTranslations(effect: CardEffect) {
 function getRepeatTranslations(repeat: MaybeValue) {
   const t = getTranslationFn(() => getNestedRepeatTranslations(repeat));
 
-  // not supported yet
+  // not supported
   assertType(repeat.value, 'playerValue');
   assert(repeat.value.multiplier == null);
   assert(repeat.value.name != 'cardsPlayedThisTurn');
@@ -428,29 +439,32 @@ function getCardEffectText(effect: CardEffect) {
     t(`if the enemy has more than 3 bleed`),
   ].join(' ');
 
-  // const addText = [
-  //   t(`Deals 3 extra damage if the enemy has more than 3 bleed`)
-  // ].join(' ');
+  const ta = getTranslationFn(() => getNestedIfTranslations(effect.add?.if));
+  const addText = `${t('Deals 3 extra damage')} ${ta('if the enemy has more than 3 bleed')}`;
 
-  return [effectText];
+  return [effectText, addText];
 }
 
 function getRepeatText(repeat?: MaybeValue) {
   if (!repeat) return [];
 
   const t = getTranslationFn(() => getNestedRepeatTranslations(repeat));
-  const text = `${t(`Repeat for each bleed you have`)} ${t(`if the enemy has more than 3 bleed`)}`;
+  const text = `${t(`Repeat for each bleed you have`)} ${t('if the enemy has more than 3 bleed')}`;
 
   return [text];
 }
 
 // Remove extra spaces
-function fixSpacing(text: string): string {
+function fixSpacing(text: string) {
   return text.trim().replace(/\s+/g, ' ');
 }
 
+function isNotEmpty(text: string) {
+  return !text.match(/^\s*$/);
+}
+
 export default function getCardText(card: CardState): string[] {
-  return [...card.effects.flatMap(getCardEffectText), ...getRepeatText(card.repeat)].map(
-    fixSpacing,
-  );
+  return [...card.effects.flatMap(getCardEffectText), ...getRepeatText(card.repeat)]
+    .filter(isNotEmpty)
+    .map(fixSpacing);
 }

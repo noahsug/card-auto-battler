@@ -314,3 +314,15 @@ it('renders repeat', () => {
   card.repeat = { value: v('opponent', 'bleed') };
   expect(render(card)).toBe('Deal 1 damage. Repeat for each bleed the enemy has.');
 });
+
+it('renders add', () => {
+  effect.add = {
+    value: v(3),
+    if: {
+      value: v('opponent', 'bleed'),
+      comparison: '>',
+      value2: v(0),
+    },
+  };
+  expect(render(card)).toBe('Deal 1 damage. Deals 3 extra damage if the enemy has bleed.');
+});
