@@ -116,7 +116,7 @@ describe('heal', () => {
     effect.value = v(1.5);
     const { diff } = getPlayCardResult();
 
-    expect(diff).toEqual({ self: { health: 1 } });
+    expect(diff).toEqual({ opponent: { health: 1 } });
   });
 });
 
@@ -142,7 +142,7 @@ describe('dodge', () => {
     effect.value = v(1.5);
     const { diff } = getPlayCardResult();
 
-    expect(diff).toEqual({ self: { dodge: 1 } });
+    expect(diff).toEqual({ opponent: { dodge: 1 } });
   });
 });
 

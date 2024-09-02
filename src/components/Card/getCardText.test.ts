@@ -136,10 +136,10 @@ it('renders bleed', () => {
 
 it('renders heal', () => {
   effect.name = 'heal';
-  expect(render(card)).toBe('Enemy gains 1 heal.');
+  expect(render(card)).toBe('Enemy gains 1 HP.');
 
   effect.target = 'self';
-  expect(render(card)).toBe('Gain 1 heal.');
+  expect(render(card)).toBe('Gain 1 HP.');
 });
 
 it('renders trash', () => {

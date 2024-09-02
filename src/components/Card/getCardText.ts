@@ -415,6 +415,7 @@ function getEffectTranslations(effect: CardEffect) {
     },
 
     ['damage']: () => {
+      if (effect.name === 'heal') return 'HP';
       return effect.name;
     },
 
