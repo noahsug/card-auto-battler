@@ -392,9 +392,7 @@ describe('renders add', () => {
       value: v('self', 'strength', 2),
     };
 
-    expect(render(card)).toBe('Deal 1 damage. Deal extra damage equal to twice your strength.');
-    // TODO
-    // expect(render(card)).toBe('Deal 1 damage. Strength affects this card 3 times.');
+    expect(render(card)).toBe('Deal 1 damage. Strength affects this card 3 times.');
   });
 });
 

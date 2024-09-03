@@ -171,7 +171,7 @@ function getNestedRepeatTranslations(repeat: MaybeValue) {
 }
 
 interface EffectOptions {
-  addingToValue?: boolean;
+  isAddingToValue?: boolean;
 }
 
 function getNestedEffectTranslations(effect: CardEffect, options: EffectOptions = {}) {
@@ -317,6 +317,15 @@ function getEffectTranslations(effect: CardEffect, options: EffectOptions = {}) 
     [`Deal damage equal to your bleed`]: (): string => {
       switch (effect.value.type) {
         case 'playerValue':
+          if (
+            options.isAddingToValue &&
+            effect.target === 'opponent' &&
+            effect.name === 'damage' &&
+            effect.value.name === 'strength'
+          ) {
+            const x = (effect.value.multiplier || 1) + 1;
+            return `Strength affects this card ${x} times`;
+          }
           return `${t(`Deal damage`)} ${t(`equal to your bleed`)}`;
         case 'basicValue':
           return t(`Deal 3 damage`);
@@ -392,7 +401,7 @@ function getEffectTranslations(effect: CardEffect, options: EffectOptions = {}) 
     },
 
     ['extra']: () => {
-      return options.addingToValue ? 'extra' : '';
+      return options.isAddingToValue ? 'extra' : '';
     },
 
     ['damage']: () => {
@@ -454,9 +463,10 @@ function getAddText(effect: CardEffect) {
     value: effect.add.value,
     if: effect.add.if,
   });
-  const options = { addingToValue: true };
 
-  const t = getTranslationFn(() => getNestedEffectTranslations(addEffect, options));
+  const t = getTranslationFn(() =>
+    getNestedEffectTranslations(addEffect, { isAddingToValue: true }),
+  );
   return `${t('Deal damage equal to your bleed')} ${t('if the enemy has more than 3 bleed')}`;
 }
 
