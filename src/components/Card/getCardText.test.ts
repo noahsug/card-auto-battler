@@ -271,7 +271,7 @@ describe('renders effect based on player value', () => {
     effect.value = v('opponent', 'cardsPlayedThisTurn');
     // TODO: remove "has", just "cards the enemy played"
     expect(render(card)).toBe(
-      `Deal damage equal to the number of cards the enemy has played last turn.`,
+      `Deal damage equal to the number of cards the enemy played last turn.`,
     );
 
     effect.value = v('self', 'cardsPlayedThisTurn');
@@ -280,7 +280,7 @@ describe('renders effect based on player value', () => {
 
   test('equal to cards trashed', () => {
     effect.value = v('opponent', 'trashedCards');
-    expect(render(card)).toBe(`Deal damage equal to the number of cards the enemy has trashed.`);
+    expect(render(card)).toBe(`Deal damage equal to the number of cards the enemy trashed.`);
 
     effect.value = v('self', 'trashedCards');
     expect(render(card)).toBe(`Deal damage equal to the number of cards you've trashed.`);
@@ -346,7 +346,7 @@ describe('renders if statements', () => {
       comparison: '>=',
       value2: v(2),
     };
-    expect(render(card)).toBe(`Deal 1 damage if the enemy has trashed at least 2 cards.`);
+    expect(render(card)).toBe(`Deal 1 damage if the enemy trashed at least 2 cards.`);
   });
 
   test('if you have less than 10 HP', () => {
@@ -379,23 +379,23 @@ describe('renders add', () => {
     expect(render(card)).toBe('Deal 1 damage. Deal 3 extra damage if the enemy has bleed.');
   });
 
-  // test('deals extra damage equal to bleed', () => {
-  //   effect.add = {
-  //     value: v('opponent', 'bleed'),
-  //   };
+  test('deals extra damage equal to bleed', () => {
+    effect.add = {
+      value: v('opponent', 'bleed'),
+    };
 
-  //   expect(render(card)).toBe(`Deal 1 damage. Deal extra damage equal to the enemy's bleed.`);
-  // });
+    expect(render(card)).toBe(`Deal 1 damage. Deal extra damage equal to the enemy's bleed.`);
+  });
 
-  // test('strength effects this card 3 times', () => {
-  //   effect.add = {
-  //     value: v('self', 'strength', 3),
-  //   };
+  test('strength effects this card 3 times', () => {
+    effect.add = {
+      value: v('self', 'strength', 2),
+    };
 
-  //   expect(render(card)).toBe('Deal 1 damage. Deal extra damage equal to 2 times your strength.');
-  //   // TODO
-  //   // expect(render(card)).toBe('Deal 1 damage. Strength affects this card 3 times.');
-  // });
+    expect(render(card)).toBe('Deal 1 damage. Deal extra damage equal to twice your strength.');
+    // TODO
+    // expect(render(card)).toBe('Deal 1 damage. Strength affects this card 3 times.');
+  });
 });
 
 it('renders multiply', () => {

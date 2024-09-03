@@ -186,7 +186,7 @@ function getNestedEffectTranslations(effect: CardEffect, options: EffectOptions 
 function getTargetTranslations(target: Target) {
   return {
     [`you've`]: () => {
-      return target === 'self' ? `you've` : `the enemy has`;
+      return target === 'self' ? `you've` : `the enemy`;
     },
     [`you have`]: () => {
       return target === 'self' ? `you have` : `the enemy has`;
