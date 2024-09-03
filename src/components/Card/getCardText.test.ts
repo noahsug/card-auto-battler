@@ -1,6 +1,6 @@
 import getCardText from './getCardText';
 
-import { createCard, getValueDescriptor as v } from '../../gameState/utils';
+import { createCard, ifHas, getValueDescriptor as v } from '../../gameState/utils';
 import { CardEffect, CardState, PlayerValueDescriptor } from '../../gameState/gameState';
 
 // Deal 1 damage 3 times.
@@ -117,13 +117,45 @@ it('renders damage', () => {
   expect(render(card)).toBe('Take 3 damage.');
 });
 
-it('renders multiple effects', () => {
-  card.effects.push({
-    target: 'self',
-    name: 'damage',
-    value: v(1),
+describe('renders multiple effects', () => {
+  test('deal 1, take 1', () => {
+    card.effects.push({
+      target: 'self',
+      name: 'damage',
+      value: v(1),
+    });
+    expect(render(card)).toBe('Deal 1 damage. Take 1 damage.');
   });
-  expect(render(card)).toBe('Deal 1 damage. Take 1 damage.');
+
+  test('deal 1, deal 2', () => {
+    card.effects.push({
+      target: 'opponent',
+      name: 'damage',
+      value: v(2),
+    });
+    expect(render(card)).toBe('Deal 1 damage. Deal 2 damage.');
+  });
+
+  test('deal 1, deal another 2 if', () => {
+    card.effects.push({
+      target: 'opponent',
+      name: 'damage',
+      value: v(2),
+      if: ifHas('opponent', 'bleed'),
+    });
+    expect(render(card)).toBe('Deal 1 damage. Deal 2 damage if the enemy has bleed.');
+    // TODO: add "another" if this effect has if and prev effect is the same
+    // 'Deal 1 damage. Deal another 2 damage if the enemy...');
+    // 'Apply 1 bleed. Apply another 2 bleed if the enemy...');
+    // 'You trash 1. You trash another 2 if the enemy...');
+    // 'Deal 1 damage. Deal damage equal to your...'); <-- doesn't change
+    // 'Deal 1 damage. Deal 2 damage. <-- doesn't change
+    // TODO: support non-damage add
+    // expect(render(card)).toBe('Apply 1 bleed. Apply 2 extra bleed if the enemy has less than 10 HP.');
+    // expect(render(card)).toBe('You trash 1. You trash 2 extra if the enemy has less than 10
+    // HP.');
+    // TODO: add ONLY supports damage. But we'll use the term "extra" for non-damage anyway.
+  });
 });
 
 it('renders bleed', () => {
@@ -191,7 +223,7 @@ it('renders multi-hits', () => {
 //     expect(render(card)).toBe('Deal 1 damage and apply 2 bleed.');
 //   });
 
-//   test('deal damage and apply bleed equal to enemy bleed', () => {
+//   test('gain bleed and strength bleed equal to enemy bleed', () => {
 //     effect.multiplyBy = {
 //       type: 'playerValue',
 //       target: 'opponent',
@@ -237,8 +269,9 @@ describe('renders effect based on player value', () => {
 
   test('equal to cards played', () => {
     effect.value = v('opponent', 'cardsPlayedThisTurn');
+    // TODO: remove "has", just "cards the enemy played"
     expect(render(card)).toBe(
-      `Deal damage equal to the number of cards the enemy has played this turn.`,
+      `Deal damage equal to the number of cards the enemy has played last turn.`,
     );
 
     effect.value = v('self', 'cardsPlayedThisTurn');
@@ -270,6 +303,9 @@ describe('renders effect based on player value', () => {
   test('triple your strength', () => {
     card = createCard({ target: 'self', name: 'strength', value: v('self', 'strength', 2) });
     expect(render(card)).toBe(`Gain strength equal to twice your strength.`);
+    // TODO
+    // expect(render(card)).toBe(`Triple your strength.`);
+    // expect(render(card)).toBe(`Triple the enemy's bleed.`);
   });
 
   // TODO:
@@ -330,16 +366,36 @@ it('renders repeat', () => {
   expect(render(card)).toBe('Deal 1 damage. Repeat for each bleed the enemy has.');
 });
 
-it('renders add', () => {
-  effect.add = {
-    value: v(3),
-    if: {
-      value: v('opponent', 'bleed'),
-      comparison: '>',
-      value2: v(0),
-    },
-  };
-  expect(render(card)).toBe('Deal 1 damage. Deals 3 extra damage if the enemy has bleed.');
+describe('renders add', () => {
+  test('deal extra damage if the enemy has bleed', () => {
+    effect.add = {
+      value: v(3),
+      if: {
+        value: v('opponent', 'bleed'),
+        comparison: '>',
+        value2: v(0),
+      },
+    };
+    expect(render(card)).toBe('Deal 1 damage. Deal 3 extra damage if the enemy has bleed.');
+  });
+
+  // test('deals extra damage equal to bleed', () => {
+  //   effect.add = {
+  //     value: v('opponent', 'bleed'),
+  //   };
+
+  //   expect(render(card)).toBe(`Deal 1 damage. Deal extra damage equal to the enemy's bleed.`);
+  // });
+
+  // test('strength effects this card 3 times', () => {
+  //   effect.add = {
+  //     value: v('self', 'strength', 3),
+  //   };
+
+  //   expect(render(card)).toBe('Deal 1 damage. Deal extra damage equal to 2 times your strength.');
+  //   // TODO
+  //   // expect(render(card)).toBe('Deal 1 damage. Strength affects this card 3 times.');
+  // });
 });
 
 it('renders multiply', () => {
@@ -353,17 +409,14 @@ it('renders multiply', () => {
     },
   };
 
-  expect(render(card)).toBe('Deal 1 damage. Deals double damage if the enemy has bleed.');
+  expect(render(card)).toBe('Deal 1 damage. Deal double damage if the enemy has bleed.');
 
   basicValue.value = 3;
-  expect(render(card)).toBe('Deal 1 damage. Deals triple damage if the enemy has bleed.');
+  expect(render(card)).toBe('Deal 1 damage. Deal triple damage if the enemy has bleed.');
 
   basicValue.value = 4;
-  expect(render(card)).toBe('Deal 1 damage. Deals quadruple damage if the enemy has bleed.');
-
-  basicValue.value = 0.5;
-  expect(render(card)).toBe('Deal 1 damage. Deals 50% damage if the enemy has bleed.');
+  expect(render(card)).toBe('Deal 1 damage. Deal quadruple damage if the enemy has bleed.');
 
   basicValue.value = 1.5;
-  expect(render(card)).toBe('Deal 1 damage. Deals 150% damage if the enemy has bleed.');
+  expect(render(card)).toBe('Deal 1 damage. Deal 150% damage if the enemy has bleed.');
 });

@@ -1,9 +1,9 @@
 import { PlayerState, createInitialGameState, getCurrentCard } from '../gameState';
 import { discardCurrentCard, trashCurrentCard, trashNextCards } from './deck';
-import { DEAL_1_DAMAGE } from '../utils';
+import { createCard } from '../utils';
 
 let player: PlayerState;
-const [c1, c2, c3] = [DEAL_1_DAMAGE, DEAL_1_DAMAGE, DEAL_1_DAMAGE];
+const [c1, c2, c3] = [createCard(), createCard(), createCard()];
 
 beforeEach(() => {
   const { user } = createInitialGameState();

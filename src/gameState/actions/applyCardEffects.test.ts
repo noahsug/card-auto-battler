@@ -4,14 +4,14 @@ import { createInitialGameState, PlayerState } from '../index';
 import applyCardEffects from './applyCardEffects';
 import { CardEffect, CardState } from '../gameState';
 import { BLEED_DAMAGE } from '../constants';
-import { getValueDescriptor as v, DEAL_1_DAMAGE } from '../utils';
+import { getValueDescriptor as v, createCard } from '../utils';
 import { diffValues } from '../../utils';
 
 let card: CardState;
 let effect: CardEffect;
 
 beforeEach(() => {
-  card = cloneDeep(DEAL_1_DAMAGE);
+  card = cloneDeep(createCard());
   effect = card.effects[0];
 });
 
@@ -23,8 +23,8 @@ function getPlayCardResult({
   opponent?: Partial<PlayerState>;
 } = {}) {
   const { user, enemy } = createInitialGameState();
-  user.cards = new Array(3).fill(DEAL_1_DAMAGE);
-  enemy.cards = new Array(3).fill(DEAL_1_DAMAGE);
+  user.cards = [createCard(), createCard(), createCard()];
+  enemy.cards = [createCard(), createCard(), createCard()];
 
   const self = Object.assign(user, selfOverrides);
   const opponent = Object.assign(enemy, opponentOverrides);

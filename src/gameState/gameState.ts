@@ -71,7 +71,7 @@ export interface CardEffect {
   target: Target;
   name: CardEffectName;
   value: ValueDescriptor;
-  add?: MaybeValue<BasicValueDescriptor>;
+  add?: MaybeValue;
   multiply?: MaybeValue<BasicValueDescriptor>;
   multiHit?: number;
   if?: If;

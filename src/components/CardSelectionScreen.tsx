@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { getCardSelectionsForBattle } from '../gameState';
 import { useActions } from './GameStateContext';

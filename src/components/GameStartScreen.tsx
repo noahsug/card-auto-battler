@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { useActions } from './GameStateContext';
 import { Screen } from './shared';

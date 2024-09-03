@@ -29,6 +29,7 @@ import { discardCurrentCard } from './deck';
  */
 
 export function startGame(game: GameState) {
+  // set new starter cards
   game.user.cards = createInitialGameState().user.cards;
   game.user.trashedCards = [];
   startCardSelection(game);
@@ -38,7 +39,6 @@ export function startGame(game: GameState) {
 }
 
 export function startCardSelection(game: GameState) {
-  game.turn = 0;
   game.screen = 'cardSelection';
 }
 
@@ -145,5 +145,6 @@ function resetGameState(game: GameState) {
     });
   });
 
+  game.turn = 0;
   game.battleEvents = [];
 }

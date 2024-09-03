@@ -1,4 +1,3 @@
-import { Target } from '../../gameState/gameState';
 import { assert, assertIsNonNullable, assertType } from '../../utils';
 import {
   CardEffect,
@@ -8,35 +7,9 @@ import {
   BasicValueDescriptor,
   PlayerValueDescriptor,
   If,
+  Target,
 } from '../../gameState/gameState';
 import { KeysOfUnion } from '../../utils/types';
-
-// Deal 1 damage. Repeat for each bleed the enemy has.
-
-// OLD WAY
-// {
-//   target: 'opponent',
-//   damage: 1,
-//   gainEffectsList: [
-//     {
-//       effects: { activations: 1 },
-//       forEveryPlayerValue: { target: 'opponent', name: 'bleed' },
-//     },
-//   ],
-// })
-
-// const flushBleed = {
-//   target: 'opponent',
-//   effect: 'damage',
-//   value: 1,
-//   repeat: {
-//     value: 1,
-//     multiplyBy: {
-//       type: 'opponent',
-//       name: 'bleed',
-//     },
-//   },
-// };
 
 // Deal damage and gain strength equal to 2 times the enemy's bleed.
 
@@ -197,9 +170,13 @@ function getNestedRepeatTranslations(repeat: MaybeValue) {
   ];
 }
 
-function getNestedEffectTranslations(effect: CardEffect) {
+interface EffectOptions {
+  addingToValue?: boolean;
+}
+
+function getNestedEffectTranslations(effect: CardEffect, options: EffectOptions = {}) {
   return [
-    getEffectTranslations(effect),
+    getEffectTranslations(effect, options),
     getTargetTranslations(effect.target),
     ...getNestedValueTranslations(effect.value),
     ...getNestedIfTranslations(effect.if),
@@ -211,13 +188,14 @@ function getTargetTranslations(target: Target) {
     [`you've`]: () => {
       return target === 'self' ? `you've` : `the enemy has`;
     },
-
     [`you have`]: () => {
       return target === 'self' ? `you have` : `the enemy has`;
     },
-
     [`your`]: () => {
       return target === 'self' ? `your` : `the enemy's`;
+    },
+    ['Enemy']: () => {
+      return target === 'self' ? `You` : `Enemy`;
     },
   };
 }
@@ -247,9 +225,13 @@ function getPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
         return `the number of cards ${t(`you've`)} trashed`;
       }
       if (playerValue.name === 'cardsPlayedThisTurn') {
-        return `the number of cards ${t(`you've`)} played this turn`;
+        return `the number of cards ${t(`you've`)} played ${t('this turn')}`;
       }
       return `${t(`your`)} ${t('bleed')}`;
+    },
+
+    ['this turn']: (): string => {
+      return playerValue.target === 'opponent' ? 'last turn' : 'this turn';
     },
 
     ['bleed']: () => {
@@ -328,8 +310,8 @@ function getIfTranslations(ifStatement: If) {
   };
 }
 
-function getEffectTranslations(effect: CardEffect) {
-  const t = getTranslationFn(() => getNestedEffectTranslations(effect));
+function getEffectTranslations(effect: CardEffect, options: EffectOptions = {}) {
+  const t = getTranslationFn(() => getNestedEffectTranslations(effect, options));
 
   return {
     [`Deal damage equal to your bleed`]: (): string => {
@@ -342,53 +324,48 @@ function getEffectTranslations(effect: CardEffect) {
       return effect.value satisfies never;
     },
 
-    [`Deal damage`]: () => {
+    [`Deal damage`]: (): string => {
       if (effect.name === 'trash') {
-        return t(`You trash`);
+        return `${t(`You trash`)} ${t('extra')}`;
       }
       if (effect.name === 'extraCardPlays') {
-        return 'Enemy plays cards';
+        return t('Enemy plays extra cards next turn');
       }
-      return `${t(`Deal`)} ${t(`damage`)}`;
+      return `${t(`Deal`)} ${t(`extra`)} ${t(`damage`)}`;
     },
 
     [`Deal 3 damage`]: (): string => {
       if (effect.name === 'trash') {
-        return `${t(`You trash`)} ${t('3')}`;
+        return `${t(`You trash`)} ${t('3')} ${t('extra')}`;
       }
       if (effect.name === 'extraCardPlays') {
         return `${t('Enemy plays 3 extra cards next turn')}`;
       }
-      return `${t(`Deal`)} ${t('3')} ${t(`damage`)}`;
+      return `${t(`Deal`)} ${t('3')} ${t(`extra`)} ${t(`damage`)}`;
     },
 
-    ['Deals 3 extra damage']: (): string => {
-      const { add } = effect;
-      if (add == null) return '';
-
-      // not supported
-      assert(effect.name === 'damage');
-      assert(add.value.value > 0);
-
-      const tv = getTranslationFn(() => [getBasicValueTranslations(add.value)]);
-      return `Deals ${tv('3')} extra ${t(`damage`)}`;
-    },
-
-    ['Deals double damage']: (): string => {
+    ['Deal double damage']: (): string => {
       const { multiply } = effect;
       if (multiply == null) return '';
 
-      // not supported
+      // not supported - would need 'Apply twice as much poison if...'
       assert(effect.name === 'damage');
 
-      return `Deals ${t('double')} ${t(`damage`)}`;
+      return `${t('Deal')} ${t('double')} ${t(`damage`)}`;
     },
 
     ['Enemy plays 3 extra cards next turn']: (): string => {
       if (effect.target === 'self') {
-        return `Play ${t('3')} ${t('cards')}`;
+        return `Play ${t('3')} ${t(`extra`)} ${t('cards')}`;
       }
       return `Enemy plays ${t('3')} extra ${t('cards')} next turn`;
+    },
+
+    ['Enemy plays extra cards next turn']: (): string => {
+      if (effect.target === 'self') {
+        return `Play ${t(`extra`)} cards`;
+      }
+      return `Enemy plays extra cards next turn`;
     },
 
     [`equal to your bleed`]: (): string => {
@@ -414,6 +391,10 @@ function getEffectTranslations(effect: CardEffect) {
       return 'Apply';
     },
 
+    ['extra']: () => {
+      return options.addingToValue ? 'extra' : '';
+    },
+
     ['damage']: () => {
       if (effect.name === 'heal') return 'HP';
       return effect.name;
@@ -427,6 +408,9 @@ function getEffectTranslations(effect: CardEffect) {
     ['double']: () => {
       const basicValue = effect.multiply?.value;
       assertIsNonNullable(basicValue);
+
+      // not supported - "Damage is reduced by 50%"
+      assert(basicValue.value > 1);
 
       switch (basicValue.value) {
         case 2:
@@ -463,6 +447,19 @@ function getRepeatTranslations(repeat: MaybeValue) {
   };
 }
 
+function getAddText(effect: CardEffect) {
+  if (effect.add == null) return '';
+
+  const addEffect: CardEffect = Object.assign({}, effect, {
+    value: effect.add.value,
+    if: effect.add.if,
+  });
+  const options = { addingToValue: true };
+
+  const t = getTranslationFn(() => getNestedEffectTranslations(addEffect, options));
+  return `${t('Deal damage equal to your bleed')} ${t('if the enemy has more than 3 bleed')}`;
+}
+
 function getCardEffectText(effect: CardEffect) {
   const t = getTranslationFn(() => getNestedEffectTranslations(effect));
   const effectText = [
@@ -471,11 +468,10 @@ function getCardEffectText(effect: CardEffect) {
     t(`if the enemy has more than 3 bleed`),
   ].join(' ');
 
-  const ta = getTranslationFn(() => getNestedIfTranslations(effect.add?.if));
-  const addText = `${t('Deals 3 extra damage')} ${ta('if the enemy has more than 3 bleed')}`;
+  const addText = getAddText(effect);
 
   const tm = getTranslationFn(() => getNestedIfTranslations(effect.multiply?.if));
-  const multiplyText = `${t('Deals double damage')} ${tm('if the enemy has more than 3 bleed')}`;
+  const multiplyText = `${t('Deal double damage')} ${tm('if the enemy has more than 3 bleed')}`;
 
   return [effectText, addText, multiplyText];
 }

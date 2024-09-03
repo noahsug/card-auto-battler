@@ -3,6 +3,7 @@ import {
   BasicValueDescriptor,
   CardEffect,
   CardState,
+  If,
   MaybeValue,
   PlayerValueDescriptor,
   PlayerValueName,
@@ -11,17 +12,64 @@ import {
 } from './gameState';
 
 export function createCard(
-  effect: CardEffect,
+  partialEffect: Partial<CardEffect> = {},
   {
     repeat,
     name = '',
     effects,
   }: { repeat?: MaybeValue; name?: string; effects?: CardEffect[] } = {},
 ): CardState {
+  const effect: CardEffect = Object.assign(
+    { target: 'opponent', name: 'damage', value: getValueDescriptor(1) },
+    partialEffect,
+  );
   return {
     effects: [effect].concat(effects || []),
     repeat,
     name,
+  };
+}
+
+export function ifCompare(
+  target: Target,
+  name: PlayerValueName,
+  multiplier: number,
+  comparison: If['comparison'],
+  basicValue: number,
+): If;
+export function ifCompare(
+  target: Target,
+  name: PlayerValueName,
+  comparison: If['comparison'],
+  basicValue: number,
+): If;
+export function ifCompare(
+  target: Target,
+  name: PlayerValueName,
+  arg1: number | If['comparison'],
+  arg2: If['comparison'] | number,
+  arg3?: number,
+): If {
+  if (arguments.length === 4) {
+    const comparison = arg1 as If['comparison'];
+    const basicValue = arg2 as number;
+    return ifCompare(target, name, 1, comparison, basicValue);
+  }
+  const multiplier = arg1 as number;
+  const comparison = arg2 as If['comparison'];
+  const basicValue = arg3 as number;
+  return {
+    value: getValueDescriptor(target, name, multiplier),
+    comparison,
+    value2: getValueDescriptor(basicValue),
+  };
+}
+
+export function ifHas(target: Target, name: PlayerValueName): If {
+  return {
+    value: getValueDescriptor(target, name),
+    comparison: '>',
+    value2: getValueDescriptor(0),
   };
 }
 
@@ -47,9 +95,3 @@ export function getValueDescriptor(
   assertIsNonNullable(name);
   return { type: 'playerValue', target: valueOrTarget, name, multiplier };
 }
-
-export const DEAL_1_DAMAGE = createCard({
-  name: 'damage',
-  target: 'opponent',
-  value: getValueDescriptor(1),
-});

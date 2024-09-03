@@ -1,10 +1,9 @@
 import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
 
-import { endTurn, playCard, startGame, startBattle, startTurn } from './actions';
+import { endTurn, playCard, startGame, startBattle, startTurn, endBattle } from './actions';
 import {
   BLEED_DAMAGE,
-  CardEffects,
   CardState,
   MAX_TURNS_IN_BATTLE,
   PlayerState,
@@ -14,18 +13,6 @@ import {
   getIsEnemyTurn,
 } from '../index';
 import { createCard } from '../utils';
-import {
-  dodgeAndTrashCard,
-  healForEachTrashedCard,
-  damageSelfIfMissCard,
-  appliesStrengthTwiceCard,
-  gainStrengthForBleedCard,
-  extraPlayIfBleedCard,
-  tripleStrengthCard,
-} from '../cards';
-
-const damage0 = createCard({ target: 'opponent', damage: 0 });
-const damage1 = createCard({ target: 'opponent', damage: 1 });
 
 function runBattle({
   user,
@@ -41,7 +28,7 @@ function runBattle({
   stopAfterUserTurns?: number;
   stopAfterEnemyTurns?: number;
   stopAfterNUserCardsPlayed?: number;
-}) {
+} = {}) {
   const game = merge(
     createInitialGameState(),
     { user: { startingHealth: 10 }, enemy: { startingHealth: 10 } },
@@ -54,8 +41,8 @@ function runBattle({
   const startingState = cloneDeep(game);
 
   // unshuffle the cards
-  game.user.cards = user?.cards || [damage0];
-  game.enemy.cards = enemy?.cards || [damage0];
+  game.user.cards = user?.cards || [createCard()];
+  game.enemy.cards = enemy?.cards || [createCard()];
 
   let userCardsPlayed = 0;
   stopAfterTurns = Math.min(stopAfterTurns, stopAfterUserTurns * 2 - 1, stopAfterEnemyTurns * 2);
@@ -73,6 +60,7 @@ function runBattle({
     }
 
     endTurn(game);
+    if (getIsBattleOver(game)) return { endingState: game, startingState };
   }
 
   return { endingState: game, startingState };
@@ -84,6 +72,36 @@ function playCards(cards: CardState[]) {
     stopAfterNUserCardsPlayed: cards.length,
   });
 }
+
+describe('startBattle', () => {
+  it('resets game state and initializes a new enemy', () => {});
+});
+
+describe('playCard', () => {
+  it('kills a player if they are out of cards', () => {});
+
+  it('discards the played card', () => {});
+
+  it('can be called again until extraCardPlays reaches 0', () => {});
+});
+
+it('play out a full game', () => {
+  const { endingState } = runBattle();
+  expect(endingState.wonLastBattle).toBe(false);
+  expect(endingState.wins).toBe(1);
+  expect(endingState.losses).toBe(0);
+  expect(endingState.enemy.health).toBe(0);
+  expect(endingState.user.health).toBe(1);
+});
+
+test('endBattle', () => {
+  const { endingState: game } = runBattle();
+  endBattle(game);
+
+  expect(game.screen).toBe('battleEnd');
+  expect(game.user.health).toBe(10);
+  expect(game.enemy.health).toBe(10);
+});
 
 describe('damage effect', () => {
   it('reduces opponent health', () => {
