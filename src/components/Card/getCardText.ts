@@ -326,11 +326,35 @@ function getEffectTranslations(effect: CardEffect, options: EffectOptions = {}) 
             const x = (effect.value.multiplier || 1) + 1;
             return `Strength affects this card ${x} times`;
           }
+          if (
+            effect.target === effect.value.target &&
+            effect.name === effect.value.name &&
+            effect.name !== 'extraCardPlays'
+          ) {
+            return `${t('Triple')} ${t('your bleed')}`;
+          }
           return `${t(`Deal damage`)} ${t(`equal to your bleed`)}`;
         case 'basicValue':
           return t(`Deal 3 damage`);
       }
       return effect.value satisfies never;
+    },
+
+    ['Triple']: (): string => {
+      assertType(effect.value, 'playerValue');
+      const multiplier = (effect.value.multiplier || 1) + 1;
+
+      switch (multiplier) {
+        case 2:
+          return 'Double';
+        case 3:
+          return 'Triple';
+        case 4:
+          return 'Quadruple';
+        default: {
+          return `${multiplier}x`;
+        }
+      }
     },
 
     [`Deal damage`]: (): string => {
@@ -350,7 +374,7 @@ function getEffectTranslations(effect: CardEffect, options: EffectOptions = {}) 
       if (effect.name === 'extraCardPlays') {
         return `${t('Enemy plays 3 extra cards next turn')}`;
       }
-      return `${t(`Deal`)} ${t('3')} ${t(`extra`)} ${t(`damage`)}`;
+      return `${t(`Deal`)} ${t('+')}${t('3')} ${t(`extra`)} ${t(`damage`)}`;
     },
 
     ['Deal double damage']: (): string => {
@@ -402,6 +426,10 @@ function getEffectTranslations(effect: CardEffect, options: EffectOptions = {}) 
 
     ['extra']: () => {
       return options.isAddingToValue ? 'extra' : '';
+    },
+
+    ['+']: () => {
+      return options.isAddingToValue && effect.name === 'damage' ? '+' : '';
     },
 
     ['damage']: () => {

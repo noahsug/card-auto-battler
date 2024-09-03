@@ -269,7 +269,6 @@ describe('renders effect based on player value', () => {
 
   test('equal to cards played', () => {
     effect.value = v('opponent', 'cardsPlayedThisTurn');
-    // TODO: remove "has", just "cards the enemy played"
     expect(render(card)).toBe(
       `Deal damage equal to the number of cards the enemy played last turn.`,
     );
@@ -302,10 +301,12 @@ describe('renders effect based on player value', () => {
 
   test('triple your strength', () => {
     card = createCard({ target: 'self', name: 'strength', value: v('self', 'strength', 2) });
-    expect(render(card)).toBe(`Gain strength equal to twice your strength.`);
-    // TODO
-    // expect(render(card)).toBe(`Triple your strength.`);
-    // expect(render(card)).toBe(`Triple the enemy's bleed.`);
+    expect(render(card)).toBe(`Triple your strength.`);
+  });
+
+  test(`double the enemy's bleed`, () => {
+    card = createCard({ name: 'bleed', value: v('opponent', 'bleed') });
+    expect(render(card)).toBe(`Double the enemy's bleed.`);
   });
 
   // TODO:
@@ -376,7 +377,7 @@ describe('renders add', () => {
         value2: v(0),
       },
     };
-    expect(render(card)).toBe('Deal 1 damage. Deal 3 extra damage if the enemy has bleed.');
+    expect(render(card)).toBe('Deal 1 damage. Deal +3 extra damage if the enemy has bleed.');
   });
 
   test('deals extra damage equal to bleed', () => {
