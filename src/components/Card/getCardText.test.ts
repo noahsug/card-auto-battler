@@ -299,7 +299,14 @@ describe('renders if statements', () => {
       comparison: '>',
       value2: v(0),
     };
+
     expect(render(card)).toBe('Deal 1 damage if the enemy has dodge.');
+
+    effect.name = 'trash';
+    expect(render(card)).toBe('Enemy trashes 1 if they have dodge.');
+
+    effect.name = 'extraCardPlays';
+    expect(render(card)).toBe('Enemy plays 1 extra card next turn if they have dodge.');
   });
 
   test('if you have 3 bleed', () => {
@@ -364,11 +371,11 @@ describe('renders add', () => {
 
     effect.name = 'extraCardPlays';
     expect(render(card)).toBe(
-      'Enemy plays 1 extra card next turn. Enemy plays 3 extra cards next turn if the enemy has bleed.',
+      'Enemy plays 1 extra card next turn. Enemy plays 3 extra cards next turn if they have bleed.',
     );
 
     effect.name = 'trash';
-    expect(render(card)).toBe('Enemy trashes 1. Enemy trashes 3 more if the enemy has bleed.');
+    expect(render(card)).toBe('Enemy trashes 1. Enemy trashes 3 more if they have bleed.');
 
     effect.target = 'self';
     expect(render(card)).toBe('You trash 1. You trash 3 more if the enemy has bleed.');

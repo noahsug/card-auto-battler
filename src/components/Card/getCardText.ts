@@ -8,6 +8,7 @@ import {
   PlayerValueDescriptor,
   If,
   Target,
+  CardEffectName,
 } from '../../gameState/gameState';
 import { KeysOfUnion } from '../../utils/types';
 
@@ -143,21 +144,32 @@ function getTranslationFn<T extends Translations>(getTranslationsList: () => T[]
   };
 }
 
-function getNestedPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
-  return [getPlayerValueTranslations(playerValue), getTargetTranslations(playerValue.target)];
+interface ValueOptions {
+  prevTarget?: Target;
+  prevEffect?: CardEffectName;
 }
 
-function getNestedValueTranslations(value: ValueDescriptor) {
+function getNestedPlayerValueTranslations(
+  playerValue: PlayerValueDescriptor,
+  options: ValueOptions = {},
+) {
+  return [
+    getPlayerValueTranslations(playerValue, options),
+    getTargetTranslations(playerValue.target),
+  ];
+}
+
+function getNestedValueTranslations(value: ValueDescriptor, options: ValueOptions = {}) {
   return value.type === 'basicValue'
     ? [getBasicValueTranslations(value)]
-    : getNestedPlayerValueTranslations(value);
+    : getNestedPlayerValueTranslations(value, options);
 }
 
-function getNestedIfTranslations(ifStatement?: If) {
+function getNestedIfTranslations(ifStatement?: If, options: ValueOptions = {}) {
   if (ifStatement == null) return [];
   return [
-    getIfTranslations(ifStatement),
-    ...getNestedPlayerValueTranslations(ifStatement.value),
+    getIfTranslations(ifStatement, options),
+    ...getNestedPlayerValueTranslations(ifStatement.value, options),
     getBasicValueTranslations(ifStatement.value2),
   ];
 }
@@ -175,22 +187,17 @@ interface EffectOptions {
 }
 
 function getNestedEffectTranslations(effect: CardEffect, options: EffectOptions = {}) {
+  const valueOptions = { prevTarget: effect.target, prevEffect: effect.name };
   return [
     getEffectTranslations(effect, options),
     getTargetTranslations(effect.target),
-    ...getNestedValueTranslations(effect.value),
-    ...getNestedIfTranslations(effect.if),
+    ...getNestedValueTranslations(effect.value, valueOptions),
+    ...getNestedIfTranslations(effect.if, valueOptions),
   ];
 }
 
 function getTargetTranslations(target: Target) {
   return {
-    [`you've`]: () => {
-      return target === 'self' ? `you've` : `the enemy`;
-    },
-    [`you have`]: () => {
-      return target === 'self' ? `you have` : `the enemy has`;
-    },
     [`your`]: () => {
       return target === 'self' ? `your` : `the enemy's`;
     },
@@ -212,8 +219,8 @@ function getBasicValueTranslations({ value }: BasicValueDescriptor) {
   };
 }
 
-function getPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
-  const t = getTranslationFn(() => getNestedPlayerValueTranslations(playerValue));
+function getPlayerValueTranslations(playerValue: PlayerValueDescriptor, options: ValueOptions) {
+  const t = getTranslationFn(() => getNestedPlayerValueTranslations(playerValue, options));
 
   // not supported
   assert(playerValue.name != 'currentCardIndex');
@@ -228,6 +235,20 @@ function getPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
         return `the number of cards ${t(`you've`)} played ${t('this turn')}`;
       }
       return `${t(`your`)} ${t('bleed')}`;
+    },
+    [`you have`]: () => {
+      if (
+        options.prevTarget === 'opponent' &&
+        playerValue.target === 'opponent' &&
+        (options.prevEffect === 'extraCardPlays' || options.prevEffect === 'trash')
+      ) {
+        return 'they have';
+      }
+      return playerValue.target === 'self' ? `you have` : `the enemy has`;
+    },
+
+    [`you've`]: () => {
+      return playerValue.target === 'self' ? `you've` : `the enemy`;
     },
 
     ['this turn']: (): string => {
@@ -261,8 +282,8 @@ function getPlayerValueTranslations(playerValue: PlayerValueDescriptor) {
   };
 }
 
-function getIfTranslations(ifStatement: If) {
-  const t = getTranslationFn(() => getNestedIfTranslations(ifStatement));
+function getIfTranslations(ifStatement: If, options: ValueOptions) {
+  const t = getTranslationFn(() => getNestedIfTranslations(ifStatement, options));
 
   // not supported
   assert(ifStatement.value.multiplier == null);
