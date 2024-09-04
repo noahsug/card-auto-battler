@@ -1,8 +1,0 @@
-{
-  // prettier
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-
-  // vscode-jest
-  "jest.jestCommandLine": "yarn test",
-  "prettier.configPath": ""
-}
