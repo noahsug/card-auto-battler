@@ -135,27 +135,6 @@ describe('renders multiple effects', () => {
     });
     expect(render(card)).toBe('Deal 1 damage. Deal 2 damage.');
   });
-
-  test('deal 1, deal another 2 if', () => {
-    card.effects.push({
-      target: 'opponent',
-      name: 'damage',
-      value: v(2),
-      if: ifHas('opponent', 'bleed'),
-    });
-    expect(render(card)).toBe('Deal 1 damage. Deal 2 damage if the enemy has bleed.');
-    // TODO: add "another" if this effect has if and prev effect is the same
-    // 'Deal 1 damage. Deal another 2 damage if the enemy...');
-    // 'Apply 1 bleed. Apply another 2 bleed if the enemy...');
-    // 'You trash 1. You trash another 2 if the enemy...');
-    // 'Deal 1 damage. Deal damage equal to your...'); <-- doesn't change
-    // 'Deal 1 damage. Deal 2 damage. <-- doesn't change
-    // TODO: support non-damage add
-    // expect(render(card)).toBe('Apply 1 bleed. Apply 2 extra bleed if the enemy has less than 10 HP.');
-    // expect(render(card)).toBe('You trash 1. You trash 2 extra if the enemy has less than 10
-    // HP.');
-    // TODO: add ONLY supports damage. But we'll use the term "extra" for non-damage anyway.
-  });
 });
 
 it('renders bleed', () => {
@@ -377,7 +356,19 @@ describe('renders add', () => {
         value2: v(0),
       },
     };
+
     expect(render(card)).toBe('Deal 1 damage. Deal +3 extra damage if the enemy has bleed.');
+
+    effect.name = 'bleed';
+    expect(render(card)).toBe('Apply 1 bleed. Apply 3 extra bleed if the enemy has bleed.');
+
+    effect.name = 'trash';
+    expect(render(card)).toBe('Enemy trashes 1. Enemy trashes 3 more if the enemy has bleed.');
+
+    effect.name = 'extraCardPlays';
+    expect(render(card)).toBe(
+      'Enemy plays 1 extra card next turn. Enemy plays 3 extra cards next turn if the enemy has bleed.',
+    );
   });
 
   test('deals extra damage equal to bleed', () => {

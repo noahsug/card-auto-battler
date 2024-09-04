@@ -425,7 +425,9 @@ function getEffectTranslations(effect: CardEffect, options: EffectOptions = {}) 
     },
 
     ['extra']: () => {
-      return options.isAddingToValue ? 'extra' : '';
+      if (!options.isAddingToValue) return '';
+      if (effect.name === 'trash') return 'more';
+      return 'extra';
     },
 
     ['+']: () => {
