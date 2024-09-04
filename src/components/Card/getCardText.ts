@@ -492,16 +492,20 @@ function getRepeatTranslations(repeat: MaybeValue) {
   const t = getTranslationFn(() => getNestedRepeatTranslations(repeat));
 
   // not supported
-  assertType(repeat.value, 'playerValue');
-  assert(repeat.value.multiplier == null);
-  assert(repeat.value.name != 'cardsPlayedThisTurn');
-  assert(repeat.value.name != 'currentCardIndex');
-  assert(repeat.value.name != 'extraCardPlays');
-  assert(repeat.value.name != 'startingHealth');
-  assert(repeat.value.name != 'trashedCards');
+  if (repeat.value.type === 'playerValue') {
+    assert(repeat.value.multiplier == null);
+    assert(repeat.value.name != 'cardsPlayedThisTurn');
+    assert(repeat.value.name != 'currentCardIndex');
+    assert(repeat.value.name != 'extraCardPlays');
+    assert(repeat.value.name != 'startingHealth');
+    assert(repeat.value.name != 'trashedCards');
+  }
 
   return {
     [`Repeat for each bleed you have`]: (): string => {
+      if (repeat.value.type === 'basicValue') {
+        return `Repeat ${t('3')} times`;
+      }
       return `Repeat for each ${t('bleed')} ${t('you have')}`;
     },
   };

@@ -1,6 +1,6 @@
 import getCardText from './getCardText';
 
-import { createCard, getValueDescriptor as v } from '../../gameState/utils';
+import { createCard, ifHas, getValueDescriptor as v } from '../../gameState/utils';
 import { CardEffect, CardState, PlayerValueDescriptor } from '../../gameState/gameState';
 
 // Deal 1 damage 3 times.
@@ -348,9 +348,19 @@ describe('renders if statements', () => {
   // ... if this card deals at least 7 damage.
 });
 
-it('renders repeat', () => {
-  card.repeat = { value: v('opponent', 'bleed') };
-  expect(render(card)).toBe('Deal 1 damage. Repeat for each bleed the enemy has.');
+describe('renders repeat', () => {
+  it('repeats for each bleed', () => {
+    card.repeat = { value: v('opponent', 'bleed') };
+    expect(render(card)).toBe('Deal 1 damage. Repeat for each bleed the enemy has.');
+  });
+
+  it('repeats 3 times', () => {
+    card.repeat = {
+      value: v(3),
+      if: ifHas('opponent', 'bleed'),
+    };
+    expect(render(card)).toBe('Deal 1 damage. Repeat 3 times if the enemy has bleed.');
+  });
 });
 
 describe('renders add', () => {
