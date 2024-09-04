@@ -1,12 +1,31 @@
 export function assertIsNonNullable<T>(value: T): asserts value is NonNullable<T> {
-  if (value === undefined || value === null) {
+  if (value == null) {
     throw new Error(`${value} is not defined`);
   }
 }
 
-export function assert(condition: boolean): asserts condition is true {
+export function assertIsNullable(value: unknown): asserts value is null | undefined {
+  if (value != null) {
+    throw new Error(`expected null or undefined, but got ${value}`);
+  }
+}
+
+export function assert(condition: boolean, message?: string): asserts condition is true {
   if (!condition) {
-    throw new Error('assertion failed');
+    const expectedText = message ? `, expected ${message}` : '';
+    throw new Error(`assertion failed${expectedText}`);
+  }
+}
+
+export function assertEqual<T>(a: T, b: T): asserts a is T {
+  if (a !== b) {
+    throw new Error(`expected ${a} to equal ${b}`);
+  }
+}
+
+export function assertNotEqual(a: unknown, b: unknown) {
+  if (a === b) {
+    throw new Error(`expected ${a} NOT to equal ${b}`);
   }
 }
 

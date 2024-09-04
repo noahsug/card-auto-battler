@@ -11,122 +11,7 @@ import {
   CardEffectName,
 } from '../../gameState/gameState';
 import { KeysOfUnion } from '../../utils/types';
-
-// Deal damage and gain strength equal to 2 times the enemy's bleed.
-
-// const damageAndStrengthFromBleed = {
-//   target: 'opponent',
-//   effect: 'damage',
-//   and: {
-//     target: 'self',
-//     effect: 'strength',
-//   },
-//   value: 2,
-//   // times: 1, (1 by default)
-//   multiplyBy: {
-//     type: 'opponent',
-//     name: 'bleed',
-//   },
-// };
-
-// Deal 10 damage.
-// Take 5 damage if this misses.
-
-// const highJumpKick = {
-//   effects: [{
-//     target: 'opponent',
-//     effect: 'damage',
-//     value: 10,
-//   }],
-//   then: {
-//     effects: [{
-//       target: 'self',
-//       effect: 'damage',
-//       value: 5,
-//       if: {
-//         type: 'miss',
-//       },
-//     }],
-//   },
-// };
-
-// Deal 10 damage.
-// Misses if you have more HP than the enemy.
-
-// const damageIfHigherHP = {
-//   effects: [{
-//     target: 'opponent',
-//     effect: 'damage',
-//     value: 10,
-//   }],
-//   modify: {
-//     effect: 'miss',
-//     if: {
-//       type: 'self',
-//       name: 'health',
-//       comparison: '>',
-//       compareTo: {
-//         type: 'opponent',
-//       },
-//     },
-//   },
-// };
-
-// Deal 5 damage.
-// Deals double damage if you have less than half HP.
-
-// const doubleDamageIfLowHp = {
-//   effects: [{
-//     target: 'opponent',
-//     effect: 'damage',
-//     value: 5,
-//   }],
-//   modify: {
-//     effect: 'doubleDamage',
-//     if: {
-//       type: 'maxHealth',
-//       target: 'self',
-//       comparison: '<',
-//       value: 'half',
-//     },
-//   },
-// };
-
-// Deal 5 damage.
-// Deals 3 extra damage if you have more HP than bleed.
-
-// Deal 3 damage.
-// Deals extra damage for every 5 missing health.
-// Apply bleed equal to damage dealt.
-
-// const damageForMissingHealth = {
-//   target: 'opponent',
-//   effect: 'damage',
-//   value: 3,
-//   additionalEffect: {
-//     target: 'opponent',
-//     effect: 'damage',
-//     multiplyBy: {
-//       type: 'playerValue',
-//       target: 'opponent',
-//       name: 'missingHealth',
-//       divisor: 5,
-//     },
-//   },
-//   additionalEffect: {
-//     target: 'opponent',
-//     effect: 'bleed',
-//     value: 1,
-//   },
-// };
-// }
-
-// Deal damage equal to the turn number.
-
-// Deal damage and apply bleed equal to the number of cards you've played this turn.
-
-// BAD: confusing, do not support
-// Deal 3 damage and gain 2 strength if you have full HP.
+import { assertEqual, assertNotEqual } from '../../utils/asserts';
 
 type Translations = { [key: string]: () => string };
 
@@ -223,8 +108,8 @@ function getPlayerValueTranslations(playerValue: PlayerValueDescriptor, options:
   const t = getTranslationFn(() => getNestedPlayerValueTranslations(playerValue, options));
 
   // not supported
-  assert(playerValue.name != 'currentCardIndex');
-  assert(playerValue.name != 'startingHealth');
+  assertNotEqual(playerValue.name, 'currentCardIndex');
+  assertNotEqual(playerValue.name, 'startingHealth');
 
   return {
     [`your bleed`]: (): string => {
@@ -286,7 +171,10 @@ function getIfTranslations(ifStatement: If, options: ValueOptions) {
   const t = getTranslationFn(() => getNestedIfTranslations(ifStatement, options));
 
   // not supported
-  assert(ifStatement.value.multiplier == null);
+  assert(
+    ifStatement.value.multiplier === 1 || ifStatement.value.multiplier == null,
+    'if multiplier not supported',
+  );
 
   return {
     [`if the enemy has more than 3 bleed`]: (): string => {
@@ -403,7 +291,7 @@ function getEffectTranslations(effect: CardEffect, options: EffectOptions = {}) 
       if (multiply == null) return '';
 
       // not supported - would need 'Apply twice as much poison if...'
-      assert(effect.name === 'damage');
+      assertEqual(effect.name, 'damage');
 
       return `${t('Deal')} ${t('double')} ${t(`damage`)}`;
     },
@@ -470,7 +358,7 @@ function getEffectTranslations(effect: CardEffect, options: EffectOptions = {}) 
       assertIsNonNullable(basicValue);
 
       // not supported - "Damage is reduced by 50%"
-      assert(basicValue.value > 1);
+      assert(basicValue.value > 1, `${basicValue.value} > 1`);
 
       switch (basicValue.value) {
         case 2:
@@ -493,12 +381,15 @@ function getRepeatTranslations(repeat: MaybeValue) {
 
   // not supported
   if (repeat.value.type === 'playerValue') {
-    assert(repeat.value.multiplier == null);
-    assert(repeat.value.name != 'cardsPlayedThisTurn');
-    assert(repeat.value.name != 'currentCardIndex');
-    assert(repeat.value.name != 'extraCardPlays');
-    assert(repeat.value.name != 'startingHealth');
-    assert(repeat.value.name != 'trashedCards');
+    assert(
+      repeat.value.multiplier === 1 || repeat.value.multiplier == null,
+      'repeat multiplier not supported',
+    );
+    assertNotEqual(repeat.value.name, 'cardsPlayedThisTurn');
+    assertNotEqual(repeat.value.name, 'currentCardIndex');
+    assertNotEqual(repeat.value.name, 'extraCardPlays');
+    assertNotEqual(repeat.value.name, 'startingHealth');
+    assertNotEqual(repeat.value.name, 'trashedCards');
   }
 
   return {

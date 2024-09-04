@@ -1,39 +1,20 @@
 import getCardText from './getCardText';
 
-import { createCard, ifHas, getValueDescriptor as v } from '../../gameState/utils';
+import { createCard, ifCompare, ifHas, getValueDescriptor as v } from '../../gameState/utils';
 import { CardEffect, CardState, PlayerValueDescriptor } from '../../gameState/gameState';
+import { STARTING_HEALTH } from '../../gameState';
 
-// Deal 1 damage 3 times.
-// Rally: Each hit deals 2 extra damage.
-
-// Deal 10 damage.
-// Gain 4 HP.
-// Apply 2 bleed.
-// Gain 1 poison.
-// Enemy gains 2 strength.
-// You Trash 2 cards.
-// Enemy Trashes 2 cards.
-// Play two cards.
-// Trash.
-
-// Play the top damage card of your deck.
-
-// Deal 1 damage 3 times.
-// Rally: Deals double damage.
-
-// Deal 1 damage 3 times.
-// Rally: Each hit deals 2 extra damage.
-
-// Deal 1 damage 3 times.
+// Deal 2 damage 3 times.
 // Each hit deals 2 extra damage if you have less than half HP.
+// Each hit deals extra damage equal to your bleed.
 
-// Deal 5 damage.
-// Deals double damage if you have less than half HP.
+// Trash. // trashSelf: true
+
+// Play the top damage card from your deck.
+
+// Deal 10 damage if this is the first card you played this turn.
 
 // Set your HP to half.
-
-// Deal 3 damage.
-// Deals extra damage for every 5 missing health.
 
 // Deal 10 damage.
 // Misses if you have more HP than the enemy.
@@ -42,55 +23,39 @@ import { CardEffect, CardState, PlayerValueDescriptor } from '../../gameState/ga
 // Momentum: Each hit deals extra damage equal to your bleed (3).
 
 // Deal 3 damage.
-// Deal 5 damage if the enemy has bleed.
+// Deal another 5 damage if the enemy has bleed.
 
 // Deal 3 damage.
-// Powerful Blow: Lifesteal. // triggers if this card does double it's original damage (6)
-// Gains Lifesteal if this card deals >= 7 damage.
-// Gain HP equal to damage dealt if this card deals at least 7 damage.
+// Lifesteal if this card deals at least 7 damage.
 
 // Deal 3 damage.
 // Apply bleed equal to damage dealt.
-// Apply 2 bleed if this hits.
-// Apply 2 bleed if the enemy has bleed.
+// Apply 2 bleed if this hits. // onHit: { name: 'bleed', value: 2 }
 
 // Deal 10 damage.
-// Take 5 damage if this misses.
-
-// Deal 3 damage.
-// Deals 5 extra damage if the enemy has bleed.
-
-// Deal damage equal to two times the enemy's bleed (3).
-
-// Deal 3 damage. Deals extra damage equal to the enemy's bleed (3).
-
-// Deal 2 damage. Deals extra damage equal to the number of cards you've played this turn.
+// Take 5 damage if this misses. // onMiss: { target: 'self', name: 'damage', value: 5 }
 
 // Deal 1 damage.
-// Deals extra damage equal to your strength (6). // re-write to "This card is effected by strength twice"
-
-// Gain strength equal to 2 times your strength. // rewrite to "Triple your strength."
-
-// Apply bleed equal to 2 times the enemy's bleed. // rewrite to "Triple the enemy's bleed."
-
-// Apply 5 bleed.
-// Gain 5 bleed.
-
-// Heal 3.
-// Gain 3 strength.
-
-// Deal 1 damage. Play 1 card.
+// Play 1 card.
 // Momentum: Play 1 card. // triggers when you've played more than one card this turn.
 
-// Gain 1 Dodge for every 4 cards you play.
+// Every 4 cards you play, gain 1 dodge. // { name: 'dodgeEvery4Cards', value: 1 }
 
 // Enemy cards deal 1 less damage for the next 3 turns.
 
-// ALL damage is reduced by 2 for the next 3 turns.
+// ALL damage is reduced by 2 for the next 3 turns. // including your damage to opponent?
 
-// Deal 1 damage.
-// Repeat for each bleed you have (3).
-// Repeat for each bleed the enemy has (3).
+// Deal damage equal to the turn number.
+
+// Deal 2 damage equal for every 5 missing health.
+
+// effect.and
+//
+// BAD: confusing, do not support
+// Deal 3 damage and gain 2 strength if you have full HP.
+// Deal damage and apply bleed equal to the enemy's bleed.
+//
+// But this can be useful for "Momentum: Deal 2 damage and play 1 card."
 
 function render(card: CardState) {
   const lines = getCardText(card);
@@ -187,33 +152,6 @@ it('renders multi-hits', () => {
   expect(render(card)).toBe('Deal 1 damage 2 times.');
 });
 
-// TODO
-// // used to combine two effects under the same if statement or multiplier
-// describe('renders two effects on the same line', () => {
-//   beforeEach(() => {
-//     effect.and = {
-//       target: 'opponent',
-//       name: 'bleed',
-//       value: 2,
-//     };
-//   });
-
-//   test('deal damage and apply bleed', () => {
-//     expect(render(card)).toBe('Deal 1 damage and apply 2 bleed.');
-//   });
-
-//   test('gain bleed and strength bleed equal to enemy bleed', () => {
-//     effect.multiplyBy = {
-//       type: 'playerValue',
-//       target: 'opponent',
-//       name: 'bleed',
-//     };
-
-//     // Note that the `effect.and.value` is ignored when `effect.multiplyBy` is present
-//     expect(render(card)).toBe(`Deal damage and apply bleed equal to the enemy's bleed.`);
-//   });
-// });
-
 describe('renders effect based on player value', () => {
   beforeEach(() => {
     effect.value = v('opponent', 'bleed');
@@ -287,9 +225,6 @@ describe('renders effect based on player value', () => {
     card = createCard({ name: 'bleed', value: v('opponent', 'bleed') });
     expect(render(card)).toBe(`Double the enemy's bleed.`);
   });
-
-  // TODO:
-  // test('equal to missing health', () => {});
 });
 
 describe('renders if statements', () => {
@@ -344,14 +279,17 @@ describe('renders if statements', () => {
     };
     expect(render(card)).toBe('Deal 1 damage if you have less than 10 HP.');
   });
-
-  // ... if this card deals at least 7 damage.
 });
 
 describe('renders repeat', () => {
   it('repeats for each bleed', () => {
     card.repeat = { value: v('opponent', 'bleed') };
     expect(render(card)).toBe('Deal 1 damage. Repeat for each bleed the enemy has.');
+
+    card.repeat.if = ifCompare('opponent', 'health', '<', STARTING_HEALTH / 2);
+    expect(render(card)).toBe(
+      'Deal 1 damage. Repeat for each bleed the enemy has if the enemy has less than 10 HP.',
+    );
   });
 
   it('repeats 3 times', () => {
