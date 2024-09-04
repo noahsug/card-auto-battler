@@ -3,8 +3,7 @@
 module.exports = {
   extends: [
     'eslint:recommended',
-    // TODO: uncomment and figure out what to do about the "React must be required with jsx" errors
-    // 'plugin:react/recommended',
+    'plugin:react/recommended',
     'plugin:import/recommended',
     'plugin:jsx-a11y/recommended',
     'plugin:@typescript-eslint/recommended',
@@ -33,4 +32,9 @@ module.exports = {
       },
     },
   ],
+  rules: {
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'warn',
+    'react/react-in-jsx-scope': 'off',
+  },
 };
