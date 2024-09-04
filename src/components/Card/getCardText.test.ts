@@ -1,6 +1,6 @@
 import getCardText from './getCardText';
 
-import { createCard, ifHas, getValueDescriptor as v } from '../../gameState/utils';
+import { createCard, getValueDescriptor as v } from '../../gameState/utils';
 import { CardEffect, CardState, PlayerValueDescriptor } from '../../gameState/gameState';
 
 // Deal 1 damage 3 times.
@@ -362,13 +362,16 @@ describe('renders add', () => {
     effect.name = 'bleed';
     expect(render(card)).toBe('Apply 1 bleed. Apply 3 extra bleed if the enemy has bleed.');
 
-    effect.name = 'trash';
-    expect(render(card)).toBe('Enemy trashes 1. Enemy trashes 3 more if the enemy has bleed.');
-
     effect.name = 'extraCardPlays';
     expect(render(card)).toBe(
       'Enemy plays 1 extra card next turn. Enemy plays 3 extra cards next turn if the enemy has bleed.',
     );
+
+    effect.name = 'trash';
+    expect(render(card)).toBe('Enemy trashes 1. Enemy trashes 3 more if the enemy has bleed.');
+
+    effect.target = 'self';
+    expect(render(card)).toBe('You trash 1. You trash 3 more if the enemy has bleed.');
   });
 
   test('deals extra damage equal to bleed', () => {

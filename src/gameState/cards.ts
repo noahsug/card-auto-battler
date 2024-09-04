@@ -69,7 +69,6 @@ export const basicCardsByName = {
 
 export const damagePercentHealthDamage = createCard({
   name: 'damage',
-  target: 'opponent',
   value: v('opponent', 'health', 0.5),
 });
 
@@ -212,7 +211,6 @@ export const strengthCardsByName = {
 
 export const damageForEachBleedCard = createCard(
   {
-    target: 'opponent',
     name: 'damage',
     value: v(1),
   },
@@ -456,7 +454,6 @@ export const healCardsByName = {
 // mill synergy
 
 export const trashOpponentCard = createCard({
-  target: 'opponent',
   name: 'trash',
   value: v(2),
 });
@@ -514,7 +511,6 @@ export const millCardsByName = {
 // });
 
 export const damageForEachTrashedCard = createCard({
-  target: 'opponent',
   name: 'damage',
   value: v('self', 'trashedCards', 2),
 });
@@ -576,7 +572,6 @@ export const trashCardsByName = {
 // });
 
 export const damageForEachCardPlayedCard = createCard({
-  target: 'opponent',
   name: 'damage',
   value: v('opponent', 'cardsPlayedThisTurn', 3),
 });

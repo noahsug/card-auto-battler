@@ -11,20 +11,23 @@ import {
   ValueDescriptor,
 } from './gameState';
 
+export function getEffect(partialEffect: Partial<CardEffect> = {}) {
+  return Object.assign(
+    { target: 'opponent', name: 'damage', value: getValueDescriptor(1) },
+    partialEffect,
+  );
+}
+
 export function createCard(
-  partialEffect: Partial<CardEffect> = {},
+  effect: Partial<CardEffect> = {},
   {
     repeat,
     name = '',
     effects,
-  }: { repeat?: MaybeValue; name?: string; effects?: CardEffect[] } = {},
+  }: { repeat?: MaybeValue; name?: string; effects?: Partial<CardEffect>[] } = {},
 ): CardState {
-  const effect: CardEffect = Object.assign(
-    { target: 'opponent', name: 'damage', value: getValueDescriptor(1) },
-    partialEffect,
-  );
   return {
-    effects: [effect].concat(effects || []),
+    effects: [effect].concat(effects || []).map(getEffect),
     repeat,
     name,
   };
