@@ -4,6 +4,13 @@ Game TODO:
 
 1. use 'gsap' for animations (see slaytheweb/src/ui/animations.js)
 
+Performance TODO:
+
+If performance becomes an issue, look into these libraries to help:
+
+1. https://www.npmjs.com/package/@emotion/react for smaller bundle size than styled
+2. https://github.com/pmndrs/zustand or https://github.com/pmndrs/jotai to stop unnecessary renders
+
 Analysis TODO:
 
 1. Use multithreading (see section below)

@@ -1,4 +1,4 @@
-import ScreenContainer from './ScreenContainer';
+import Button from './Button';
 
 interface Props {
   onNewGame: () => void;
@@ -6,9 +6,9 @@ interface Props {
 
 export default function WinScreen({ onNewGame }: Props) {
   return (
-    <ScreenContainer>
+    <div>
       <div>WIN</div>
-      <button onClick={onNewGame}>start</button>
-    </ScreenContainer>
+      <Button onClick={onNewGame}>start</Button>
+    </div>
   );
 }
