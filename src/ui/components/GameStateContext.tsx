@@ -15,7 +15,7 @@ interface GameStateManager {
   gameState: GameState;
   dispatch: <T extends Value<typeof actions>>(action: T, ...args: Tail<Parameters<T>>) => void;
   canUndo: () => boolean;
-  clearPast: () => void;
+  clearUndo: () => void;
   undo: () => void;
 }
 
@@ -23,11 +23,11 @@ const GameStateManagerContext = createContext<GameStateManager>({
   gameState: createNewGameState(),
   dispatch: () => {},
   canUndo: () => false,
-  clearPast() {},
+  clearUndo() {},
   undo() {},
 });
 
-export default function GameStateProvider({ children }: PropsWithChildren) {
+export function GameStateProvider({ children }: PropsWithChildren) {
   const [gameState, setGameState] = useState<GameState>(createNewGameState());
   const [past, setPast] = useState<GameState[]>([]);
 
@@ -41,7 +41,7 @@ export default function GameStateProvider({ children }: PropsWithChildren) {
     return past.length > 0;
   }
 
-  function clearPast() {
+  function clearUndo() {
     setPast([]);
   }
 
@@ -49,15 +49,13 @@ export default function GameStateProvider({ children }: PropsWithChildren) {
     const nextGameState = past[past.length - 1];
     setGameState(nextGameState);
     setPast((past) => past.slice(0, -1));
-
-    console.log('undo', past, nextGameState);
   }
 
   const gameStateManager = {
     gameState,
     dispatch,
     canUndo,
-    clearPast,
+    clearUndo,
     undo,
   };
 
@@ -88,11 +86,12 @@ export function useActions(): StatefulActions {
 }
 
 export function useUndo() {
-  const { undo, canUndo } = useContext(GameStateManagerContext);
+  const { undo, canUndo, clearUndo } = useContext(GameStateManagerContext);
   return {
     undo,
     get canUndo() {
       return canUndo();
     },
+    clearUndo,
   };
 }

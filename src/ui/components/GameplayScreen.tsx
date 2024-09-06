@@ -1,4 +1,4 @@
-import { useActions, useGameState, useUndo } from './GameStateProvider';
+import { useActions, useGameState, useUndo } from './GameStateContext';
 import Button from './Button';
 import { useEffect } from 'react';
 
