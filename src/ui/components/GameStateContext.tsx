@@ -87,11 +87,14 @@ export function useActions(): StatefulActions {
 
 export function useUndo() {
   const { undo, canUndo, clearUndo } = useContext(GameStateManagerContext);
-  return {
-    undo,
-    get canUndo() {
-      return canUndo();
-    },
-    clearUndo,
-  };
+  return useMemo(
+    () => ({
+      undo,
+      get canUndo() {
+        return canUndo();
+      },
+      clearUndo,
+    }),
+    [undo, canUndo, clearUndo],
+  );
 }
