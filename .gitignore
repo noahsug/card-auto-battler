@@ -15,6 +15,9 @@
 # !/.vscode/extensions.json
 # !/.vscode/settings.json
 
+# storybook
+*storybook.log
+
 # misc
 .DS_Store
 
@@ -23,4 +26,3 @@ yarn-debug.log*
 yarn-error.log*
 
 .log
-

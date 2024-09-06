@@ -135,6 +135,7 @@ describe('renders play extra cards', () => {
     expect(render(card)).toBe('Enemy plays 1 extra card next turn.');
 
     effect.target = 'self';
+    // TODO: "Play another card", "Play another 2 cards"
     expect(render(card)).toBe('Play 1 card.');
   });
 

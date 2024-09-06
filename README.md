@@ -11,6 +11,14 @@ If performance becomes an issue, look into these libraries to help:
 1. https://www.npmjs.com/package/@emotion/react for smaller bundle size than styled
 2. https://github.com/pmndrs/zustand or https://github.com/pmndrs/jotai to stop unnecessary renders
 
+## Art
+
+Create card art via Gemini prompt: "Create an image that would match the text "Sucker Punch" in the style of a hand drawn illustration."
+
+Remove background via https://www.remove.bg/upload
+
+## analysis
+
 Analysis TODO:
 
 1. Use multithreading (see section below)
@@ -18,8 +26,6 @@ Analysis TODO:
 3. inverse priority list: try to minimize win rate. Use this to sort bottom half of priority list
    and to find bugs (e.g. card is accidentally hitting self)
 4. make card text super easy to read (add lots of keywords?)
-
-## analysis
 
 ### Multithreading
 
