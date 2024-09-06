@@ -1,60 +1,98 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { createContext, useContext, PropsWithChildren, Dispatch, useMemo } from 'react';
-import { useImmerReducer } from 'use-immer';
+import { createContext, useContext, PropsWithChildren, useMemo, useState } from 'react';
+import { produce } from 'immer';
 
 import { GameState, createNewGameState } from '../../game/gameState';
 import * as actions from '../../game/actions';
-import { Tail, Writable } from '../../utils/types';
+import { Tail, Value, Writable } from '../../utils/types';
 
-type ReduceFn = (gameState: GameState) => void;
-
-type Action = (gameState: GameState, ...args: any[]) => void;
 type StatefulActions = {
   [K in keyof typeof actions]: (...args: Tail<Parameters<(typeof actions)[K]>>) => void;
 };
 
-const initialGameState = createNewGameState();
+interface GameStateManager {
+  gameState: GameState;
+  dispatch: <T extends Value<typeof actions>>(action: T, ...args: Tail<Parameters<T>>) => void;
+  canUndo: () => boolean;
+  clearPast: () => void;
+  undo: () => void;
+}
 
-const GameStateContext = createContext(initialGameState);
-const GameStateDispatchContext = createContext((() => null) as Dispatch<ReduceFn>);
+const GameStateManagerContext = createContext<GameStateManager>({
+  gameState: createNewGameState(),
+  dispatch: () => {},
+  canUndo: () => false,
+  clearPast() {},
+  undo() {},
+});
 
 export default function GameStateProvider({ children }: PropsWithChildren) {
-  const gameReducer = (gameState: GameState, reduceFn: ReduceFn) => reduceFn(gameState);
+  const [gameState, setGameState] = useState<GameState>(createNewGameState());
+  const [past, setPast] = useState<GameState[]>([]);
 
-  const [gameState, dispatch] = useImmerReducer(gameReducer, initialGameState);
+  const dispatch: GameStateManager['dispatch'] = (action, ...args) => {
+    const nextGameState = produce(gameState, (draft) => action(draft, ...args));
+    setGameState(nextGameState);
+    setPast((past) => [...past, gameState]);
+  };
+
+  function canUndo() {
+    return past.length > 0;
+  }
+
+  function clearPast() {
+    setPast([]);
+  }
+
+  function undo() {
+    const nextGameState = past[past.length - 1];
+    setGameState(nextGameState);
+    setPast((past) => past.slice(0, -1));
+
+    console.log('undo', past, nextGameState);
+  }
+
+  const gameStateManager = {
+    gameState,
+    dispatch,
+    canUndo,
+    clearPast,
+    undo,
+  };
 
   return (
-    <GameStateContext.Provider value={gameState}>
-      <GameStateDispatchContext.Provider value={dispatch}>
-        {children}
-      </GameStateDispatchContext.Provider>
-    </GameStateContext.Provider>
+    <GameStateManagerContext.Provider value={gameStateManager}>
+      {children}
+    </GameStateManagerContext.Provider>
   );
 }
 
 export function useGameState() {
-  return useContext(GameStateContext);
-}
-
-// Converts an action from `action(state, ...args)` -> `action(...args)`
-function getStatefulAction(action: Action, dispatch: (reduceFn: ReduceFn) => void) {
-  return (...args: any[]) => {
-    const reduceFn = (gameState: GameState) => action(gameState, ...args);
-    dispatch(reduceFn);
-  };
+  const { gameState } = useContext(GameStateManagerContext);
+  return gameState;
 }
 
 export function useActions(): StatefulActions {
-  const dispatch = useContext(GameStateDispatchContext);
+  const { dispatch } = useContext(GameStateManagerContext);
 
   return useMemo(() => {
     const statefulActions = {} as Writable<StatefulActions>;
     for (const name in actions) {
-      const action = actions[name as keyof StatefulActions];
-      statefulActions[name as keyof StatefulActions] = getStatefulAction(action, dispatch);
+      const key = name as keyof StatefulActions;
+      statefulActions[key] = dispatch.bind(null, actions[key]);
     }
 
     return statefulActions;
   }, [dispatch]);
+}
+
+export function useUndo() {
+  const { undo, canUndo } = useContext(GameStateManagerContext);
+  return {
+    undo,
+    get canUndo() {
+      return canUndo();
+    },
+  };
 }

@@ -1,7 +1,6 @@
-import { useActions, useGameState } from './GameStateProvider';
+import { useActions, useGameState, useUndo } from './GameStateProvider';
 import Button from './Button';
 import { useEffect } from 'react';
-import wait from '../../utils/wait';
 
 interface Props {
   onWin: () => void;
@@ -11,20 +10,10 @@ interface Props {
 export default function GameplayScreen({ onWin: handleWin, onLose: handleLose }: Props) {
   const { counter } = useGameState();
   const { increment, reset } = useActions();
+  const { canUndo, undo } = useUndo();
 
   async function handleIncrement() {
-    increment(100);
-    await wait(10);
-    for (let i = 0; i < 90; i++) {
-      increment(-1);
-      await wait(10);
-    }
-    increment(-10);
-    increment(1);
-  }
-
-  function handleUndo() {
-    // TODO
+    increment();
   }
 
   useEffect(() => {
@@ -38,7 +27,7 @@ export default function GameplayScreen({ onWin: handleWin, onLose: handleLose }:
     <div>
       <div>GAMEPLAY {counter}</div>
       <Button onClick={handleIncrement}>plus</Button>
-      <Button onClick={handleUndo}>undo</Button>
+      {canUndo && <Button onClick={undo}>undo</Button>}
       <Button onClick={handleLose}>give up</Button>
     </div>
   );
