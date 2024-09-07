@@ -35,13 +35,12 @@ const Bar = styled.div`
 
 const Label = styled.h2`
   position: absolute;
-  top: -35px;
+  top: -22px;
   left: 0;
   width: 100%;
   font-size: 100px;
   text-align: center;
   font-weight: bold;
-  color: #fcfafb;
   text-shadow:
     5px 5px 0 black,
     5px -5px 0 black,

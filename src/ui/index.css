@@ -7,12 +7,13 @@
 html {
   background-color: lightgray;
   font-size: 1.7vh;
-  line-height: 1.25;
+  line-height: 1;
 }
 
 body {
   margin: 0;
   user-select: none;
+  color: #fcfafb;
 
   font-family: 'IndieFlower', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -26,10 +27,9 @@ h1 {
 }
 
 h2 {
-  font-family: 'Amatic', sans-serif;
+  font-family: 'AmaticBold', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-weight: 600;
   letter-spacing: 0.05em;
   margin: 0 auto;
   padding: 0;
@@ -48,4 +48,9 @@ h2 {
 @font-face {
   font-family: 'Amatic';
   src: url('./fonts/AmaticSC-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'AmaticBold';
+  src: url('./fonts/Amatic-Bold.ttf');
 }

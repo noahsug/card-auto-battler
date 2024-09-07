@@ -9,6 +9,9 @@ export default styled.button`
   border-top-right-radius: 15px 225px;
   border-bottom-right-radius: 225px 15px;
   border-bottom-left-radius: 15px 255px;
-  font-family: 'Amatic';
+  font-family: 'AmaticBold';
   letter-spacing: 0.1em;
+  color: #fcfafb;
+  border-color: #fcfafb;
+  line-height: 1.4;
 `;
