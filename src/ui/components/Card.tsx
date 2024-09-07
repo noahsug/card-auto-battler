@@ -1,4 +1,4 @@
-import { styled, ThemeProvider } from 'styled-components';
+import { styled } from 'styled-components';
 
 import '../index.css';
 import Container from './shared/Container';
@@ -10,7 +10,7 @@ interface Props {
 
 export default function Card({ size }: Props) {
   return (
-    <ThemeProvider theme={{ size }}>
+    <Root size={size}>
       <OuterContainer>
         <InnerContainer>
           <Title>Sucker Punch</Title>
@@ -21,32 +21,43 @@ export default function Card({ size }: Props) {
           </Text>
         </InnerContainer>
       </OuterContainer>
-    </ThemeProvider>
+    </Root>
   );
 }
 
+const Root = styled.div<Props>`
+  font-size: ${({ size }) => {
+    switch (size) {
+      case 'small':
+        return '0.8rem';
+      case 'medium':
+        return '1rem';
+      case 'large':
+        return '2rem';
+    }
+  }};
+`;
+
 const OuterContainer = styled.div`
-  height: ${({ theme }) =>
-    theme.size === 'small' ? '12rem' : theme.size === 'medium' ? '18rem' : '24rem'};
-  width: 12rem;
+  height: 20em;
+  width: 12em;
   background-color: #461513;
-  border-radius: 1rem;
-  border: 0.4rem solid #461513;
+  border-radius: 1em;
+  border: 0.4em solid #461513;
+  text-align: center;
 `;
 
 const InnerContainer = styled(Container)`
   height: 100%;
-  border-radius: 1rem;
+  border-radius: 1em;
   background-color: #cfb59e;
 `;
 
-const Title = styled.div`
-  text-align: center;
-  font-family: '3Dumb';
+const Title = styled('h2')`
+  margin-top: 0.5em;
 `;
 
 const Text = styled.div`
-  font-size: 0.8rem;
-  text-align: center;
   margin: auto;
+  padding-bottom: 0.5em;
 `;
