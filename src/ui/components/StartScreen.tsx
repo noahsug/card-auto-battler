@@ -19,8 +19,8 @@ export default function StartScreen({ onNewGame }: Props) {
 const Header = styled('h1')`
   text-align: center;
   margin-bottom: 2rem;
-  font-size: 4rem;
-  margin-top: 2rem;
+  font-size: 5rem;
+  margin-top: auto;
 `;
 
 const StartButton = styled(Button)`

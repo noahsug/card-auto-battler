@@ -5,10 +5,6 @@ import HealthBar from './HealthBar';
 const meta = {
   title: 'HealthBar',
   component: HealthBar,
-  parameters: {
-    layout: 'centered',
-    backgrounds: { default: 'dark' },
-  },
 } satisfies Meta<typeof HealthBar>;
 
 export default meta;

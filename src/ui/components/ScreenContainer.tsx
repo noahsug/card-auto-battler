@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { styled } from 'styled-components';
 
 import { GameStateProvider, useActions, useGameState, useUndo } from './GameStateContext';
 import StartScreen from './StartScreen';
@@ -55,13 +56,18 @@ export default function ScreenContainer() {
   }
 
   return (
-    <>
+    <Root>
       <Screen />
       {overlay !== OverlayType.none && (
         <OverlayBackground>
           <Overlay />
         </OverlayBackground>
       )}
-    </>
+    </Root>
   );
 }
+
+const Root = styled.div`
+  max-width: 100vh;
+  margin: auto;
+`;
