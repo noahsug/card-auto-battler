@@ -1,6 +1,5 @@
 import { styled } from 'styled-components';
 
-import '../index.css';
 import Container from './shared/Container';
 import suckerPunchImage from '../images/cards/sucker-punch.jpeg';
 
