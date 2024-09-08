@@ -6,6 +6,7 @@ const meta = {
   title: 'App',
   component: App,
   parameters: {
+    layout: 'fullscreen',
     backgrounds: {
       default: 'dark',
     },

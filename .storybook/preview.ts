@@ -12,11 +12,11 @@ const preview: Preview = {
     },
     layout: 'centered',
     backgrounds: {
-      default: 'chalkboard',
+      default: 'main',
       values: [
         {
-          name: 'chalkboard',
-          value: `url('/chalkboard-background.png')`,
+          name: 'main',
+          value: `url('/main-background.png')`,
         },
       ],
     },

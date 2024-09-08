@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 import StartScreen from './StartScreen';
 
@@ -12,6 +13,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
-    onNewGame: () => {},
+    onNewGame: fn(),
   },
 };

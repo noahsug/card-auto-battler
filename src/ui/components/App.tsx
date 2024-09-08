@@ -2,7 +2,7 @@ import { styled } from 'styled-components';
 
 import { GameStateProvider } from './GameStateContext';
 import ScreenContainer from './ScreenContainer';
-import backgroundImage from '../images/chalkboard-background.png';
+import backgroundImage from '../images/main-background.png';
 
 export default function App() {
   return (

@@ -5,7 +5,6 @@
 }
 
 html {
-  background-color: lightgray;
   font-size: 1.7vh;
   line-height: 1;
 }
@@ -13,7 +12,7 @@ html {
 body {
   margin: 0;
   user-select: none;
-  color: #fcfafb;
+  color: var(--fg);
 
   font-family: 'IndieFlower', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -22,17 +21,20 @@ body {
 
 h1 {
   font-family: '3Dumb', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-size: 5rem;
+  margin-bottom: 2rem;
 }
 
 h2 {
   font-family: 'AmaticBold', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   letter-spacing: 0.05em;
   margin: 0 auto;
   padding: 0;
+}
+
+:root {
+  --fg: #fcfafb;
+  --bg: #080808;
 }
 
 @font-face {
