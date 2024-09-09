@@ -56,18 +56,18 @@ export default function ScreenContainer() {
   }
 
   return (
-    <Root>
+    <ScreenContainerRoot>
       <Screen />
       {overlay !== OverlayType.none && (
         <OverlayBackground>
           <Overlay />
         </OverlayBackground>
       )}
-    </Root>
+    </ScreenContainerRoot>
   );
 }
 
-const Root = styled.div`
+export const ScreenContainerRoot = styled.div`
   max-width: 100vh;
   margin: auto;
 `;

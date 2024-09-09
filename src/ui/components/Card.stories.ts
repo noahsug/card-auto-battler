@@ -5,23 +5,31 @@ import Card from './Card';
 const meta = {
   title: 'Card',
   component: Card,
+  parameters: {
+    args: {
+      size: 'large',
+    },
+  },
 } satisfies Meta<typeof Card>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Large: Story = {
+export const User: Story = {
   args: {
     size: 'large',
+    type: 'user',
   },
 };
-export const Medium: Story = {
+export const EnemyRed: Story = {
   args: {
-    size: 'medium',
+    size: 'large',
+    type: 'enemyRed',
   },
 };
-export const Small: Story = {
+export const EnemyGreen: Story = {
   args: {
-    size: 'small',
+    size: 'large',
+    type: 'enemyGreen',
   },
 };

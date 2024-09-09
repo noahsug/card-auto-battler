@@ -11,18 +11,28 @@ interface Props {
 export default function HealthBar({ health, maxHealth }: Props) {
   const width = (health / maxHealth) * 100;
   return (
-    <Container>
+    <Root>
       <img src={healthBarBorderImage} />
       <Bar style={{ width: `${width}%` }} />
       <Label>
         {health} / {maxHealth}
       </Label>
-    </Container>
+    </Root>
   );
 }
 
-const Container = styled.div`
+const WIDTH = 10;
+
+const Root = styled.div`
   position: relative;
+  width: ${WIDTH}rem;
+  height: ${WIDTH / 5.5}rem;
+  font-size: 2rem;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }
 `;
 
 const Bar = styled.div`
@@ -31,19 +41,20 @@ const Bar = styled.div`
   top: 0;
   left: 0;
   background-image: url(${healthBarInnerImage});
+  background-position: center;
+  background-size: cover;
 `;
 
 const Label = styled.h2`
   position: absolute;
-  top: -28px;
+  top: -0.3em;
   left: 0;
   width: 100%;
-  font-size: 100px;
   text-align: center;
   font-weight: bold;
   text-shadow:
-    5px 5px 0 black,
-    5px -5px 0 black,
-    -5px 5px 0 black,
-    -5px -5px 0 black;
+    0.03em 0.03em 0 black,
+    0.03em -0.03em 0 black,
+    -0.03em 0.03em 0 black,
+    -0.03em -0.03em 0 black;
 `;

@@ -13,7 +13,6 @@ body {
   margin: 0;
   user-select: none;
   color: var(--color-primary);
-
   font-family: var(--font-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -27,7 +26,7 @@ h1 {
 
 h2 {
   font-family: var(--font-heading);
-  letter-spacing: 0.05em;
+  letter-spacing: var(--letter-spacing-heading);
   margin: 0 auto;
   padding: 0;
 }
@@ -35,8 +34,10 @@ h2 {
 :root {
   --color-primary: #fcfafb;
   --color-bg: #080808;
+  --color-bg-opacity: #08080869;
   --font-text: 'IndieFlower', sans-serif;
   --font-heading: 'AmaticBold', sans-serif;
+  --letter-spacing-heading: 0.05em;
   --font-title: '3Dumb', sans-serif;
 }
 

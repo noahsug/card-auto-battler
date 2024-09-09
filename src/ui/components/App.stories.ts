@@ -8,9 +8,6 @@ const meta = {
   component: App,
   parameters: {
     layout: 'fullscreen',
-    backgrounds: {
-      default: 'dark',
-    },
   },
 } satisfies Meta<typeof App>;
 

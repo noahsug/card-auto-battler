@@ -10,17 +10,17 @@ export default function App() {
 
   return (
     <GameStateProvider gameState={gameState}>
-      <Root>
+      <AppRoot>
         <ScreenContainer />
-      </Root>
+      </AppRoot>
     </GameStateProvider>
   );
 }
 
-const Root = styled.div`
+export const AppRoot = styled.div`
+  width: 100vw;
+  height: 100vh;
   background-image: url(${backgroundImage});
   background-size: cover;
   background-position: center;
-  width: 100vw;
-  height: 100vh;
 `;
