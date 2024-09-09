@@ -1,8 +1,18 @@
 import type { Preview } from '@storybook/react';
+import React from 'react';
+
+import { GameStateProvider } from '../src/ui/components/GameStateContext';
 
 import '../src/ui/index.css';
 
 const preview: Preview = {
+  decorators: [
+    (Story, { parameters: { gameState } }) => (
+      <GameStateProvider gameState={gameState}>
+        <Story />
+      </GameStateProvider>
+    ),
+  ],
   parameters: {
     controls: {
       matchers: {

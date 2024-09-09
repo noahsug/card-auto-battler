@@ -35,7 +35,7 @@ const Bar = styled.div`
 
 const Label = styled.h2`
   position: absolute;
-  top: -22px;
+  top: -28px;
   left: 0;
   width: 100%;
   font-size: 100px;

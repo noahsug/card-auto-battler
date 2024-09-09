@@ -6,13 +6,12 @@ import StartScreen from './StartScreen';
 const meta = {
   title: 'StartScreen',
   component: StartScreen,
+  args: {
+    onNewGame: fn(),
+  },
 } satisfies Meta<typeof StartScreen>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {
-  args: {
-    onNewGame: fn(),
-  },
-};
+export const Primary: Story = {};

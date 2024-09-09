@@ -3,7 +3,7 @@ export interface GameState {
   won: boolean;
 }
 
-export function createNewGameState(): GameState {
+export function createGameState(): GameState {
   return {
     counter: 0,
     won: false,

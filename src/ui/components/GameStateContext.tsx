@@ -3,7 +3,7 @@
 import { createContext, useContext, PropsWithChildren, useMemo, useState } from 'react';
 import { produce } from 'immer';
 
-import { GameState, createNewGameState } from '../../game/gameState';
+import { GameState, createGameState } from '../../game/gameState';
 import * as actions from '../../game/actions';
 import { Tail, Value, Writable } from '../../utils/types';
 
@@ -20,15 +20,19 @@ interface GameStateManager {
 }
 
 const GameStateManagerContext = createContext<GameStateManager>({
-  gameState: createNewGameState(),
+  gameState: createGameState(),
   dispatch: () => {},
   canUndo: () => false,
   clearUndo() {},
   undo() {},
 });
 
-export function GameStateProvider({ children }: PropsWithChildren) {
-  const [gameState, setGameState] = useState<GameState>(createNewGameState());
+interface Props extends PropsWithChildren {
+  gameState: GameState;
+}
+
+export function GameStateProvider({ children, gameState: initialGameState }: Props) {
+  const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [past, setPast] = useState<GameState[]>([]);
 
   const dispatch: GameStateManager['dispatch'] = (action, ...args) => {

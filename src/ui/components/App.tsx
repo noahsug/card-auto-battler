@@ -3,10 +3,13 @@ import { styled } from 'styled-components';
 import { GameStateProvider } from './GameStateContext';
 import ScreenContainer from './ScreenContainer';
 import backgroundImage from '../images/main-background.png';
+import { createGameState } from '../../game/gameState';
 
 export default function App() {
+  const gameState = createGameState();
+
   return (
-    <GameStateProvider>
+    <GameStateProvider gameState={gameState}>
       <Root>
         <ScreenContainer />
       </Root>

@@ -12,8 +12,8 @@ export default function Card({ size }: Props) {
   return (
     <Root size={size}>
       <OuterContainer>
-        <Image src={suckerPunchImage} />
         <Title>Sucker Punch</Title>
+        <Image src={suckerPunchImage} />
         <Text>
           <div>
             Deal <Value>3</Value> damage.
@@ -38,41 +38,44 @@ const Root = styled.div<Props>`
   }};
 `;
 
+const CARD_COLOR = `hsla(26, 40%, 85%, 1)`;
+const CARD_TITLE_COLOR = CARD_COLOR.replace('85', '90');
+
 const OuterContainer = styled(Container)`
   height: 20em;
   width: 12em;
   text-align: center;
-  color: #050304;
-  background-color: #e8d7c9;
+  color: var(--color-bg);
+  background-color: ${CARD_COLOR};
   border-top-left-radius: 255px 15px;
   border-top-right-radius: 15px 225px;
   border-bottom-right-radius: 225px 15px;
   border-bottom-left-radius: 15px 255px;
-  border: solid 0.5em #050304;
-  padding: 0;
+  border: solid 0.5em var(--color-bg);
+  padding: 0.5em 0;
 `;
 
 const Title = styled('h2')`
   width: 95%;
-  background-image: url(${textBackground});
-  background-position: center;
-  background-size: cover;
-  color: #fcfafb;
+  mask-image: url(${textBackground});
+  mask-repeat: no-repeat;
+  mask-size: 100%;
+  color: ${CARD_TITLE_COLOR};
   height: 1.2em;
+  background-color: var(--color-bg);
 `;
 
-// TODO: set image height and clip overflow while centering
 const Image = styled.img`
   height: 9em;
   object-fit: cover;
 `;
 
 const Text = styled.div`
-  padding: 0.5em 0.25em;
+  padding: 0.5em 0.25em 0;
   margin: auto;
 
   > div + div {
-    margin-top: 0.25em;
+    margin-top: 0.2em;
   }
 `;
 

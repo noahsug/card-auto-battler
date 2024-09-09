@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import App from './App';
+import { createGameState } from '../../game/gameState';
 
 const meta = {
   title: 'App',
@@ -17,5 +18,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
-  args: {},
+  args: {
+    gameState: createGameState(),
+  },
 };

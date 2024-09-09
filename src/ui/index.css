@@ -12,29 +12,32 @@ html {
 body {
   margin: 0;
   user-select: none;
-  color: var(--fg);
+  color: var(--color-primary);
 
-  font-family: 'IndieFlower', sans-serif;
+  font-family: var(--font-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 h1 {
-  font-family: '3Dumb', sans-serif;
+  font-family: var(--font-title);
   font-size: 5rem;
   margin-bottom: 2rem;
 }
 
 h2 {
-  font-family: 'AmaticBold', sans-serif;
+  font-family: var(--font-heading);
   letter-spacing: 0.05em;
   margin: 0 auto;
   padding: 0;
 }
 
 :root {
-  --fg: #fcfafb;
-  --bg: #080808;
+  --color-primary: #fcfafb;
+  --color-bg: #080808;
+  --font-text: 'IndieFlower', sans-serif;
+  --font-heading: 'AmaticBold', sans-serif;
+  --font-title: '3Dumb', sans-serif;
 }
 
 @font-face {
@@ -45,11 +48,6 @@ h2 {
 @font-face {
   font-family: 'IndieFlower';
   src: url('./fonts/IndieFLower.ttf');
-}
-
-@font-face {
-  font-family: 'Amatic';
-  src: url('./fonts/AmaticSC-Regular.ttf');
 }
 
 @font-face {

@@ -12,18 +12,17 @@ export default function BattleResultOverlay({ onNewGame }: Props) {
   const { won } = useGameState();
   return (
     <Container>
-      <Header>{won ? 'Victory!' : 'Defeat'}</Header>
+      <Header>{won ? 'Victory!' : 'defeat'}</Header>
       <NewGameButton onClick={onNewGame}>New Game</NewGameButton>
     </Container>
   );
 }
 
-const Header = styled.div`
-  color: white;
+const Header = styled('h2')`
   text-align: center;
+  font-size: 10rem;
   margin-bottom: 2rem;
-  font-size: 4rem;
-  margin-top: 4rem;
+  margin-top: auto;
 `;
 
 const NewGameButton = styled(Button)`
