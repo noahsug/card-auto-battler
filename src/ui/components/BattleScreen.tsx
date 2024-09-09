@@ -5,12 +5,15 @@ import { useActions, useGameState, useUndo } from './GameStateContext';
 import Container from './shared/Container';
 import HealthBar from './HealthBar';
 import Card from './Card';
+import { getHandDrawnBorderRadius, maskImage } from '../style';
 
 import userImage from '../images/characters/warrior.png';
 import enemyImage from '../images/characters/green-monster.png';
-import battleImage from '../images/swords.png';
-import livesImage from '../images/heart.png';
-import { getHandDrawnBorderRadius, maskImage } from '../style';
+import battleImage from '../images/icons/swords.png';
+import livesImage from '../images/icons/heart.png';
+import pauseImage from '../images/icons/pause.png';
+import playImage from '../images/icons/play.png';
+import nextImage from '../images/icons/arrow.png';
 
 interface Props {
   onBattleOver: () => void;
@@ -32,8 +35,8 @@ export default function BattleScreen({ onBattleOver }: Props) {
   }, [onBattleOver, won]);
 
   return (
-    <Container>
-      <Row>
+    <Root>
+      <IconsRow>
         <Label>
           <Icon src={livesImage} />
           <div>3 lives</div>
@@ -43,7 +46,7 @@ export default function BattleScreen({ onBattleOver }: Props) {
           <Icon src={battleImage} />
           <div>round 2</div>
         </Label>
-      </Row>
+      </IconsRow>
 
       <Row>
         <Player>
@@ -61,9 +64,25 @@ export default function BattleScreen({ onBattleOver }: Props) {
         <Card size="small" type="user" />
         <Card size="small" type="enemyGreen" />
       </Row>
-    </Container>
+
+      <ControlsRow>
+        <button>
+          <img src={playImage} />
+        </button>
+
+        <button>
+          <img src={pauseImage} />
+        </button>
+
+        <button>
+          <img src={nextImage} />
+        </button>
+      </ControlsRow>
+    </Root>
   );
 }
+
+const Root = styled(Container)``;
 
 const Row = styled.div`
   display: flex;
@@ -112,4 +131,23 @@ const Profile = styled.img`
   width: 12rem;
   margin-bottom: 0.5rem;
   filter: ${getDropShadow};
+`;
+
+const IconsRow = styled(Row)`
+  align-items: start;
+  flex: 1;
+`;
+
+const ControlsRow = styled(Row)`
+  align-items: end;
+  flex: 1;
+
+  > button {
+    background: none;
+    border: none;
+  }
+
+  img {
+    height: 3rem;
+  }
 `;

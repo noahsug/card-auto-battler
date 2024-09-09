@@ -23,4 +23,5 @@ export const AppRoot = styled.div`
   background-image: url(${backgroundImage});
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
 `;

@@ -10,8 +10,8 @@ interface Props {
 export default function StartScreen({ onNewGame }: Props) {
   return (
     <Container>
-      <Header>Card Auto Battler</Header>
-      <StartButton onClick={onNewGame}>Start</StartButton>
+      <Header>Chalkboard Heroes</Header>
+      <StartButton onClick={onNewGame}>start</StartButton>
     </Container>
   );
 }
@@ -21,6 +21,7 @@ const Header = styled('h1')`
   font-size: 5rem;
   margin-bottom: 2rem;
   margin-top: auto;
+  text-transform: uppercase;
 `;
 
 const StartButton = styled(Button)`

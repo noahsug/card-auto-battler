@@ -5,5 +5,5 @@ export default styled.div`
   display: flex;
   margin: auto;
   flex-flow: column;
-  padding: 0 0.5rem;
+  padding: 1rem 0.5rem;
 `;
