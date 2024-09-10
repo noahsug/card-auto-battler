@@ -48,7 +48,7 @@ export default function BattleScreen({ onBattleOver }: Props) {
         </Label>
       </IconsRow>
 
-      <Row>
+      <PlayersRow>
         <Player>
           <Profile src={userImage} />
           <HealthBar health={10} maxHealth={10} />
@@ -58,11 +58,11 @@ export default function BattleScreen({ onBattleOver }: Props) {
           <Profile src={enemyImage} />
           <HealthBar health={10} maxHealth={10} />
         </Player>
-      </Row>
+      </PlayersRow>
 
       <Row>
-        <Card size="small" type="user" />
-        <Card size="small" type="enemyGreen" />
+        <Card size="small" type="user" card="punch" />
+        <Card size="small" type="red" card="fireball" />
       </Row>
 
       <ControlsRow>
@@ -89,6 +89,15 @@ const Row = styled.div`
   flex-direction: row;
   justify-content: space-evenly;
   align-items: center;
+`;
+
+const IconsRow = styled(Row)`
+  align-items: start;
+  flex: 1;
+`;
+
+const PlayersRow = styled(Row)`
+  flex: 3;
 `;
 
 const Label = styled(Row)`
@@ -133,11 +142,6 @@ const Profile = styled.img`
   filter: ${getDropShadow};
 `;
 
-const IconsRow = styled(Row)`
-  align-items: start;
-  flex: 1;
-`;
-
 const ControlsRow = styled(Row)`
   align-items: end;
   flex: 1;
@@ -148,6 +152,6 @@ const ControlsRow = styled(Row)`
   }
 
   img {
-    height: 3rem;
+    height: 2rem;
   }
 `;

@@ -15,21 +15,24 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const User: Story = {
+export const Punch: Story = {
   args: {
     size: 'large',
     type: 'user',
+    card: 'punch',
   },
 };
-export const EnemyRed: Story = {
+export const Fireball: Story = {
   args: {
     size: 'large',
-    type: 'enemyRed',
+    type: 'red',
+    card: 'fireball',
   },
 };
-export const EnemyGreen: Story = {
+export const Eviscerate: Story = {
   args: {
     size: 'large',
-    type: 'enemyGreen',
+    type: 'user',
+    card: 'eviscerate',
   },
 };
