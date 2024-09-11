@@ -4,12 +4,13 @@ import Container from './shared/Container';
 import { getHandDrawnBorderRadius, maskImage } from '../style';
 
 import textBackground from '../images/text-background.png';
-import { CardName, allCards } from '../../content/cards';
+import { CardState } from '../../game/gameState';
 
 interface Props {
   size: 'small' | 'medium' | 'large';
   type: 'user' | 'red' | 'green';
-  card: CardName;
+  card: CardState;
+  rotation?: number; // number of turns
 }
 
 function CardTextLine({ text }: { text: string }) {
@@ -25,12 +26,12 @@ function CardTextLine({ text }: { text: string }) {
   );
 }
 
-export default function Card({ size, type, card }: Props) {
-  const { name, description, imageName: image } = allCards[card];
+export default function Card({ size, type, card, rotation }: Props) {
+  const { name, description, image } = card;
   const lines = description.split('.').slice(0, -1);
 
   return (
-    <Root size={size}>
+    <CardRoot size={size} rotation={rotation}>
       <ThemeProvider theme={{ type }}>
         <OuterContainer>
           <Image src={image} />
@@ -42,11 +43,11 @@ export default function Card({ size, type, card }: Props) {
           </Text>
         </OuterContainer>
       </ThemeProvider>
-    </Root>
+    </CardRoot>
   );
 }
 
-const Root = styled.div<{ size: Props['size'] }>`
+export const CardRoot = styled.div<{ size: Props['size']; rotation?: number }>`
   font-size: ${({ size }) => {
     switch (size) {
       case 'small':
@@ -57,6 +58,7 @@ const Root = styled.div<{ size: Props['size'] }>`
         return '2rem';
     }
   }};
+  transform: rotate(${({ rotation }) => rotation || 0}turn);
 `;
 
 const hsl = {

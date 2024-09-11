@@ -6,8 +6,6 @@ import Container from './shared/Container';
 import HealthBar from './HealthBar';
 import Card from './Card';
 import { getHandDrawnBorderRadius, maskImage } from '../style';
-import { user } from '../../content/user';
-import { allEnemies } from '../../content/enemies';
 
 import battleImage from '../images/icons/swords.png';
 import livesImage from '../images/icons/heart.png';
@@ -20,19 +18,15 @@ interface Props {
 }
 
 export default function BattleScreen({ onBattleOver }: Props) {
-  const { counter, won } = useGameState();
-  const { increment } = useActions();
+  const { user, enemy } = useGameState();
+  // const { increment } = useActions();
   const { canUndo, undo } = useUndo();
 
-  async function handleIncrement() {
-    increment();
-  }
-
   useEffect(() => {
-    if (won) {
+    if (user.health <= 0 || enemy.health <= 0) {
       onBattleOver();
     }
-  }, [onBattleOver, won]);
+  }, [onBattleOver]);
 
   return (
     <Root>
@@ -51,18 +45,18 @@ export default function BattleScreen({ onBattleOver }: Props) {
       <PlayersRow>
         <Player>
           <Profile src={user.image} />
-          <HealthBar health={10} maxHealth={10} />
+          <HealthBar health={user.health} maxHealth={user.startingHealth} />
         </Player>
 
         <Player>
-          <Profile src={allEnemies.fireMonster.image} />
-          <HealthBar health={10} maxHealth={10} />
+          <Profile src={enemy.image} />
+          <HealthBar health={user.health} maxHealth={user.startingHealth} />
         </Player>
       </PlayersRow>
 
       <Row>
-        <Card size="small" type="user" card="punch" />
-        <Card size="small" type="red" card="fireball" />
+        <Card size="small" type="user" card={user.cards[user.currentCardIndex]} />
+        <Card size="small" type="red" card={enemy.cards[enemy.currentCardIndex]} />
       </Row>
 
       <ControlsRow>
