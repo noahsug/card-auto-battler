@@ -6,9 +6,9 @@ import Container from './shared/Container';
 import HealthBar from './HealthBar';
 import Card from './Card';
 import { getHandDrawnBorderRadius, maskImage } from '../style';
+import { user } from '../../content/user';
+import { allEnemies } from '../../content/enemies';
 
-import userImage from '../images/characters/warrior.png';
-import enemyImage from '../images/characters/green-monster.png';
 import battleImage from '../images/icons/swords.png';
 import livesImage from '../images/icons/heart.png';
 import pauseImage from '../images/icons/pause.png';
@@ -50,12 +50,12 @@ export default function BattleScreen({ onBattleOver }: Props) {
 
       <PlayersRow>
         <Player>
-          <Profile src={userImage} />
+          <Profile src={user.image} />
           <HealthBar health={10} maxHealth={10} />
         </Player>
 
         <Player>
-          <Profile src={enemyImage} />
+          <Profile src={allEnemies.fireMonster.image} />
           <HealthBar health={10} maxHealth={10} />
         </Player>
       </PlayersRow>
@@ -78,6 +78,10 @@ export default function BattleScreen({ onBattleOver }: Props) {
           <img src={nextImage} />
         </button>
       </ControlsRow>
+
+      {/* <ActiveCardContainer>
+        <Card size="medium" type="user" card="punch" />
+      </ActiveCardContainer> */}
     </Root>
   );
 }
@@ -154,4 +158,11 @@ const ControlsRow = styled(Row)`
   img {
     height: 2rem;
   }
+`;
+
+const ActiveCardContainer = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
 `;

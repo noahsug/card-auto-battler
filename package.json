@@ -2,6 +2,8 @@
   "name": "card-auto-battler",
   "version": "0.1.0",
   "dependencies": {
+    "@gsap/react": "^2.1.1",
+    "gsap": "^3.12.5",
     "immer": "^10.0.3",
     "lodash": "^4.17.21",
     "react": "^18.2.0",

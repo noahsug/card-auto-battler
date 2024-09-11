@@ -4,36 +4,13 @@ import Container from './shared/Container';
 import { getHandDrawnBorderRadius, maskImage } from '../style';
 
 import textBackground from '../images/text-background.png';
-import punchImage from '../images/cards/punch.png';
-import fireballImage from '../images/cards/fireball.png';
-import eviscerateImage from '../images/cards/eviscerate.jpeg';
-
-// import fireballImage from '../images/cards/parry2.png';
-// import punchImage from '../images/cards/parry.png';
+import { CardName, allCards } from '../../content/cards';
 
 interface Props {
   size: 'small' | 'medium' | 'large';
   type: 'user' | 'red' | 'green';
-  card: 'punch' | 'eviscerate' | 'fireball';
+  card: CardName;
 }
-
-const cards = {
-  punch: {
-    name: 'Serious Punch',
-    description: 'Deal 10 damage.',
-    image: punchImage,
-  },
-  eviscerate: {
-    name: 'Eviscerate',
-    description: 'Deal 2 damage. Repeat for each bleed the enemy has.',
-    image: eviscerateImage,
-  },
-  fireball: {
-    name: 'Fireball',
-    description: `Deal 5 damage. Deal 3 extra damage for each burn the enemy has. Remove all enemy burn.`,
-    image: fireballImage,
-  },
-} satisfies Record<Props['card'], object>;
 
 function CardTextLine({ text }: { text: string }) {
   const parts = text.split(/(\d+)/);
@@ -48,14 +25,8 @@ function CardTextLine({ text }: { text: string }) {
   );
 }
 
-const cardImages = {
-  punch: punchImage,
-  eviscerate: eviscerateImage,
-  fireball: fireballImage,
-} satisfies Record<Props['card'], string>;
-
 export default function Card({ size, type, card }: Props) {
-  const { name, description, image } = cards[card];
+  const { name, description, imageName: image } = allCards[card];
   const lines = description.split('.').slice(0, -1);
 
   return (

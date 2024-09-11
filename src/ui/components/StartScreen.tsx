@@ -18,7 +18,7 @@ export default function StartScreen({ onNewGame }: Props) {
 
 const Header = styled('h1')`
   text-align: center;
-  font-size: 5rem;
+  font-size: 4rem;
   margin-bottom: 2rem;
   margin-top: auto;
   text-transform: uppercase;
