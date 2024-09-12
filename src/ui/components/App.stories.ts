@@ -14,8 +14,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {
-  args: {
-    gameState: createGameState(),
-  },
-};
+export const Primary: Story = {};

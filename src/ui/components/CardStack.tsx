@@ -22,7 +22,7 @@ export default function CardStack({ cards, currentCardIndex, direction }: Props)
   cards = cards.slice(currentCardIndex).concat(cards.slice(0, currentCardIndex)).reverse();
 
   return (
-    <Root direction={direction === 'left' ? -1 : 1}>
+    <Root $direction={direction === 'left' ? -1 : 1}>
       {cards.map((card, i) => {
         const index = (currentCardIndex + cards.length - i) % cards.length;
         return (
@@ -42,10 +42,10 @@ function getOffset(i: number) {
   return maxGap * ratio;
 }
 
-function getCardGaps({ direction }: { direction: number }) {
+function getCardGaps({ $direction }: { $direction: number }) {
   const gaps = [];
   for (let i = 0; i < maxCardsDisplayed - 1; i++) {
-    const offset = getOffset(i) * direction;
+    const offset = getOffset(i) * $direction;
     gaps.push(`
       &:nth-last-child(${i + 1}) {
         left: ${offset}rem;
@@ -55,7 +55,7 @@ function getCardGaps({ direction }: { direction: number }) {
   return gaps.join('\n');
 }
 
-const Root = styled.div<{ direction: number }>`
+const Root = styled.div<{ $direction: number }>`
   position: relative;
 
   /* matches Card width/height */
@@ -64,7 +64,7 @@ const Root = styled.div<{ direction: number }>`
 
   ${CardRoot} {
     position: absolute;
-    left: ${(props) => maxGap * props.direction}rem;
+    left: ${(props) => maxGap * props.$direction}rem;
 
     ${getCardGaps}
   }

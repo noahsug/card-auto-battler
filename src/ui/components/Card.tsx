@@ -31,7 +31,7 @@ export default function Card({ size, type, card, rotation }: Props) {
   const lines = description.split('.').slice(0, -1);
 
   return (
-    <CardRoot size={size} rotation={rotation}>
+    <CardRoot $size={size} $rotation={rotation}>
       <ThemeProvider theme={{ type }}>
         <OuterContainer>
           <Image src={image} />
@@ -47,9 +47,9 @@ export default function Card({ size, type, card, rotation }: Props) {
   );
 }
 
-export const CardRoot = styled.div<{ size: Props['size']; rotation?: number }>`
-  font-size: ${({ size }) => {
-    switch (size) {
+export const CardRoot = styled.div<{ $size: Props['size']; $rotation?: number }>`
+  font-size: ${({ $size }) => {
+    switch ($size) {
       case 'small':
         return '0.8rem';
       case 'medium':
@@ -58,7 +58,7 @@ export const CardRoot = styled.div<{ size: Props['size']; rotation?: number }>`
         return '2rem';
     }
   }};
-  transform: rotate(${({ rotation }) => rotation || 0}turn);
+  transform: rotate(${({ $rotation }) => $rotation || 0}turn);
 `;
 
 const hsl = {

@@ -17,8 +17,12 @@ interface Props {
 
 export default function BattleScreen({ onBattleOver }: Props) {
   const { user, enemy } = useGameState();
-  // const { increment } = useActions();
+  const { playCard } = useActions();
   const { canUndo, undo } = useUndo();
+
+  function handleTogglePlayPause() {
+    // TODO
+  }
 
   useEffect(() => {
     if (user.health <= 0 || enemy.health <= 0) {
@@ -47,7 +51,7 @@ export default function BattleScreen({ onBattleOver }: Props) {
         </Player>
 
         <Player>
-          <Profile src={enemy.image} flip={true} />
+          <Profile src={enemy.image} $flip={true} />
           <HealthBar health={user.health} maxHealth={user.startingHealth} />
         </Player>
       </PlayersRow>
@@ -61,7 +65,13 @@ export default function BattleScreen({ onBattleOver }: Props) {
         />
       </CardStackRow>
 
-      <BattleControls />
+      <BattleControls
+        onBack={undo}
+        canGoBack={canUndo}
+        onTogglePlay={handleTogglePlayPause}
+        isPlaying={false}
+        onNext={playCard}
+      />
 
       {/* <ActiveCardContainer>
         <Card size="medium" type="user" card="punch" />
@@ -128,11 +138,11 @@ function getDropShadow() {
   return new Array(4).fill(dropShadow).join(' ');
 }
 
-const Profile = styled.img<{ flip?: boolean }>`
+const Profile = styled.img<{ $flip?: boolean }>`
   width: 12rem;
   margin-bottom: 0.5rem;
   filter: ${getDropShadow};
-  transform: ${(props) => (props.flip ? 'scaleX(-1)' : 'none')};
+  transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
 `;
 
 const ActiveCardContainer = styled.div`

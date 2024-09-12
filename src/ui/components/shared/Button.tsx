@@ -14,4 +14,5 @@ export default styled.button`
   color: var(--color-primary);
   line-height: 1;
   text-transform: uppercase;
+  cursor: pointer;
 `;

@@ -1,5 +1,17 @@
-import { GameState } from './gameState';
+import { GameState, PlayerState } from './gameState';
 
-export function increment(state: GameState) {}
+export function playCard({ user, enemy }: GameState) {
+  const card = user.cards[user.currentCardIndex];
+  enemy.health -= card.damage;
+  user.currentCardIndex++;
+}
 
-export function reset(state: GameState) {}
+function resetPlayer(player: PlayerState) {
+  player.health = player.startingHealth;
+  player.currentCardIndex = 0;
+}
+
+export function resetBattle({ user, enemy }: GameState) {
+  resetPlayer(user);
+  resetPlayer(enemy);
+}

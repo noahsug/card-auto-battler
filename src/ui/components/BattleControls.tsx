@@ -29,7 +29,7 @@ export default function BattleControls({
         {isPlaying ? <img src={pauseImage} /> : <img src={playImage} />}
       </ControlButton>
 
-      <ControlButton onClick={onNext} flip={true}>
+      <ControlButton onClick={onNext} $flip={true}>
         <img src={nextImage} />
       </ControlButton>
     </ControlsRow>
@@ -44,10 +44,10 @@ const ControlsRow = styled.div`
   flex: 1;
 `;
 
-const ControlButton = styled.button<{ flip?: boolean }>`
+const ControlButton = styled.button<{ $flip?: boolean }>`
   background: none;
   border: none;
-  transform: ${(props) => (props.flip ? 'scaleX(-1)' : 'none')};
+  transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
   cursor: pointer;
 
   &[disabled] {

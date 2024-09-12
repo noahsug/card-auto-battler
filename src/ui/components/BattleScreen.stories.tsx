@@ -21,9 +21,6 @@ const meta = {
   ],
   parameters: {
     layout: 'fullscreen',
-    gameState: {
-      ...createGameState(),
-    },
   },
   args: {
     onBattleOver: fn(),
