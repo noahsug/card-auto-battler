@@ -3,16 +3,7 @@ import sample from 'lodash/sample';
 
 import CardStack from './CardStack';
 import { allCards } from '../../content/cards';
-
-function getRandomCards(length: number) {
-  const cards = new Array(length);
-  const options = Object.values(allCards);
-
-  for (let i = 0; i < length; i++) {
-    cards[i] = sample(options);
-  }
-  return cards;
-}
+import { getRandomCards } from '../../game/utils';
 
 const meta = {
   title: 'CardStack',

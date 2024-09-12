@@ -12,6 +12,7 @@ import livesImage from '../images/icons/heart.png';
 import pauseImage from '../images/icons/pause.png';
 import playImage from '../images/icons/play.png';
 import nextImage from '../images/icons/arrow.png';
+import CardStack from './CardStack';
 
 interface Props {
   onBattleOver: () => void;
@@ -55,8 +56,12 @@ export default function BattleScreen({ onBattleOver }: Props) {
       </PlayersRow>
 
       <Row>
-        <Card size="small" type="user" card={user.cards[user.currentCardIndex]} />
-        <Card size="small" type="red" card={enemy.cards[enemy.currentCardIndex]} />
+        <CardStack cards={user.cards} currentCardIndex={user.currentCardIndex} direction="left" />
+        <CardStack
+          cards={enemy.cards}
+          currentCardIndex={enemy.currentCardIndex}
+          direction="right"
+        />
       </Row>
 
       <ControlsRow>

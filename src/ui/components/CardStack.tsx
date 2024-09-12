@@ -9,7 +9,8 @@ interface Props {
   direction: 'left' | 'right';
 }
 
-const maxRotation = 1 / 33;
+const maxRotation = 1 / 33; // in turns
+// store random rotations for each card, the same card will always have the same rotation
 const rotations = new Array(20)
   .fill(0)
   .map((_, i) => Math.random() * 2 * maxRotation - maxRotation);
@@ -56,6 +57,10 @@ function getCardGaps({ direction }: { direction: number }) {
 
 const Root = styled.div<{ direction: number }>`
   position: relative;
+
+  /* matches Card width/height */
+  height: ${20 * 0.8}rem;
+  width: ${12 * 0.8}rem;
 
   ${CardRoot} {
     position: absolute;
