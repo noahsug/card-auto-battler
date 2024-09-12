@@ -1,18 +1,15 @@
 import { useEffect } from 'react';
 import { styled } from 'styled-components';
 
-import { useActions, useGameState, useUndo } from './GameStateContext';
-import Container from './shared/Container';
-import HealthBar from './HealthBar';
-import Card from './Card';
 import { getHandDrawnBorderRadius, maskImage } from '../style';
-
-import battleImage from '../images/icons/swords.png';
-import livesImage from '../images/icons/heart.png';
-import pauseImage from '../images/icons/pause.png';
-import playImage from '../images/icons/play.png';
-import nextImage from '../images/icons/arrow.png';
+import BattleControls from './BattleControls';
 import CardStack from './CardStack';
+import { useActions, useGameState, useUndo } from './GameStateContext';
+import HealthBar from './HealthBar';
+import Container from './shared/Container';
+
+import livesImage from '../images/icons/heart.png';
+import battleImage from '../images/icons/swords.png';
 
 interface Props {
   onBattleOver: () => void;
@@ -50,33 +47,21 @@ export default function BattleScreen({ onBattleOver }: Props) {
         </Player>
 
         <Player>
-          <Profile src={enemy.image} />
+          <Profile src={enemy.image} flip={true} />
           <HealthBar health={user.health} maxHealth={user.startingHealth} />
         </Player>
       </PlayersRow>
 
-      <Row>
+      <CardStackRow>
         <CardStack cards={user.cards} currentCardIndex={user.currentCardIndex} direction="left" />
         <CardStack
           cards={enemy.cards}
           currentCardIndex={enemy.currentCardIndex}
           direction="right"
         />
-      </Row>
+      </CardStackRow>
 
-      <ControlsRow>
-        <button>
-          <img src={playImage} />
-        </button>
-
-        <button>
-          <img src={pauseImage} />
-        </button>
-
-        <button>
-          <img src={nextImage} />
-        </button>
-      </ControlsRow>
+      <BattleControls />
 
       {/* <ActiveCardContainer>
         <Card size="medium" type="user" card="punch" />
@@ -101,6 +86,10 @@ const IconsRow = styled(Row)`
 
 const PlayersRow = styled(Row)`
   flex: 3;
+`;
+
+const CardStackRow = styled(Row)`
+  justify-content: space-around;
 `;
 
 const Label = styled(Row)`
@@ -139,24 +128,11 @@ function getDropShadow() {
   return new Array(4).fill(dropShadow).join(' ');
 }
 
-const Profile = styled.img`
+const Profile = styled.img<{ flip?: boolean }>`
   width: 12rem;
   margin-bottom: 0.5rem;
   filter: ${getDropShadow};
-`;
-
-const ControlsRow = styled(Row)`
-  align-items: end;
-  flex: 1;
-
-  > button {
-    background: none;
-    border: none;
-  }
-
-  img {
-    height: 2rem;
-  }
+  transform: ${(props) => (props.flip ? 'scaleX(-1)' : 'none')};
 `;
 
 const ActiveCardContainer = styled.div`

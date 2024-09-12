@@ -33,7 +33,7 @@ export default function CardStack({ cards, currentCardIndex, direction }: Props)
   );
 }
 
-const maxGap = 10;
+const maxGap = 3;
 const maxCardsDisplayed = 10;
 
 function getOffset(i: number) {
