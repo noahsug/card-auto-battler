@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { getHandDrawnBorderRadius, maskImage } from '../style';
@@ -19,16 +19,17 @@ export default function BattleScreen({ onBattleOver }: Props) {
   const { user, enemy } = useGameState();
   const { playCard } = useActions();
   const { canUndo, undo } = useUndo();
+  const [isPlaying, setIsPlaying] = useState(false);
 
   function handleTogglePlayPause() {
-    // TODO
+    setIsPlaying((prev) => !prev);
   }
 
   useEffect(() => {
     if (user.health <= 0 || enemy.health <= 0) {
       onBattleOver();
     }
-  }, [onBattleOver]);
+  }, [user.health, enemy.health, onBattleOver]);
 
   return (
     <Root>
@@ -52,7 +53,7 @@ export default function BattleScreen({ onBattleOver }: Props) {
 
         <Player>
           <Profile src={enemy.image} $flip={true} />
-          <HealthBar health={user.health} maxHealth={user.startingHealth} />
+          <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
         </Player>
       </PlayersRow>
 
@@ -69,7 +70,7 @@ export default function BattleScreen({ onBattleOver }: Props) {
         onBack={undo}
         canGoBack={canUndo}
         onTogglePlay={handleTogglePlayPause}
-        isPlaying={false}
+        isPlaying={isPlaying}
         onNext={playCard}
       />
 

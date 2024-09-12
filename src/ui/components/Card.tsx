@@ -34,7 +34,7 @@ export default function Card({ size, type, card, rotation }: Props) {
     <CardRoot $size={size} $rotation={rotation}>
       <ThemeProvider theme={{ type }}>
         <OuterContainer>
-          <Image src={image} />
+          <Image src={image} alt="{name}" />
           <Title>{name}</Title>
           <Text>
             {lines.map((text, i) => (
@@ -70,16 +70,18 @@ function getHSLString(hue: number, saturation: number, lightness: number) {
   return `hsl(${hue} ${saturation}% ${lightness}%)`;
 }
 function getBackgroundColor(type: Props['type']) {
-  let [hue, saturation, lightness] = hsl[type];
+  const [hue, saturation, lightness] = hsl[type];
   return getHSLString(hue, saturation, lightness);
 }
 function getTitleColor(type: Props['type']) {
-  let [hue, saturation, lightness] = hsl[type];
+  const [hue, saturation] = hsl[type];
+  let lightness = hsl[type][2];
   lightness += 10;
   return getHSLString(hue, saturation, lightness);
 }
 function getBorderColor(type: Props['type']) {
-  let [hue, saturation, lightness] = hsl[type];
+  const [hue, saturation] = hsl[type];
+  let lightness = hsl[type][2];
   lightness = 15;
   return getHSLString(hue, saturation, lightness);
 }

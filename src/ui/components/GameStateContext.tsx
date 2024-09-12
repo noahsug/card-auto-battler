@@ -1,15 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { createContext, useContext, PropsWithChildren, useMemo, useState } from 'react';
 import { produce } from 'immer';
 
-import { GameState, createGameState } from '../../game/gameState';
+import { GameState } from '../../game/gameState';
 import * as actions from '../../game/actions';
 import { Tail, Value, Writable } from '../../utils/types';
 
 type StatefulActions = {
   [K in keyof typeof actions]: (...args: Tail<Parameters<(typeof actions)[K]>>) => void;
 };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Action = (state: GameState, ...args: any[]) => void;
 
 interface GameStateManager {
   gameState: GameState;
@@ -19,13 +19,7 @@ interface GameStateManager {
   undo: () => void;
 }
 
-const GameStateManagerContext = createContext<GameStateManager>({
-  gameState: createGameState(),
-  dispatch: () => {},
-  canUndo: () => false,
-  clearUndo() {},
-  undo() {},
-});
+const GameStateManagerContext = createContext<GameStateManager | null>(null);
 
 interface Props extends PropsWithChildren {
   gameState: GameState;
@@ -35,7 +29,7 @@ export function GameStateProvider({ children, gameState: initialGameState }: Pro
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [past, setPast] = useState<GameState[]>([]);
 
-  const dispatch: GameStateManager['dispatch'] = (action, ...args) => {
+  const dispatch: GameStateManager['dispatch'] = (action: Action, ...args) => {
     const nextGameState = produce(gameState, (draft) => action(draft, ...args));
     setGameState(nextGameState);
     setPast((past) => [...past, gameState]);
@@ -70,27 +64,35 @@ export function GameStateProvider({ children, gameState: initialGameState }: Pro
   );
 }
 
+function useContextOrFail<T>(context: React.Context<T>) {
+  const contextValue = useContext(context);
+  if (contextValue == null) {
+    throw new Error('no Provider found for context');
+  }
+  return contextValue;
+}
+
 export function useGameState() {
-  const { gameState } = useContext(GameStateManagerContext);
+  const { gameState } = useContextOrFail(GameStateManagerContext);
   return gameState;
 }
 
 export function useActions(): StatefulActions {
-  const { dispatch } = useContext(GameStateManagerContext);
+  const { dispatch } = useContextOrFail(GameStateManagerContext);
 
   return useMemo(() => {
     const statefulActions = {} as Writable<StatefulActions>;
     for (const name in actions) {
       const key = name as keyof StatefulActions;
-      statefulActions[key] = dispatch.bind(null, actions[key]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      statefulActions[key] = dispatch.bind(null, actions[key]) as any;
     }
-
     return statefulActions;
   }, [dispatch]);
 }
 
 export function useUndo() {
-  const { undo, canUndo, clearUndo } = useContext(GameStateManagerContext);
+  const { undo, canUndo, clearUndo } = useContextOrFail(GameStateManagerContext);
   return useMemo(
     () => ({
       undo,

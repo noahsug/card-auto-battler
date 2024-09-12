@@ -12,7 +12,7 @@ export default function HealthBar({ health, maxHealth }: Props) {
   const width = (health / maxHealth) * 100;
   return (
     <Root>
-      <img src={healthBarBorderImage} />
+      <img src={healthBarBorderImage} alt="health-bar" />
       <Bar style={{ width: `${width}%` }} />
       <Label>
         {health} / {maxHealth}

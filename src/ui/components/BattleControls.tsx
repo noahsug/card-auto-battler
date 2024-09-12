@@ -22,15 +22,15 @@ export default function BattleControls({
   return (
     <ControlsRow>
       <ControlButton onClick={onBack} disabled={!canGoBack}>
-        <img src={nextImage} />
+        <img src={nextImage} alt="back" />
       </ControlButton>
 
       <ControlButton onClick={onTogglePlay}>
-        {isPlaying ? <img src={pauseImage} /> : <img src={playImage} />}
+        {isPlaying ? <img src={pauseImage} alt="pause" /> : <img src={playImage} alt="play" />}
       </ControlButton>
 
       <ControlButton onClick={onNext} $flip={true}>
-        <img src={nextImage} />
+        <img src={nextImage} alt="next" />
       </ControlButton>
     </ControlsRow>
   );
@@ -49,6 +49,7 @@ const ControlButton = styled.button<{ $flip?: boolean }>`
   border: none;
   transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
   cursor: pointer;
+  width: 4rem;
 
   &[disabled] {
     opacity: 0.5;
