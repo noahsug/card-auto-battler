@@ -31,7 +31,7 @@ export default function Card({ size, type, card, rotation }: Props) {
   const lines = description.split('.').slice(0, -1);
 
   return (
-    <CardRoot $size={size} $rotation={rotation}>
+    <CardRoot $size={size} $rotation={rotation} className="card">
       <ThemeProvider theme={{ type }}>
         <OuterContainer>
           <Image src={image} alt="{name}" />

@@ -3,6 +3,7 @@ import React from 'react';
 
 import { GameStateProvider } from '../src/ui/components/GameStateContext';
 import '../src/ui/index.css';
+import '../src/ui/animations';
 
 const preview: Preview = {
   decorators: [

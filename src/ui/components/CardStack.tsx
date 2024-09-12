@@ -1,4 +1,7 @@
 import { css, styled } from 'styled-components';
+import { useRef } from 'react';
+import { Flip } from 'gsap/Flip';
+import { useGSAP } from '@gsap/react';
 
 import type { CardState } from '../../game/gameState';
 import Card, { CardRoot } from './Card';
@@ -11,18 +14,37 @@ interface Props {
 
 const maxRotation = 1 / 33; // in turns
 // store random rotations for each card, the same card will always have the same rotation
-const rotations = new Array(20)
-  .fill(0)
-  .map((_, i) => Math.random() * 2 * maxRotation - maxRotation);
+const rotations = new Array(20).fill(0).map(() => Math.random() * 2 * maxRotation - maxRotation);
 function getRotation(index: number) {
   return rotations[index % rotations.length];
 }
 
 export default function CardStack({ cards, currentCardIndex, direction }: Props) {
+  const container = useRef(null);
+  const animationStates = useRef<Flip.FlipState>();
+  const animate = useRef(true);
+
+  useGSAP(
+    () => {
+      if (!animate.current) return;
+
+      if (animationStates.current) {
+        Flip.from(animationStates.current, {
+          duration: 5,
+          ease: 'power3.inOut',
+          absolute: true,
+        });
+        animate.current = false;
+      }
+      animationStates.current = Flip.getState('.card');
+    },
+    { dependencies: [cards, currentCardIndex, direction], scope: container },
+  );
+
   cards = cards.slice(currentCardIndex).concat(cards.slice(0, currentCardIndex)).reverse();
 
   return (
-    <Root $direction={direction === 'left' ? -1 : 1}>
+    <Root ref={container} $direction={direction === 'left' ? -1 : 1}>
       {cards.map((card, i) => {
         const index = (currentCardIndex + cards.length - i) % cards.length;
         return (
