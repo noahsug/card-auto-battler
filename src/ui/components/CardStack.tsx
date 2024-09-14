@@ -1,4 +1,4 @@
-import { css, styled } from 'styled-components';
+import { styled } from 'styled-components';
 import { useRef } from 'react';
 import { Flip } from 'gsap/Flip';
 import { useGSAP } from '@gsap/react';

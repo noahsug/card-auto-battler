@@ -1,81 +1,91 @@
 import { Flip } from 'gsap/Flip';
 import { useGSAP } from '@gsap/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { styled } from 'styled-components';
+
+interface Props {
+  currentCardIndex: number;
+}
 
 export default function Test() {
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setCurrentCardIndex((prev) => prev + 1);
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, [currentCardIndex]);
+
+  return <InnerTest currentCardIndex={currentCardIndex} />;
+}
+
+function InnerTest({ currentCardIndex }: Props) {
   const container = useRef(null);
   const flipState = useRef<Flip.FlipState>();
-  const [expand, setExpand] = useState(true);
-  const [text, setText] = useState(0);
+  const cards = ['1', '2', '3', '4', '5'];
+  // const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
-  function handleClick() {
-    setText(text + 1);
-  }
+  // Runs before render when currentCardIndex changes
+  useMemo(() => {
+    flipState.current = Flip.getState('.box');
+    console.log('set');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCardIndex]);
 
-  // For demonstration
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      flipState.current = Flip.getState('.box');
-      setExpand(!expand);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [expand]);
+  // useEffect(() => {
+  //   const timeout = setTimeout(() => {
+  //     setCurrentCardIndex((prev) => prev + 1);
+  //     flipState.current = Flip.getState('.box');
+  //     console.log('set');
+  //   }, 1000);
+  //   return () => clearTimeout(timeout);
+  // }, [currentCardIndex]);
 
   useGSAP(
     () => {
       if (!flipState.current) return;
+      console.log('animate');
+
       Flip.from(flipState.current, {
-        ease: 'expo.inOut',
+        ease: 'circ.inOut',
         duration: 0.6,
-        // fade: true,
-        // absolute: true,
-        // scale: true,
       });
     },
-    { scope: container, dependencies: [expand] },
+    { scope: container, dependencies: [currentCardIndex] },
   );
 
+  console.log('render');
+
   return (
-    <button onClick={handleClick} ref={container} style={{ background: 'none', border: 'none' }}>
-      {text}
-      <div
-        style={{
-          height: '200px',
-          width: '200px',
-          backgroundColor: 'white',
-        }}
-      >
-        <div
-          className="box"
-          data-flip-id="box"
-          style={{
-            display: expand ? 'none' : 'block',
-            height: '100px',
-            width: '100px',
-            backgroundColor: 'white',
-            border: '1px solid black',
-          }}
-        ></div>
-      </div>
-      <div
-        style={{
-          height: '200px',
-          width: '200px',
-          backgroundColor: 'white',
-        }}
-      >
-        <div
-          className="box"
-          data-flip-id="box"
-          style={{
-            display: expand ? 'block' : 'none',
-            height: '100px',
-            width: '100px',
-            backgroundColor: 'white',
-            border: '1px solid black',
-          }}
-        ></div>
-      </div>
-    </button>
+    <Root ref={container}>
+      {/* {randoProp} */}
+      {cards.map((_, i) => {
+        const index = (currentCardIndex + i) % cards.length;
+        const card = cards[index];
+        return (
+          <Card
+            className="box"
+            key={`box${card}`}
+            style={{
+              rotate: `0.0${card}turn`,
+            }}
+          >
+            {card}
+          </Card>
+        );
+      })}
+    </Root>
   );
 }
+
+const Card = styled.div`
+  height: 100px;
+  width: 100px;
+  border: 1px solid white;
+`;
+
+const Root = styled.div`
+  border: 1px solid white;
+  padding: 10px;
+`;
