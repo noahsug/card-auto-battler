@@ -1,5 +1,6 @@
 import { styled } from 'styled-components';
 import { useRef } from 'react';
+import gasp from 'gsap';
 import { Flip } from 'gsap/Flip';
 import { useGSAP } from '@gsap/react';
 
@@ -21,42 +22,41 @@ function getRotation(index: number) {
 
 export default function CardStack({ cards, currentCardIndex, direction }: Props) {
   const container = useRef(null);
-  const animationStates = useRef<Flip.FlipState>();
-  const animate = useRef(true);
+  const cardElements = gasp.utils.toArray<Element>('.card', container.current);
+  const animationState = Flip.getState(cardElements);
 
   useGSAP(
     () => {
-      if (!animate.current) return;
-
-      if (animationStates.current) {
-        Flip.from(animationStates.current, {
-          duration: 5,
-          ease: 'power3.inOut',
-          absolute: true,
-        });
-        animate.current = false;
-      }
-      animationStates.current = Flip.getState('.card');
+      if (!animationState) return;
+      Flip.from(animationState, {
+        duration: 1,
+        ease: 'power3.inOut',
+      });
     },
-    { dependencies: [cards, currentCardIndex, direction], scope: container },
+    { scope: container, dependencies: [animationState] },
   );
-
-  cards = cards.slice(currentCardIndex).concat(cards.slice(0, currentCardIndex)).reverse();
 
   return (
     <Root ref={container} $direction={direction === 'left' ? -1 : 1}>
-      {cards.map((card, i) => {
-        const index = (currentCardIndex + cards.length - i) % cards.length;
+      {cards.map((_, i) => {
+        // display cards in reverse order, so the next card is on top (aka at the end)
+        const index = (cards.length + currentCardIndex - 1 - i) % cards.length;
         return (
-          <Card key={index} card={card} size="small" type="user" rotation={getRotation(index)} />
+          <Card
+            key={index}
+            card={cards[index]}
+            size="small"
+            type="user"
+            rotation={getRotation(index)}
+          />
         );
       })}
     </Root>
   );
 }
 
-const maxGap = 3;
-const maxCardsDisplayed = 10;
+const maxGap = 3; // rem
+const maxCardsDisplayed = 3;
 
 function getOffset(i: number) {
   const displayNumber = Math.min(i, maxCardsDisplayed);

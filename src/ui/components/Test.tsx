@@ -14,6 +14,7 @@ export default function Test({ currentCardIndex }: Props) {
   // Runs before render when currentCardIndex changes
   useMemo(() => {
     flipState.current = Flip.getState('.box');
+    console.log('set');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCardIndex]);
 
@@ -21,6 +22,7 @@ export default function Test({ currentCardIndex }: Props) {
     () => {
       if (!flipState.current) return;
 
+      console.log('animate');
       Flip.from(flipState.current, {
         ease: 'circ.inOut',
         duration: 0.6,
@@ -28,6 +30,8 @@ export default function Test({ currentCardIndex }: Props) {
     },
     { scope: container, dependencies: [currentCardIndex] },
   );
+
+  console.log('render');
 
   return (
     <Root ref={container}>

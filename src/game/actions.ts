@@ -4,8 +4,6 @@ export function playCard({ user, enemy }: GameState) {
   const card = user.cards[user.currentCardIndex];
   enemy.health -= card.damage;
   user.currentCardIndex++;
-
-  console.log('enemy health is now', enemy.health, '|', card.damage);
 }
 
 function resetPlayer(player: PlayerState) {

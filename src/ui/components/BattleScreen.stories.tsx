@@ -35,6 +35,6 @@ manyCards.user.cards = getRandomCards(20);
 
 export const Primary: Story = {
   parameters: {
-    gameState: manyCards,
+    gameState: createGameState(),
   },
 };
