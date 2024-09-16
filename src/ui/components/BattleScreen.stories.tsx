@@ -30,11 +30,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+export const FewCards: Story = {
+  parameters: {
+    gameState: createGameState(),
+  },
+};
+
 const manyCards = createGameState();
 manyCards.user.cards = getRandomCards(20);
 
-export const Primary: Story = {
+export const ManyCards: Story = {
   parameters: {
-    gameState: createGameState(),
+    gameState: manyCards,
   },
 };

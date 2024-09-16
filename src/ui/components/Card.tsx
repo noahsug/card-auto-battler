@@ -51,11 +51,11 @@ export const CardRoot = styled.div<{ $size: Props['size']; $rotation?: number }>
   font-size: ${({ $size }) => {
     switch ($size) {
       case 'small':
-        return '0.8rem';
+        return '0.5rem';
       case 'medium':
-        return '1rem';
+        return '0.8rem';
       case 'large':
-        return '2rem';
+        return '1.2rem';
     }
   }};
   transform: rotate(${({ $rotation }) => $rotation || 0}turn);

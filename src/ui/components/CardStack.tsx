@@ -14,7 +14,7 @@ interface Props {
   // isActive: boolean;
 }
 
-const maxRotation = 1 / 33; // in turns
+const maxRotation = 0; // in turns
 // store random rotations for each card, the same card will always have the same rotation
 const rotations = new Array(20).fill(0).map(() => Math.random() * 2 * maxRotation - maxRotation);
 function getRotation(index: number) {
@@ -123,7 +123,7 @@ export default function CardStack({ cards, currentCardIndex, direction }: Props)
               key={index}
               // data-flip-id={`card-${index}`}
               card={cards[index]}
-              size="small"
+              size={i === cards.length - 1 ? 'medium' : 'small'}
               type="user"
               rotation={getRotation(index)}
             />
@@ -147,8 +147,8 @@ export default function CardStack({ cards, currentCardIndex, direction }: Props)
   );
 }
 
-const maxGap = 3; // rem
-const maxCardsDisplayed = 3;
+const maxGap = 10; // rem
+const maxCardsDisplayed = 5;
 
 function getOffset(i: number) {
   const displayNumber = Math.min(i, maxCardsDisplayed);
@@ -179,6 +179,7 @@ const StackedCardsContainer = styled.div<{ $direction: number }>`
   ${CardRoot} {
     position: absolute;
     left: ${(props) => maxGap * props.$direction}rem;
+    bottom: 0;
 
     ${getCardGaps}
   }
