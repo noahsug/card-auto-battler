@@ -1,4 +1,5 @@
 import { Flip } from 'gsap/Flip';
+import gasp from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { useMemo, useRef } from 'react';
 import { styled } from 'styled-components';

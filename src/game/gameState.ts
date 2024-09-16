@@ -38,7 +38,7 @@ export function createGameState(): GameState {
   const { punch, fireball, eviscerate } = allCards;
 
   const user = createPlayer(allHeroes.warrior);
-  user.cards = [punch, punch, eviscerate];
+  user.cards = [punch, fireball, eviscerate];
 
   const enemy = createPlayer(allEnemies.fireMonster);
   enemy.cards = [fireball, fireball, fireball];
