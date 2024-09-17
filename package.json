@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@gsap/react": "^2.1.1",
+    "@react-spring/web": "^9.7.4",
     "gsap": "^3.12.5",
     "immer": "^10.0.3",
     "lodash": "^4.17.21",

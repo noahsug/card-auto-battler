@@ -2,7 +2,8 @@
 
 Game TODO:
 
-1. use 'gsap' for animations (see slaytheweb/src/ui/animations.js)
+1. react-use-gesture for drag/drop (https://codesandbox.io/p/sandbox/to6uf?file=%2Fsrc%2FApp.tsx%3A3%2C1-6%2C1)
+2. react-use-measure for positioning based on current ref width/height (https://codesandbox.io/p/sandbox/ucvbf?file=%2Fsrc%2FApp.tsx%3A2%2C1-3%2C1)
 
 Performance TODO:
 
