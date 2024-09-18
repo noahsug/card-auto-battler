@@ -13,5 +13,6 @@ type Story = StoryObj<typeof meta>;
 export const Primary: Story = {
   args: {
     currentCardIndex: 0,
+    cards: [1, 2, 3, 4, 5],
   },
 };

@@ -1,10 +1,12 @@
 import { styled } from 'styled-components';
-import { useSprings, animated } from '@react-spring/web';
+import { useTransition, animated } from '@react-spring/web';
 import { useRef } from 'react';
+
 import wait from '../../utils/wait';
 
 interface Props {
   currentCardIndex: number;
+  cards: number[];
 }
 
 const cardSize = 100;
@@ -29,56 +31,42 @@ const Card = styled(animated.div)`
   align-items: center;
 `;
 
-export default function Test({ currentCardIndex }: Props) {
-  const cards = ['1', '2', '3', '4', '5'];
-
+export default function Test({ currentCardIndex, cards }: Props) {
   const cardIndex = useRef(currentCardIndex);
   cardIndex.current = currentCardIndex % cards.length;
   if (cardIndex.current < 0) {
     cardIndex.current = cards.length + cardIndex.current;
   }
 
-  function getIndex(i: number) {
+  const playedCardIndex = (cardIndex.current - 1 + cards.length) % cards.length;
+
+  function getDeckIndex(i: number) {
     return (i - cardIndex.current + cards.length) % cards.length;
   }
   function getEndPosition(i: number) {
-    return { y: getIndex(i) * cardSize, x: 0, scale: 1 };
+    return { y: getDeckIndex(i) * cardSize, x: 0, scale: 1, opacity: 1 };
+  }
+  function animatePlayCard(i: number) {
+    return async (next: (...args: unknown[]) => Promise<void>) => {
+      await next({ x: 200, scale: 2 });
+      await wait(500);
+      await next(getEndPosition(i));
+    };
   }
 
-  const [springs] = useSprings(
-    cards.length,
-    (i) => {
-      const startPosition = { y: i * cardSize };
-
-      const isPlayedCard = i === (cardIndex.current - 1 + cards.length) % cards.length;
-      if (isPlayedCard) {
-        return {
-          from: startPosition,
-          to: async (next) => {
-            await next({ x: 200, scale: 2 });
-            await wait(500);
-            await next(getEndPosition(i));
-          },
-        };
-      }
-
-      return {
-        from: startPosition,
-        to: getEndPosition(i),
-      };
-    },
-    [currentCardIndex],
-  );
+  const transitions = useTransition(cards, {
+    key: (card: number) => card,
+    from: { y: -100 },
+    enter: (_, i: number) => getEndPosition(i),
+    update: (_, i: number) => (i === playedCardIndex ? animatePlayCard(i) : getEndPosition(i)),
+    leave: () => [{ x: -200 }, { scale: 0.1, opacity: 0 }],
+  });
 
   return (
     <Root style={{ height: cardSize * cards.length }}>
-      {springs.map((style, i) => {
-        return (
-          <Card key={i} style={style}>
-            {cards[i]}
-          </Card>
-        );
-      })}
+      {transitions((style, item) => (
+        <Card style={style}>{item}</Card>
+      ))}
     </Root>
   );
 }
