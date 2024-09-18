@@ -1,5 +1,7 @@
 import { styled } from 'styled-components';
 import { useSprings, animated } from '@react-spring/web';
+import { useRef } from 'react';
+import wait from '../../utils/wait';
 
 interface Props {
   currentCardIndex: number;
@@ -29,18 +31,42 @@ const Card = styled(animated.div)`
 
 export default function Test({ currentCardIndex }: Props) {
   const cards = ['1', '2', '3', '4', '5'];
-  const getIndex = (i: number) => (currentCardIndex + i) % cards.length;
+
+  const cardIndex = useRef(currentCardIndex);
+  cardIndex.current = currentCardIndex % cards.length;
+  if (cardIndex.current < 0) {
+    cardIndex.current = cards.length + cardIndex.current;
+  }
+
+  function getIndex(i: number) {
+    return (i - cardIndex.current + cards.length) % cards.length;
+  }
+  function getEndPosition(i: number) {
+    return { y: getIndex(i) * cardSize, x: 0, scale: 1 };
+  }
 
   const [springs] = useSprings(
     cards.length,
-    (i) => ({
-      from: {
-        y: i * cardSize,
-      },
-      to: {
-        y: getIndex(i) * cardSize,
-      },
-    }),
+    (i) => {
+      const startPosition = { y: i * cardSize };
+
+      const isPlayedCard = i === (cardIndex.current - 1 + cards.length) % cards.length;
+      if (isPlayedCard) {
+        return {
+          from: startPosition,
+          to: async (next) => {
+            await next({ x: 200, scale: 2 });
+            await wait(500);
+            await next(getEndPosition(i));
+          },
+        };
+      }
+
+      return {
+        from: startPosition,
+        to: getEndPosition(i),
+      };
+    },
     [currentCardIndex],
   );
 
