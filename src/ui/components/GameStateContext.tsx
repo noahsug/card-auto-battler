@@ -25,6 +25,7 @@ interface Props extends PropsWithChildren {
   gameState: GameState;
 }
 
+// TODO: store future states and redo them so randomness is preserved
 export function GameStateProvider({ children, gameState: initialGameState }: Props) {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [past, setPast] = useState<GameState[]>([]);

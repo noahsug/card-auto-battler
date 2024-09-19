@@ -11,12 +11,6 @@ export function cancelableWait(ms: number): [Promise<void>, () => void] {
     setTimeout(resolve, ms);
   });
 
-  const cancel = () => {
-    console.log('cancel wait');
-    resolve();
-  };
-
-  console.log('wait');
-
+  const cancel = () => resolve();
   return [promise, cancel];
 }

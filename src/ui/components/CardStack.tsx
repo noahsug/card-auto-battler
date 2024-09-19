@@ -54,20 +54,23 @@ function createAnimatedCardState(card: CardState) {
     rotate: random(-10, 10),
     key: card.name + crypto.randomUUID(),
     speedUpAnimation: () => {},
-    cancelAnimation: () => {},
   };
 }
 
 export default function CardStack({ cards, currentCardIndex }: Props) {
   const [u, windowDimensions] = useUnits();
 
+  const animations = useSpringRef();
   const animatedCards = useRef(cards.map(createAnimatedCardState));
 
   // reverse card order so the first card is rendered last and displayed on top
   const deck = animatedCards.current.slice(currentCardIndex).reverse();
 
   function dealCardAnimation(animatedCard: AnimatedCard, index: number) {
-    animatedCard.cancelAnimation();
+    if (animations.current[index]) {
+      // stop the current animation (e.g. the card being played)
+      animations.current[index].stop();
+    }
 
     return {
       x: u(index),
@@ -75,27 +78,31 @@ export default function CardStack({ cards, currentCardIndex }: Props) {
       rotate: animatedCard.rotate,
       scale: 1,
       delay: Math.sqrt(index) * 200,
+      zIndex: 0,
     };
   }
 
-  // TODO: pause the played card until another card is played, played card boops up and down and
-  // only then the next card is played, discarded cards should go to the left since that's where
-  // they come from
-  function playCardAnimation(animatedCard: AnimatedCard) {
+  function playCardAnimation(animatedCard: AnimatedCard, index: number) {
     animatedCards.current.forEach((card) => card.speedUpAnimation());
+    const zIndex = animatedCards.current.length - index;
+    animations.current[index].set({ zIndex });
 
-    return async (next: (...args: unknown[]) => Promise<void>, cancel: () => void) => {
-      animatedCard.cancelAnimation = cancel;
-
-      // let shouldSpeedUp = false;
-      // animatedCard.speedUpAnimation =
+    return async (next: (...args: unknown[]) => Promise<void>) => {
+      let speedUp = false;
+      let cancelWaitFn = () => {};
+      animatedCard.speedUpAnimation = () => {
+        speedUp = true;
+        cancelWaitFn();
+      };
 
       await next({ x: u(200), scale: 2, rotate: 0, config: config.stiff });
 
-      const [waitPromise, cancelWait] = cancelableWait(500);
-      animatedCard.speedUpAnimation = cancelWait;
+      if (!speedUp) {
+        const [waitPromise, cancelWait] = cancelableWait(500);
+        cancelWaitFn = cancelWait;
+        await waitPromise;
+      }
 
-      await waitPromise;
       await next({
         y: u(-1000),
         config: { duration: 300, easing: easings.easeInBack },
@@ -105,10 +112,15 @@ export default function CardStack({ cards, currentCardIndex }: Props) {
 
   const transitions = useTransition(deck, {
     key: ({ key }: AnimatedCard) => key,
-    from: { x: -windowDimensions.width, y: 0, rotate: 0, scale: 1.5 },
+    from: { x: -windowDimensions.width, y: 0, rotate: 0, scale: 1.5, zIndex: 0 },
     enter: dealCardAnimation,
     leave: playCardAnimation,
+    ref: animations,
   });
+
+  useEffect(() => {
+    animations.start();
+  }, [animations, currentCardIndex]);
 
   return (
     <div>
