@@ -2,7 +2,7 @@ import { styled } from 'styled-components';
 import { useTransition, animated } from '@react-spring/web';
 import { useRef } from 'react';
 
-import wait from '../../utils/wait';
+import { wait } from '../../utils/wait';
 
 interface Props {
   currentCardIndex: number;
