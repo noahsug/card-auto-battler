@@ -1,87 +1,106 @@
 import { styled } from 'styled-components';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useTransition, animated, config, easings } from '@react-spring/web';
+import random from 'lodash/random';
 
 import type { CardState } from '../../game/gameState';
-import Card, { CardRoot } from './Card';
+import Card from './Card';
+import useUnits from '../hooks/useUnits';
+import wait from '../../utils/wait';
 
-interface Props {
-  cards: CardState[];
-  currentCardIndex: number;
-  direction: 'left' | 'right';
-}
-
-const maxRotation = 0; // in turns
-// store random rotations for each card, the same card will always have the same rotation
-const rotations = new Array(20).fill(0).map(() => Math.random() * 2 * maxRotation - maxRotation);
-function getRotation(index: number) {
-  return rotations[index % rotations.length];
-}
-
-export default function CardStack({ cards, currentCardIndex, direction }: Props) {
-  return (
-    <div>
-      <StackedCardsContainer $direction={direction === 'left' ? -1 : 1}>
-        {cards.map((_, i) => {
-          // display cards in reverse order, so the next card is on top (aka at the end)
-          const index = (cards.length + currentCardIndex - 1 - i) % cards.length;
-          return (
-            <Card
-              key={index}
-              card={cards[index]}
-              size={i === cards.length - 1 ? 'medium' : 'small'}
-              type="user"
-              rotation={getRotation(index)}
-            />
-          );
-        })}
-      </StackedCardsContainer>
-    </div>
-  );
-}
-
-const maxGap = 10; // rem
-const maxCardsDisplayed = 5;
-
-function getOffset(i: number) {
-  const displayNumber = Math.min(i, maxCardsDisplayed);
-  const ratio = Math.sin((Math.PI / 2) * (displayNumber / maxCardsDisplayed));
-  return maxGap * ratio;
-}
-
-function getCardGaps({ $direction }: { $direction: number }) {
-  const gaps = [];
-  for (let i = 0; i < maxCardsDisplayed - 1; i++) {
-    const offset = getOffset(i) * $direction;
-    gaps.push(`
-      &:nth-last-child(${i + 1}) {
-        left: ${offset}rem;
-      }
-    `);
-  }
-  return gaps.join('\n');
-}
-
-const StackedCardsContainer = styled.div<{ $direction: number }>`
+const StackedCardsContainer = styled.div`
   position: relative;
 
   /* matches Card width/height */
   height: ${20 * 0.8}rem;
   width: ${12 * 0.8}rem;
-
-  ${CardRoot} {
-    position: absolute;
-    left: ${(props) => maxGap * props.$direction}rem;
-    bottom: 0;
-
-    ${getCardGaps}
-  }
 `;
 
-const ActiveCardContainer = styled.div`
+const AnimatedContainer = styled(animated.div)`
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  z-index: 1;
-  opacity: 0.5;
+  inset: 0;
 `;
+
+interface Props {
+  cards: CardState[];
+  currentCardIndex: number;
+}
+
+interface AnimatedCard {
+  card: CardState;
+  rotate: number;
+  animation: 'dealCard' | 'inDeck' | 'playCard';
+  key: string;
+}
+
+// reverse card order so the first card is rendered last and displayed on top
+// const getDeck = () => animatedCards.current.slice(currentCardIndex).reverse();
+// const deck = useRef(getDeck());
+
+// const discard = useRef<AnimatedCard[]>([]);
+// function getDiscard(cards: CardState[], currentCardIndex: number, animatedCards: AnimatedCard[]) {
+//   return animatedCards.slice(0, currentCardIndex);
+// }
+
+// useEffect(() => {
+//   deck.current = getDeck();
+//   // eslint-disable-next-line react-hooks/exhaustive-deps
+// }, [cards, currentCardIndex]);
+
+function createAnimatedCardState(card: CardState): AnimatedCard {
+  return {
+    card,
+    rotate: random(-10, 10),
+    animation: 'inDeck',
+    key: card.name + crypto.randomUUID(),
+  };
+}
+
+export default function CardStack({ cards, currentCardIndex }: Props) {
+  const [u, windowDimensions] = useUnits();
+
+  const animatedCards = useRef(cards.map(createAnimatedCardState));
+
+  // reverse card order so the first card is rendered last and displayed on top
+  const deck = animatedCards.current.slice(currentCardIndex).reverse();
+
+  function dealCardAnimation(animatedCard: AnimatedCard, index: number) {
+    return {
+      x: u(index),
+      y: u(-index),
+      rotate: animatedCard.rotate,
+      scale: 1,
+      delay: Math.sqrt(index) * 200,
+    };
+  }
+
+  function playCardAnimation() {
+    return async (next: (...args: unknown[]) => Promise<void>) => {
+      await next({ x: u(200), scale: 2, rotate: 0 });
+      await wait(500);
+      await next({
+        y: u(-1000),
+        config: { duration: 300, easing: easings.easeInBack },
+      });
+    };
+  }
+
+  const transitions = useTransition(deck, {
+    key: ({ key }: AnimatedCard) => key,
+    from: { x: -windowDimensions.width, y: 0, rotate: 0, scale: 1.5 },
+    enter: dealCardAnimation,
+    leave: playCardAnimation,
+  });
+
+  return (
+    <div>
+      <StackedCardsContainer>
+        {transitions((style, { card }) => (
+          <AnimatedContainer style={style}>
+            <Card card={card} size="medium" type="user" />
+          </AnimatedContainer>
+        ))}
+      </StackedCardsContainer>
+    </div>
+  );
+}

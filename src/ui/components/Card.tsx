@@ -10,7 +10,6 @@ interface Props {
   size: 'small' | 'medium' | 'large';
   type: 'user' | 'red' | 'green';
   card: CardState;
-  rotation?: number; // number of turns
 }
 
 function CardTextLine({ text }: { text: string }) {
@@ -26,12 +25,12 @@ function CardTextLine({ text }: { text: string }) {
   );
 }
 
-export default function Card({ size, type, card, rotation }: Props) {
+export default function Card({ size, type, card }: Props) {
   const { name, description, image } = card;
   const lines = description.split('.').slice(0, -1);
 
   return (
-    <CardRoot $size={size} $rotation={rotation} className="card">
+    <CardRoot $size={size} className="card">
       <ThemeProvider theme={{ type }}>
         <OuterContainer>
           <Image src={image} alt="{name}" />
@@ -47,7 +46,7 @@ export default function Card({ size, type, card, rotation }: Props) {
   );
 }
 
-export const CardRoot = styled.div<{ $size: Props['size']; $rotation?: number }>`
+const CardRoot = styled.div<{ $size: Props['size'] }>`
   font-size: ${({ $size }) => {
     switch ($size) {
       case 'small':
@@ -58,7 +57,6 @@ export const CardRoot = styled.div<{ $size: Props['size']; $rotation?: number }>
         return '1.2rem';
     }
   }};
-  transform: rotate(${({ $rotation }) => $rotation || 0}turn);
 `;
 
 const hsl = {

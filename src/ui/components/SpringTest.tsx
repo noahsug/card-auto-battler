@@ -44,7 +44,13 @@ export default function Test({ currentCardIndex, cards }: Props) {
     return (i - cardIndex.current + cards.length) % cards.length;
   }
   function getEndPosition(i: number) {
-    return { y: getDeckIndex(i) * cardSize, x: 0, scale: 1, opacity: 1 };
+    return {
+      y: getDeckIndex(i) * cardSize,
+      x: 0,
+      scale: 1,
+      opacity: 1,
+      rotate: -10 + 20 * Math.random(),
+    };
   }
   function animatePlayCard(i: number) {
     return async (next: (...args: unknown[]) => Promise<void>) => {
