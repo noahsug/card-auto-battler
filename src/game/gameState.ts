@@ -21,6 +21,7 @@ export interface PlayerState {
 export interface GameState {
   user: PlayerState;
   enemy: PlayerState;
+  turn: number;
 }
 
 function createPlayer({ name, image }: { name: string; image: string }): PlayerState {
@@ -46,5 +47,6 @@ export function createGameState(): GameState {
   return {
     user,
     enemy,
+    turn: 0,
   };
 }

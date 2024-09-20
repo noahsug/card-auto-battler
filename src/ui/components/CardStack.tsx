@@ -80,7 +80,7 @@ export default function CardStack({ cards, currentCardIndex, target, playerType 
   function playCardEndLocation() {
     return {
       x: 0,
-      y: u(1000 * direction),
+      y: u(-1000),
       rotate: 0,
       scale: 1.5,
       zIndex: 1,

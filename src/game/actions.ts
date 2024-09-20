@@ -1,9 +1,15 @@
 import { GameState, PlayerState } from './gameState';
+import { getPlayers } from './utils';
 
-export function playCard({ user, enemy }: GameState) {
-  const card = user.cards[user.currentCardIndex];
-  enemy.health -= card.damage;
-  user.currentCardIndex++;
+export function playCard(game: GameState) {
+  const [activePlayer, nonActivePlayer] = getPlayers(game);
+
+  const card = activePlayer.cards[activePlayer.currentCardIndex];
+
+  nonActivePlayer.health -= card.damage;
+  activePlayer.currentCardIndex++;
+
+  game.turn++;
 }
 
 function resetPlayer(player: PlayerState) {
