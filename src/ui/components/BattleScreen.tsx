@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, KeyboardEvent } from 'react';
 import { styled } from 'styled-components';
 
 import { getHandDrawnBorderRadius, maskImage } from '../style';
@@ -97,11 +97,10 @@ const Row = styled.div`
 
 const IconsRow = styled(Row)`
   align-items: start;
-  flex: 1;
 `;
 
 const PlayersRow = styled(Row)`
-  flex: 3;
+  flex: 1;
 `;
 
 const CardStackRow = styled(Row)`
@@ -149,11 +148,4 @@ const Profile = styled.img<{ $flip?: boolean }>`
   margin-bottom: 0.5rem;
   filter: ${getDropShadow};
   transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
-`;
-
-const ActiveCardContainer = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%);
 `;

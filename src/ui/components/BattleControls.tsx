@@ -3,6 +3,7 @@ import { styled } from 'styled-components';
 import pauseImage from '../images/icons/pause.png';
 import playImage from '../images/icons/play.png';
 import nextImage from '../images/icons/arrow.png';
+import { KeyboardEvent, useEffect } from 'react';
 
 interface Props {
   onBack: () => void;
@@ -19,6 +20,27 @@ export default function BattleControls({
   canGoBack,
   isPlaying,
 }: Props) {
+  function handleKeyboardShortcuts(event: globalThis.KeyboardEvent) {
+    switch (event.key) {
+      case ' ':
+        onTogglePlay();
+        break;
+      case 'ArrowRight':
+        onNext();
+        break;
+      case 'ArrowLeft':
+        if (canGoBack) {
+          onBack();
+        }
+        break;
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyboardShortcuts);
+    return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
+  });
+
   return (
     <ControlsRow>
       <ControlButton onClick={onBack} disabled={!canGoBack}>
@@ -41,7 +63,7 @@ const ControlsRow = styled.div`
   flex-direction: row;
   justify-content: space-evenly;
   align-items: end;
-  flex: 1;
+  margin-top: 3rem;
 `;
 
 const ControlButton = styled.button<{ $flip?: boolean }>`

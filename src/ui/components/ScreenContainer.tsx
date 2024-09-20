@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { styled } from 'styled-components';
 
-import { GameStateProvider, useActions, useGameState, useUndo } from './GameStateContext';
+import { useActions, useUndo } from './GameStateContext';
 import StartScreen from './StartScreen';
 import BattleScreen from './BattleScreen';
 import BattleResultScreen from './BattleResultOverlay';
 import OverlayBackground from './shared/OverlayBackground';
-import { resetBattle } from '../../game/actions';
 
 enum ScreenType {
   start,
@@ -18,6 +17,11 @@ enum OverlayType {
   battleResult,
   none,
 }
+
+export const ScreenContainerRoot = styled.div`
+  max-width: 100vh;
+  margin: auto;
+`;
 
 export default function ScreenContainer() {
   const { resetBattle } = useActions();
@@ -67,8 +71,3 @@ export default function ScreenContainer() {
     </ScreenContainerRoot>
   );
 }
-
-export const ScreenContainerRoot = styled.div`
-  max-width: 100vh;
-  margin: auto;
-`;
