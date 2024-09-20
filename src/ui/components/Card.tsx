@@ -8,7 +8,7 @@ import { CardState } from '../../game/gameState';
 
 interface Props {
   size: 'small' | 'medium' | 'large';
-  type: 'user' | 'red' | 'green';
+  color: 'regular' | 'red' | 'green';
   card: CardState;
 }
 
@@ -25,7 +25,7 @@ function CardTextLine({ text }: { text: string }) {
   );
 }
 
-export default function Card({ size, type, card }: Props) {
+export default function Card({ size, color: type, card }: Props) {
   const { name, description, image } = card;
   const lines = description.split('.').slice(0, -1);
 
@@ -60,24 +60,24 @@ const CardRoot = styled.div<{ $size: Props['size'] }>`
 `;
 
 const hsl = {
-  user: [67, 18, 85],
+  regular: [67, 18, 85],
   red: [0, 20, 78],
   green: [118, 15, 73],
 };
 function getHSLString(hue: number, saturation: number, lightness: number) {
   return `hsl(${hue} ${saturation}% ${lightness}%)`;
 }
-function getBackgroundColor(type: Props['type']) {
+function getBackgroundColor(type: Props['color']) {
   const [hue, saturation, lightness] = hsl[type];
   return getHSLString(hue, saturation, lightness);
 }
-function getTitleColor(type: Props['type']) {
+function getTitleColor(type: Props['color']) {
   const [hue, saturation] = hsl[type];
   let lightness = hsl[type][2];
   lightness += 10;
   return getHSLString(hue, saturation, lightness);
 }
-function getBorderColor(type: Props['type']) {
+function getBorderColor(type: Props['color']) {
   const [hue, saturation] = hsl[type];
   let lightness = hsl[type][2];
   lightness = 15;

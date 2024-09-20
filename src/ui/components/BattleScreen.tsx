@@ -65,11 +65,13 @@ export default function BattleScreen({ onBattleOver }: Props) {
           cards={user.cards}
           currentCardIndex={user.currentCardIndex}
           target={enemyProfile.current}
+          playerType="user"
         />
         <CardStack
           cards={enemy.cards}
           currentCardIndex={enemy.currentCardIndex}
           target={userProfile.current}
+          playerType="enemy"
         />
       </CardStackRow>
 
@@ -80,10 +82,6 @@ export default function BattleScreen({ onBattleOver }: Props) {
         isPlaying={isPlaying}
         onNext={playCard}
       />
-
-      {/* <ActiveCardContainer>
-        <Card size="medium" type="user" card="punch" />
-      </ActiveCardContainer> */}
     </Root>
   );
 }

@@ -25,6 +25,7 @@ interface Props {
   cards: CardState[];
   currentCardIndex: number;
   target: Element | null;
+  playerType: 'user' | 'enemy';
 }
 
 type AnimatedCard = ReturnType<typeof createAnimatedCardState>;
@@ -38,46 +39,72 @@ function createAnimatedCardState(card: CardState) {
   };
 }
 
-function getXYToTarget(self: Element | null, target: Element | null) {
+function getXYToTarget(self: Element | null, target: Element | null, direction: -1 | 1) {
   if (self == null || target == null) return { x: 0, y: 0 };
   const selfRect = self.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
-  console.log(selfRect);
   return {
-    x: targetRect.x - selfRect.x - selfRect.width,
+    x: targetRect.x - selfRect.x + direction * selfRect.width,
     y: targetRect.y - selfRect.y,
   };
 }
 
-export default function CardStack({ cards, currentCardIndex, target }: Props) {
+export default function CardStack({ cards, currentCardIndex, target, playerType }: Props) {
   const [u, windowDimensions] = useUnits();
   const container = useRef<HTMLDivElement>(null);
+
+  const direction = playerType === 'user' ? -1 : 1;
 
   const animations = useSpringRef();
   const animatedCards = useRef(cards.map(createAnimatedCardState));
 
+  const prevCardIndex = useRef(currentCardIndex);
+  const currentCardIndexRef = useRef(currentCardIndex);
+  if (currentCardIndexRef.current !== currentCardIndex) {
+    prevCardIndex.current = currentCardIndexRef.current;
+    currentCardIndexRef.current = currentCardIndex;
+  }
+
+  // we're dealing cards if the last card was played or if we've just started
+  const isDealingCards =
+    currentCardIndex === 0 &&
+    (prevCardIndex.current === cards.length - 1 || prevCardIndex.current === 0);
+
   // reverse card order so the first card is rendered last and displayed on top
   const deck = animatedCards.current.slice(currentCardIndex).reverse();
 
+  function dealCardStartLocation() {
+    return { x: windowDimensions.width * direction, y: 0, rotate: 0, scale: 1.5, zIndex: 0 };
+  }
+
+  function playCardEndLocation() {
+    return {
+      x: 0,
+      y: u(1000 * direction),
+      rotate: 0,
+      scale: 1.5,
+      zIndex: 1,
+    };
+  }
+
   function dealCardAnimation(animatedCard: AnimatedCard, index: number) {
-    if (animations.current[index]) {
-      // stop the current animation (e.g. the card being played)
-      animations.current[index].stop();
-    }
+    // stop the current animation (e.g. the card being played)
+    animations.current[index]?.stop();
 
     return {
-      x: u(index),
+      x: u(index * -direction),
       y: u(-index),
       rotate: animatedCard.rotate,
       scale: 1,
-      delay: Math.sqrt(index) * 200,
+      delay: isDealingCards ? Math.sqrt(index) * 200 : 0,
+      config: config.default,
     };
   }
 
   function playCardAnimation(animatedCard: AnimatedCard, index: number) {
     animatedCards.current.forEach((card) => card.speedUpAnimation());
     const zIndex = animatedCards.current.length - index;
-    animations.current[index].set({ zIndex });
+    animations.current[index]?.set({ zIndex });
 
     return async (next: (...args: unknown[]) => Promise<void>) => {
       let speedUp = false;
@@ -87,9 +114,8 @@ export default function CardStack({ cards, currentCardIndex, target }: Props) {
         cancelWaitFn();
       };
 
-      const { x, y } = getXYToTarget(container.current, target);
-
-      await next({ x, y, scale: 2, rotate: 0, config: config.stiff });
+      const { x, y } = getXYToTarget(container.current, target, direction);
+      await next({ x, y, scale: 1.5, rotate: 0, config: config.stiff });
 
       if (!speedUp) {
         const [waitPromise, cancelWait] = cancelableWait(500);
@@ -98,7 +124,7 @@ export default function CardStack({ cards, currentCardIndex, target }: Props) {
       }
 
       await next({
-        y: u(-1000),
+        ...playCardEndLocation(),
         config: { duration: 300, easing: easings.easeInBack },
       });
     };
@@ -106,7 +132,7 @@ export default function CardStack({ cards, currentCardIndex, target }: Props) {
 
   const transitions = useTransition(deck, {
     key: ({ key }: AnimatedCard) => key,
-    from: { x: -windowDimensions.width, y: 0, rotate: 0, scale: 1.5, zIndex: 0 },
+    from: isDealingCards ? dealCardStartLocation : playCardEndLocation,
     enter: dealCardAnimation,
     leave: playCardAnimation,
     ref: animations,
@@ -116,12 +142,14 @@ export default function CardStack({ cards, currentCardIndex, target }: Props) {
     animations.start();
   }, [animations, currentCardIndex]);
 
+  const cardColor = playerType === 'user' ? 'regular' : 'red';
+
   return (
     <div>
       <StackedCardsContainer ref={container}>
         {transitions((style, { card }) => (
           <AnimatedContainer style={style}>
-            <Card card={card} size="medium" type="user" />
+            <Card card={card} size="medium" color={cardColor} />
           </AnimatedContainer>
         ))}
       </StackedCardsContainer>

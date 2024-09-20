@@ -14,21 +14,21 @@ type Story = StoryObj<typeof meta>;
 export const Punch: Story = {
   args: {
     size: 'large',
-    type: 'user',
+    color: 'user',
     card: allCards.punch,
   },
 };
 export const Fireball: Story = {
   args: {
     size: 'large',
-    type: 'red',
+    color: 'red',
     card: allCards.fireball,
   },
 };
 export const Eviscerate: Story = {
   args: {
     size: 'large',
-    type: 'user',
+    color: 'user',
     card: allCards.eviscerate,
   },
 };

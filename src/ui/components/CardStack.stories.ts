@@ -13,17 +13,19 @@ type Story = StoryObj<typeof meta>;
 
 export const ManyCards: Story = {
   args: {
-    cards: getRandomCards(20),
     currentCardIndex: 0,
     target: null,
+    playerType: 'user',
+    cards: getRandomCards(20),
   },
 };
 
 export const SomeCards: Story = {
   args: {
-    cards: getRandomCards(5),
     currentCardIndex: 0,
     target: null,
+    playerType: 'user',
+    cards: getRandomCards(5),
   },
 };
 
@@ -32,5 +34,6 @@ export const CoupleCards: Story = {
     cards: getRandomCards(2),
     currentCardIndex: 0,
     target: null,
+    playerType: 'user',
   },
 };
