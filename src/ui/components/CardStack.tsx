@@ -24,27 +24,8 @@ const AnimatedContainer = styled(animated.div)`
 interface Props {
   cards: CardState[];
   currentCardIndex: number;
+  target: Element | null;
 }
-
-// reverse card order so the first card is rendered last and displayed on top
-// const getDeck = () => animatedCards.current.slice(currentCardIndex).reverse();
-// const deck = useRef(getDeck());
-
-// const discard = useRef<AnimatedCard[]>([]);
-// function getDiscard(cards: CardState[], currentCardIndex: number, animatedCards: AnimatedCard[]) {
-//   return animatedCards.slice(0, currentCardIndex);
-// }
-
-// useEffect(() => {
-//   deck.current = getDeck();
-//   // eslint-disable-next-line react-hooks/exhaustive-deps
-// }, [cards, currentCardIndex]);
-
-// interface AnimatedCard {
-//   card: CardState;
-//   rotate: number;
-//   key: string;
-// }
 
 type AnimatedCard = ReturnType<typeof createAnimatedCardState>;
 
@@ -57,8 +38,20 @@ function createAnimatedCardState(card: CardState) {
   };
 }
 
-export default function CardStack({ cards, currentCardIndex }: Props) {
+function getXYToTarget(self: Element | null, target: Element | null) {
+  if (self == null || target == null) return { x: 0, y: 0 };
+  const selfRect = self.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  console.log(selfRect);
+  return {
+    x: targetRect.x - selfRect.x - selfRect.width,
+    y: targetRect.y - selfRect.y,
+  };
+}
+
+export default function CardStack({ cards, currentCardIndex, target }: Props) {
   const [u, windowDimensions] = useUnits();
+  const container = useRef<HTMLDivElement>(null);
 
   const animations = useSpringRef();
   const animatedCards = useRef(cards.map(createAnimatedCardState));
@@ -78,7 +71,6 @@ export default function CardStack({ cards, currentCardIndex }: Props) {
       rotate: animatedCard.rotate,
       scale: 1,
       delay: Math.sqrt(index) * 200,
-      zIndex: 0,
     };
   }
 
@@ -95,7 +87,9 @@ export default function CardStack({ cards, currentCardIndex }: Props) {
         cancelWaitFn();
       };
 
-      await next({ x: u(200), scale: 2, rotate: 0, config: config.stiff });
+      const { x, y } = getXYToTarget(container.current, target);
+
+      await next({ x, y, scale: 2, rotate: 0, config: config.stiff });
 
       if (!speedUp) {
         const [waitPromise, cancelWait] = cancelableWait(500);
@@ -124,7 +118,7 @@ export default function CardStack({ cards, currentCardIndex }: Props) {
 
   return (
     <div>
-      <StackedCardsContainer>
+      <StackedCardsContainer ref={container}>
         {transitions((style, { card }) => (
           <AnimatedContainer style={style}>
             <Card card={card} size="medium" type="user" />

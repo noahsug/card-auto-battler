@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { getHandDrawnBorderRadius, maskImage } from '../style';
@@ -20,6 +20,9 @@ export default function BattleScreen({ onBattleOver }: Props) {
   const { playCard } = useActions();
   const { canUndo, undo } = useUndo();
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const userProfile = useRef<HTMLImageElement>(null);
+  const enemyProfile = useRef<HTMLImageElement>(null);
 
   function handleTogglePlayPause() {
     setIsPlaying((prev) => !prev);
@@ -47,22 +50,26 @@ export default function BattleScreen({ onBattleOver }: Props) {
 
       <PlayersRow>
         <Player>
-          <Profile src={user.image} />
+          <Profile src={user.image} ref={userProfile} />
           <HealthBar health={user.health} maxHealth={user.startingHealth} />
         </Player>
 
         <Player>
-          <Profile src={enemy.image} $flip={true} />
+          <Profile src={enemy.image} $flip={true} ref={enemyProfile} />
           <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
         </Player>
       </PlayersRow>
 
       <CardStackRow>
-        <CardStack cards={user.cards} currentCardIndex={user.currentCardIndex} direction="left" />
+        <CardStack
+          cards={user.cards}
+          currentCardIndex={user.currentCardIndex}
+          target={enemyProfile.current}
+        />
         <CardStack
           cards={enemy.cards}
           currentCardIndex={enemy.currentCardIndex}
-          direction="right"
+          target={userProfile.current}
         />
       </CardStackRow>
 

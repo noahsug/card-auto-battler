@@ -15,6 +15,7 @@ export const ManyCards: Story = {
   args: {
     cards: getRandomCards(20),
     currentCardIndex: 0,
+    target: null,
   },
 };
 
@@ -22,6 +23,7 @@ export const SomeCards: Story = {
   args: {
     cards: getRandomCards(5),
     currentCardIndex: 0,
+    target: null,
   },
 };
 
@@ -29,5 +31,6 @@ export const CoupleCards: Story = {
   args: {
     cards: getRandomCards(2),
     currentCardIndex: 0,
+    target: null,
   },
 };
