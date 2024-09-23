@@ -7,16 +7,8 @@ import BattleScreen from './BattleScreen';
 import BattleResultScreen from './BattleResultOverlay';
 import OverlayBackground from './shared/OverlayBackground';
 
-enum ScreenType {
-  start,
-  cardSelection,
-  battle,
-}
-
-enum OverlayType {
-  battleResult,
-  none,
-}
+type ScreenType = 'start' | 'cardSelection' | 'battle';
+type OverlayType = 'battleResult' | 'none';
 
 export const ScreenContainerRoot = styled.div`
   max-width: 100vh;
@@ -26,26 +18,26 @@ export const ScreenContainerRoot = styled.div`
 export default function ScreenContainer() {
   const { resetBattle } = useActions();
   const { clearUndo } = useUndo();
-  const [screen, setScreen] = useState(ScreenType.start);
-  const [overlay, setOverlay] = useState(OverlayType.none);
+  const [screen, setScreen] = useState<ScreenType>('start');
+  const [overlay, setOverlay] = useState<OverlayType>('none');
 
   function handleNewGame() {
     resetBattle();
     clearUndo();
-    setScreen(ScreenType.battle);
-    setOverlay(OverlayType.none);
+    setScreen('battle');
+    setOverlay('none');
   }
 
   function handleBattleOver() {
-    setOverlay(OverlayType.battleResult);
+    setOverlay('battleResult');
   }
 
   function Screen() {
     switch (screen) {
-      case ScreenType.start:
+      case 'start':
         return <StartScreen onNewGame={handleNewGame}></StartScreen>;
 
-      case ScreenType.battle:
+      case 'battle':
         return <BattleScreen onBattleOver={handleBattleOver}></BattleScreen>;
 
       // case Screen.cardSelection:
@@ -55,7 +47,7 @@ export default function ScreenContainer() {
 
   function Overlay() {
     switch (overlay) {
-      case OverlayType.battleResult:
+      case 'battleResult':
         return <BattleResultScreen onNewGame={handleNewGame}></BattleResultScreen>;
     }
   }
@@ -63,7 +55,7 @@ export default function ScreenContainer() {
   return (
     <ScreenContainerRoot>
       <Screen />
-      {overlay !== OverlayType.none && (
+      {overlay !== 'none' && (
         <OverlayBackground>
           <Overlay />
         </OverlayBackground>

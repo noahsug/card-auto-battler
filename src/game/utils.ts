@@ -1,7 +1,7 @@
 import sample from 'lodash/sample';
 
 import { allCards } from '../content/cards';
-import { GameState } from './gameState';
+import { GameState, PlayerState, Target } from './gameState';
 
 export function getRandomCards(length: number) {
   const cards = new Array(length);
@@ -13,18 +13,26 @@ export function getRandomCards(length: number) {
   return cards;
 }
 
-export function getIsEnemyTurn(game: GameState) {
-  return game.turn % 2 === 1;
+export function getIsUserTurn(game: GameState) {
+  return game.turn % 2 === 0;
 }
 
 export function getActivePlayer(game: GameState) {
-  return getIsEnemyTurn(game) ? game.enemy : game.user;
+  return getIsUserTurn(game) ? game.user : game.enemy;
 }
 
 export function getNonActivePlayer(game: GameState) {
-  return getIsEnemyTurn(game) ? game.user : game.enemy;
+  return getIsUserTurn(game) ? game.enemy : game.user;
 }
 
-export function getPlayers(game: GameState) {
-  return getIsEnemyTurn(game) ? [game.enemy, game.user] : [game.user, game.enemy];
+export function getPlayers(game: GameState): [PlayerState, PlayerState] {
+  return getIsUserTurn(game) ? [game.user, game.enemy] : [game.enemy, game.user];
+}
+
+export function getUserTarget(game: GameState): Target {
+  return getIsUserTurn(game) ? 'self' : 'opponent';
+}
+
+export function getPlayerTargets(game: GameState): [Target, Target] {
+  return getIsUserTurn(game) ? ['self', 'opponent'] : ['opponent', 'self'];
 }

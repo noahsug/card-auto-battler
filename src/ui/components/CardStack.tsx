@@ -28,9 +28,9 @@ interface Props {
   playerType: 'user' | 'enemy';
 }
 
-type AnimatedCard = ReturnType<typeof createAnimatedCardState>;
+type CardAnimation = ReturnType<typeof createCardAnimation>;
 
-function createAnimatedCardState(card: CardState) {
+function createCardAnimation(card: CardState) {
   return {
     card,
     rotate: random(-10, 10),
@@ -39,12 +39,13 @@ function createAnimatedCardState(card: CardState) {
   };
 }
 
-function getXYToTarget(self: Element | null, target: Element | null, direction: -1 | 1) {
+function getXYToTarget(self: Element | null, target: Element | null, cardDealDirection: -1 | 1) {
   if (self == null || target == null) return { x: 0, y: 0 };
   const selfRect = self.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
+  const xOffset = cardDealDirection === 1 ? -selfRect.width : targetRect.width;
   return {
-    x: targetRect.x - selfRect.x + direction * selfRect.width,
+    x: targetRect.x - selfRect.x + xOffset,
     y: targetRect.y - selfRect.y,
   };
 }
@@ -53,10 +54,11 @@ export default function CardStack({ cards, currentCardIndex, target, playerType 
   const [u, windowDimensions] = useUnits();
   const container = useRef<HTMLDivElement>(null);
 
-  const direction = playerType === 'user' ? -1 : 1;
+  // for the user, cards fly out from the left to the right
+  const cardDealDirection = playerType === 'user' ? 1 : -1;
 
   const animations = useSpringRef();
-  const animatedCards = useRef(cards.map(createAnimatedCardState));
+  const animatedCards = useRef(cards.map(createCardAnimation));
 
   const prevCardIndex = useRef(currentCardIndex);
   const currentCardIndexRef = useRef(currentCardIndex);
@@ -74,25 +76,29 @@ export default function CardStack({ cards, currentCardIndex, target, playerType 
   const deck = animatedCards.current.slice(currentCardIndex).reverse();
 
   function dealCardStartLocation() {
-    return { x: windowDimensions.width * direction, y: 0, rotate: 0, scale: 1.5, zIndex: 0 };
+    return {
+      x: windowDimensions.width * -cardDealDirection,
+      y: 0,
+      rotate: 0,
+      scale: 1.5,
+      zIndex: 0,
+    };
   }
 
   function playCardEndLocation() {
     return {
-      x: 0,
       y: u(-1000),
       rotate: 0,
-      scale: 1.5,
       zIndex: 1,
     };
   }
 
-  function dealCardAnimation(animatedCard: AnimatedCard, index: number) {
+  function dealCardAnimation(animatedCard: CardAnimation, index: number) {
     // stop the current animation (e.g. the card being played)
     animations.current[index]?.stop();
 
     return {
-      x: u(index * -direction),
+      x: u(index * cardDealDirection),
       y: u(-index),
       rotate: animatedCard.rotate,
       scale: 1,
@@ -101,7 +107,7 @@ export default function CardStack({ cards, currentCardIndex, target, playerType 
     };
   }
 
-  function playCardAnimation(animatedCard: AnimatedCard, index: number) {
+  function playCardAnimation(animatedCard: CardAnimation, index: number) {
     animatedCards.current.forEach((card) => card.speedUpAnimation());
     const zIndex = animatedCards.current.length - index;
     animations.current[index]?.set({ zIndex });
@@ -114,8 +120,8 @@ export default function CardStack({ cards, currentCardIndex, target, playerType 
         cancelWaitFn();
       };
 
-      const { x, y } = getXYToTarget(container.current, target, direction);
-      await next({ x, y, scale: 1.5, rotate: 0, config: config.stiff });
+      const { x, y } = getXYToTarget(container.current, target, cardDealDirection);
+      await next({ x, y, scale: 1.25, rotate: 0, config: config.stiff });
 
       if (!speedUp) {
         const [waitPromise, cancelWait] = cancelableWait(500);
@@ -130,8 +136,8 @@ export default function CardStack({ cards, currentCardIndex, target, playerType 
     };
   }
 
-  const transitions = useTransition(deck, {
-    key: ({ key }: AnimatedCard) => key,
+  const render = useTransition(deck, {
+    key: ({ key }: CardAnimation) => key,
     from: isDealingCards ? dealCardStartLocation : playCardEndLocation,
     enter: dealCardAnimation,
     leave: playCardAnimation,
@@ -147,7 +153,7 @@ export default function CardStack({ cards, currentCardIndex, target, playerType 
   return (
     <div>
       <StackedCardsContainer ref={container}>
-        {transitions((style, { card }) => (
+        {render((style, { card }) => (
           <AnimatedContainer style={style}>
             <Card card={card} size="medium" color={cardColor} />
           </AnimatedContainer>

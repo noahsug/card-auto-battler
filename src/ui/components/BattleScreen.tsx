@@ -10,22 +10,45 @@ import Container from './shared/Container';
 
 import livesImage from '../images/icons/heart.png';
 import battleImage from '../images/icons/swords.png';
+import { getIsUserTurn, getPlayerTargets } from '../../game/utils';
+import { BattleEvent } from '../../game/actions';
+import FloatingCombatText from './FloatingCombatText';
 
 interface Props {
   onBattleOver: () => void;
 }
 
 export default function BattleScreen({ onBattleOver }: Props) {
-  const { user, enemy } = useGameState();
+  const game = useGameState();
   const { playCard } = useActions();
   const { canUndo, undo } = useUndo();
+
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const [userBattleEvents, setUserBattleEvents] = useState<BattleEvent[]>([]);
+  const [enemyBattleEvents, setEnemyBattleEvents] = useState<BattleEvent[]>([]);
 
   const userProfile = useRef<HTMLImageElement>(null);
   const enemyProfile = useRef<HTMLImageElement>(null);
 
+  const { user, enemy } = game;
+
   function handleTogglePlayPause() {
     setIsPlaying((prev) => !prev);
+  }
+
+  function handleUndo() {
+    undo();
+    setUserBattleEvents([]);
+    setEnemyBattleEvents([]);
+  }
+
+  function handlePlayNextCard() {
+    const battleEvents = playCard();
+
+    const [userTarget, enemyTarget] = getPlayerTargets(game);
+    setUserBattleEvents(battleEvents.filter(({ target }) => target === userTarget));
+    setEnemyBattleEvents(battleEvents.filter(({ target }) => target === enemyTarget));
   }
 
   useEffect(() => {
@@ -49,13 +72,15 @@ export default function BattleScreen({ onBattleOver }: Props) {
       </IconsRow>
 
       <PlayersRow>
-        <Player>
+        <Player className={getIsUserTurn(game) ? 'active' : ''}>
           <Profile src={user.image} ref={userProfile} />
+          <FloatingCombatText battleEvents={userBattleEvents} target={userProfile.current} />
           <HealthBar health={user.health} maxHealth={user.startingHealth} />
         </Player>
 
-        <Player>
+        <Player className={getIsUserTurn(game) ? '' : 'active'}>
           <Profile src={enemy.image} $flip={true} ref={enemyProfile} />
+          <FloatingCombatText battleEvents={enemyBattleEvents} target={userProfile.current} />
           <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
         </Player>
       </PlayersRow>
@@ -76,11 +101,11 @@ export default function BattleScreen({ onBattleOver }: Props) {
       </CardStackRow>
 
       <BattleControls
-        onBack={undo}
+        onBack={handleUndo}
         canGoBack={canUndo}
         onTogglePlay={handleTogglePlayPause}
         isPlaying={isPlaying}
-        onNext={playCard}
+        onNext={handlePlayNextCard}
       />
     </Root>
   );
@@ -97,10 +122,12 @@ const Row = styled.div`
 
 const IconsRow = styled(Row)`
   align-items: start;
+  flex: 1;
 `;
 
 const PlayersRow = styled(Row)`
-  flex: 1;
+  margin-bottom: 3rem;
+  justify-content: space-around;
 `;
 
 const CardStackRow = styled(Row)`
@@ -132,12 +159,6 @@ const Icon = styled.div<{ src: string }>`
   background-color: var(--color-primary);
 `;
 
-const Player = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
 function getDropShadow() {
   const dropShadow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
   return new Array(4).fill(dropShadow).join(' ');
@@ -148,4 +169,11 @@ const Profile = styled.img<{ $flip?: boolean }>`
   margin-bottom: 0.5rem;
   filter: ${getDropShadow};
   transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
+`;
+
+const Player = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;

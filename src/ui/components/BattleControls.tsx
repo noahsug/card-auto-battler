@@ -3,7 +3,7 @@ import { styled } from 'styled-components';
 import pauseImage from '../images/icons/pause.png';
 import playImage from '../images/icons/play.png';
 import nextImage from '../images/icons/arrow.png';
-import { KeyboardEvent, useEffect } from 'react';
+import { useEffect } from 'react';
 
 interface Props {
   onBack: () => void;
@@ -64,6 +64,7 @@ const ControlsRow = styled.div`
   justify-content: space-evenly;
   align-items: end;
   margin-top: 3rem;
+  flex: 0.5;
 `;
 
 const ControlButton = styled.button<{ $flip?: boolean }>`

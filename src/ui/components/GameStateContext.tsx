@@ -6,7 +6,9 @@ import * as actions from '../../game/actions';
 import { Tail, Value, Writable } from '../../utils/types';
 
 type StatefulActions = {
-  [K in keyof typeof actions]: (...args: Tail<Parameters<(typeof actions)[K]>>) => void;
+  [K in keyof typeof actions]: (
+    ...args: Tail<Parameters<(typeof actions)[K]>>
+  ) => ReturnType<(typeof actions)[K]>;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Action = (state: GameState, ...args: any[]) => void;
@@ -25,15 +27,18 @@ interface Props extends PropsWithChildren {
   gameState: GameState;
 }
 
-// TODO: store future states and redo them so randomness is preserved
 export function GameStateProvider({ children, gameState: initialGameState }: Props) {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [past, setPast] = useState<GameState[]>([]);
 
   const dispatch: GameStateManager['dispatch'] = (action: Action, ...args) => {
-    const nextGameState = produce(gameState, (draft) => action(draft, ...args));
+    let result: unknown;
+    const nextGameState = produce(gameState, (draft) => {
+      result = action(draft, ...args);
+    });
     setGameState(nextGameState);
     setPast((past) => [...past, gameState]);
+    return result;
   };
 
   function canUndo() {

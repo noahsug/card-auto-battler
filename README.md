@@ -2,9 +2,15 @@
 
 Game TODO:
 
-1.
-1. react-use-gesture for drag/drop (https://codesandbox.io/p/sandbox/to6uf?file=%2Fsrc%2FApp.tsx%3A3%2C1-6%2C1)
-1. react-use-measure for positioning based on current ref width/height (https://codesandbox.io/p/sandbox/ucvbf?file=%2Fsrc%2FApp.tsx%3A2%2C1-3%2C1)
+1. floating damage text
+2. take damage animation
+3. shuffle discard back into deck, use seeded random to ensure shuffle is always the same
+4. battle win / defeat screen when out of HP
+5. game win / defeat screen after X wins/losses
+6. card select screen
+7. add back card logic + text
+
+Maybe: 3. react-use-gesture for drag/drop (https://codesandbox.io/p/sandbox/to6uf?file=%2Fsrc%2FApp.tsx%3A3%2C1-6%2C1) 4. react-use-measure for positioning based on current ref width/height (https://codesandbox.io/p/sandbox/ucvbf?file=%2Fsrc%2FApp.tsx%3A2%2C1-3%2C1)
 
 Performance TODO:
 

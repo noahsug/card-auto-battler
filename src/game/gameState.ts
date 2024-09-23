@@ -2,6 +2,8 @@ import { allCards } from '../content/cards';
 import { allHeroes } from '../content/heroes';
 import { allEnemies } from '../content/enemies';
 
+export type Target = 'self' | 'opponent';
+
 export interface CardState {
   name: string;
   description: string;

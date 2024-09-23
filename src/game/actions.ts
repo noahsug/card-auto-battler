@@ -1,7 +1,20 @@
-import { GameState, PlayerState } from './gameState';
-import { getPlayers } from './utils';
+import { GameState, PlayerState, Target } from './gameState';
+import { getIsUserTurn, getPlayers, getUserTarget } from './utils';
 
-export function playCard(game: GameState) {
+interface MissBattleEvent {
+  type: 'miss';
+  target: Target;
+}
+
+interface BattleEventWithValue {
+  type: 'damage' | 'heal';
+  target: Target;
+  value: number;
+}
+
+export type BattleEvent = MissBattleEvent | BattleEventWithValue;
+
+export function playCard(game: GameState): BattleEvent[] {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
 
   const card = activePlayer.cards[activePlayer.currentCardIndex];
@@ -10,6 +23,8 @@ export function playCard(game: GameState) {
   activePlayer.currentCardIndex++;
 
   game.turn++;
+
+  return [{ type: 'damage', target: 'opponent', value: card.damage }];
 }
 
 function resetPlayer(player: PlayerState) {

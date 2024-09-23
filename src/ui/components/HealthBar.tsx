@@ -41,7 +41,7 @@ const Bar = styled.div`
   top: 0;
   left: 0;
   background-image: url(${healthBarInnerImage});
-  background-position: center;
+  background-position: left;
   background-size: cover;
 `;
 
