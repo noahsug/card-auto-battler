@@ -2,18 +2,22 @@ import random from 'lodash/random';
 import { useRef, useEffect } from 'react';
 
 import { CardState } from '../../../game/gameState';
-import useUnits from '../../hooks/useUnits';
+import { useUnits } from '../../hooks/useUnits';
 import { useSpringRef, useTransition, config, easings } from '@react-spring/web';
 import { cancelableWait } from '../../../utils/wait';
+import { Direction } from '../../../utils/types';
 
 export interface Props {
   cards: CardState[];
   currentCardIndex: number;
   selfElement: Element | null;
   targetElement: Element | null;
-  cardDealDirection: -1 | 1;
+  cardDealDirection: Direction;
   turn: number;
 }
+
+// milliseconds it takes the card to animate from the deck to the player
+export const CARD_ANIMATION_DELAY = 200;
 
 function useIsDealingCards(currentCardIndex: number, cardsLength: number) {
   const prevCardIndex = useRef(currentCardIndex);

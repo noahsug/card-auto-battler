@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-export default function useUnits() {
+export type UnitFn = (value: number) => number;
+
+export function useUnits() {
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -18,9 +20,10 @@ export default function useUnits() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  function unit(value: number) {
-    return (value * dimensions.height) / 500;
-  }
+  const unit: UnitFn = useCallback(
+    (value: number) => (value * dimensions.height) / 500,
+    [dimensions],
+  );
 
   return [unit, dimensions] as const;
 }

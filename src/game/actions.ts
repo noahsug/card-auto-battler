@@ -24,6 +24,12 @@ export function playCard(game: GameState): BattleEvent[] {
 
   game.turn++;
 
+  if (card.damage === 1 && Math.random() < 0.5) {
+    return [{ type: 'miss', target: 'opponent' }];
+  }
+  if (card.damage < 0) {
+    return [{ type: 'heal', target: 'opponent', value: -card.damage }];
+  }
   return [{ type: 'damage', target: 'opponent', value: card.damage }];
 }
 

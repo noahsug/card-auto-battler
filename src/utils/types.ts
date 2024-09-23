@@ -49,3 +49,5 @@ export type ExtendUnion<T, U> = T extends unknown ? U & T : never;
  *   KeysOfUnion<{ a: 1 } | { b: 2 }> => 'a' | 'b'
  */
 export type KeysOfUnion<T> = T extends T ? keyof T : never;
+
+export type Direction = -1 | 1;

@@ -12,6 +12,7 @@ import battleImage from '../images/icons/swords.png';
 import { getIsUserTurn, getPlayerTargets } from '../../game/utils';
 import { BattleEvent } from '../../game/actions';
 import { FloatingCombatText } from './FloatingCombatText';
+import { PlayerProfile } from './PlayerProfile';
 
 interface Props {
   onBattleOver: () => void;
@@ -29,8 +30,8 @@ export default function BattleScreen({ onBattleOver }: Props) {
   const [userBattleEvents, setUserBattleEvents] = useState<BattleEvent[]>([]);
   const [enemyBattleEvents, setEnemyBattleEvents] = useState<BattleEvent[]>([]);
 
-  const userProfile = useRef<HTMLImageElement>(null);
-  const enemyProfile = useRef<HTMLImageElement>(null);
+  const userProfileRef = useRef<HTMLDivElement>(null);
+  const enemyProfileRef = useRef<HTMLDivElement>(null);
 
   function handleTogglePlayPause() {
     setIsPlaying((prev) => !prev);
@@ -72,16 +73,28 @@ export default function BattleScreen({ onBattleOver }: Props) {
 
       <PlayersRow>
         <Player className={getIsUserTurn(game) ? 'active' : ''}>
-          <Profile src={user.image} ref={userProfile} />
-          <FloatingCombatText battleEvents={userBattleEvents} targetElement={userProfile.current} />
+          <PlayerProfile
+            src={user.image}
+            profileRef={userProfileRef}
+            battleEvents={userBattleEvents}
+          />
+          <FloatingCombatText
+            battleEvents={userBattleEvents}
+            targetElement={userProfileRef.current}
+          />
           <HealthBar health={user.health} maxHealth={user.startingHealth} />
         </Player>
 
         <Player className={getIsUserTurn(game) ? '' : 'active'}>
-          <Profile src={enemy.image} $flip={true} ref={enemyProfile} />
+          <PlayerProfile
+            src={enemy.image}
+            flip={true}
+            profileRef={enemyProfileRef}
+            battleEvents={enemyBattleEvents}
+          />
           <FloatingCombatText
             battleEvents={enemyBattleEvents}
-            targetElement={userProfile.current}
+            targetElement={userProfileRef.current}
           />
           <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
         </Player>
@@ -91,14 +104,14 @@ export default function BattleScreen({ onBattleOver }: Props) {
         <CardStack
           cards={user.cards}
           currentCardIndex={user.currentCardIndex}
-          targetElement={enemyProfile.current}
+          targetElement={enemyProfileRef.current}
           playerType="user"
           turn={turn}
         />
         <CardStack
           cards={enemy.cards}
           currentCardIndex={enemy.currentCardIndex}
-          targetElement={userProfile.current}
+          targetElement={userProfileRef.current}
           playerType="enemy"
           turn={turn}
         />
@@ -161,18 +174,6 @@ const Icon = styled.div<{ src: string }>`
   margin-right: 1rem;
   ${maskImage}
   background-color: var(--color-primary);
-`;
-
-function getDropShadow() {
-  const dropShadow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
-  return new Array(4).fill(dropShadow).join(' ');
-}
-
-const Profile = styled.img<{ $flip?: boolean }>`
-  width: 12rem;
-  margin-bottom: 0.5rem;
-  filter: ${getDropShadow};
-  transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
 `;
 
 const Player = styled.div`

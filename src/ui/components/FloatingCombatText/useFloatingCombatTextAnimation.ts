@@ -1,8 +1,9 @@
-import { useTransition } from '@react-spring/web';
+import { useSpringRef, useTransition } from '@react-spring/web';
 import { useEffect, useMemo, useRef } from 'react';
 
-import useUnits from '../../hooks/useUnits';
+import { useUnits } from '../../hooks/useUnits';
 import { BattleEvent } from '../../../game/actions';
+import { CARD_ANIMATION_DELAY } from '../CardStack/useCardStackAnimation';
 
 export interface Props {
   battleEvents: BattleEvent[];
@@ -23,6 +24,8 @@ function createTextAnimation(battleEvent: BattleEvent) {
 export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: Props) {
   const [u] = useUnits();
 
+  const animationController = useSpringRef();
+
   function getXY({ xOffsetRatio, yOffsetRatio }: { xOffsetRatio: number; yOffsetRatio: number }) {
     if (targetElement == null) return { x: 0, y: 0 };
 
@@ -31,7 +34,18 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
   }
 
   function getAnimationStart(textAnimation: TextAnimation) {
-    return { ...getXY(textAnimation), opacity: 1 };
+    return { ...getXY(textAnimation), opacity: 0 };
+  }
+
+  function animateCombatText(textAnimation: TextAnimation) {
+    return async (next: (...args: unknown[]) => Promise<void>) => {
+      await next({
+        opacity: 1,
+        immediate: true,
+        delay: CARD_ANIMATION_DELAY,
+      });
+      await next(getAnimationEnd(textAnimation));
+    };
   }
 
   function getAnimationEnd(textAnimation: TextAnimation) {
@@ -56,16 +70,17 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
     }
   }, [battleEvents]);
 
-  const [render, animationController] = useTransition(textAnimationsRef.current, () => ({
+  const render = useTransition(textAnimationsRef.current, {
     key: ({ key }: TextAnimation) => key,
     from: getAnimationStart,
-    enter: getAnimationEnd,
+    enter: animateCombatText,
     leave: getAnimationEnd,
-  }));
+    ref: animationController,
+  });
 
   useEffect(() => {
     animationController.start();
-  }, [battleEvents]);
+  }, [animationController, battleEvents]);
 
   return render;
 }

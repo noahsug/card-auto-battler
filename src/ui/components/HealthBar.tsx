@@ -1,7 +1,11 @@
 import { styled } from 'styled-components';
+import clamp from 'lodash/clamp';
+import { useEffect, useState } from 'react';
+import { animated, useSpring } from '@react-spring/web';
 
 import healthBarBorderImage from '../images/health-bar-border.png';
 import healthBarInnerImage from '../images/health-bar-inner.png';
+import { CARD_ANIMATION_DELAY } from './CardStack/useCardStackAnimation';
 
 interface Props {
   health: number;
@@ -9,13 +13,32 @@ interface Props {
 }
 
 export default function HealthBar({ health, maxHealth }: Props) {
-  const width = (health / maxHealth) * 100;
+  const [displayedHealth, setDisplayedHealth] = useState(health);
+  const [displayedMaxHealth, setDisplayedMaxHealth] = useState(maxHealth);
+
+  // delay changes in the health bar so they line up with the card animation
+  useEffect(() => {
+    setTimeout(() => {
+      setDisplayedHealth(health);
+      setDisplayedMaxHealth(maxHealth);
+    }, CARD_ANIMATION_DELAY);
+  }, [health, maxHealth]);
+
+  const [animationProps] = useSpring(
+    {
+      from: { width: '100%' },
+      to: { width: `${clamp((displayedHealth / displayedMaxHealth) * 100, 0, 100)}%` },
+    },
+    [displayedHealth, displayedMaxHealth],
+  );
+
   return (
     <Root>
       <img src={healthBarBorderImage} alt="health-bar" />
-      <Bar style={{ width: `${width}%` }} />
+      {/* <Bar style={{ width: `${width}%` }} /> */}
+      <Bar style={animationProps} />
       <Label>
-        {health} / {maxHealth}
+        {displayedHealth} / {displayedMaxHealth}
       </Label>
     </Root>
   );
@@ -35,7 +58,7 @@ const Root = styled.div`
   }
 `;
 
-const Bar = styled.div`
+const Bar = styled(animated.div)`
   height: 100%;
   position: absolute;
   top: 0;

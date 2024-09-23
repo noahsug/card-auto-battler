@@ -2,7 +2,6 @@
 
 Game TODO:
 
-1. floating damage text
 2. take damage animation
 3. shuffle discard back into deck, use seeded random to ensure shuffle is always the same
 4. battle win / defeat screen when out of HP

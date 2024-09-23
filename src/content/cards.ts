@@ -14,19 +14,19 @@ export const allCards = {
     name: 'Serious Punch',
     description: 'Deal 7 damage.',
     image: punch,
-    damage: 3,
+    damage: 1,
   },
   fireball: {
     name: 'Fireball',
     description:
       'Deal 4 damage. Deal 3 extra damage for each burn the enemy has. Remove all enemy burn.',
     image: fireball,
-    damage: 3,
+    damage: -3,
   },
   eviscerate: {
     name: 'Eviscerate',
     description: 'Deal 2 damage. Repeat for each bleed the enemy has.',
     image: eviscerate,
-    damage: 4,
+    damage: 10,
   },
 } satisfies Record<string, CardState>;

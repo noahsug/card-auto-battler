@@ -28,3 +28,9 @@ export const Empty: Story = {
     health: 0,
   },
 };
+export const MoreThanFull: Story = {
+  args: {
+    maxHealth: 10,
+    health: 20,
+  },
+};

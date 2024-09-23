@@ -19,7 +19,7 @@ const Container = styled.div`
   position: relative;
 `;
 
-function TargetWithFloatingCombatText(props: Omit<Props, 'target'>) {
+function TargetWithFloatingCombatText(props: Omit<Props, 'targetElement'>) {
   const targetRef = useRef(null);
   return (
     <>
@@ -49,3 +49,5 @@ export const MultiHitDamage = getStory([
 ]);
 
 export const Miss = getStory([{ type: 'miss', target: 'self' }]);
+
+export const Heal = getStory([{ type: 'heal', target: 'self', value: 3 }]);
