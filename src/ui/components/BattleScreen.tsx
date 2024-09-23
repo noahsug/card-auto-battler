@@ -1,18 +1,17 @@
-import { useEffect, useRef, useState, KeyboardEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { getHandDrawnBorderRadius, maskImage } from '../style';
 import BattleControls from './BattleControls';
-import CardStack from './CardStack';
+import { CardStack } from './CardStack/CardStack';
 import { useActions, useGameState, useUndo } from './GameStateContext';
 import HealthBar from './HealthBar';
 import Container from './shared/Container';
-
 import livesImage from '../images/icons/heart.png';
 import battleImage from '../images/icons/swords.png';
 import { getIsUserTurn, getPlayerTargets } from '../../game/utils';
 import { BattleEvent } from '../../game/actions';
-import FloatingCombatText from './FloatingCombatText';
+import { FloatingCombatText } from './FloatingCombatText';
 
 interface Props {
   onBattleOver: () => void;
@@ -20,6 +19,8 @@ interface Props {
 
 export default function BattleScreen({ onBattleOver }: Props) {
   const game = useGameState();
+  const { user, enemy, turn } = game;
+
   const { playCard } = useActions();
   const { canUndo, undo } = useUndo();
 
@@ -30,8 +31,6 @@ export default function BattleScreen({ onBattleOver }: Props) {
 
   const userProfile = useRef<HTMLImageElement>(null);
   const enemyProfile = useRef<HTMLImageElement>(null);
-
-  const { user, enemy } = game;
 
   function handleTogglePlayPause() {
     setIsPlaying((prev) => !prev);
@@ -74,13 +73,16 @@ export default function BattleScreen({ onBattleOver }: Props) {
       <PlayersRow>
         <Player className={getIsUserTurn(game) ? 'active' : ''}>
           <Profile src={user.image} ref={userProfile} />
-          <FloatingCombatText battleEvents={userBattleEvents} target={userProfile.current} />
+          <FloatingCombatText battleEvents={userBattleEvents} targetElement={userProfile.current} />
           <HealthBar health={user.health} maxHealth={user.startingHealth} />
         </Player>
 
         <Player className={getIsUserTurn(game) ? '' : 'active'}>
           <Profile src={enemy.image} $flip={true} ref={enemyProfile} />
-          <FloatingCombatText battleEvents={enemyBattleEvents} target={userProfile.current} />
+          <FloatingCombatText
+            battleEvents={enemyBattleEvents}
+            targetElement={userProfile.current}
+          />
           <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
         </Player>
       </PlayersRow>
@@ -89,14 +91,16 @@ export default function BattleScreen({ onBattleOver }: Props) {
         <CardStack
           cards={user.cards}
           currentCardIndex={user.currentCardIndex}
-          target={enemyProfile.current}
+          targetElement={enemyProfile.current}
           playerType="user"
+          turn={turn}
         />
         <CardStack
           cards={enemy.cards}
           currentCardIndex={enemy.currentCardIndex}
-          target={userProfile.current}
+          targetElement={userProfile.current}
           playerType="enemy"
+          turn={turn}
         />
       </CardStackRow>
 

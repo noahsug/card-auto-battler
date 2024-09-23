@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import Card from './Card';
+import { Card } from './Card';
 import { allCards } from '../../content/cards';
 
 const meta = {
@@ -14,7 +14,7 @@ type Story = StoryObj<typeof meta>;
 export const Punch: Story = {
   args: {
     size: 'large',
-    color: 'user',
+    color: 'regular',
     card: allCards.punch,
   },
 };
@@ -28,7 +28,7 @@ export const Fireball: Story = {
 export const Eviscerate: Story = {
   args: {
     size: 'large',
-    color: 'user',
+    color: 'regular',
     card: allCards.eviscerate,
   },
 };

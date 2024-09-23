@@ -25,7 +25,7 @@ function CardTextLine({ text }: { text: string }) {
   );
 }
 
-export default function Card({ size, color: type, card }: Props) {
+export function Card({ size, color: type, card }: Props) {
   const { name, description, image } = card;
   const lines = description.split('.').slice(0, -1);
 
@@ -46,17 +46,16 @@ export default function Card({ size, color: type, card }: Props) {
   );
 }
 
+export const baseCardSize = { width: 12, height: 20 };
+
+export const cardSizeScaling = {
+  small: 0.5,
+  medium: 0.8,
+  large: 1.2,
+};
+
 const CardRoot = styled.div<{ $size: Props['size'] }>`
-  font-size: ${({ $size }) => {
-    switch ($size) {
-      case 'small':
-        return '0.5rem';
-      case 'medium':
-        return '0.8rem';
-      case 'large':
-        return '1.2rem';
-    }
-  }};
+  font-size: ${({ $size }) => cardSizeScaling[$size]}rem;
 `;
 
 const hsl = {
@@ -85,8 +84,8 @@ function getBorderColor(type: Props['color']) {
 }
 
 const OuterContainer = styled(Container)`
-  height: 20em;
-  width: 12em;
+  height: ${baseCardSize.height}em;
+  width: ${baseCardSize.width}em;
   text-align: center;
   color: var(--color-bg);
   background-color: ${(props) => getBackgroundColor(props.theme.type)};
