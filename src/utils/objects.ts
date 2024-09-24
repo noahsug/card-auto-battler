@@ -1,7 +1,8 @@
 // Returns the differences in values between the next object and the previous object.
 // Numbers are subtracted, while other values are simply returned.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function diffValues<T extends Record<PropertyKey, any>>(prev: T, next: T) {
-  const diff: Record<PropertyKey, number | string | Boolean | Object> = {};
+  const diff: Record<PropertyKey, number | string | boolean | object> = {};
 
   Object.keys(next).forEach((key) => {
     const prevValue = prev[key];

@@ -66,6 +66,7 @@ export function useCardStackAnimation({
     cardAnimationsRef.current.forEach((card) => card.speedUpAnimation());
   }
 
+  // speed up animation when a turn ends early
   useEffect(() => {
     speedUpAnimation();
   }, [turn]);

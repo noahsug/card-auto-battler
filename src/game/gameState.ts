@@ -24,6 +24,7 @@ export interface GameState {
   user: PlayerState;
   enemy: PlayerState;
   turn: number;
+  wonLastBattle: boolean;
 }
 
 function createPlayer({ name, image }: { name: string; image: string }): PlayerState {
@@ -50,5 +51,6 @@ export function createGameState(): GameState {
     user,
     enemy,
     turn: 0,
+    wonLastBattle: false,
   };
 }

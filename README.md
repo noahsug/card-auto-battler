@@ -2,8 +2,12 @@
 
 Game TODO:
 
-3. shuffle discard back into deck, use seeded random to ensure shuffle is always the same
-4. battle win / defeat screen when out of HP
+1. fix card animation issue on 'yarn start'
+2. set up github pages publishing and make sure there's nothing super out of wack (e.g. mobile
+   experience, performance)
+3. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
+   up by the user on left/right
+4. fix animation when shuffling discard back into deck, use seeded random to ensure shuffle is always the same
 5. game win / defeat screen after X wins/losses
 6. card select screen
 7. add back card logic + text
@@ -11,16 +15,16 @@ Game TODO:
 
 Maybe TODO:
 
-1. react-use-gesture for drag/drop (https://codesandbox.io/p/sandbox/to6uf?file=%2Fsrc%2FApp.tsx%3A3%2C1-6%2C1)
-2. react-use-measure for positioning based on current ref width/height (https://codesandbox.io/p/sandbox/ucvbf?file=%2Fsrc%2FApp.tsx%3A2%2C1-3%2C1)
+1. react-use-gesture for drag/drop (<https://codesandbox.io/p/sandbox/to6uf?file=%2Fsrc%2FApp.tsx%3A3%2C1-6%2C1>)
+2. react-use-measure for positioning based on current ref width/height (<https://codesandbox.io/p/sandbox/ucvbf?file=%2Fsrc%2FApp.tsx%3A2%2C1-3%2C1>)
 
 Performance TODO:
 
 If performance becomes an issue, look into these libraries to help:
 
 1. shrink all the images and allow the browser to pick which image to use (via css I think)
-1. https://www.npmjs.com/package/@emotion/react for smaller bundle size than styled
-1. https://github.com/pmndrs/zustand or https://github.com/pmndrs/jotai to stop unnecessary renders
+1. <https://www.npmjs.com/package/@emotion/react> for smaller bundle size than styled
+1. <https://github.com/pmndrs/zustand> or <https://github.com/pmndrs/jotai> to stop unnecessary renders
 1. pre-load some fonts, e.g:
 
 ```html
@@ -37,7 +41,7 @@ If performance becomes an issue, look into these libraries to help:
 
 Create card art via Gemini prompt: "Create an image that would match the text "Sucker Punch" in the style of a hand drawn illustration."
 
-Remove background via https://www.remove.bg/upload
+Remove background via <https://www.remove.bg/upload>
 
 ## analysis
 

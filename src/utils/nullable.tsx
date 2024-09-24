@@ -9,5 +9,5 @@ export function isArrayNonNullable<T>(array: Array<T>): array is Array<NonNullab
 export function areEntriesNonNullable<T>(
   entries: Array<Array<T>>,
 ): entries is Array<Array<NonNullable<T>>> {
-  return entries.every((entry) => isArrayNonNullable);
+  return entries.every(isArrayNonNullable);
 }

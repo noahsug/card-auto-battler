@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import { CardStack } from './CardStack';
 import { getRandomCards } from '../../../game/utils';
+import { CardState } from '../../../game/gameState';
 
 const meta = {
   title: 'CardStack',
@@ -11,29 +12,18 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const ManyCards: Story = {
-  args: {
-    currentCardIndex: 0,
-    targetElement: null,
-    playerType: 'user',
-    cards: getRandomCards(20),
-  },
-};
+function getStory(cards: CardState[]): Story {
+  return {
+    args: {
+      currentCardIndex: 0,
+      targetElement: null,
+      playerType: 'user',
+      turn: 0,
+      cards,
+    },
+  };
+}
 
-export const SomeCards: Story = {
-  args: {
-    currentCardIndex: 0,
-    targetElement: null,
-    playerType: 'user',
-    cards: getRandomCards(5),
-  },
-};
-
-export const CoupleCards: Story = {
-  args: {
-    cards: getRandomCards(2),
-    currentCardIndex: 0,
-    targetElement: null,
-    playerType: 'user',
-  },
-};
+export const ManyCards: Story = getStory(getRandomCards(20));
+export const SomeCards: Story = getStory(getRandomCards(5));
+export const CoupleCards: Story = getStory(getRandomCards(2));

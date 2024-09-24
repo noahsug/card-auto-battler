@@ -9,10 +9,10 @@ interface Props {
 }
 
 export default function BattleResultOverlay({ onNewGame }: Props) {
-  const { won } = useGameState();
+  const { wonLastBattle } = useGameState();
   return (
     <Container>
-      <Header>{won ? 'Victory!' : 'defeat'}</Header>
+      <Header>{wonLastBattle ? 'Victory!' : 'defeat'}</Header>
       <NewGameButton onClick={onNewGame}>New Game</NewGameButton>
     </Container>
   );
