@@ -1,5 +1,5 @@
 import { GameState, PlayerState, Target } from './gameState';
-import { getIsUserTurn, getPlayers, getUserTarget } from './utils';
+import { getPlayers } from './utils';
 
 interface MissBattleEvent {
   type: 'miss';
@@ -20,7 +20,11 @@ export function playCard(game: GameState): BattleEvent[] {
   const card = activePlayer.cards[activePlayer.currentCardIndex];
 
   nonActivePlayer.health -= card.damage;
-  activePlayer.currentCardIndex++;
+
+  activePlayer.currentCardIndex += 1;
+  if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
+    activePlayer.currentCardIndex = 0;
+  }
 
   game.turn++;
 

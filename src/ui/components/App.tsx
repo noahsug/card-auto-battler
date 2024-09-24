@@ -12,6 +12,7 @@ export const AppRoot = styled.div`
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  overflow: hidden;
 `;
 
 export default function App() {

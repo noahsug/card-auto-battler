@@ -2,21 +2,36 @@
 
 Game TODO:
 
-2. take damage animation
 3. shuffle discard back into deck, use seeded random to ensure shuffle is always the same
 4. battle win / defeat screen when out of HP
 5. game win / defeat screen after X wins/losses
 6. card select screen
 7. add back card logic + text
+8. add loading screen
 
-Maybe: 3. react-use-gesture for drag/drop (https://codesandbox.io/p/sandbox/to6uf?file=%2Fsrc%2FApp.tsx%3A3%2C1-6%2C1) 4. react-use-measure for positioning based on current ref width/height (https://codesandbox.io/p/sandbox/ucvbf?file=%2Fsrc%2FApp.tsx%3A2%2C1-3%2C1)
+Maybe TODO:
+
+1. react-use-gesture for drag/drop (https://codesandbox.io/p/sandbox/to6uf?file=%2Fsrc%2FApp.tsx%3A3%2C1-6%2C1)
+2. react-use-measure for positioning based on current ref width/height (https://codesandbox.io/p/sandbox/ucvbf?file=%2Fsrc%2FApp.tsx%3A2%2C1-3%2C1)
 
 Performance TODO:
 
 If performance becomes an issue, look into these libraries to help:
 
+1. shrink all the images and allow the browser to pick which image to use (via css I think)
 1. https://www.npmjs.com/package/@emotion/react for smaller bundle size than styled
-2. https://github.com/pmndrs/zustand or https://github.com/pmndrs/jotai to stop unnecessary renders
+1. https://github.com/pmndrs/zustand or https://github.com/pmndrs/jotai to stop unnecessary renders
+1. pre-load some fonts, e.g:
+
+```html
+<link
+  rel="preload"
+  href="https://assets.slaytheweb.cards/fonts/heliotrope/heliotrope_4_regular.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin=""
+/>)
+```
 
 ## Art
 
