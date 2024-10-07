@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { styled } from 'styled-components';
 
 import { useActions, useUndo } from './GameStateContext';
@@ -32,32 +32,17 @@ export default function ScreenContainer() {
     setOverlay('battleResult');
   }
 
-  function Screen() {
-    switch (screen) {
-      case 'start':
-        return <StartScreen onNewGame={handleNewGame}></StartScreen>;
-
-      case 'battle':
-        return <BattleScreen onBattleOver={handleBattleOver}></BattleScreen>;
-
-      // case Screen.cardSelection:
-      //   return <BattleResultScreen onNewGame={handleNewGame}></BattleResultScreen>;
-    }
-  }
-
-  function Overlay() {
-    switch (overlay) {
-      case 'battleResult':
-        return <BattleResultScreen onNewGame={handleNewGame}></BattleResultScreen>;
-    }
-  }
-
   return (
     <ScreenContainerRoot>
-      <Screen />
+      {screen === 'start' && <StartScreen onNewGame={handleNewGame}></StartScreen>}
+
+      {screen === 'battle' && <BattleScreen onBattleOver={handleBattleOver}></BattleScreen>}
+
       {overlay !== 'none' && (
         <OverlayBackground>
-          <Overlay />
+          {overlay === 'battleResult' && (
+            <BattleResultScreen onNewGame={handleNewGame}></BattleResultScreen>
+          )}
         </OverlayBackground>
       )}
     </ScreenContainerRoot>
