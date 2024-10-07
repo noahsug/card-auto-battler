@@ -2,15 +2,13 @@
 
 Game TODO:
 
-1. set up github pages publishing and make sure there's nothing super out of wack (e.g. mobile
-   experience, performance)
 1. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
    up by the user on left/right
-1. shuffle discard back into deck and use UID to fix animation, use seeded random to ensure shuffle is always the same
-1. game win / defeat screen after X wins/losses
-1. card select screen
-1. add back card logic + text
-1. add loading screen
+2. shuffle discard back into deck and use UID to fix animation, use seeded random to ensure shuffle is always the same
+3. game win / defeat screen after X wins/losses
+4. card select screen
+5. add back card logic + text
+6. add loading screen
 
 Maybe TODO:
 
