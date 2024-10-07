@@ -16,6 +16,11 @@ export interface Props {
   turn: number;
 }
 
+// TODO: add UID to cards so don't recreate divs on deck shuffle
+interface CardInstance extends CardState {
+  uid: string;
+}
+
 // milliseconds it takes the card to animate from the deck to the player
 export const CARD_ANIMATION_DELAY = 200;
 
@@ -28,7 +33,7 @@ function useIsDealingCards(currentCardIndex: number, cardsLength: number) {
     currentCardIndexRef.current = currentCardIndex;
   }
 
-  // we're dealing cards if the last card was played or if we've just started
+  // we're dealing cards if the last card was played or if we've just started the battle
   return (
     currentCardIndex === 0 &&
     (prevCardIndex.current === cardsLength - 1 || prevCardIndex.current === 0)

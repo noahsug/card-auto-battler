@@ -18,7 +18,6 @@ const cardSize = {
 const StackedCardsContainer = styled.div`
   position: relative;
 
-  /* matches Card width/height */
   height: ${cardSize.height}rem;
   width: ${cardSize.width}rem;
 `;
