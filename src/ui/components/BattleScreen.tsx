@@ -108,13 +108,15 @@ export default function BattleScreen({ onBattleOver }: Props) {
           playerType="user"
           turn={turn}
         />
-        <CardStack
-          cards={enemy.cards}
-          currentCardIndex={enemy.currentCardIndex}
-          targetElement={userProfileRef.current}
-          playerType="enemy"
-          turn={turn}
-        />
+        {
+          <CardStack
+            cards={enemy.cards}
+            currentCardIndex={enemy.currentCardIndex}
+            targetElement={userProfileRef.current}
+            playerType="enemy"
+            turn={turn}
+          />
+        }
       </CardStackRow>
 
       <BattleControls

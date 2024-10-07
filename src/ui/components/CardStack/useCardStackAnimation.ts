@@ -1,5 +1,5 @@
 import random from 'lodash/random';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 
 import { CardState } from '../../../game/gameState';
 import { useUnits } from '../../hooks/useUnits';
@@ -16,15 +16,13 @@ export interface Props {
   turn: number;
 }
 
-// TODO: add UID to cards so don't recreate divs on deck shuffle
-interface CardInstance extends CardState {
-  uid: string;
-}
-
 // milliseconds it takes the card to animate from the deck to the player
 export const CARD_ANIMATION_DELAY = 200;
 
-function useIsDealingCards(currentCardIndex: number, cardsLength: number) {
+function useIsDealingCards(
+  currentCardIndex: number,
+  cardAnimations: CardAnimation[],
+): [boolean, CardAnimation | null] {
   const prevCardIndex = useRef(currentCardIndex);
   const currentCardIndexRef = useRef(currentCardIndex);
 
@@ -33,11 +31,12 @@ function useIsDealingCards(currentCardIndex: number, cardsLength: number) {
     currentCardIndexRef.current = currentCardIndex;
   }
 
-  // we're dealing cards if the last card was played or if we've just started the battle
-  return (
-    currentCardIndex === 0 &&
-    (prevCardIndex.current === cardsLength - 1 || prevCardIndex.current === 0)
-  );
+  const justStartedBattle = currentCardIndex === 0 && prevCardIndex.current === 0;
+  const lastPlayedCard = justStartedBattle ? null : cardAnimations[prevCardIndex.current];
+
+  const isDealingCards = justStartedBattle || currentCardIndex === 0;
+
+  return [isDealingCards, lastPlayedCard];
 }
 
 type CardAnimation = ReturnType<typeof createCardAnimation>;
@@ -60,20 +59,30 @@ export function useCardStackAnimation({
   turn,
 }: Props) {
   const [u, windowDimensions] = useUnits();
-  const isDealingCards = useIsDealingCards(currentCardIndex, cards.length);
-  const animationController = useSpringRef();
   const cardAnimationsRef = useRef(cards.map(createCardAnimation));
+  const [isDealingCards, lastPlayedCard] = useIsDealingCards(
+    currentCardIndex,
+    cardAnimationsRef.current,
+  );
+  const animationController = useSpringRef();
 
-  // reverse card order so the first card is rendered last and displayed on top
-  const deck = cardAnimationsRef.current.slice(currentCardIndex).reverse();
+  const [isDealingLastCard, setIsDealingLastCard] = useState(true);
+  if (currentCardIndex > 0 && !isDealingLastCard) setIsDealingLastCard(true);
 
-  function speedUpAnimation() {
+  const deck =
+    isDealingCards && lastPlayedCard && isDealingLastCard
+      ? // wait to play the last card before shuffling the discard pile back into the deck
+        []
+      : // reverse card order so the first card is rendered last and displayed on top
+        cardAnimationsRef.current.slice(currentCardIndex).reverse();
+
+  function speedUpExistingAnimations() {
     cardAnimationsRef.current.forEach((card) => card.speedUpAnimation());
   }
 
   // speed up animation when a turn ends early
   useEffect(() => {
-    speedUpAnimation();
+    speedUpExistingAnimations();
   }, [turn]);
 
   function dealCardStart() {
@@ -121,8 +130,9 @@ export function useCardStackAnimation({
   }
 
   function playCard(animatedCard: CardAnimation, index: number) {
-    speedUpAnimation();
+    speedUpExistingAnimations();
 
+    // show the currently played card on top
     const zIndex = cardAnimationsRef.current.length - index;
     animationController.current[index]?.set({ zIndex });
 
@@ -147,6 +157,8 @@ export function useCardStackAnimation({
         ...playCardEnd(),
         config: { duration: 300, easing: easings.easeInBack },
       });
+
+      setIsDealingLastCard(false);
     };
   }
 
@@ -160,7 +172,7 @@ export function useCardStackAnimation({
 
   useEffect(() => {
     animationController.start();
-  }, [animationController, currentCardIndex]);
+  }, [animationController, currentCardIndex, isDealingLastCard]);
 
   return render;
 }

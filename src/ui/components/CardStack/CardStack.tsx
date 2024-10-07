@@ -27,19 +27,17 @@ const AnimatedContainer = styled(animated.div)`
   inset: 0;
 `;
 
-export function CardStack({ cards, currentCardIndex, targetElement, playerType, turn }: Props) {
+export function CardStack(props: Props) {
   const container = useRef<HTMLDivElement>(null);
+  const { playerType, ...animationProps } = props;
 
   // for the user, cards fly out from the left to the right
   const cardDealDirection = playerType === 'user' ? 1 : -1;
 
   const render = useCardStackAnimation({
-    cards,
-    currentCardIndex,
+    ...animationProps,
     selfElement: container.current,
-    targetElement,
     cardDealDirection,
-    turn,
   });
 
   const cardColor = playerType === 'user' ? 'regular' : 'red';
