@@ -157,12 +157,12 @@ const Label = styled(Row)`
   font-size: 2rem;
   font-family: var(--font-heading);
   letter-spacing: var(--letter-spacing-heading);
-  background-color: var(--color-bg-opacity);
+  background-color: var(--color-bg-opaque);
   justify-content: center;
   padding: 0 0.5rem;
 
   ${getHandDrawnBorderRadius()}
-  border: solid 0.75rem var(--color-bg-opacity);
+  border: solid 0.75rem var(--color-bg-opaque);
 
   > div {
     line-height: 0.85;
