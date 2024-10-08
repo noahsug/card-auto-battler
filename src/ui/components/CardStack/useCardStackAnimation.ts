@@ -66,11 +66,11 @@ export function useCardStackAnimation({
   );
   const animationController = useSpringRef();
 
-  const [isDealingLastCard, setIsDealingLastCard] = useState(true);
-  if (currentCardIndex > 0 && !isDealingLastCard) setIsDealingLastCard(true);
+  const [isRedealingDiscard, setIsRedealingDiscard] = useState(false);
+  if (currentCardIndex > 0 && isRedealingDiscard) setIsRedealingDiscard(false);
 
   const deck =
-    isDealingCards && lastPlayedCard && isDealingLastCard
+    isDealingCards && lastPlayedCard && !isRedealingDiscard
       ? // wait to play the last card before shuffling the discard pile back into the deck
         []
       : // reverse card order so the first card is rendered last and displayed on top
@@ -158,7 +158,7 @@ export function useCardStackAnimation({
         config: { duration: 300, easing: easings.easeInBack },
       });
 
-      setIsDealingLastCard(false);
+      setIsRedealingDiscard(true);
     };
   }
 
@@ -172,7 +172,7 @@ export function useCardStackAnimation({
 
   useEffect(() => {
     animationController.start();
-  }, [animationController, currentCardIndex, isDealingLastCard]);
+  }, [animationController, currentCardIndex, isRedealingDiscard]);
 
   return render;
 }

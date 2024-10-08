@@ -20,7 +20,7 @@ export default function BattleResultOverlay({ onNewGame }: Props) {
 
 const Header = styled('h2')`
   text-align: center;
-  font-size: 10rem;
+  font-size: 8rem;
   margin-bottom: 2rem;
   margin-top: auto;
 `;

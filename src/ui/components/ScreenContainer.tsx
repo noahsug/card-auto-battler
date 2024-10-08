@@ -29,6 +29,7 @@ export default function ScreenContainer() {
   }
 
   function handleBattleOver() {
+    clearUndo();
     setOverlay('battleResult');
   }
 

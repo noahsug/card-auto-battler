@@ -16,9 +16,10 @@ import { PlayerProfile } from './PlayerProfile';
 
 interface Props {
   onBattleOver: () => void;
+  hasOverlay?: boolean;
 }
 
-export default function BattleScreen({ onBattleOver }: Props) {
+export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props) {
   const game = useGameState();
   const { user, enemy, turn } = game;
 
@@ -32,6 +33,10 @@ export default function BattleScreen({ onBattleOver }: Props) {
 
   const userProfileRef = useRef<HTMLDivElement>(null);
   const enemyProfileRef = useRef<HTMLDivElement>(null);
+
+  const endBattleTimeout = useRef<NodeJS.Timeout>();
+
+  const isBattleOver = user.health <= 0 || enemy.health <= 0;
 
   function handleTogglePlayPause() {
     setIsPlaying((prev) => !prev);
@@ -52,10 +57,14 @@ export default function BattleScreen({ onBattleOver }: Props) {
   }
 
   useEffect(() => {
-    if (user.health <= 0 || enemy.health <= 0) {
-      onBattleOver();
+    clearTimeout(endBattleTimeout.current);
+
+    if (isBattleOver) {
+      endBattleTimeout.current = setTimeout(onBattleOver, 1500);
     }
-  }, [user.health, enemy.health, onBattleOver]);
+
+    return () => clearTimeout(endBattleTimeout.current);
+  }, [isBattleOver, onBattleOver]);
 
   return (
     <Root>
@@ -120,11 +129,10 @@ export default function BattleScreen({ onBattleOver }: Props) {
       </CardStackRow>
 
       <BattleControls
-        onBack={handleUndo}
-        canGoBack={canUndo}
-        onTogglePlay={handleTogglePlayPause}
+        onBack={canUndo ? handleUndo : undefined}
+        onTogglePlay={isBattleOver || hasOverlay ? undefined : handleTogglePlayPause}
         isPlaying={isPlaying}
-        onNext={handlePlayNextCard}
+        onNext={isBattleOver || hasOverlay ? undefined : handlePlayNextCard}
       />
     </Root>
   );

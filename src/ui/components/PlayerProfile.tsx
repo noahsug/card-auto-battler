@@ -8,15 +8,16 @@ import { useUnits, UnitFn } from '../hooks/useUnits';
 import { Direction } from '../../utils/types';
 import { CARD_ANIMATION_DELAY } from './CardStack/useCardStackAnimation';
 
-function getDropShadow() {
-  const dropShadow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
-  return new Array(4).fill(dropShadow).join(' ');
-}
+const oneDropShadow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
+const dropShadow = new Array(4).fill(oneDropShadow).join(' ');
+
+const ProfileImageContainer = styled(animated.div)`
+  filter: ${dropShadow};
+`;
 
 const ProfileImage = styled(animated.img)<{ $flip?: boolean }>`
   width: 12rem;
   margin-bottom: 0.5rem;
-  filter: ${getDropShadow};
   transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
 `;
 
@@ -25,6 +26,7 @@ interface Props {
   battleEvents: BattleEvent[];
   src: string;
   profileRef: RefObject<HTMLDivElement>;
+  // TODO: animate dead via dead?: boolean;
 }
 
 const startPosition = { x: 0, y: 0, hue: 0, brightness: 1, config: { duration: 600 }, delay: 0 };
@@ -134,9 +136,11 @@ export function PlayerProfile({ flip, battleEvents, src, profileRef }: Props) {
     (hue, brightness) => `hue-rotate(${hue}deg) brightness(${brightness})`,
   );
 
+  console.log(filter);
+
   return (
-    <animated.div ref={profileRef} style={animationProps}>
+    <ProfileImageContainer ref={profileRef} style={animationProps}>
       <ProfileImage $flip={flip} src={src} style={{ filter }} />
-    </animated.div>
+    </ProfileImageContainer>
   );
 }

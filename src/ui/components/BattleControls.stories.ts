@@ -11,12 +11,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {
+export const Enabled: Story = {
   args: {
     onBack: fn(),
     onTogglePlay: fn(),
     onNext: fn(),
-    canGoBack: true,
     isPlaying: true,
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    isPlaying: false,
   },
 };

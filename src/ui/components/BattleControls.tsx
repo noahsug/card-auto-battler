@@ -6,32 +6,23 @@ import nextImage from '../images/icons/arrow.png';
 import { useEffect } from 'react';
 
 interface Props {
-  onBack: () => void;
-  onTogglePlay: () => void;
-  onNext: () => void;
-  canGoBack: boolean;
+  onBack?: () => void;
+  onTogglePlay?: () => void;
+  onNext?: () => void;
   isPlaying: boolean;
 }
 
-export default function BattleControls({
-  onBack,
-  onTogglePlay,
-  onNext,
-  canGoBack,
-  isPlaying,
-}: Props) {
+export default function BattleControls({ onBack, onTogglePlay, onNext, isPlaying }: Props) {
   function handleKeyboardShortcuts(event: globalThis.KeyboardEvent) {
     switch (event.key) {
       case ' ':
-        onTogglePlay();
+        onTogglePlay?.();
         break;
       case 'ArrowRight':
-        onNext();
+        onNext?.();
         break;
       case 'ArrowLeft':
-        if (canGoBack) {
-          onBack();
-        }
+        onBack?.();
         break;
     }
   }
@@ -43,15 +34,15 @@ export default function BattleControls({
 
   return (
     <ControlsRow>
-      <ControlButton onClick={onBack} disabled={!canGoBack}>
+      <ControlButton onClick={onBack} disabled={!onBack}>
         <img src={nextImage} alt="back" />
       </ControlButton>
 
-      <ControlButton onClick={onTogglePlay}>
+      <ControlButton onClick={onTogglePlay} disabled={!onTogglePlay}>
         {isPlaying ? <img src={pauseImage} alt="pause" /> : <img src={playImage} alt="play" />}
       </ControlButton>
 
-      <ControlButton onClick={onNext} $flip={true}>
+      <ControlButton onClick={onNext} disabled={!onNext} $flip={true}>
         <img src={nextImage} alt="next" />
       </ControlButton>
     </ControlsRow>
