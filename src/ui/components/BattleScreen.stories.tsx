@@ -38,9 +38,16 @@ export const FewCards: Story = {
 
 const manyCards = createGameState();
 manyCards.user.cards = getRandomCards(20);
-
 export const ManyCards: Story = {
   parameters: {
     gameState: manyCards,
+  },
+};
+
+const isDead = createGameState();
+isDead.enemy.health = 0;
+export const IsDead: Story = {
+  parameters: {
+    gameState: isDead,
   },
 };

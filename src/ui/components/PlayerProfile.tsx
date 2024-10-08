@@ -26,10 +26,18 @@ interface Props {
   battleEvents: BattleEvent[];
   src: string;
   profileRef: RefObject<HTMLDivElement>;
-  // TODO: animate dead via dead?: boolean;
+  isDead?: boolean;
 }
 
-const startPosition = { x: 0, y: 0, hue: 0, brightness: 1, config: { duration: 600 }, delay: 0 };
+const startPosition = {
+  x: 0,
+  y: 0,
+  hue: 0,
+  brightness: 1,
+  rotate: 0,
+  config: { duration: 600 },
+  delay: 0,
+};
 
 function summarizeBattleEvents(battleEvents: BattleEvent[]) {
   const summary = {
@@ -93,6 +101,25 @@ function getDamageAnimation({
   };
 }
 
+function getDeathAnimation({
+  u,
+  direction,
+  windowWidth,
+}: {
+  u: UnitFn;
+  direction: Direction;
+  windowWidth: number;
+}) {
+  return {
+    x: (windowWidth / 2) * direction,
+    y: u(-100),
+    hue: 0,
+    delay: CARD_ANIMATION_DELAY + 75,
+    rotate: 360 * direction,
+    config: { easing: easings.easeOutCubic, duration: 4000 },
+  };
+}
+
 function getBattleAnimation({
   battleEvents,
   direction,
@@ -109,18 +136,22 @@ function getBattleAnimation({
   return getDamageAnimation({ damage, direction, u });
 }
 
-export function PlayerProfile({ flip, battleEvents, src, profileRef }: Props) {
-  const [u] = useUnits();
+export function PlayerProfile({ flip, battleEvents, src, profileRef, isDead }: Props) {
+  const [u, windowDimensions] = useUnits();
 
   // move in the opposite direction the image is facing
   const direction = flip ? 1 : -1;
 
-  const [animationProps, animationController] = useSpring(() => ({
-    from: startPosition,
-    onRest(_, ctrl) {
-      ctrl.start(startPosition);
-    },
-  }));
+  const [animationProps, animationController] = useSpring(
+    () => ({
+      from: startPosition,
+      onRest(_, ctrl) {
+        if (isDead) return;
+        ctrl.start(startPosition);
+      },
+    }),
+    [isDead],
+  );
 
   useEffect(() => {
     if (battleEvents.length > 0) {
@@ -129,14 +160,22 @@ export function PlayerProfile({ flip, battleEvents, src, profileRef }: Props) {
     } else {
       animationController.set(startPosition);
     }
-  }, [animationController, battleEvents, direction, u]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animationController, battleEvents, direction]);
+
+  useEffect(() => {
+    if (!isDead) return;
+
+    animationController.start(
+      getDeathAnimation({ u, direction, windowWidth: windowDimensions.width }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animationController, isDead, direction]);
 
   const filter = to(
     [animationProps.hue, animationProps.brightness],
     (hue, brightness) => `hue-rotate(${hue}deg) brightness(${brightness})`,
   );
-
-  console.log(filter);
 
   return (
     <ProfileImageContainer ref={profileRef} style={animationProps}>

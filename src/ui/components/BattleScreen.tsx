@@ -86,6 +86,7 @@ export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props
             src={user.image}
             profileRef={userProfileRef}
             battleEvents={userBattleEvents}
+            isDead={user.health <= 0}
           />
           <FloatingCombatText
             battleEvents={userBattleEvents}
@@ -100,6 +101,7 @@ export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props
             flip={true}
             profileRef={enemyProfileRef}
             battleEvents={enemyBattleEvents}
+            isDead={enemy.health <= 0}
           />
           <FloatingCombatText
             battleEvents={enemyBattleEvents}

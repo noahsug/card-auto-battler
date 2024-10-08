@@ -3,14 +3,14 @@ import { useCallback, useEffect, useState } from 'react';
 export type UnitFn = (value: number) => number;
 
 export function useUnits() {
-  const [dimensions, setDimensions] = useState({
+  const [windowDimensions, setWindowDimensions] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
 
   useEffect(() => {
     const handleResize = () => {
-      setDimensions({
+      setWindowDimensions({
         width: window.innerWidth,
         height: window.innerHeight,
       });
@@ -21,9 +21,9 @@ export function useUnits() {
   }, []);
 
   const unit: UnitFn = useCallback(
-    (value: number) => (value * dimensions.height) / 500,
-    [dimensions],
+    (value: number) => (value * windowDimensions.height) / 500,
+    [windowDimensions],
   );
 
-  return [unit, dimensions] as const;
+  return [unit, windowDimensions] as const;
 }
