@@ -1,5 +1,5 @@
-import { GameState, PlayerState, Target } from './gameState';
-import { getIsUserTurn, getPlayers } from './utils';
+import { GameState, PlayerState, Target, createGameState } from './gameState';
+import { getBattleWinner, getPlayers } from './utils';
 
 interface MissBattleEvent {
   type: 'miss';
@@ -21,10 +21,6 @@ export function playCard(game: GameState): BattleEvent[] {
 
   nonActivePlayer.health -= card.damage;
 
-  if (nonActivePlayer.health <= 0) {
-    game.wonLastBattle = getIsUserTurn(game);
-  }
-
   activePlayer.currentCardIndex += 1;
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
     activePlayer.currentCardIndex = 0;
@@ -41,12 +37,22 @@ export function playCard(game: GameState): BattleEvent[] {
   return [{ type: 'damage', target: 'opponent', value: card.damage }];
 }
 
-function resetPlayer(player: PlayerState) {
+function resetBattlePlayer(player: PlayerState) {
   player.health = player.startingHealth;
   player.currentCardIndex = 0;
 }
 
-export function resetBattle({ user, enemy }: GameState) {
-  resetPlayer(user);
-  resetPlayer(enemy);
+function resetBattle({ user, enemy }: GameState) {
+  resetBattlePlayer(user);
+  resetBattlePlayer(enemy);
+}
+
+export function endBattle(game: GameState) {
+  const winner = getBattleWinner(game);
+  winner === 'user' ? game.wins++ : game.lives--;
+  resetBattle(game);
+}
+
+export function resetGame(game: GameState) {
+  Object.assign(game, createGameState());
 }

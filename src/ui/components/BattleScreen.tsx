@@ -1,24 +1,27 @@
 import { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
+import { BattleEvent } from '../../game/actions';
+import { getBattleWinner, getIsUserTurn, getPlayerTargets } from '../../game/utils';
+import livesImage from '../images/icons/heart.png';
+import battleImage from '../images/icons/swords.png';
 import { getHandDrawnBorderRadius, maskImage } from '../style';
 import BattleControls from './BattleControls';
 import { CardStack } from './CardStack/CardStack';
+import { FloatingCombatText } from './FloatingCombatText';
 import { useActions, useGameState, useUndo } from './GameStateContext';
 import HealthBar from './HealthBar';
-import Container from './shared/Container';
-import livesImage from '../images/icons/heart.png';
-import battleImage from '../images/icons/swords.png';
-import { getIsUserTurn, getPlayerTargets } from '../../game/utils';
-import { BattleEvent } from '../../game/actions';
-import { FloatingCombatText } from './FloatingCombatText';
 import { PlayerProfile } from './PlayerProfile';
+import Container from './shared/Container';
 
 interface Props {
   onBattleOver: () => void;
   hasOverlay?: boolean;
 }
 
+// TODO: Freeze game state after battle is over so we don't show next stage?
+// TODO: Have "playedCard" and "currentGameState" local state, which we update to next game state
+// after the card animation is complete (instead of using 200ms everywhere)
 export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props) {
   const game = useGameState();
   const { user, enemy, turn } = game;
@@ -36,7 +39,7 @@ export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props
 
   const endBattleTimeout = useRef<NodeJS.Timeout>();
 
-  const isBattleOver = user.health <= 0 || enemy.health <= 0;
+  const isBattleOver = getBattleWinner(game) != null;
 
   function handleTogglePlayPause() {
     setIsPlaying((prev) => !prev);
@@ -71,12 +74,12 @@ export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props
       <IconsRow>
         <Label>
           <Icon src={livesImage} />
-          <div>3 lives</div>
+          <div>{game.lives} lives</div>
         </Label>
 
         <Label>
           <Icon src={battleImage} />
-          <div>round 2</div>
+          <div>round {game.wins + 1}</div>
         </Label>
       </IconsRow>
 

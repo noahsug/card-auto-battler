@@ -35,8 +35,9 @@ module.exports = {
     },
   ],
   rules: {
-    'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
+    'no-unused-vars': 'off',
     'react/react-in-jsx-scope': 'off',
+    '@typescript-eslint/no-unused-expressions': 'off',
   },
 };

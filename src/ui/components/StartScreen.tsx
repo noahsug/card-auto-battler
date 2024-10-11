@@ -4,14 +4,14 @@ import Button from './shared/Button';
 import Container from './shared/Container';
 
 interface Props {
-  onNewGame: () => void;
+  onContinue: () => void;
 }
 
-export default function StartScreen({ onNewGame }: Props) {
+export default function StartScreen({ onContinue }: Props) {
   return (
     <Container>
       <Header>Chalkboard Heroes</Header>
-      <StartButton onClick={onNewGame}>start</StartButton>
+      <StartButton onClick={onContinue}>start</StartButton>
     </Container>
   );
 }

@@ -2,6 +2,7 @@ import sample from 'lodash/sample';
 
 import { allCards } from '../content/cards';
 import { GameState, PlayerState, Target } from './gameState';
+import { MAX_WINS } from './constants';
 
 export function getRandomCards(length: number) {
   const cards = new Array(length);
@@ -35,4 +36,14 @@ export function getUserTarget(game: GameState): Target {
 
 export function getPlayerTargets(game: GameState): [Target, Target] {
   return getIsUserTurn(game) ? ['self', 'opponent'] : ['opponent', 'self'];
+}
+
+export function isGameOver({ wins, lives }: { wins: number; lives: number }) {
+  return lives <= 0 || wins >= MAX_WINS;
+}
+
+export function getBattleWinner(game: GameState) {
+  if (game.user.health <= 0) return 'enemy';
+  if (game.enemy.health <= 0) return 'user';
+  return null;
 }

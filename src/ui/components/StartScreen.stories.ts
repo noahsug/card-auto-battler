@@ -7,7 +7,7 @@ const meta = {
   title: 'StartScreen',
   component: StartScreen,
   args: {
-    onNewGame: fn(),
+    onContinue: fn(),
   },
 } satisfies Meta<typeof StartScreen>;
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, PropsWithChildren, useMemo, useState, useRef } from 'react';
+import { createContext, useContext, PropsWithChildren, useMemo, useState } from 'react';
 import { produce } from 'immer';
 
 import { GameState } from '../../game/gameState';
