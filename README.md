@@ -2,11 +2,11 @@
 
 Game TODO:
 
-4. card select screen
-5. add back card logic + text
-6. add loading screen
-7. shuffle discard back into deck and use UID to fix animation, use seeded random to ensure shuffle is always the same
-8. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
+1. card select screen
+2. add back card logic + text
+3. add loading screen
+4. shuffle discard back into deck and use UID to fix animation, use seeded random to ensure shuffle is always the same
+5. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
    up by the user on left/right
 
 Maybe TODO:

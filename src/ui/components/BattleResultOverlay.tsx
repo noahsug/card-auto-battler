@@ -13,7 +13,7 @@ const Header = styled('h2')`
   margin-top: auto;
 `;
 
-const NewGameButton = styled(Button)`
+const ContinueButton = styled(Button)`
   margin: auto;
 `;
 
@@ -49,7 +49,7 @@ export default function BattleResultOverlay({ onContinue, wonLastBattle }: Props
   return (
     <Container>
       <Header>{message}</Header>
-      <NewGameButton onClick={onContinue}>{buttonText}</NewGameButton>
+      <ContinueButton onClick={onContinue}>{buttonText}</ContinueButton>
     </Container>
   );
 }

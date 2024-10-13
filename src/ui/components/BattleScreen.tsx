@@ -70,7 +70,7 @@ export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props
   }, [isBattleOver, onBattleOver]);
 
   return (
-    <Root>
+    <Container>
       <IconsRow>
         <Label>
           <Icon src={livesImage} />
@@ -139,11 +139,9 @@ export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props
         isPlaying={isPlaying}
         onNext={isBattleOver || hasOverlay ? undefined : handlePlayNextCard}
       />
-    </Root>
+    </Container>
   );
 }
-
-const Root = styled(Container)``;
 
 const Row = styled.div`
   display: flex;

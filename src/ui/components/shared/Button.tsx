@@ -3,7 +3,7 @@ import { getHandDrawnBorderRadius } from '../../style';
 
 export default styled.button`
   font-size: 2rem;
-  margin: 0.5em auto;
+  margin: 0 auto;
   padding: 0.5rem 0 1rem;
   width: 10rem;
   background: none;

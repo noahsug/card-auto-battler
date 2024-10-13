@@ -1,4 +1,4 @@
-import { GameState, PlayerState, Target, createGameState } from './gameState';
+import { CardState, GameState, PlayerState, Target, createGameState } from './gameState';
 import { getBattleWinner, getPlayers } from './utils';
 
 interface MissBattleEvent {
@@ -13,6 +13,10 @@ interface BattleEventWithValue {
 }
 
 export type BattleEvent = MissBattleEvent | BattleEventWithValue;
+
+export function addCard(game: GameState, card: CardState) {
+  game.user.cards.push(card);
+}
 
 export function playCard(game: GameState): BattleEvent[] {
   const [activePlayer, nonActivePlayer] = getPlayers(game);

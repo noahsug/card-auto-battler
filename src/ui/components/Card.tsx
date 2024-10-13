@@ -1,16 +1,19 @@
 import { styled, ThemeProvider } from 'styled-components';
 
-import Container from './shared/Container';
-import { getHandDrawnBorderRadius, maskImage } from '../style';
-
-import textBackground from '../images/text-background.png';
 import { CardState } from '../../game/gameState';
+import textBackground from '../images/text-background.png';
+import { getHandDrawnBorderRadius, maskImage } from '../style';
+import Container from './shared/Container';
 
 interface Props {
-  size: 'small' | 'medium' | 'large';
-  color: 'regular' | 'red' | 'green';
   card: CardState;
+  size: 'small' | 'medium' | 'large';
+  color?: CardColor;
+  onClick?: () => void;
+  style?: React.CSSProperties;
 }
+
+type CardColor = 'regular' | 'red' | 'green';
 
 function CardTextLine({ text }: { text: string }) {
   const parts = text.split(/(\d+)/);
@@ -25,13 +28,13 @@ function CardTextLine({ text }: { text: string }) {
   );
 }
 
-export function Card({ size, color: type, card }: Props) {
+export function Card({ size, color = 'regular', card, onClick, style }: Props) {
   const { name, description, image } = card;
   const lines = description.split('.').slice(0, -1);
 
   return (
-    <CardRoot $size={size} className="card">
-      <ThemeProvider theme={{ type }}>
+    <CardRoot $size={size} className="card" onClick={onClick} style={style}>
+      <ThemeProvider theme={{ color }}>
         <OuterContainer>
           <Image src={image} alt="{name}" />
           <Title>{name}</Title>
@@ -49,7 +52,7 @@ export function Card({ size, color: type, card }: Props) {
 export const baseCardSize = { width: 12, height: 20 };
 
 export const cardSizeScaling = {
-  small: 0.5,
+  small: 0.7,
   medium: 0.8,
   large: 1.2,
 };
@@ -66,19 +69,19 @@ const hsl = {
 function getHSLString(hue: number, saturation: number, lightness: number) {
   return `hsl(${hue} ${saturation}% ${lightness}%)`;
 }
-function getBackgroundColor(type: Props['color']) {
-  const [hue, saturation, lightness] = hsl[type];
+function getBackgroundColor(color: CardColor) {
+  const [hue, saturation, lightness] = hsl[color];
   return getHSLString(hue, saturation, lightness);
 }
-function getTitleColor(type: Props['color']) {
-  const [hue, saturation] = hsl[type];
-  let lightness = hsl[type][2];
+function getTitleColor(color: CardColor) {
+  const [hue, saturation] = hsl[color];
+  let lightness = hsl[color][2];
   lightness += 10;
   return getHSLString(hue, saturation, lightness);
 }
-function getBorderColor(type: Props['color']) {
-  const [hue, saturation] = hsl[type];
-  let lightness = hsl[type][2];
+function getBorderColor(color: CardColor) {
+  const [hue, saturation] = hsl[color];
+  let lightness = hsl[color][2];
   lightness = 15;
   return getHSLString(hue, saturation, lightness);
 }
@@ -88,9 +91,9 @@ const OuterContainer = styled(Container)`
   width: ${baseCardSize.width}em;
   text-align: center;
   color: var(--color-bg);
-  background-color: ${(props) => getBackgroundColor(props.theme.type)};
+  background-color: ${(props) => getBackgroundColor(props.theme.color)};
   ${getHandDrawnBorderRadius}
-  border: solid 0.5em ${(props) => getBorderColor(props.theme.type)};
+  border: solid 0.5em ${(props) => getBorderColor(props.theme.color)};
   padding: 0;
   position: relative;
 `;
@@ -98,7 +101,7 @@ const OuterContainer = styled(Container)`
 const Title = styled('h2')`
   width: 95%;
   ${maskImage({ src: textBackground })};
-  color: ${(props) => getTitleColor(props.theme.type)};
+  color: ${(props) => getTitleColor(props.theme.color)};
   height: 1.15em;
   background-color: var(--color-bg);
   position: absolute;
@@ -109,7 +112,7 @@ const Image = styled.img`
   height: 55%;
   object-fit: cover;
   object-position: center;
-  border-bottom: solid 0.25em ${(props) => getBorderColor(props.theme.type)};
+  border-bottom: solid 0.25em ${(props) => getBorderColor(props.theme.color)};
 `;
 
 const Text = styled.div`
