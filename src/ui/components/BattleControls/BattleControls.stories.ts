@@ -16,12 +16,12 @@ export const Enabled: Story = {
     onBack: fn(),
     onTogglePlay: fn(),
     onNext: fn(),
-    isPlaying: true,
+    isPaused: true,
   },
 };
 
 export const Disabled: Story = {
   args: {
-    isPlaying: false,
+    isPaused: false,
   },
 };

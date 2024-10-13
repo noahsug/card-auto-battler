@@ -44,7 +44,12 @@ export default function ScreenContainer() {
     <ScreenContainerRoot>
       {screen === 'start' && <StartScreen onContinue={handleNextBattle}></StartScreen>}
 
-      {screen === 'battle' && <BattleScreen onBattleOver={handleBattleOver}></BattleScreen>}
+      {screen === 'battle' && (
+        <BattleScreen
+          onBattleOver={handleBattleOver}
+          hasOverlay={overlay !== 'none'}
+        ></BattleScreen>
+      )}
 
       {overlay !== 'none' && (
         <OverlayBackground>

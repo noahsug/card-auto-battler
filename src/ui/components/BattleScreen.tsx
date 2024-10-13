@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { BattleEvent } from '../../game/actions';
@@ -24,6 +24,7 @@ interface Props {
 export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props) {
   const game = useGameState();
   const { user, enemy, turn } = game;
+  const [userTarget, enemyTarget] = getPlayerTargets(game);
 
   const { playCard } = useActions();
   const { canUndo, undo } = useUndo();
@@ -40,31 +41,27 @@ export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props
 
   const isBattleOver = getBattleWinner(game) != null;
 
-  function handleTogglePlayPause() {
+  const handleTogglePlayPause = useCallback(() => {
     setIsPlaying((prev) => !prev);
-  }
+  }, []);
 
-  function handleUndo() {
+  const handleUndo = useCallback(() => {
     undo();
     setUserBattleEvents([]);
     setEnemyBattleEvents([]);
-  }
+  }, [undo]);
 
-  function handlePlayNextCard() {
+  const handlePlayNextCard = useCallback(() => {
     const battleEvents = playCard();
-
-    const [userTarget, enemyTarget] = getPlayerTargets(game);
     setUserBattleEvents(battleEvents.filter(({ target }) => target === userTarget));
     setEnemyBattleEvents(battleEvents.filter(({ target }) => target === enemyTarget));
-  }
+  }, [playCard, userTarget, enemyTarget]);
 
   useEffect(() => {
     clearTimeout(endBattleTimeout.current);
-
     if (isBattleOver) {
       endBattleTimeout.current = setTimeout(onBattleOver, 1500);
     }
-
     return () => clearTimeout(endBattleTimeout.current);
   }, [isBattleOver, onBattleOver]);
 
@@ -123,9 +120,9 @@ export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props
       </CardStackRow>
 
       <BattleControls
-        onBack={canUndo ? handleUndo : undefined}
-        onTogglePlay={isBattleOver || hasOverlay ? undefined : handleTogglePlayPause}
-        isPlaying={isPlaying}
+        onBack={hasOverlay || !canUndo ? undefined : handleUndo}
+        onTogglePlay={hasOverlay ? undefined : handleTogglePlayPause}
+        isPaused={isPlaying}
         onNext={isBattleOver || hasOverlay ? undefined : handlePlayNextCard}
       />
     </Container>

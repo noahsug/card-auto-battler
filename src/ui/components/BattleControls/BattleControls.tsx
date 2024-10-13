@@ -35,28 +35,36 @@ interface Props {
   onBack?: () => void;
   onTogglePlay?: () => void;
   onNext?: () => void;
-  isPlaying: boolean;
+  isPaused: boolean;
 }
 
-export function BattleControls({ onBack, onTogglePlay, onNext, isPlaying }: Props) {
-  function handleKeyboardShortcuts(event: globalThis.KeyboardEvent) {
-    switch (event.key) {
-      case ' ':
-        onTogglePlay?.();
-        break;
-      case 'ArrowRight':
-        onNext?.();
-        break;
-      case 'ArrowLeft':
-        onBack?.();
-        break;
-    }
-  }
-
+function useKeyboardShortcuts({
+  onBack,
+  onTogglePlay,
+  onNext,
+}: Pick<Props, 'onBack' | 'onTogglePlay' | 'onNext'>) {
   useEffect(() => {
+    function handleKeyboardShortcuts(event: globalThis.KeyboardEvent) {
+      switch (event.key) {
+        case ' ':
+          onTogglePlay?.();
+          break;
+        case 'ArrowRight':
+          onNext?.();
+          break;
+        case 'ArrowLeft':
+          onBack?.();
+          break;
+      }
+    }
+
     window.addEventListener('keydown', handleKeyboardShortcuts);
     return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
-  });
+  }, [onBack, onTogglePlay, onNext]);
+}
+
+export function BattleControls({ onBack, onTogglePlay, onNext, isPaused }: Props) {
+  useKeyboardShortcuts({ onBack, onTogglePlay, onNext });
 
   return (
     <ControlsRow>
@@ -65,7 +73,7 @@ export function BattleControls({ onBack, onTogglePlay, onNext, isPlaying }: Prop
       </ControlButton>
 
       <ControlButton onClick={onTogglePlay} disabled={!onTogglePlay}>
-        {isPlaying ? <img src={pauseImage} alt="pause" /> : <img src={playImage} alt="play" />}
+        <img src={isPaused ? playImage : pauseImage} alt="play/pause" />
       </ControlButton>
 
       <ControlButton onClick={onNext} disabled={!onNext} $flip={true}>
