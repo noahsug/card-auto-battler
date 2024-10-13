@@ -1,9 +1,9 @@
 import { styled, ThemeProvider } from 'styled-components';
 
-import { CardState } from '../../game/gameState';
-import textBackground from '../images/text-background.png';
-import { getHandDrawnBorderRadius, maskImage } from '../style';
-import Container from './shared/Container';
+import { CardState } from '../../../game/gameState';
+import { getHandDrawnBorderRadius, maskImage } from '../../style';
+import Container from '../shared/Container';
+import textBackground from './text-background.png';
 
 interface Props {
   card: CardState;

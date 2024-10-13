@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import App from './App';
-import { createGameState } from '../../game/gameState';
+import { App } from './App';
 
 const meta = {
   title: 'App',

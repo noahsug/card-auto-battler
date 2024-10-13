@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
 import { CardSelectionScreen } from './CardSelectionScreen';
-import { getRandomCards } from '../../game/utils';
+import { getRandomCards } from '../../../game/utils';
 
 const meta = {
   title: 'CardSelectionScreen',

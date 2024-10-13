@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import HealthBar from './HealthBar';
+import { HealthBar } from './HealthBar';
 
 const meta = {
   title: 'HealthBar',

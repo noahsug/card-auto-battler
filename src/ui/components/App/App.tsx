@@ -1,9 +1,9 @@
 import { styled } from 'styled-components';
 
-import { GameStateProvider } from './GameStateContext';
-import ScreenContainer from './ScreenContainer';
-import backgroundImage from '../images/main-background.png';
-import { createGameState } from '../../game/gameState';
+import { createGameState } from '../../../game/gameState';
+import { GameStateProvider } from '../GameStateContext';
+import ScreenContainer from '../ScreenContainer';
+import backgroundImage from './main-background.png';
 
 export const AppRoot = styled.div`
   width: 100vw;
@@ -15,7 +15,7 @@ export const AppRoot = styled.div`
   overflow: hidden;
 `;
 
-export default function App() {
+export function App() {
   const gameState = createGameState();
 
   return (

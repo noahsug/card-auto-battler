@@ -1,9 +1,9 @@
-import { styled } from 'styled-components';
-import { useRef } from 'react';
 import { animated } from '@react-spring/web';
+import { useRef } from 'react';
+import { styled } from 'styled-components';
 
-import { Props as AnimationProps, useCardStackAnimation } from './useCardStackAnimation';
 import { Card, baseCardSize, cardSizeScaling } from '../Card';
+import { Props as AnimationProps, useCardStackAnimation } from './useCardStackAnimation';
 
 interface Props
   extends Pick<AnimationProps, 'cards' | 'currentCardIndex' | 'targetElement' | 'turn'> {

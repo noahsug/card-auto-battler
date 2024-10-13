@@ -1,9 +1,35 @@
+import { useEffect } from 'react';
 import { styled } from 'styled-components';
 
-import pauseImage from '../images/icons/pause.png';
-import playImage from '../images/icons/play.png';
-import nextImage from '../images/icons/arrow.png';
-import { useEffect } from 'react';
+import nextImage from './arrow.png';
+import pauseImage from './pause.png';
+import playImage from './play.png';
+
+const ControlsRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: end;
+  margin-top: 3rem;
+  flex: 0.5;
+`;
+
+const ControlButton = styled.button<{ $flip?: boolean }>`
+  background: none;
+  border: none;
+  transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
+  cursor: pointer;
+  width: 4rem;
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  img {
+    height: 2rem;
+  }
+`;
 
 interface Props {
   onBack?: () => void;
@@ -12,7 +38,7 @@ interface Props {
   isPlaying: boolean;
 }
 
-export default function BattleControls({ onBack, onTogglePlay, onNext, isPlaying }: Props) {
+export function BattleControls({ onBack, onTogglePlay, onNext, isPlaying }: Props) {
   function handleKeyboardShortcuts(event: globalThis.KeyboardEvent) {
     switch (event.key) {
       case ' ':
@@ -48,29 +74,3 @@ export default function BattleControls({ onBack, onTogglePlay, onNext, isPlaying
     </ControlsRow>
   );
 }
-
-const ControlsRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: end;
-  margin-top: 3rem;
-  flex: 0.5;
-`;
-
-const ControlButton = styled.button<{ $flip?: boolean }>`
-  background: none;
-  border: none;
-  transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
-  cursor: pointer;
-  width: 4rem;
-
-  &[disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  img {
-    height: 2rem;
-  }
-`;

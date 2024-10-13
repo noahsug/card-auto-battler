@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { styled } from 'styled-components';
 
+import { getBattleWinner, isGameOver } from '../../game/utils';
 import BattleResultScreen from './BattleResultOverlay';
 import BattleScreen from './BattleScreen';
 import { useActions, useGameState, useUndo } from './GameStateContext';
 import OverlayBackground from './shared/OverlayBackground';
 import StartScreen from './StartScreen';
-import { isGameOver, getBattleWinner } from '../../game/utils';
 
 type ScreenType = 'start' | 'cardSelection' | 'battle';
 type OverlayType = 'battleResult' | 'none';

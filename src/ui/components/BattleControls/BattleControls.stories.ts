@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import BattleControls from './BattleControls';
+import { BattleControls } from './BattleControls';
 
 const meta = {
   title: 'BattleControls',

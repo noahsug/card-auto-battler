@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import BattleScreen from './BattleScreen';
 import { createGameState } from '../../game/gameState';
-import { AppRoot } from './App';
-import { ScreenContainerRoot } from './ScreenContainer';
 import { getRandomCards } from '../../game/utils';
+import { AppRoot } from './App';
+import BattleScreen from './BattleScreen';
+import { ScreenContainerRoot } from './ScreenContainer';
 
 const meta = {
   title: 'BattleScreen',

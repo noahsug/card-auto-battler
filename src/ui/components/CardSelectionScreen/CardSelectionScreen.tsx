@@ -1,11 +1,11 @@
-import { styled } from 'styled-components';
 import { useState } from 'react';
+import { styled } from 'styled-components';
 
-import { NUM_CARD_SELECTION_PICKS } from '../../game/constants';
-import { CardState } from '../../game/gameState';
-import { Card } from '../components/Card';
-import Container from '../components/shared/Container';
-import Button from '../components/shared/Button';
+import { NUM_CARD_SELECTION_PICKS } from '../../../game/constants';
+import { CardState } from '../../../game/gameState';
+import { Card } from '../Card';
+import Button from '../shared/Button';
+import Container from '../shared/Container';
 
 interface Props {
   cards: CardState[];
