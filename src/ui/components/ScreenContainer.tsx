@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { styled } from 'styled-components';
 
 import { getBattleWinner, isGameOver } from '../../game/utils';
-import BattleResultScreen from './BattleResultOverlay';
-import BattleScreen from './BattleScreen';
+import { BattleResultOverlay } from './BattleResultOverlay';
+import { BattleScreen } from './BattleScreen';
 import { useActions, useGameState, useUndo } from './GameStateContext';
-import OverlayBackground from './shared/OverlayBackground';
-import StartScreen from './StartScreen';
+import { OverlayBackground } from './shared/OverlayBackground';
+import { StartScreen } from './StartScreen';
 
 type ScreenType = 'start' | 'cardSelection' | 'battle';
 type OverlayType = 'battleResult' | 'none';
@@ -16,7 +16,7 @@ export const ScreenContainerRoot = styled.div`
   margin: auto;
 `;
 
-export default function ScreenContainer() {
+export function ScreenContainer() {
   const { endBattle, resetGame } = useActions();
   const { clearUndo } = useUndo();
   const game = useGameState();
@@ -46,6 +46,7 @@ export default function ScreenContainer() {
 
       {screen === 'battle' && (
         <BattleScreen
+          game={game}
           onBattleOver={handleBattleOver}
           hasOverlay={overlay !== 'none'}
         ></BattleScreen>
@@ -54,10 +55,11 @@ export default function ScreenContainer() {
       {overlay !== 'none' && (
         <OverlayBackground>
           {overlay === 'battleResult' && (
-            <BattleResultScreen
+            <BattleResultOverlay
+              game={game}
               wonLastBattle={wonLastBattle}
               onContinue={handleNextBattle}
-            ></BattleResultScreen>
+            ></BattleResultOverlay>
           )}
         </OverlayBackground>
       )}

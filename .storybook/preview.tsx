@@ -2,6 +2,7 @@ import type { Preview } from '@storybook/react';
 import React from 'react';
 
 import { GameStateProvider } from '../src/ui/components/GameStateContext';
+import { ScreenContainerRoot } from '../src/ui/components/ScreenContainer';
 import '../src/ui/index.css';
 
 const viewports = {
@@ -25,7 +26,9 @@ const preview: Preview = {
   decorators: [
     (Story, { parameters: { gameState } }) => (
       <GameStateProvider gameState={gameState}>
-        <Story />
+        <ScreenContainerRoot>
+          <Story />
+        </ScreenContainerRoot>
       </GameStateProvider>
     ),
   ],

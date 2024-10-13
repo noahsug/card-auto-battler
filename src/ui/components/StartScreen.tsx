@@ -1,13 +1,13 @@
 import { styled } from 'styled-components';
 
-import Button from './shared/Button';
-import Container from './shared/Container';
+import { Button } from './shared/Button';
+import { Container } from './shared/Container';
 
 interface Props {
   onContinue: () => void;
 }
 
-export default function StartScreen({ onContinue }: Props) {
+export function StartScreen({ onContinue }: Props) {
   return (
     <Container>
       <Header>Chalkboard Heroes</Header>

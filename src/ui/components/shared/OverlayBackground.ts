@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
 
-export default styled.div`
+export const OverlayBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;

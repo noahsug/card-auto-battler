@@ -1,10 +1,10 @@
 import { styled } from 'styled-components';
 
-import Button from './shared/Button';
-import Container from './shared/Container';
-import { useGameState } from './GameStateContext';
-import { MAX_WINS } from '../../game/constants';
-import { isGameOver } from '../../game/utils';
+import { MAX_WINS } from '../../../game/constants';
+import { isGameOver } from '../../../game/utils';
+import { Button } from '../shared/Button';
+import { Container } from '../shared/Container';
+import { GameState } from '../../../game/gameState';
 
 const Header = styled('h2')`
   text-align: center;
@@ -18,6 +18,7 @@ const ContinueButton = styled(Button)`
 `;
 
 interface Props {
+  game: GameState;
   onContinue: () => void;
   wonLastBattle: boolean;
 }
@@ -41,8 +42,8 @@ function getButtonText({ wins, lives }: { wins: number; lives: number }) {
   return 'Continue';
 }
 
-export default function BattleResultOverlay({ onContinue, wonLastBattle }: Props) {
-  const { wins, lives } = useGameState();
+export function BattleResultOverlay({ game, onContinue, wonLastBattle }: Props) {
+  const { wins, lives } = game;
   const message = getBattleResultMessage({ wonLastBattle, wins, lives });
   const buttonText = getButtonText({ wins, lives });
 

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import StartScreen from './StartScreen';
+import { StartScreen } from './StartScreen';
 
 const meta = {
   title: 'StartScreen',

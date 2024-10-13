@@ -2,18 +2,20 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { BattleEvent } from '../../game/actions';
+import { GameState } from '../../game/gameState';
 import { getBattleWinner, getIsUserTurn, getPlayerTargets } from '../../game/utils';
 import { BattleControls } from './BattleControls';
 import { CardStack } from './CardStack';
 import { FloatingCombatText } from './FloatingCombatText';
-import { useActions, useGameState, useUndo } from './GameStateContext';
+import { useActions, useUndo } from './GameStateContext';
 import { HealthBar } from './HealthBar';
 import { HUD } from './HUD';
 import { PlayerProfile } from './PlayerProfile';
-import Container from './shared/Container';
+import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 
 interface Props {
+  game: GameState;
   onBattleOver: () => void;
   hasOverlay?: boolean;
 }
@@ -21,8 +23,7 @@ interface Props {
 // TODO: Freeze game state after battle is over so we don't show next stage?
 // TODO: Have "playedCard" and "currentGameState" local state, which we update to next game state
 // after the card animation is complete (instead of using 200ms everywhere)
-export default function BattleScreen({ onBattleOver, hasOverlay = false }: Props) {
-  const game = useGameState();
+export function BattleScreen({ game, onBattleOver, hasOverlay = false }: Props) {
   const { user, enemy, turn } = game;
   const [userTarget, enemyTarget] = getPlayerTargets(game);
 
@@ -136,6 +137,7 @@ const PlayersRow = styled(Row)`
 
 const CardStackRow = styled(Row)`
   justify-content: space-around;
+  padding-top: 1rem;
 `;
 
 const Player = styled.div`

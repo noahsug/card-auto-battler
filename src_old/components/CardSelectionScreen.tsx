@@ -1,17 +1,16 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { getCardSelectionsForBattle } from '../gameState';
+import { NUM_CARD_SELECTION_PICKS } from '../gameState/constants';
+import type { Sequence } from '../hooks';
+import { useSequence } from '../hooks';
+import { wait } from '../utils';
+import Card from './Card';
+import DeckOverlay from './DeckOverlay';
 import { useActions } from './GameStateContext';
 import ProgressDisplay from './ProgressDisplay';
 import { Screen, Title } from './shared';
-import Card from './Card';
-import { wait } from '../utils';
-import { useSequence } from '../hooks';
-
-import type { Sequence } from '../hooks';
-import { NUM_CARD_SELECTION_PICKS } from '../gameState/constants';
-import DeckOverlay from './DeckOverlay';
 import { TopRightButton } from './shared/shared';
 
 export default function CardSelectionScreen() {

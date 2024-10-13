@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 import { getHandDrawnBorderRadius } from '../../style';
 
-export default styled.button`
+export const Button = styled.button`
   font-size: 2rem;
   margin: 0 auto;
   padding: 0.5rem 0 1rem;

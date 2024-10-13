@@ -12,6 +12,7 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {},
   },
-  staticDirs: ['../src/ui/images'],
+  // main-background.png
+  staticDirs: ['../src/ui/components/App'],
 };
 export default config;

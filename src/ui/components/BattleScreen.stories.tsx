@@ -3,25 +3,11 @@ import { fn } from '@storybook/test';
 
 import { createGameState } from '../../game/gameState';
 import { getRandomCards } from '../../game/utils';
-import { AppRoot } from './App';
-import BattleScreen from './BattleScreen';
-import { ScreenContainerRoot } from './ScreenContainer';
+import { BattleScreen } from './BattleScreen';
 
 const meta = {
   title: 'BattleScreen',
   component: BattleScreen,
-  decorators: [
-    (Story) => (
-      <AppRoot>
-        <ScreenContainerRoot>
-          <Story />
-        </ScreenContainerRoot>
-      </AppRoot>
-    ),
-  ],
-  parameters: {
-    layout: 'fullscreen',
-  },
   args: {
     onBattleOver: fn(),
   },
@@ -31,23 +17,23 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const FewCards: Story = {
-  parameters: {
-    gameState: createGameState(),
+  args: {
+    game: createGameState(),
   },
 };
 
 const manyCards = createGameState();
 manyCards.user.cards = getRandomCards(20);
 export const ManyCards: Story = {
-  parameters: {
-    gameState: manyCards,
+  args: {
+    game: manyCards,
   },
 };
 
 const isDead = createGameState();
 isDead.enemy.health = 0;
 export const IsDead: Story = {
-  parameters: {
-    gameState: isDead,
+  args: {
+    game: isDead,
   },
 };

@@ -4,8 +4,9 @@ import { styled } from 'styled-components';
 import { NUM_CARD_SELECTION_PICKS } from '../../../game/constants';
 import { CardState } from '../../../game/gameState';
 import { Card } from '../Card';
-import Button from '../shared/Button';
-import Container from '../shared/Container';
+import { Button } from '../shared/Button';
+import { Container } from '../shared/Container';
+import { Row } from '../shared/Row';
 
 interface Props {
   cards: CardState[];
@@ -27,11 +28,11 @@ const Message = styled.h2`
   font-size: 2.5rem;
 `;
 
-const BottomRow = styled.div`
+const MiddleRow = styled(Row)`
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: end;
+`;
+
+const BottomRow = styled.div`
   margin-bottom: 0.25rem;
 `;
 
@@ -63,17 +64,19 @@ export function CardSelectionScreen({ cards, onCardsSelected }: Props) {
 
   return (
     <Container>
-      <CardGrid>
-        {cards.map((card, i) => (
-          <Card
-            key={i}
-            card={card}
-            size={'small'}
-            onClick={() => handleCardSelected(i)}
-            style={getStyle(i)}
-          />
-        ))}
-      </CardGrid>
+      <MiddleRow>
+        <CardGrid>
+          {cards.map((card, i) => (
+            <Card
+              key={i}
+              card={card}
+              size={'small'}
+              onClick={() => handleCardSelected(i)}
+              style={getStyle(i)}
+            />
+          ))}
+        </CardGrid>
+      </MiddleRow>
       <BottomRow>
         {numCardsToPick > 0 && <Message>Select {numCardsToPick} Cards</Message>}
         {numCardsToPick <= 0 && <Button onClick={handleContinue}>Continue</Button>}

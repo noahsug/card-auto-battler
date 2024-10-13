@@ -1,19 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import BattleResultOverlay from './BattleResultOverlay';
-import { createGameState } from '../../game/gameState';
-import { MAX_WINS } from '../../game/constants';
+import { BattleResultOverlay } from './BattleResultOverlay';
+import { createGameState } from '../../../game/gameState';
+import { MAX_WINS } from '../../../game/constants';
 
 const meta = {
   title: 'BattleResultOverlay',
   component: BattleResultOverlay,
-  parameters: {
-    gameState: createGameState(),
-  },
   args: {
     onContinue: fn(),
     wonLastBattle: true,
+    game: createGameState(),
   },
 } satisfies Meta<typeof BattleResultOverlay>;
 
@@ -29,8 +27,8 @@ export const Defeat: Story = {
 };
 
 export const GameOver: Story = {
-  parameters: {
-    gameState: {
+  args: {
+    game: {
       ...createGameState(),
       lives: 0,
     },
@@ -38,8 +36,8 @@ export const GameOver: Story = {
 };
 
 export const YouWin: Story = {
-  parameters: {
-    gameState: {
+  args: {
+    game: {
       ...createGameState(),
       wins: MAX_WINS,
     },
