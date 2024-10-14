@@ -13,7 +13,7 @@ type ScreenType = 'start' | 'cardSelection' | 'battle';
 type OverlayType = 'battleResult' | 'none';
 
 export const ScreenContainerRoot = styled.div`
-  max-width: 100vh;
+  width: min(100vh, 100vw);
   margin: auto;
 `;
 

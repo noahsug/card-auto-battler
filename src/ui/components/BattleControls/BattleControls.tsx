@@ -9,9 +9,6 @@ const ControlsRow = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
-  align-items: end;
-  margin-top: 3rem;
-  flex: 0.5;
 `;
 
 const ControlButton = styled.button<{ $flip?: boolean }>`

@@ -13,6 +13,7 @@ import { HUD } from './HUD';
 import { PlayerProfile } from './PlayerProfile';
 import { Container } from './shared/Container';
 import { Row } from './shared/Row';
+import { CenterContent } from './shared/CenterContent';
 
 interface Props {
   game: GameState;
@@ -72,55 +73,57 @@ export function BattleScreen({ game, onBattleOver, hasOverlay = false }: Props) 
     <Container>
       <HUD lives={game.lives} wins={game.wins} />
 
-      <PlayersRow>
-        <Player className={getIsUserTurn(game) ? 'active' : ''}>
-          <PlayerProfile
-            src={user.image}
-            profileRef={userProfileRef}
-            battleEvents={userBattleEvents}
-            isDead={user.health <= 0}
-          />
-          <FloatingCombatText
-            battleEvents={userBattleEvents}
-            targetElement={userProfileRef.current}
-          />
-          <HealthBar health={user.health} maxHealth={user.startingHealth} />
-        </Player>
+      <CenterContent>
+        <PlayersRow>
+          <Player className={getIsUserTurn(game) ? 'active' : ''}>
+            <PlayerProfile
+              src={user.image}
+              profileRef={userProfileRef}
+              battleEvents={userBattleEvents}
+              isDead={user.health <= 0}
+            />
+            <FloatingCombatText
+              battleEvents={userBattleEvents}
+              targetElement={userProfileRef.current}
+            />
+            <HealthBar health={user.health} maxHealth={user.startingHealth} />
+          </Player>
 
-        <Player className={getIsUserTurn(game) ? '' : 'active'}>
-          <PlayerProfile
-            src={enemy.image}
-            flip={true}
-            profileRef={enemyProfileRef}
-            battleEvents={enemyBattleEvents}
-            isDead={enemy.health <= 0}
-          />
-          <FloatingCombatText
-            battleEvents={enemyBattleEvents}
-            targetElement={userProfileRef.current}
-          />
-          <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
-        </Player>
-      </PlayersRow>
+          <Player className={getIsUserTurn(game) ? '' : 'active'}>
+            <PlayerProfile
+              src={enemy.image}
+              flip={true}
+              profileRef={enemyProfileRef}
+              battleEvents={enemyBattleEvents}
+              isDead={enemy.health <= 0}
+            />
+            <FloatingCombatText
+              battleEvents={enemyBattleEvents}
+              targetElement={userProfileRef.current}
+            />
+            <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
+          </Player>
+        </PlayersRow>
 
-      <CardStackRow>
-        <CardStack
-          cards={user.cards}
-          currentCardIndex={user.currentCardIndex}
-          targetElement={enemyProfileRef.current}
-          playerType="user"
-          turn={turn}
-        />
-        {
+        <ContentRow>
           <CardStack
-            cards={enemy.cards}
-            currentCardIndex={enemy.currentCardIndex}
-            targetElement={userProfileRef.current}
-            playerType="enemy"
+            cards={user.cards}
+            currentCardIndex={user.currentCardIndex}
+            targetElement={enemyProfileRef.current}
+            playerType="user"
             turn={turn}
           />
-        }
-      </CardStackRow>
+          {
+            <CardStack
+              cards={enemy.cards}
+              currentCardIndex={enemy.currentCardIndex}
+              targetElement={userProfileRef.current}
+              playerType="enemy"
+              turn={turn}
+            />
+          }
+        </ContentRow>
+      </CenterContent>
 
       <BattleControls
         onBack={hasOverlay || !canUndo ? undefined : handleUndo}
@@ -132,14 +135,13 @@ export function BattleScreen({ game, onBattleOver, hasOverlay = false }: Props) 
   );
 }
 
-const PlayersRow = styled(Row)`
-  margin-bottom: 3rem;
+const ContentRow = styled(Row)`
   justify-content: space-around;
+  width: 100%;
 `;
 
-const CardStackRow = styled(Row)`
-  justify-content: space-around;
-  padding-top: 1rem;
+const PlayersRow = styled(ContentRow)`
+  margin-bottom: 4rem;
 `;
 
 const Player = styled.div`

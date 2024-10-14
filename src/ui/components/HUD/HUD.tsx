@@ -30,11 +30,6 @@ const Icon = styled.div<{ src: string }>`
   background-color: var(--color-primary);
 `;
 
-const IconsRow = styled(Row)`
-  align-items: start;
-  flex: 1;
-`;
-
 interface Props {
   lives: number;
   wins: number;
@@ -42,7 +37,7 @@ interface Props {
 
 export function HUD({ lives, wins }: Props) {
   return (
-    <IconsRow>
+    <Row>
       <Label>
         <Icon src={livesImage} />
         <div>{lives} lives</div>
@@ -52,6 +47,6 @@ export function HUD({ lives, wins }: Props) {
         <Icon src={battleImage} />
         <div>round {wins + 1}</div>
       </Label>
-    </IconsRow>
+    </Row>
   );
 }
