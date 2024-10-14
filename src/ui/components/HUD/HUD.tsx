@@ -1,51 +1,56 @@
 import { styled } from 'styled-components';
 
-import { getHandDrawnBorderRadius, maskImage } from '../../style';
+import { maskImage } from '../../style';
 import { Row } from '../shared/Row';
 import livesImage from './heart.png';
 import battleImage from './swords.png';
+import deckImage from './cards.png';
+import { MAX_LOSSES } from '../../../game/constants';
+import { GameState } from '../../../game/gameState';
+
+const size = 2;
 
 const Label = styled(Row)`
-  font-size: 2rem;
+  font-size: ${size}rem;
   font-family: var(--font-heading);
   letter-spacing: var(--letter-spacing-heading);
   background-color: var(--color-bg-opaque);
+  padding: 0.5rem;
   justify-content: center;
-  padding: 0 0.5rem;
-
-  ${getHandDrawnBorderRadius()}
-  border: solid 0.75rem var(--color-bg-opaque);
-
-  > div {
-    line-height: 0.85;
-    height: 1em;
-  }
 `;
 
+const LabelText = styled.div``;
+
 const Icon = styled.div<{ src: string }>`
-  height: 2rem;
-  width: 2rem;
-  margin-right: 1rem;
+  width: ${size}rem;
+  height: ${size}rem;
+  margin-right: 0.75rem;
   ${maskImage}
   background-color: var(--color-primary);
 `;
 
 interface Props {
-  lives: number;
-  wins: number;
+  game: GameState;
 }
 
-export function HUD({ lives, wins }: Props) {
+export function HUD({ game }: Props) {
+  const { wins, losses, user } = game;
+
   return (
     <Row>
       <Label>
         <Icon src={livesImage} />
-        <div>{lives} lives</div>
+        <LabelText>{MAX_LOSSES - losses} lives</LabelText>
       </Label>
 
       <Label>
         <Icon src={battleImage} />
-        <div>round {wins + 1}</div>
+        <LabelText>round {wins + 1}</LabelText>
+      </Label>
+
+      <Label>
+        <Icon src={deckImage} />
+        <LabelText>deck ({user.cards.length})</LabelText>
       </Label>
     </Row>
   );

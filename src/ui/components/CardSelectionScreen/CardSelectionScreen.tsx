@@ -65,7 +65,7 @@ export function CardSelectionScreen({ game, cards, onCardsSelected }: Props) {
 
   return (
     <Container>
-      <HUD lives={game.lives} wins={game.wins} />
+      <HUD game={game} />
 
       <CenterContent>
         <CardGrid>

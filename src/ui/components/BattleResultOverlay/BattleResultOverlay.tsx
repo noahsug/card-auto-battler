@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
 
-import { MAX_WINS } from '../../../game/constants';
+import { MAX_LOSSES, MAX_WINS } from '../../../game/constants';
 import { isGameOver } from '../../../game/utils';
 import { Button } from '../shared/Button';
 import { Container } from '../shared/Container';
@@ -26,26 +26,26 @@ interface Props {
 function getBattleResultMessage({
   wonLastBattle,
   wins,
-  lives,
+  losses,
 }: {
   wonLastBattle: boolean;
   wins: number;
-  lives: number;
+  losses: number;
 }) {
-  if (lives <= 0) return 'Game Over';
+  if (losses >= MAX_LOSSES) return 'Game Over';
   if (wins >= MAX_WINS) return `You win!`;
   return wonLastBattle ? 'Victory!' : 'Defeat';
 }
 
-function getButtonText({ wins, lives }: { wins: number; lives: number }) {
-  if (isGameOver({ wins, lives })) return 'New Game';
+function getButtonText({ wins, losses }: { wins: number; losses: number }) {
+  if (isGameOver({ wins, losses })) return 'New Game';
   return 'Continue';
 }
 
 export function BattleResultOverlay({ game, onContinue, wonLastBattle }: Props) {
-  const { wins, lives } = game;
-  const message = getBattleResultMessage({ wonLastBattle, wins, lives });
-  const buttonText = getButtonText({ wins, lives });
+  const { wins, losses } = game;
+  const message = getBattleResultMessage({ wonLastBattle, wins, losses });
+  const buttonText = getButtonText({ wins, losses });
 
   return (
     <Container>

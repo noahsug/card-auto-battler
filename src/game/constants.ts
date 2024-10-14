@@ -1,5 +1,5 @@
 export const MAX_WINS = 7;
-export const STARTING_LIVES = 3;
+export const MAX_LOSSES = 3;
 
 export const BLEED_DAMAGE = 3;
 

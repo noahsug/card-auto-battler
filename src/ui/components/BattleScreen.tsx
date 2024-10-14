@@ -71,7 +71,7 @@ export function BattleScreen({ game, onBattleOver, hasOverlay = false }: Props) 
 
   return (
     <Container>
-      <HUD lives={game.lives} wins={game.wins} />
+      <HUD game={game} />
 
       <CenterContent>
         <PlayersRow>

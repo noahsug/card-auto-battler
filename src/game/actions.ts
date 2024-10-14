@@ -53,7 +53,7 @@ function resetBattle({ user, enemy }: GameState) {
 
 export function endBattle(game: GameState) {
   const winner = getBattleWinner(game);
-  winner === 'user' ? game.wins++ : game.lives--;
+  winner === 'user' ? game.wins++ : game.losses++;
   resetBattle(game);
 }
 

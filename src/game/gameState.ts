@@ -1,7 +1,7 @@
 import { allCards } from '../content/cards';
 import { allHeroes } from '../content/heroes';
 import { allEnemies } from '../content/enemies';
-import { STARTING_HEALTH, STARTING_LIVES } from './constants';
+import { STARTING_HEALTH } from './constants';
 
 export type Target = 'self' | 'opponent';
 
@@ -25,8 +25,8 @@ export interface GameState {
   user: PlayerState;
   enemy: PlayerState;
   turn: number;
-  lives: number;
   wins: number;
+  losses: number;
 }
 
 function createPlayer({ name, image }: { name: string; image: string }): PlayerState {
@@ -54,6 +54,6 @@ export function createGameState(): GameState {
     enemy,
     turn: 0,
     wins: 0,
-    lives: STARTING_LIVES,
+    losses: 0,
   };
 }

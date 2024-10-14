@@ -3,7 +3,7 @@ import { fn } from '@storybook/test';
 
 import { BattleResultOverlay } from './BattleResultOverlay';
 import { createGameState } from '../../../game/gameState';
-import { MAX_WINS } from '../../../game/constants';
+import { MAX_LOSSES, MAX_WINS } from '../../../game/constants';
 
 const meta = {
   title: 'BattleResultOverlay',
@@ -30,7 +30,7 @@ export const GameOver: Story = {
   args: {
     game: {
       ...createGameState(),
-      lives: 0,
+      losses: MAX_LOSSES,
     },
   },
 };
