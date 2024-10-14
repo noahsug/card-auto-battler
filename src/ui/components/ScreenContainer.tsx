@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
+import { GameState } from '../../game/gameState';
 import { getBattleWinner, isGameOver } from '../../game/utils';
 import { BattleResultOverlay } from './BattleResultOverlay';
 import { BattleScreen } from './BattleScreen';
@@ -19,26 +20,33 @@ export const ScreenContainerRoot = styled.div`
 export function ScreenContainer() {
   const { endBattle, resetGame } = useActions();
   const { clearUndo } = useUndo();
+
   const game = useGameState();
+
+  // frozen game state from last battle, ensures battle screen doesn't update after battle is over
+  const lastBattleGameState = useRef<GameState>();
+  const battleGameState = lastBattleGameState.current || game;
 
   const [screen, setScreen] = useState<ScreenType>('start');
   const [overlay, setOverlay] = useState<OverlayType>('none');
   const [wonLastBattle, setWonLastBattle] = useState(false);
 
-  function handleNextBattle() {
+  const handleNextBattle = useCallback(() => {
+    lastBattleGameState.current = undefined;
     if (isGameOver(game)) {
       resetGame();
     }
     clearUndo();
     setScreen('battle');
     setOverlay('none');
-  }
+  }, [clearUndo, game, resetGame]);
 
-  function handleBattleOver() {
+  const handleBattleOver = useCallback(() => {
+    lastBattleGameState.current = game;
     setWonLastBattle(getBattleWinner(game) === 'user');
     endBattle();
     setOverlay('battleResult');
-  }
+  }, [game, endBattle]);
 
   return (
     <ScreenContainerRoot>
@@ -46,7 +54,7 @@ export function ScreenContainer() {
 
       {screen === 'battle' && (
         <BattleScreen
-          game={game}
+          game={battleGameState}
           onBattleOver={handleBattleOver}
           hasOverlay={overlay !== 'none'}
         ></BattleScreen>

@@ -38,10 +38,6 @@ export function BattleScreen({ game, onBattleOver, hasOverlay = false }: Props) 
   const userProfileRef = useRef<HTMLDivElement>(null);
   const enemyProfileRef = useRef<HTMLDivElement>(null);
 
-  const endBattleTimeout = useRef<NodeJS.Timeout>();
-
-  const isBattleOver = getBattleWinner(game) != null;
-
   const handleTogglePlayPause = useCallback(() => {
     setIsPlaying((prev) => !prev);
   }, []);
@@ -58,9 +54,15 @@ export function BattleScreen({ game, onBattleOver, hasOverlay = false }: Props) 
     setEnemyBattleEvents(battleEvents.filter(({ target }) => target === enemyTarget));
   }, [playCard, userTarget, enemyTarget]);
 
-  useEffect(() => {
+  const isBattleOver = getBattleWinner(game) != null;
+  const endBattleTimeout = useRef<NodeJS.Timeout>();
+  if (!isBattleOver) {
     clearTimeout(endBattleTimeout.current);
-    if (isBattleOver) {
+    endBattleTimeout.current = undefined;
+  }
+
+  useEffect(() => {
+    if (isBattleOver && endBattleTimeout.current == null) {
       endBattleTimeout.current = setTimeout(onBattleOver, 1500);
     }
     return () => clearTimeout(endBattleTimeout.current);
