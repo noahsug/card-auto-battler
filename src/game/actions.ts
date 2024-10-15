@@ -1,5 +1,6 @@
 import { CardState, GameState, PlayerState, Target, createGameState } from './gameState';
 import { getBattleWinner, getPlayers } from './utils/selectors';
+import { applyCardEffects } from './applyCardEffects';
 
 interface MissBattleEvent {
   type: 'miss';
@@ -23,7 +24,18 @@ export function playCard(game: GameState): BattleEvent[] {
 
   const card = activePlayer.cards[activePlayer.currentCardIndex];
 
-  nonActivePlayer.health -= card.damage;
+  // die if out of cards
+  if (card == null) {
+    const damage = activePlayer.health;
+    activePlayer.health = 0;
+    return [{ type: 'damage', target: 'self', value: damage }];
+  }
+
+  // TODO: implement
+  activePlayer.cardsPlayedThisTurn = 1;
+
+  // play card
+  const events = applyCardEffects(card, { self: activePlayer, opponent: nonActivePlayer });
 
   activePlayer.currentCardIndex += 1;
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
@@ -32,13 +44,7 @@ export function playCard(game: GameState): BattleEvent[] {
 
   game.turn++;
 
-  if (card.damage === 1 && Math.random() < 0.5) {
-    return [{ type: 'miss', target: 'opponent' }];
-  }
-  if (card.damage < 0) {
-    return [{ type: 'heal', target: 'opponent', value: -card.damage }];
-  }
-  return [{ type: 'damage', target: 'opponent', value: card.damage }];
+  return events;
 }
 
 function resetBattlePlayer(player: PlayerState) {

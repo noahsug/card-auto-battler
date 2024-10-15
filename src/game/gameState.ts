@@ -13,7 +13,7 @@ export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
   statusEffectNames.map((effectName) => [effectName, 0]),
 ) as StatusEffects;
 
-export type PlayerValueName = keyof PlayerState;
+export type PlayerValueName = keyof Omit<PlayerState, 'name' | 'image'>;
 
 export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
 
