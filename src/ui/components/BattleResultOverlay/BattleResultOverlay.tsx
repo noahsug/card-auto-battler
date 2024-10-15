@@ -1,10 +1,9 @@
 import { styled } from 'styled-components';
 
 import { MAX_LOSSES, MAX_WINS } from '../../../game/constants';
-import { isGameOver } from '../../../game/utils';
+import { GameState } from '../../../game/gameState';
 import { Button } from '../shared/Button';
 import { Container } from '../shared/Container';
-import { GameState } from '../../../game/gameState';
 
 const Header = styled('h2')`
   text-align: center;
@@ -37,20 +36,14 @@ function getBattleResultMessage({
   return wonLastBattle ? 'Victory!' : 'Defeat';
 }
 
-function getButtonText({ wins, losses }: { wins: number; losses: number }) {
-  if (isGameOver({ wins, losses })) return 'New Game';
-  return 'Continue';
-}
-
 export function BattleResultOverlay({ game, onContinue, wonLastBattle }: Props) {
   const { wins, losses } = game;
   const message = getBattleResultMessage({ wonLastBattle, wins, losses });
-  const buttonText = getButtonText({ wins, losses });
 
   return (
     <Container>
       <Header>{message}</Header>
-      <ContinueButton onClick={onContinue}>{buttonText}</ContinueButton>
+      <ContinueButton onClick={onContinue}>Continue</ContinueButton>
     </Container>
   );
 }

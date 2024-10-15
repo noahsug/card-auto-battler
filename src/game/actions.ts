@@ -14,8 +14,8 @@ interface BattleEventWithValue {
 
 export type BattleEvent = MissBattleEvent | BattleEventWithValue;
 
-export function addCard(game: GameState, card: CardState) {
-  game.user.cards.push(card);
+export function addCards(game: GameState, cards: CardState[]) {
+  game.user.cards.push(...cards);
 }
 
 export function playCard(game: GameState): BattleEvent[] {
