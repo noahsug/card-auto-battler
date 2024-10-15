@@ -1,5 +1,3 @@
-import type { CardState } from '../game/gameState';
-
 import channel from './images/cards/channel.jpeg';
 import eviscerate from './images/cards/eviscerate.jpeg';
 import firePower from './images/cards/fire-power.jpeg';
@@ -9,24 +7,45 @@ import phoenix from './images/cards/phoenix.jpeg';
 import punch from './images/cards/punch.png';
 import volcano from './images/cards/volcano.jpeg';
 
+import type { CardState } from '../game/gameState';
+import { createCard, value as v } from './utils';
+
 export const allCards = {
-  punch: {
-    name: 'Serious Punch',
-    description: 'Deal 7 damage.',
-    image: punch,
-    damage: 1,
-  },
-  fireball: {
-    name: 'Fireball',
-    description:
-      'Deal 4 damage. Deal 3 extra damage for each burn the enemy has. Remove all enemy burn.',
-    image: fireball,
-    damage: -3,
-  },
-  eviscerate: {
-    name: 'Eviscerate',
-    description: 'Deal 2 damage. Repeat for each bleed the enemy has.',
-    image: eviscerate,
-    damage: 10,
-  },
+  punch: createCard(
+    {
+      value: v(7),
+    },
+    {
+      name: 'Serious Punch',
+      description: 'Deal 7 damage.',
+      image: punch,
+    },
+  ),
+  fireball: createCard(
+    {
+      value: v(2),
+    },
+    {
+      effects: [
+        {
+          target: 'self',
+          name: 'extraCardPlays',
+        },
+      ],
+      name: 'Fireball',
+      description: 'Deal 2 damage. Play an extra card.',
+      image: fireball,
+    },
+  ),
+  eviscerate: createCard(
+    {
+      value: v(1),
+    },
+    {
+      repeat: { value: v('opponent', 'bleed') },
+      name: 'Eviscerate',
+      description: 'Deal 2 damage. Repeat for each bleed the enemy has.',
+      image: eviscerate,
+    },
+  ),
 } satisfies Record<string, CardState>;

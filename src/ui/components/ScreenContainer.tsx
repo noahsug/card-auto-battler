@@ -2,7 +2,8 @@ import { useCallback, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { CardState, GameState } from '../../game/gameState';
-import { getBattleWinner, getRandomCards, isGameOver } from '../../game/utils';
+import { getBattleWinner, isGameOver } from '../../game/utils/selectors';
+import { getRandomCards } from '../../game/utils/getRandomCards';
 import { BattleResultOverlay } from './BattleResultOverlay';
 import { BattleScreen } from './BattleScreen';
 import { useActions, useGameState, useUndo } from './GameStateContext';

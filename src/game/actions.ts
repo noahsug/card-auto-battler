@@ -1,5 +1,5 @@
 import { CardState, GameState, PlayerState, Target, createGameState } from './gameState';
-import { getBattleWinner, getPlayers } from './utils';
+import { getBattleWinner, getPlayers } from './utils/selectors';
 
 interface MissBattleEvent {
   type: 'miss';

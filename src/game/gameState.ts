@@ -5,18 +5,67 @@ import { STARTING_HEALTH } from './constants';
 
 export type Target = 'self' | 'opponent';
 
+export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength'] as const;
+export type StatusEffectName = (typeof statusEffectNames)[number];
+export type StatusEffects = Record<StatusEffectName, number>;
+
+export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
+  statusEffectNames.map((effectName) => [effectName, 0]),
+) as StatusEffects;
+
+export type PlayerValueName = keyof PlayerState;
+
+export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
+
+export interface BasicValueDescriptor {
+  type: 'basicValue';
+  value: number;
+}
+
+export interface PlayerValueDescriptor {
+  type: 'playerValue';
+  target: Target;
+  name: PlayerValueName;
+  multiplier?: number;
+}
+
+export type ValueDescriptor = BasicValueDescriptor | PlayerValueDescriptor;
+
+export interface If {
+  value: PlayerValueDescriptor;
+  comparison: '>' | '<' | '=' | '<=' | '>=';
+  value2: BasicValueDescriptor;
+}
+
+export interface MaybeValue<T = ValueDescriptor> {
+  value: T;
+  if?: If;
+}
+
+export interface CardEffect {
+  target: Target;
+  name: CardEffectName;
+  value: ValueDescriptor;
+  add?: MaybeValue;
+  multiply?: MaybeValue<BasicValueDescriptor>;
+  multiHit?: number;
+  if?: If;
+}
+
 export interface CardState {
+  effects: CardEffect[];
+  repeat?: MaybeValue;
   name: string;
   description: string;
   image: string;
-  damage: number;
 }
 
-export interface PlayerState {
+export interface PlayerState extends StatusEffects {
   health: number;
   startingHealth: number;
   cards: CardState[];
   currentCardIndex: number;
+  cardsPlayedThisTurn: number;
   name: string;
   image: string;
 }
@@ -33,8 +82,10 @@ function createPlayer({ name, image }: { name: string; image: string }): PlayerS
   return {
     health: STARTING_HEALTH,
     startingHealth: STARTING_HEALTH,
+    ...EMPTY_STATUS_EFFECTS,
     cards: [],
     currentCardIndex: 0,
+    cardsPlayedThisTurn: 0,
     name,
     image,
   };

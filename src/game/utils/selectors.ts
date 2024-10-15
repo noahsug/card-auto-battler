@@ -1,18 +1,5 @@
-import sample from 'lodash/sample';
-
-import { allCards } from '../content/cards';
-import { GameState, PlayerState, Target } from './gameState';
-import { MAX_WINS, MAX_LOSSES } from './constants';
-
-export function getRandomCards(length: number) {
-  const cards = new Array(length);
-  const options = Object.values(allCards);
-
-  for (let i = 0; i < length; i++) {
-    cards[i] = sample(options);
-  }
-  return cards;
-}
+import { GameState, PlayerState, Target } from '../gameState';
+import { MAX_WINS, MAX_LOSSES } from '../constants';
 
 export function getIsUserTurn(game: GameState) {
   return game.turn % 2 === 0;

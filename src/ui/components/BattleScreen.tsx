@@ -3,7 +3,7 @@ import { styled } from 'styled-components';
 
 import { BattleEvent } from '../../game/actions';
 import { GameState } from '../../game/gameState';
-import { getBattleWinner, getIsUserTurn, getPlayerTargets } from '../../game/utils';
+import { getBattleWinner, getIsUserTurn, getPlayerTargets } from '../../game/utils/selectors';
 import { BattleControls } from './BattleControls';
 import { CardStack } from './CardStack';
 import { FloatingCombatText } from './FloatingCombatText';
@@ -21,7 +21,6 @@ interface Props {
   hasOverlay?: boolean;
 }
 
-// TODO: Freeze game state after battle is over so we don't show next stage?
 // TODO: Have "playedCard" and "currentGameState" local state, which we update to next game state
 // after the card animation is complete (instead of using 200ms everywhere)
 export function BattleScreen({ game, onBattleOver, hasOverlay = false }: Props) {

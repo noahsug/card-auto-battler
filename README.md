@@ -2,7 +2,7 @@
 
 Game TODO:
 
-1. card select screen
+1. heart lives icon should be an outline, not filled in
 2. add back card logic + text
 3. add loading screen
 4. shuffle discard back into deck and use UID to fix animation, use seeded random to ensure shuffle is always the same
