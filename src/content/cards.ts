@@ -39,7 +39,7 @@ export const allCards = {
   ),
   eviscerate: createCard(
     {
-      value: v(1),
+      value: v(2),
     },
     {
       repeat: { value: v('opponent', 'bleed') },

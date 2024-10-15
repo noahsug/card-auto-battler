@@ -1,6 +1,7 @@
 import { CardState, GameState, PlayerState, Target, createGameState } from './gameState';
 import { getBattleWinner, getPlayers } from './utils/selectors';
 import { applyCardEffects } from './applyCardEffects';
+import { assertEqual, assert } from '../utils/asserts';
 
 interface MissBattleEvent {
   type: 'miss';
@@ -31,8 +32,11 @@ export function playCard(game: GameState): BattleEvent[] {
     return [{ type: 'damage', target: 'self', value: damage }];
   }
 
-  // TODO: implement
-  activePlayer.cardsPlayedThisTurn = 1;
+  if (activePlayer.cardsPlayedThisTurn > 0) {
+    assert(activePlayer.extraCardPlays > 0);
+    activePlayer.extraCardPlays -= 1;
+  }
+  activePlayer.cardsPlayedThisTurn += 1;
 
   // play card
   const events = applyCardEffects(card, { self: activePlayer, opponent: nonActivePlayer });
@@ -42,7 +46,9 @@ export function playCard(game: GameState): BattleEvent[] {
     activePlayer.currentCardIndex = 0;
   }
 
-  game.turn++;
+  if (activePlayer.extraCardPlays === 0) {
+    game.turn++;
+  }
 
   return events;
 }

@@ -1,10 +1,10 @@
 import cloneDeep from 'lodash/cloneDeep';
 
-import { createGameState, PlayerState, CardEffect, CardState } from './gameState';
+import { createCard, value as v } from '../content/utils';
+import { diffValues } from '../utils/objects';
 import { applyCardEffects } from './applyCardEffects';
 import { BLEED_DAMAGE } from './constants';
-import { value as v, createCard } from '../content/utils';
-import { diffValues } from '../utils/objects';
+import { CardEffect, CardState, createGameState, PlayerState } from './gameState';
 
 let card: CardState;
 let effect: CardEffect;
