@@ -18,12 +18,13 @@ import { CenterContent } from './shared/CenterContent';
 interface Props {
   game: GameState;
   onBattleOver: () => void;
+  onViewDeck: () => void;
   hasOverlay?: boolean;
 }
 
 // TODO: Have "playedCard" and "currentGameState" local state, which we update to next game state
 // after the card animation is complete (instead of using 200ms everywhere)
-export function BattleScreen({ game, onBattleOver, hasOverlay = false }: Props) {
+export function BattleScreen({ game, onBattleOver, onViewDeck, hasOverlay = false }: Props) {
   const { user, enemy, turn } = game;
   const [userTarget, enemyTarget] = getPlayerTargets(game);
 
@@ -70,7 +71,7 @@ export function BattleScreen({ game, onBattleOver, hasOverlay = false }: Props) 
 
   return (
     <Container>
-      <HUD game={game} />
+      <HUD game={game} onViewDeck={onViewDeck} />
 
       <CenterContent>
         <PlayersRow>

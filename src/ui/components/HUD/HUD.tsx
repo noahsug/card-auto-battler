@@ -31,9 +31,10 @@ const Icon = styled.div<{ src: string }>`
 
 interface Props {
   game: GameState;
+  onViewDeck: () => void;
 }
 
-export function HUD({ game }: Props) {
+export function HUD({ game, onViewDeck }: Props) {
   const { wins, losses, user } = game;
 
   return (
@@ -48,7 +49,7 @@ export function HUD({ game }: Props) {
         <LabelText>round {wins + 1}</LabelText>
       </Label>
 
-      <Label>
+      <Label onClick={onViewDeck}>
         <Icon src={deckImage} />
         <LabelText>deck ({user.cards.length})</LabelText>
       </Label>

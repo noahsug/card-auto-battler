@@ -9,7 +9,7 @@ interface Props {
   card: CardState;
   size: 'small' | 'medium' | 'large';
   color?: CardColor;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent) => void;
   style?: React.CSSProperties;
 }
 

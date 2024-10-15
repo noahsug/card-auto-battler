@@ -11,9 +11,10 @@ import { OverlayBackground } from './shared/OverlayBackground';
 import { StartScreen } from './StartScreen';
 import { CardSelectionScreen } from './CardSelectionScreen';
 import { NUM_CARD_SELECTION_OPTIONS } from '../../game/constants';
+import { ViewDeckOverlay } from './ViewDeckOverlay';
 
 type ScreenType = 'start' | 'cardSelection' | 'battle';
-type OverlayType = 'battleResult' | 'none';
+type OverlayType = 'battleResult' | 'deck' | 'none';
 
 export const ScreenContainerRoot = styled.div`
   width: min(100vh, 100vw);
@@ -74,6 +75,7 @@ export function ScreenContainer() {
           game={game}
           cards={cardSelectionOptionsRef.current}
           onCardsSelected={handleCardsSelected}
+          onViewDeck={() => setOverlay('deck')}
         ></CardSelectionScreen>
       )}
 
@@ -81,6 +83,7 @@ export function ScreenContainer() {
         <BattleScreen
           game={endOfBattleGameRef.current || game}
           onBattleOver={handleBattleOver}
+          onViewDeck={() => setOverlay('deck')}
           hasOverlay={overlay !== 'none'}
         ></BattleScreen>
       )}
@@ -93,6 +96,10 @@ export function ScreenContainer() {
               wonLastBattle={wonLastBattleRef.current}
               onContinue={isGameOver(game) ? handleGameOver : startCardSelection}
             ></BattleResultOverlay>
+          )}
+
+          {overlay === 'deck' && (
+            <ViewDeckOverlay game={game} onBack={() => setOverlay('none')}></ViewDeckOverlay>
           )}
         </OverlayBackground>
       )}

@@ -9,12 +9,6 @@ import { Container } from '../shared/Container';
 import { HUD } from '../HUD';
 import { CenterContent } from '../shared/CenterContent';
 
-interface Props {
-  game: GameState;
-  cards: CardState[];
-  onCardsSelected: (selectedCardIndexes: number[]) => void;
-}
-
 const CardGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -38,7 +32,14 @@ const BottomRow = styled.div`
   height: ${bottomRowHeight}rem;
 `;
 
-export function CardSelectionScreen({ game, cards, onCardsSelected }: Props) {
+interface Props {
+  game: GameState;
+  cards: CardState[];
+  onViewDeck: () => void;
+  onCardsSelected: (selectedCardIndexes: number[]) => void;
+}
+
+export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }: Props) {
   const [selectedCardIndexes, setSelectedCardIndexes] = useState<number[]>([]);
 
   const numCardsToPick = NUM_CARD_SELECTION_PICKS - selectedCardIndexes.length;
@@ -65,7 +66,7 @@ export function CardSelectionScreen({ game, cards, onCardsSelected }: Props) {
 
   return (
     <Container>
-      <HUD game={game} />
+      <HUD game={game} onViewDeck={onViewDeck} />
 
       <CenterContent>
         <CardGrid>

@@ -2,12 +2,13 @@
 
 Game TODO:
 
-1. heart lives icon should be an outline, not filled in
-2. add back card logic + text
-3. add loading screen
-4. shuffle discard back into deck and use UID to fix animation, use seeded random to ensure shuffle is always the same
-5. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
+1. add loading screen
+2. shuffle discard back into deck and use UID to fix animation, use seeded random to ensure shuffle is always the same
+3. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
    up by the user on left/right
+4. clicking a card in battle screen pauses and zooms in on card
+5. clicking a card in deck view screen zooms in on card
+6. heart lives icon should be an outline, not filled in
 
 Maybe TODO:
 
