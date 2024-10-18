@@ -15,17 +15,13 @@ export function getEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {
   return Object.assign({ target: 'opponent', name: 'damage', value: value(1) }, partialEffect);
 }
 
-interface CreateCardOptions extends Partial<Omit<CardState, 'effects'>> {
-  effects?: Partial<CardEffect>[];
-}
-
 // returns a CardState with defaults
 export function createCard(
-  effect: Partial<CardEffect> = {},
-  { repeat, name = '', description = '', image = '', effects = [] }: CreateCardOptions = {},
+  effects: Partial<CardEffect>[] = [{}],
+  { repeat, name = '', description = '', image = '' }: Partial<Omit<CardState, 'effects'>> = {},
 ): CardState {
   return {
-    effects: [effect].concat(effects).map(getEffect),
+    effects: effects.map(getEffect),
     repeat,
     name,
     description,

@@ -19,7 +19,9 @@ const Label = styled(Row)`
   justify-content: center;
 `;
 
-const LabelText = styled.div``;
+const ClickableLabel = styled(Label)`
+  cursor: pointer;
+`;
 
 const Icon = styled.div<{ src: string }>`
   width: ${size}rem;
@@ -41,18 +43,18 @@ export function HUD({ game, onViewDeck }: Props) {
     <Row>
       <Label>
         <Icon src={livesImage} />
-        <LabelText>{MAX_LOSSES - losses} lives</LabelText>
+        <div>{MAX_LOSSES - losses} lives</div>
       </Label>
 
       <Label>
         <Icon src={battleImage} />
-        <LabelText>round {wins + 1}</LabelText>
+        <div>round {wins + 1}</div>
       </Label>
 
-      <Label onClick={onViewDeck}>
+      <ClickableLabel onClick={onViewDeck}>
         <Icon src={deckImage} />
-        <LabelText>deck ({user.cards.length})</LabelText>
-      </Label>
+        <div>cards ({user.cards.length})</div>
+      </ClickableLabel>
     </Row>
   );
 }

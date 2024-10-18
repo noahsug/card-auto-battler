@@ -1,7 +1,7 @@
+import { assert } from '../utils/asserts';
+import { applyCardEffects } from './applyCardEffects';
 import { CardState, GameState, PlayerState, Target, createGameState } from './gameState';
 import { getBattleWinner, getPlayers } from './utils/selectors';
-import { applyCardEffects } from './applyCardEffects';
-import { assertEqual, assert } from '../utils/asserts';
 
 interface MissBattleEvent {
   type: 'miss';
@@ -47,6 +47,7 @@ export function playCard(game: GameState): BattleEvent[] {
   }
 
   if (activePlayer.extraCardPlays === 0) {
+    activePlayer.cardsPlayedThisTurn = 0;
     game.turn++;
   }
 

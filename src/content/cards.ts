@@ -10,37 +10,55 @@ import volcano from './images/cards/volcano.jpeg';
 import type { CardState } from '../game/gameState';
 import { createCard, value as v } from './utils';
 
-export const allCards = {
-  punch: createCard(
+const fireCards = {
+  channel: createCard(
+    [
+      {
+        target: 'self',
+        name: 'extraCardPlays',
+      },
+    ],
     {
-      value: v(7),
+      name: 'Channel',
+      description: 'Play another card.',
+      image: channel,
     },
+  ),
+  fireball: createCard(
+    [
+      {
+        value: v('self', 'cardsPlayedThisTurn', 3),
+      },
+    ],
+    {
+      name: 'Fireball',
+      description: 'Deal 3 damage for each card played this turn.',
+      image: fireball,
+    },
+  ),
+};
+
+export const allCards = {
+  ...fireCards,
+  punch: createCard(
+    [
+      {
+        value: v(7),
+      },
+    ],
     {
       name: 'Serious Punch',
       description: 'Deal 7 damage.',
       image: punch,
     },
   ),
-  fireball: createCard(
-    {
-      value: v(2),
-    },
-    {
-      effects: [
-        {
-          target: 'self',
-          name: 'extraCardPlays',
-        },
-      ],
-      name: 'Fireball',
-      description: 'Deal 2 damage. Play an extra card.',
-      image: fireball,
-    },
-  ),
+
   eviscerate: createCard(
-    {
-      value: v(2),
-    },
+    [
+      {
+        value: v(2),
+      },
+    ],
     {
       repeat: { value: v('opponent', 'bleed') },
       name: 'Eviscerate',
