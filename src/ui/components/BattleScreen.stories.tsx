@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { createGameState } from '../../game/gameState';
+import { createGameState, statusEffectNames } from '../../game/gameState';
 import { getRandomCards } from '../../game/utils/getRandomCards';
 import { BattleScreen } from './BattleScreen';
 
@@ -10,6 +10,7 @@ const meta = {
   component: BattleScreen,
   args: {
     onBattleOver: fn(),
+    onViewDeck: fn(),
   },
 } satisfies Meta<typeof BattleScreen>;
 
@@ -35,5 +36,16 @@ isDead.enemy.health = 0;
 export const IsDead: Story = {
   args: {
     game: isDead,
+  },
+};
+
+const hasStatusEffects = createGameState();
+statusEffectNames.forEach((effectName) => {
+  hasStatusEffects.enemy[effectName] = 3;
+});
+hasStatusEffects.user.strength = -5;
+export const StatusEffects: Story = {
+  args: {
+    game: hasStatusEffects,
   },
 };

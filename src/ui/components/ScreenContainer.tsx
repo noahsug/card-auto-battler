@@ -44,12 +44,12 @@ export function ScreenContainer() {
 
   const handleCardsSelected = useCallback(
     (selectedCardIndexes: number[]) => {
-      clearUndo();
       const cards = cardSelectionOptionsRef.current.filter((_, i) =>
         selectedCardIndexes.includes(i),
       );
       addCards(cards);
       setScreen('battle');
+      clearUndo();
     },
     [addCards, clearUndo],
   );

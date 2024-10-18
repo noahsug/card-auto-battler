@@ -8,7 +8,6 @@ export type Target = 'self' | 'opponent';
 export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength'] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;
-
 export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
   statusEffectNames.map((effectName) => [effectName, 0]),
 ) as StatusEffects;

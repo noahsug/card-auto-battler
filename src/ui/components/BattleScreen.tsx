@@ -14,6 +14,7 @@ import { PlayerProfile } from './PlayerProfile';
 import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { CenterContent } from './shared/CenterContent';
+import { StatusEffects } from './StatusEffects';
 
 interface Props {
   game: GameState;
@@ -50,6 +51,7 @@ export function BattleScreen({ game, onBattleOver, onViewDeck, hasOverlay = fals
   }, [undo]);
 
   const handlePlayNextCard = useCallback(() => {
+    // TODO: pass in game state
     const battleEvents = playCard();
     setUserBattleEvents(battleEvents.filter(({ target }) => target === userTarget));
     setEnemyBattleEvents(battleEvents.filter(({ target }) => target === enemyTarget));
@@ -76,6 +78,7 @@ export function BattleScreen({ game, onBattleOver, onViewDeck, hasOverlay = fals
       <CenterContent>
         <PlayersRow>
           <Player className={getIsUserTurn(game) ? 'active' : ''}>
+            <StatusEffects statusEffects={user} />
             <PlayerProfile
               src={user.image}
               profileRef={userProfileRef}
@@ -90,6 +93,7 @@ export function BattleScreen({ game, onBattleOver, onViewDeck, hasOverlay = fals
           </Player>
 
           <Player className={getIsUserTurn(game) ? '' : 'active'}>
+            <StatusEffects statusEffects={enemy} />
             <PlayerProfile
               src={enemy.image}
               flip={true}

@@ -4,14 +4,16 @@ Game TODO:
 
 High Pri:
 
-1. shuffle discard back into deck and use UID to fix animation, use seeded random to ensure shuffle is always the same
-2. implement Play/Pause
-3. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
+1. pass game state to actions - stop trying to be so smart
+2. set OrderAcquired in CardInstance, use it as uid + for sorting in cards screen
+3. shuffle discard back into deck and use UID to fix animation, use seeded random to ensure shuffle is always the same
+4. implement Play/Pause
+5. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
    up by the user on left/right
-4. clicking a card in battle screen pauses and zooms in on card
-5. clicking a card in deck view screen zooms in on card
-6. add loading screen
-7. heart lives icon should be an outline, not filled in
+6. clicking a card in battle screen pauses and zooms in on card
+7. clicking a card in deck view screen zooms in on card
+8. add loading screen
+9. heart lives icon should be an outline, not filled in
 
 Maybe TODO:
 
