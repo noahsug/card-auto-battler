@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { styled } from 'styled-components';
 
-import nextImage from './arrow.png';
+import nextImage from './next.png';
 import pauseImage from './pause.png';
 import playImage from './play.png';
 
@@ -65,7 +65,7 @@ export function BattleControls({ onBack, onTogglePlay, onNext, isPaused }: Props
 
   return (
     <ControlsRow>
-      <ControlButton onClick={onBack} disabled={!onBack}>
+      <ControlButton onClick={onBack} disabled={!onBack} $flip={true}>
         <img src={nextImage} alt="back" />
       </ControlButton>
 
@@ -73,7 +73,7 @@ export function BattleControls({ onBack, onTogglePlay, onNext, isPaused }: Props
         <img src={isPaused ? playImage : pauseImage} alt="play/pause" />
       </ControlButton>
 
-      <ControlButton onClick={onNext} disabled={!onNext} $flip={true}>
+      <ControlButton onClick={onNext} disabled={!onNext}>
         <img src={nextImage} alt="next" />
       </ControlButton>
     </ControlsRow>

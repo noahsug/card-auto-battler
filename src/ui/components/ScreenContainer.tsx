@@ -35,12 +35,20 @@ export function ScreenContainer() {
   const wonLastBattleRef = useRef(false);
   const cardSelectionOptionsRef = useRef<CardState[]>([]);
 
+  const goToScreen = useCallback(
+    (screen: ScreenType) => {
+      setScreen(screen);
+      setOverlay('none');
+      clearUndo();
+    },
+    [clearUndo],
+  );
+
   const startCardSelection = useCallback(() => {
     endOfBattleGameRef.current = undefined;
     cardSelectionOptionsRef.current = getRandomCards(NUM_CARD_SELECTION_OPTIONS);
-    setScreen('cardSelection');
-    setOverlay('none');
-  }, []);
+    goToScreen('cardSelection');
+  }, [goToScreen]);
 
   const handleCardsSelected = useCallback(
     (selectedCardIndexes: number[]) => {
@@ -48,10 +56,9 @@ export function ScreenContainer() {
         selectedCardIndexes.includes(i),
       );
       addCards(cards);
-      setScreen('battle');
-      clearUndo();
+      goToScreen('battle');
     },
-    [addCards, clearUndo],
+    [addCards, goToScreen],
   );
 
   const handleBattleOver = useCallback(() => {
@@ -61,10 +68,10 @@ export function ScreenContainer() {
     setOverlay('battleResult');
   }, [game, endBattle]);
 
-  const handleGameOver = useCallback(() => {
+  const restartGame = useCallback(() => {
     resetGame();
-    setScreen('start');
-  }, [resetGame]);
+    goToScreen('start');
+  }, [goToScreen, resetGame]);
 
   return (
     <ScreenContainerRoot>
@@ -94,7 +101,7 @@ export function ScreenContainer() {
             <BattleResultOverlay
               game={game}
               wonLastBattle={wonLastBattleRef.current}
-              onContinue={isGameOver(game) ? handleGameOver : startCardSelection}
+              onContinue={isGameOver(game) ? restartGame : startCardSelection}
             ></BattleResultOverlay>
           )}
 
