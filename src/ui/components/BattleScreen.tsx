@@ -7,7 +7,6 @@ import { getBattleWinner, getIsUserTurn, getPlayerTargets } from '../../game/uti
 import { BattleControls } from './BattleControls';
 import { CardStack } from './CardStack';
 import { FloatingCombatText } from './FloatingCombatText';
-import { useActions, useUndo } from './GameStateContext';
 import { HealthBar } from './HealthBar';
 import { HUD } from './HUD';
 import { PlayerProfile } from './PlayerProfile';
@@ -15,22 +14,31 @@ import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { CenterContent } from './shared/CenterContent';
 import { StatusEffects } from './StatusEffects';
+import { CanUndo, PlayCard, Undo } from '../hooks/useGameState';
 
 interface Props {
   game: GameState;
+  playCard: PlayCard;
+  canUndo: CanUndo;
+  undo: Undo;
   onBattleOver: () => void;
   onViewDeck: () => void;
   hasOverlay?: boolean;
 }
 
 // TODO: Have "playedCard" and "currentGameState" local state, which we update to next game state
-// after the card animation is complete (instead of using 200ms everywhere)
-export function BattleScreen({ game, onBattleOver, onViewDeck, hasOverlay = false }: Props) {
+// after the card animation is complete (instead of using 200ms delay everywhere)
+export function BattleScreen({
+  game,
+  playCard,
+  canUndo,
+  undo,
+  onBattleOver,
+  onViewDeck,
+  hasOverlay = false,
+}: Props) {
   const { user, enemy, turn } = game;
   const [userTarget, enemyTarget] = getPlayerTargets(game);
-
-  const { playCard } = useActions();
-  const { canUndo, undo } = useUndo();
 
   const [isPlaying, setIsPlaying] = useState(false);
 

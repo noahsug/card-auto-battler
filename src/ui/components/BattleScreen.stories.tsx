@@ -11,6 +11,9 @@ const meta = {
   args: {
     onBattleOver: fn(),
     onViewDeck: fn(),
+    canUndo: () => false,
+    undo: fn(),
+    playCard: () => [],
   },
 } satisfies Meta<typeof BattleScreen>;
 
