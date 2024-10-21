@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { BattleEvent } from '../../game/actions';
 import { GameState } from '../../game/gameState';
@@ -15,6 +16,8 @@ import { Row } from './shared/Row';
 import { CenterContent } from './shared/CenterContent';
 import { StatusEffects } from './StatusEffects';
 import { CanUndo, PlayCard, Undo } from '../hooks/useGameState';
+
+const EMPTY_BATTLE_EVENTS: { user: BattleEvent[]; enemy: BattleEvent[] } = { user: [], enemy: [] };
 
 interface Props {
   game: GameState;
@@ -42,8 +45,7 @@ export function BattleScreen({
 
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const [userBattleEvents, setUserBattleEvents] = useState<BattleEvent[]>([]);
-  const [enemyBattleEvents, setEnemyBattleEvents] = useState<BattleEvent[]>([]);
+  const battleEventsRef = useRef(cloneDeep(EMPTY_BATTLE_EVENTS));
 
   const userProfileRef = useRef<HTMLDivElement>(null);
   const enemyProfileRef = useRef<HTMLDivElement>(null);
@@ -54,15 +56,14 @@ export function BattleScreen({
 
   const handleUndo = useCallback(() => {
     undo();
-    setUserBattleEvents([]);
-    setEnemyBattleEvents([]);
+    battleEventsRef.current = cloneDeep(EMPTY_BATTLE_EVENTS);
   }, [undo]);
 
   const handlePlayNextCard = useCallback(() => {
     // TODO: pass in game state
     const battleEvents = playCard();
-    setUserBattleEvents(battleEvents.filter(({ target }) => target === userTarget));
-    setEnemyBattleEvents(battleEvents.filter(({ target }) => target === enemyTarget));
+    battleEventsRef.current.user = battleEvents.filter(({ target }) => target === userTarget);
+    battleEventsRef.current.enemy = battleEvents.filter(({ target }) => target === enemyTarget);
   }, [playCard, userTarget, enemyTarget]);
 
   const isBattleOver = getBattleWinner(game) != null;
@@ -90,11 +91,11 @@ export function BattleScreen({
             <PlayerProfile
               src={user.image}
               profileRef={userProfileRef}
-              battleEvents={userBattleEvents}
+              battleEvents={battleEventsRef.current.user}
               isDead={user.health <= 0}
             />
             <FloatingCombatText
-              battleEvents={userBattleEvents}
+              battleEvents={battleEventsRef.current.user}
               targetElement={userProfileRef.current}
             />
             <HealthBar health={user.health} maxHealth={user.startingHealth} />
@@ -106,11 +107,11 @@ export function BattleScreen({
               src={enemy.image}
               flip={true}
               profileRef={enemyProfileRef}
-              battleEvents={enemyBattleEvents}
+              battleEvents={battleEventsRef.current.enemy}
               isDead={enemy.health <= 0}
             />
             <FloatingCombatText
-              battleEvents={enemyBattleEvents}
+              battleEvents={battleEventsRef.current.enemy}
               targetElement={userProfileRef.current}
             />
             <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />

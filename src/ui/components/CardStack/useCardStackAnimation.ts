@@ -1,11 +1,11 @@
 import random from 'lodash/random';
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { config, easings, useSpringRef, useTransition } from '@react-spring/web';
 import { CardState } from '../../../game/gameState';
-import { useUnits } from '../../hooks/useUnits';
-import { useSpringRef, useTransition, config, easings } from '@react-spring/web';
-import { cancelableWait } from '../../../utils/wait';
 import { Direction } from '../../../utils/types';
+import { cancelableWait } from '../../../utils/wait';
+import { useUnits } from '../../hooks/useUnits';
 
 export interface Props {
   cards: CardState[];
@@ -66,11 +66,13 @@ export function useCardStackAnimation({
   );
   const animationController = useSpringRef();
 
-  const [isRedealingDiscard, setIsRedealingDiscard] = useState(false);
-  if (currentCardIndex > 0 && isRedealingDiscard) setIsRedealingDiscard(false);
+  // set to true after the last card play animation finishes, which triggers the discard deal
+  // animation
+  const [isReDealingDiscard, setIsReDealingDiscard] = useState(false);
+  if (currentCardIndex > 0 && isReDealingDiscard) setIsReDealingDiscard(false);
 
   const deck =
-    isDealingCards && lastPlayedCard && !isRedealingDiscard
+    isDealingCards && lastPlayedCard && !isReDealingDiscard
       ? // wait to play the last card before shuffling the discard pile back into the deck
         []
       : // reverse card order so the first card is rendered last and displayed on top
@@ -85,7 +87,7 @@ export function useCardStackAnimation({
     speedUpExistingAnimations();
   }, [turn]);
 
-  function dealCardStart() {
+  function getDealCardAnimationStart() {
     return {
       x: windowDimensions.width * -cardDealDirection,
       y: 0,
@@ -95,7 +97,7 @@ export function useCardStackAnimation({
     };
   }
 
-  function playCardEnd() {
+  function getPlayCardAnimationEnd() {
     return {
       y: u(-1000),
       rotate: 0,
@@ -103,7 +105,7 @@ export function useCardStackAnimation({
     };
   }
 
-  function dealCard(animatedCard: CardAnimation, index: number) {
+  function getDealCardAnimation(animatedCard: CardAnimation, index: number) {
     // stop the current animation (e.g. the card being played)
     animationController.current[index]?.stop();
 
@@ -129,7 +131,7 @@ export function useCardStackAnimation({
     };
   }
 
-  function playCard(animatedCard: CardAnimation, index: number) {
+  function getPlayCardAnimation(animatedCard: CardAnimation, index: number) {
     speedUpExistingAnimations();
 
     // show the currently played card on top
@@ -154,25 +156,25 @@ export function useCardStackAnimation({
       }
 
       await next({
-        ...playCardEnd(),
+        ...getPlayCardAnimationEnd(),
         config: { duration: 300, easing: easings.easeInBack },
       });
 
-      setIsRedealingDiscard(true);
+      setIsReDealingDiscard(true);
     };
   }
 
   const render = useTransition(deck, {
     key: ({ key }: CardAnimation) => key,
-    from: isDealingCards ? dealCardStart : playCardEnd,
-    enter: dealCard,
-    leave: playCard,
+    from: isDealingCards ? getDealCardAnimationStart : getPlayCardAnimationEnd,
+    enter: getDealCardAnimation,
+    leave: getPlayCardAnimation,
     ref: animationController,
   });
 
   useEffect(() => {
     animationController.start();
-  }, [animationController, currentCardIndex, isRedealingDiscard]);
+  }, [animationController, currentCardIndex, isReDealingDiscard]);
 
   return render;
 }

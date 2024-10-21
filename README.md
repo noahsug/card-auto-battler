@@ -2,18 +2,16 @@
 
 Game TODO:
 
-High Pri:
+1. Relic select screen
 
-1. pass game state to actions - stop trying to be so smart
-2. set OrderAcquired in CardInstance, use it as uid + for sorting in cards screen
-3. shuffle discard back into deck and use UID to fix animation, use seeded random to ensure shuffle is always the same
-4. implement Play/Pause
-5. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
+1. shuffle discard back into deck and use UID (OrderAcquired field in CardInstance?) to fix animation, use seeded random to ensure shuffle is always the same
+1. implement Play/Pause
+1. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
    up by the user on left/right
-6. clicking a card in battle screen pauses and zooms in on card
-7. clicking a card in deck view screen zooms in on card
-8. add loading screen
-9. heart lives icon should be an outline, not filled in
+1. clicking a card in battle screen pauses and zooms in on card
+1. clicking a card in deck view screen zooms in on card
+1. add loading screen
+1. heart lives icon should be an outline, not filled in
 
 Maybe TODO:
 
@@ -24,10 +22,10 @@ Performance TODO:
 
 If performance becomes an issue, look into these libraries to help:
 
-1. shrink all the images and allow the browser to pick which image to use (via css I think)
-1. <https://www.npmjs.com/package/@emotion/react> for smaller bundle size than styled
-1. <https://github.com/pmndrs/zustand> or <https://github.com/pmndrs/jotai> to stop unnecessary renders
-1. pre-load some fonts, e.g:
+1. shrink all the images + allow the browser to pick which image to use (via css I think)
+2. <https://www.npmjs.com/package/@emotion/react> for smaller bundle size than styled
+3. <https://github.com/pmndrs/zustand> or <https://github.com/pmndrs/jotai> to stop unnecessary renders
+4. pre-load fonts, e.g:
 
 ```html
 <link
@@ -36,7 +34,7 @@ If performance becomes an issue, look into these libraries to help:
   as="font"
   type="font/woff2"
   crossorigin=""
-/>)
+/>
 ```
 
 ## Art
