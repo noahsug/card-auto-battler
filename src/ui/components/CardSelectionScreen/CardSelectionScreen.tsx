@@ -35,8 +35,8 @@ const BottomRow = styled.div`
 interface Props {
   game: GameState;
   cards: CardState[];
-  onViewDeck: () => void;
   onCardsSelected: (selectedCardIndexes: number[]) => void;
+  onViewDeck: () => void;
 }
 
 export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }: Props) {
@@ -59,7 +59,7 @@ export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }
   }
 
   function getStyle(index: number) {
-    // hide card after it's been selected
+    // indicate which cards are selected
     const opacity = selectedCardIndexes.includes(index) ? '0.33' : '1';
     return { opacity };
   }

@@ -1,6 +1,6 @@
-import { allCards } from '../content/cards';
-import { allHeroes } from '../content/heroes';
-import { allEnemies } from '../content/enemies';
+import { allCards } from '../content/cards/cards';
+import { allHeroes } from '../content/heroes/heroes';
+import { allEnemies } from '../content/enemies/enemies';
 import { STARTING_HEALTH } from './constants';
 
 export type Target = 'self' | 'opponent';
@@ -59,10 +59,24 @@ export interface CardState {
   image: string;
 }
 
+export interface RelicEffect {
+  target: Target;
+  name: StatusEffectName;
+  value: number;
+}
+
+export interface RelicState {
+  effect: RelicEffect;
+  name: string;
+  description: string;
+  image: string;
+}
+
 export interface PlayerState extends StatusEffects {
   health: number;
   startingHealth: number;
   cards: CardState[];
+  relics: RelicState[];
   currentCardIndex: number;
   cardsPlayedThisTurn: number;
   name: string;
@@ -83,6 +97,7 @@ function createPlayer({ name, image }: { name: string; image: string }): PlayerS
     startingHealth: STARTING_HEALTH,
     ...EMPTY_STATUS_EFFECTS,
     cards: [],
+    relics: [],
     currentCardIndex: 0,
     cardsPlayedThisTurn: 0,
     name,

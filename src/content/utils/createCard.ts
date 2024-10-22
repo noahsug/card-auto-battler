@@ -7,8 +7,8 @@ import {
   PlayerValueName,
   Target,
   ValueDescriptor,
-} from '../game/gameState';
-import { assertIsNonNullable } from '../utils/asserts';
+} from '../../game/gameState';
+import { assertIsNonNullable } from '../../utils/asserts';
 
 // returns a CardEffect with defaults
 export function getEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {

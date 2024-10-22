@@ -1,4 +1,4 @@
-import warrior from './images/characters/warrior.png';
+import warrior from './images/warrior.png';
 
 export const allHeroes = {
   warrior: {

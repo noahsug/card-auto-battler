@@ -2,16 +2,16 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
 import { createGameState } from '../../../game/gameState';
-import { getRandomCards } from '../../../game/utils/getRandomCards';
-import { CardSelectionScreen } from './CardSelectionScreen';
+import { getRandomRelics } from '../../../game/utils/getRandomRelics';
+import { RelicSelectionScreen } from './RelicSelectionScreen';
 
 const meta = {
-  title: 'CardSelectionScreen',
-  component: CardSelectionScreen,
+  title: 'RelicSelectionScreen',
+  component: RelicSelectionScreen,
   args: {
     onViewDeck: fn,
   },
-} satisfies Meta<typeof CardSelectionScreen>;
+} satisfies Meta<typeof RelicSelectionScreen>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -19,7 +19,7 @@ type Story = StoryObj<typeof meta>;
 export const Primary: Story = {
   args: {
     game: createGameState(),
-    cards: getRandomCards(6),
-    onCardsSelected: fn,
+    relics: getRandomRelics(3),
+    onRelicSelected: fn,
   },
 };

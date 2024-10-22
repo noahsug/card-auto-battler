@@ -5,50 +5,6 @@ import { getHandDrawnBorderRadius, maskImage } from '../../style';
 import { Container } from '../shared/Container';
 import textBackground from './text-background.png';
 
-interface Props {
-  card: CardState;
-  size: 'small' | 'medium' | 'large';
-  color?: CardColor;
-  onClick?: (event: React.MouseEvent) => void;
-  style?: React.CSSProperties;
-}
-
-type CardColor = 'regular' | 'red' | 'green';
-
-function CardTextLine({ text }: { text: string }) {
-  const parts = text.split(/(\d+)/);
-  return (
-    <div>
-      {parts.map((part, i) => {
-        const isValue = /\d+/.test(part);
-        return isValue ? <Value key={i}>{part}</Value> : part;
-      })}
-      .
-    </div>
-  );
-}
-
-export function Card({ size, color = 'regular', card, onClick, style }: Props) {
-  const { name, description, image } = card;
-  const lines = description.split('.').slice(0, -1);
-
-  return (
-    <CardRoot $size={size} className="card" onClick={onClick} style={style}>
-      <ThemeProvider theme={{ color }}>
-        <OuterContainer>
-          <Image src={image} alt="{name}" />
-          <Title>{name}</Title>
-          <Text>
-            {lines.map((text, i) => (
-              <CardTextLine text={text} key={i} />
-            ))}
-          </Text>
-        </OuterContainer>
-      </ThemeProvider>
-    </CardRoot>
-  );
-}
-
 export const baseCardSize = { width: 12, height: 20 };
 
 export const cardSizeScaling = {
@@ -129,3 +85,47 @@ const Value = styled.span`
   font-weight: bold;
   font-size: 1.1em;
 `;
+
+interface Props {
+  card: CardState;
+  size: 'small' | 'medium' | 'large';
+  color?: CardColor;
+  onClick?: (event: React.MouseEvent) => void;
+  style?: React.CSSProperties;
+}
+
+type CardColor = 'regular' | 'red' | 'green';
+
+function CardTextLine({ text }: { text: string }) {
+  const parts = text.split(/(\d+)/);
+  return (
+    <div>
+      {parts.map((part, i) => {
+        const isValue = /\d+/.test(part);
+        return isValue ? <Value key={i}>{part}</Value> : part;
+      })}
+      .
+    </div>
+  );
+}
+
+export function Card({ size, color = 'regular', card, onClick, style }: Props) {
+  const { name, description, image } = card;
+  const lines = description.split('.').slice(0, -1);
+
+  return (
+    <CardRoot $size={size} className="card" onClick={onClick} style={style}>
+      <ThemeProvider theme={{ color }}>
+        <OuterContainer>
+          <Image src={image} alt="{name}" />
+          <Title>{name}</Title>
+          <Text>
+            {lines.map((text, i) => (
+              <CardTextLine text={text} key={i} />
+            ))}
+          </Text>
+        </OuterContainer>
+      </ThemeProvider>
+    </CardRoot>
+  );
+}

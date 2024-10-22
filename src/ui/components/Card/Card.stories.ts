@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Card } from './Card';
-import { allCards } from '../../../content/cards';
+import { allCards } from '../../../content/cards/cards';
 
 const meta = {
   title: 'Card',

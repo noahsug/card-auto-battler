@@ -32,7 +32,7 @@ function getBattleResultMessage({
   losses: number;
 }) {
   if (losses >= MAX_LOSSES) return 'Game Over';
-  if (wins >= MAX_WINS) return `You win!`;
+  if (wins >= MAX_WINS) return `You Win!`;
   return wonLastBattle ? 'Victory!' : 'Defeat';
 }
 

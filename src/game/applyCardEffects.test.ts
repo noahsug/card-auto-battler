@@ -1,6 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
-import { createCard, value as v } from '../content/utils';
+import { createCard, value as v } from '../content/utils/createCard';
 import { diffValues } from '../utils/objects';
 import { applyCardEffects } from './applyCardEffects';
 import { BLEED_DAMAGE } from './constants';
