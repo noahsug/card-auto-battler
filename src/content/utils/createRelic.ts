@@ -11,7 +11,7 @@ export function getEffect(partialEffect: EffectBuilder): RelicEffect {
 // returns a RelicState with defaults
 export function createRelic(
   effect: EffectBuilder,
-  { name = '', description = '', image = '' }: Partial<Omit<RelicState, 'effect'>> = {},
+  { name = '', description = '', image = '', color = '' }: Partial<Omit<RelicState, 'effect'>> = {},
 ): RelicState {
-  return { effect: getEffect(effect), name, description, image };
+  return { effect: getEffect(effect), name, description, image, color };
 }

@@ -15,7 +15,7 @@ const CardGrid = styled.div`
   justify-content: center;
 
   > * {
-    margin: 0.25rem 0.25rem;
+    margin: 0.25rem;
   }
 `;
 

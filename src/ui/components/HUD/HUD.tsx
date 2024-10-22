@@ -10,6 +10,10 @@ import { GameState } from '../../../game/gameState';
 
 const size = 2;
 
+const IconRow = styled(Row)`
+  justify-content: space-between;
+`;
+
 const Label = styled(Row)`
   font-size: ${size}rem;
   font-family: var(--font-heading);
@@ -31,6 +35,18 @@ const Icon = styled.div<{ src: string }>`
   background-color: var(--color-primary);
 `;
 
+const RelicRow = styled(Row)`
+  margin-top: 0.5rem;
+  justify-content: left;
+  gap: 0.5rem;
+`;
+
+const RelicImage = styled(Icon)<{ $color: string }>`
+  margin: 0;
+  background-color: green;
+  background-color: ${(props) => props.$color};
+`;
+
 interface Props {
   game: GameState;
   onViewDeck: () => void;
@@ -40,21 +56,28 @@ export function HUD({ game, onViewDeck }: Props) {
   const { wins, losses, user } = game;
 
   return (
-    <Row>
-      <Label>
-        <Icon src={livesImage} />
-        <div>{MAX_LOSSES - losses} lives</div>
-      </Label>
+    <>
+      <IconRow>
+        <Label>
+          <Icon src={livesImage} />
+          <div>{MAX_LOSSES - losses} lives</div>
+        </Label>
 
-      <Label>
-        <Icon src={battleImage} />
-        <div>round {wins + 1}</div>
-      </Label>
+        <Label>
+          <Icon src={battleImage} />
+          <div>round {wins + 1}</div>
+        </Label>
 
-      <ClickableLabel onClick={onViewDeck}>
-        <Icon src={deckImage} />
-        <div>cards ({user.cards.length})</div>
-      </ClickableLabel>
-    </Row>
+        <ClickableLabel onClick={onViewDeck}>
+          <Icon src={deckImage} />
+          <div>cards ({user.cards.length})</div>
+        </ClickableLabel>
+      </IconRow>
+      <RelicRow>
+        {user.relics.map((relic, i) => (
+          <RelicImage key={i} src={relic.image} $color={relic.color} />
+        ))}
+      </RelicRow>
+    </>
   );
 }

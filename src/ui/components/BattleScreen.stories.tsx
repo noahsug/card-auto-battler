@@ -4,6 +4,7 @@ import { fn } from '@storybook/test';
 import { createGameState, statusEffectNames } from '../../game/gameState';
 import { getRandomCards } from '../../game/utils/getRandomCards';
 import { BattleScreen } from './BattleScreen';
+import { getRandomRelics } from '../../game/utils/getRandomRelics';
 
 const meta = {
   title: 'BattleScreen',
@@ -42,13 +43,14 @@ export const IsDead: Story = {
   },
 };
 
-const hasStatusEffects = createGameState();
+const hasStatusEffectsAndRelics = createGameState();
 statusEffectNames.forEach((effectName) => {
-  hasStatusEffects.enemy[effectName] = 3;
+  hasStatusEffectsAndRelics.enemy[effectName] = 3;
 });
-hasStatusEffects.user.strength = -5;
-export const StatusEffects: Story = {
+hasStatusEffectsAndRelics.user.strength = -5;
+hasStatusEffectsAndRelics.user.relics = getRandomRelics(3);
+export const StatusEffectsAndRelics: Story = {
   args: {
-    game: hasStatusEffects,
+    game: hasStatusEffectsAndRelics,
   },
 };

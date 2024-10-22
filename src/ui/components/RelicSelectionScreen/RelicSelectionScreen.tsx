@@ -15,7 +15,7 @@ const RelicList = styled.div`
   justify-content: center;
 
   > * {
-    margin: 0.25rem 0.25rem;
+    margin: 0.5rem;
   }
 `;
 
@@ -57,8 +57,8 @@ export function RelicSelectionScreen({ game, relics, onRelicSelected, onViewDeck
 
   function getStyle(index: number) {
     // indicate which relic is selected
-    const opacity = selectedRelicIndex === index ? '0.33' : '1';
-    return { opacity };
+    const filter = selectedRelicIndex === index ? 'brightness(2.5)' : '';
+    return { filter };
   }
 
   return (

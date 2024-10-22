@@ -70,6 +70,7 @@ export interface RelicState {
   name: string;
   description: string;
   image: string;
+  color: string;
 }
 
 export interface PlayerState extends StatusEffects {

@@ -1,26 +1,27 @@
 import { styled } from 'styled-components';
 
-import bleedImage from './drop.png';
+import strengthImage from './biceps.png';
 import dodgeImage from './body-balance.png';
 import extraCardPlaysImage from './card-play.png';
-import strengthImage from './biceps.png';
+import bleedImage from './drop.png';
 
-import { StatusEffects as StatusEffectsType, statusEffectNames } from '../../../game/gameState';
-import { Row } from '../shared/Row';
+import { StatusEffects as StatusEffectsType } from '../../../game/gameState';
 import { maskImage } from '../../style';
+import { Row } from '../shared/Row';
 
-const effectToImage: Record<keyof StatusEffectsType, string> = {
+const effectToImage: Partial<Record<keyof StatusEffectsType, string>> = {
   bleed: bleedImage,
   dodge: dodgeImage,
   extraCardPlays: extraCardPlaysImage,
   strength: strengthImage,
 };
 
+const visibleStatusEffects = Object.keys(effectToImage) as (keyof StatusEffectsType)[];
+
 const size = 1.7;
 
 const StatusEffectValue = styled.div`
   font-size: ${size}rem;
-  margin: 0 0.25rem;
 `;
 
 const Icon = styled.div<{ src: string }>`
@@ -28,12 +29,13 @@ const Icon = styled.div<{ src: string }>`
   width: ${size}rem;
   ${maskImage}
   display: inline-block;
-  background-color: var(--color-secondary);
+  background-color: var(--color-primary-dark);
 `;
 
 const StatusEffectRow = styled(Row)`
   height: ${size}rem;
   justify-content: center;
+  gap: 0.25rem;
   margin-bottom: 0.5rem;
 `;
 
@@ -44,11 +46,11 @@ interface Props {
 export function StatusEffects({ statusEffects }: Props) {
   return (
     <StatusEffectRow>
-      {statusEffectNames.map(
+      {visibleStatusEffects.map(
         (effectName, i) =>
           !!statusEffects[effectName] && (
             <StatusEffectValue key={i}>
-              <Icon src={effectToImage[effectName]} />
+              <Icon src={effectToImage[effectName]!} />
               {statusEffects[effectName]}
             </StatusEffectValue>
           ),

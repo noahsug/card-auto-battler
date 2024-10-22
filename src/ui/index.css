@@ -34,9 +34,10 @@ h2 {
 
 :root {
   --color-primary: #fcfafb;
-  --color-secondary: #bfbfbf;
+  --color-primary-dark: #bfbfbf;
   --color-bg: #080808;
   --color-bg-opaque: #08080869;
+  --color-bg-light: #202020;
   --font-text: 'IndieFlower', sans-serif;
   --font-heading: 'AmaticBold', sans-serif;
   --letter-spacing-heading: 0.05em;
