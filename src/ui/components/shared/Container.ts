@@ -7,4 +7,5 @@ export const Container = styled.div`
   margin: auto;
   flex-flow: column;
   padding: 1rem 0.5rem;
+  overflow: scroll;
 `;

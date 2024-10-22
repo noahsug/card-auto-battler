@@ -2,7 +2,14 @@ import shuffle from 'lodash/shuffle';
 
 import { assert } from '../utils/asserts';
 import { applyCardEffects } from './applyCardEffects';
-import { CardState, GameState, PlayerState, Target, createGameState } from './gameState';
+import {
+  CardState,
+  GameState,
+  PlayerState,
+  RelicState,
+  Target,
+  createGameState,
+} from './gameState';
 import { getBattleWinner, getPlayers } from './utils/selectors';
 
 interface MissBattleEvent {
@@ -21,6 +28,10 @@ export type BattleEvent = MissBattleEvent | BattleEventWithValue;
 export function addCards(game: GameState, cards: CardState[]) {
   game.user.cards.push(...cards);
   game.user.cards = shuffle(game.user.cards);
+}
+
+export function addRelic(game: GameState, relic: RelicState) {
+  game.user.relics.push(relic);
 }
 
 export function playCard(game: GameState): BattleEvent[] {

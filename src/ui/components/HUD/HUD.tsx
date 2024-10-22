@@ -1,12 +1,13 @@
 import { styled } from 'styled-components';
 
-import { maskImage } from '../../style';
-import { Row } from '../shared/Row';
-import livesImage from './heart.png';
-import battleImage from './swords.png';
-import deckImage from './cards.png';
 import { MAX_LOSSES } from '../../../game/constants';
 import { GameState } from '../../../game/gameState';
+import { maskImage } from '../../style';
+import { RelicImage } from '../RelicSelectionScreen/Relic';
+import { Row } from '../shared/Row';
+import deckImage from './cards.png';
+import livesImage from './heart.png';
+import battleImage from './swords.png';
 
 const size = 2;
 
@@ -41,10 +42,9 @@ const RelicRow = styled(Row)`
   gap: 0.5rem;
 `;
 
-const RelicImage = styled(Icon)<{ $color: string }>`
-  margin: 0;
-  background-color: green;
-  background-color: ${(props) => props.$color};
+const HUDRelicImage = styled(RelicImage)`
+  width: ${size}rem;
+  height: ${size}rem;
 `;
 
 interface Props {
@@ -75,7 +75,7 @@ export function HUD({ game, onViewDeck }: Props) {
       </IconRow>
       <RelicRow>
         {user.relics.map((relic, i) => (
-          <RelicImage key={i} src={relic.image} $color={relic.color} />
+          <HUDRelicImage key={i} src={relic.image} $color={relic.color} />
         ))}
       </RelicRow>
     </>

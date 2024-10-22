@@ -1,9 +1,9 @@
-import { useMemo, useRef, useState } from 'react';
 import { produce } from 'immer';
+import { useMemo, useState } from 'react';
 
+import * as actions from '../../game/actions';
 import { createGameState, GameState } from '../../game/gameState';
 import { Tail } from '../../utils/types';
-import * as actions from '../../game/actions';
 
 type BoundActions = {
   [K in keyof typeof actions]: (

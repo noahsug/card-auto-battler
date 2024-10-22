@@ -1,7 +1,8 @@
 import { styled } from 'styled-components';
+
 import { RelicState } from '../../../game/gameState';
+import { getHandDrawnBorderRadius, maskImage } from '../../style';
 import { Row } from '../shared/Row';
-import { getHandDrawnBorderRadius } from '../../style';
 
 interface Props {
   relic: RelicState;
@@ -13,6 +14,7 @@ const TextContainer = styled.div`
   flex: 1;
   height: 100%;
   padding: 0.5rem 0.25rem;
+  margin-left: 0.5rem;
 `;
 
 const Root = styled(Row)`
@@ -21,9 +23,11 @@ const Root = styled(Row)`
   border: solid 0.5em var(--color-bg-light);
 `;
 
-const Image = styled.img`
+export const RelicImage = styled.div<{ src: string; $color: string }>`
+  width: 6rem;
   height: 6rem;
-  margin-right: 0.5rem;
+  ${maskImage}
+  background-color: ${(props) => props.$color};
 `;
 
 const Title = styled('h2')`
@@ -40,7 +44,7 @@ const Text = styled.div`
 export function Relic({ relic, onClick, style }: Props) {
   return (
     <Root onClick={onClick} style={style}>
-      <Image src={relic.image} alt={relic.name} />
+      <RelicImage src={relic.image} $color={relic.color} />
       <TextContainer>
         <Title>{relic.name}</Title>
         <Text>{relic.description}</Text>

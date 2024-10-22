@@ -25,6 +25,10 @@ export function getPlayerTargets(game: GameState): [Target, Target] {
   return getIsUserTurn(game) ? ['self', 'opponent'] : ['opponent', 'self'];
 }
 
+export function shouldPickRelic(game: GameState) {
+  return (game.wins + game.losses) % 2 === 1;
+}
+
 export function isGameOver({ wins, losses }: { wins: number; losses: number }) {
   return losses >= MAX_LOSSES || wins >= MAX_WINS;
 }

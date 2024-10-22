@@ -1,10 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { NUM_CARD_SELECTION_OPTIONS } from '../../../game/constants';
-import { CardState, GameState } from '../../../game/gameState';
+import { NUM_CARD_SELECTION_OPTIONS, NUM_RELIC_SELECTION_OPTIONS } from '../../../game/constants';
+import { CardState, GameState, RelicState } from '../../../game/gameState';
 import { getRandomCards } from '../../../game/utils/getRandomCards';
-import { getBattleWinner, isGameOver } from '../../../game/utils/selectors';
+import { getBattleWinner, isGameOver, shouldPickRelic } from '../../../game/utils/selectors';
 import { useGameState } from '../../hooks/useGameState';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
@@ -13,8 +13,10 @@ import { OverlayBackground } from '../shared/OverlayBackground';
 import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
+import { getRandomRelics } from '../../../game/utils/getRandomRelics';
+import { RelicSelectionScreen } from '../RelicSelectionScreen';
 
-type ScreenType = 'start' | 'cardSelection' | 'battle';
+type ScreenType = 'start' | 'cardSelection' | 'relicSelection' | 'battle';
 type OverlayType = 'battleResult' | 'deck' | 'none';
 
 export const Root = styled.div`
@@ -37,13 +39,14 @@ export function App() {
   const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const { game, actions, undoManager } = useGameState();
-  const { addCards, endBattle, resetGame } = actions;
+  const { addCards, addRelic, endBattle, resetGame } = actions;
   const { clearUndo } = undoManager;
 
   // passed to battle screen so it doesn't update after battle is over
   const endOfBattleGameRef = useRef<GameState>();
   const wonLastBattleRef = useRef(false);
   const cardSelectionOptionsRef = useRef<CardState[]>([]);
+  const relicSelectionOptionsRef = useRef<RelicState[]>([]);
 
   const goToScreen = useCallback(
     (screen: ScreenType) => {
@@ -66,9 +69,24 @@ export function App() {
         selectedCardIndexes.includes(i),
       );
       addCards(cards);
+
+      if (shouldPickRelic(game)) {
+        relicSelectionOptionsRef.current = getRandomRelics(NUM_RELIC_SELECTION_OPTIONS);
+        goToScreen('relicSelection');
+      } else {
+        goToScreen('battle');
+      }
+    },
+    [addCards, game, goToScreen],
+  );
+
+  const handleRelicSelected = useCallback(
+    (selectedRelicIndex: number) => {
+      const relic = relicSelectionOptionsRef.current[selectedRelicIndex];
+      addRelic(relic);
       goToScreen('battle');
     },
-    [addCards, goToScreen],
+    [addRelic, goToScreen],
   );
 
   const handleBattleOver = useCallback(() => {
@@ -95,6 +113,15 @@ export function App() {
             onCardsSelected={handleCardsSelected}
             onViewDeck={() => setOverlay('deck')}
           ></CardSelectionScreen>
+        )}
+
+        {screen === 'relicSelection' && (
+          <RelicSelectionScreen
+            game={game}
+            relics={relicSelectionOptionsRef.current}
+            onRelicSelected={handleRelicSelected}
+            onViewDeck={() => setOverlay('deck')}
+          ></RelicSelectionScreen>
         )}
 
         {screen === 'battle' && (
