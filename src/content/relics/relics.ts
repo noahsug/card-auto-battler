@@ -9,7 +9,7 @@ function getColor(hue: number) {
 
 export const allRelics: Record<string, RelicState> = {
   openWound: createRelic(
-    { name: 'bleed', target: 'opponent' },
+    { statusEffectName: 'permaBleed', target: 'opponent' },
     {
       name: 'Open Wound',
       description: 'Adds one bleed to the opponent that never goes away.',

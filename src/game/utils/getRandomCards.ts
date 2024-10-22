@@ -1,6 +1,6 @@
 import { sample } from 'lodash';
 
-import { allCards } from '../../content/cards/cards';
+import { allCards } from '../../content/cards';
 
 export function getRandomCards(length: number) {
   const cards = new Array(length);

@@ -8,11 +8,11 @@ import {
   Target,
   ValueDescriptor,
   PlayerState,
-} from './gameState';
-import { BLEED_DAMAGE } from './constants';
-import { assert } from '../utils/asserts';
+} from '../gameState';
+import { BLEED_DAMAGE } from '../constants';
+import { assert } from '../../utils/asserts';
 import { BattleEvent } from './actions';
-import { readonlyIncludes } from '../utils/iterators';
+import { readonlyIncludes } from '../../utils/iterators';
 
 interface PlayCardContext {
   self: PlayerState;
@@ -171,6 +171,11 @@ function dealDamage(
     opponent.health -= BLEED_DAMAGE;
     opponent.bleed -= 1;
     events.push({ type: 'damage', target, value });
+  }
+
+  // permaBleed
+  if (opponent.bleed <= 0) {
+    opponent.bleed += opponent.permaBleed;
   }
 }
 

@@ -1,10 +1,10 @@
 import cloneDeep from 'lodash/cloneDeep';
 
-import { createCard, value as v } from '../content/utils/createCard';
-import { diffValues } from '../utils/objects';
+import { createCard, value as v } from '../../content/utils/createCard';
+import { diffValues } from '../../utils/objects';
 import { applyCardEffects } from './applyCardEffects';
-import { BLEED_DAMAGE } from './constants';
-import { CardEffect, CardState, createGameState, PlayerState } from './gameState';
+import { BLEED_DAMAGE } from '../constants';
+import { CardEffect, CardState, createGameState, PlayerState } from '../gameState';
 
 let card: CardState;
 let effect: CardEffect;
@@ -57,7 +57,8 @@ describe('damage', () => {
   it('triggers bleed', () => {
     const { diff } = getPlayCardResult({ opponent: { bleed: 1 } });
 
-    expect(diff).toEqual({ opponent: { health: -1 - BLEED_DAMAGE, bleed: -1 } });
+    const damage = 1 + BLEED_DAMAGE;
+    expect(diff).toEqual({ opponent: { health: -damage, bleed: -1 } });
   });
 
   it('dealing 0 damage does not trigger bleed', () => {
@@ -72,6 +73,16 @@ describe('damage', () => {
     const { diff } = getPlayCardResult();
 
     expect(diff).toEqual({ opponent: { health: -1 } });
+  });
+});
+
+describe('permaBleed', () => {
+  it('adds 1 bleed whenever bleed reaches 0', () => {
+    effect.multiHit = 3;
+    const { diff } = getPlayCardResult({ opponent: { permaBleed: 1, bleed: 1 } });
+
+    const damage = 3 * (1 + BLEED_DAMAGE);
+    expect(diff).toEqual({ opponent: { health: -damage } });
   });
 });
 

@@ -1,6 +1,6 @@
 import { sample } from 'lodash';
 
-import { allRelics } from '../../content/relics/relics';
+import { allRelics } from '../../content/relics';
 
 export function getRandomRelics(length: number) {
   const relics = new Array(length);

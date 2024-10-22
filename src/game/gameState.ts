@@ -1,11 +1,17 @@
-import { allCards } from '../content/cards/cards';
-import { allHeroes } from '../content/heroes/heroes';
-import { allEnemies } from '../content/enemies/enemies';
+import { allCards } from '../content/cards';
+import { allHeroes } from '../content/heroes';
+import { allEnemies } from '../content/enemies';
 import { STARTING_HEALTH } from './constants';
 
 export type Target = 'self' | 'opponent';
 
-export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength'] as const;
+export const statusEffectNames = [
+  'bleed',
+  'permaBleed',
+  'extraCardPlays',
+  'dodge',
+  'strength',
+] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;
 export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
@@ -61,7 +67,7 @@ export interface CardState {
 
 export interface RelicEffect {
   target: Target;
-  name: StatusEffectName;
+  statusEffectName: StatusEffectName;
   value: number;
 }
 

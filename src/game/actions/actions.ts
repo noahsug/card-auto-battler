@@ -1,7 +1,6 @@
 import shuffle from 'lodash/shuffle';
 
-import { assert } from '../utils/asserts';
-import { applyCardEffects } from './applyCardEffects';
+import { assert } from '../../utils/asserts';
 import {
   CardState,
   GameState,
@@ -9,8 +8,10 @@ import {
   RelicState,
   Target,
   createGameState,
-} from './gameState';
-import { getBattleWinner, getPlayers } from './utils/selectors';
+  statusEffectNames,
+} from '../gameState';
+import { getBattleWinner, getPlayers } from '../utils/selectors';
+import { applyCardEffects } from './applyCardEffects';
 
 interface MissBattleEvent {
   type: 'miss';
@@ -32,6 +33,36 @@ export function addCards(game: GameState, cards: CardState[]) {
 
 export function addRelic(game: GameState, relic: RelicState) {
   game.user.relics.push(relic);
+  console.log('add relic', game.user.relics.length);
+}
+
+function applyRelicStatusEffects({ self, opponent }: { self: PlayerState; opponent: PlayerState }) {
+  self.relics.forEach((relic) => {
+    const { target, statusEffectName, value } = relic.effect;
+    console.log('relic effect', target, statusEffectName, value);
+    const targetPlayer = target === 'self' ? self : opponent;
+    targetPlayer[statusEffectName] += value;
+  });
+}
+
+function triggerStartOfBattleEffects({ self }: { self: PlayerState; opponent: PlayerState }) {
+  // permaBleed
+  if (self.permaBleed > 0) {
+    self.bleed += self.permaBleed;
+  }
+}
+
+export function startBattle(game: GameState) {
+  const userPerspective = { self: game.user, opponent: game.enemy };
+  const enemyPerspective = { self: game.enemy, opponent: game.user };
+
+  applyRelicStatusEffects(userPerspective);
+  applyRelicStatusEffects(enemyPerspective);
+
+  triggerStartOfBattleEffects(userPerspective);
+  triggerStartOfBattleEffects(enemyPerspective);
+
+  console.log('start battle', game.user.permaBleed, game.user.bleed, game.enemy.bleed);
 }
 
 export function playCard(game: GameState): BattleEvent[] {
@@ -68,20 +99,19 @@ export function playCard(game: GameState): BattleEvent[] {
   return events;
 }
 
-function resetBattlePlayer(player: PlayerState) {
+function resetPlayerAfterBattle(player: PlayerState) {
   player.health = player.startingHealth;
   player.currentCardIndex = 0;
-}
-
-function resetBattle({ user, enemy }: GameState) {
-  resetBattlePlayer(user);
-  resetBattlePlayer(enemy);
+  statusEffectNames.forEach((statusEffectName) => {
+    player[statusEffectName] = 0;
+  });
 }
 
 export function endBattle(game: GameState) {
   const winner = getBattleWinner(game);
   winner === 'user' ? game.wins++ : game.losses++;
-  resetBattle(game);
+  resetPlayerAfterBattle(game.user);
+  resetPlayerAfterBattle(game.enemy);
 }
 
 export function resetGame(game: GameState) {

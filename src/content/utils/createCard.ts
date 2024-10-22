@@ -12,7 +12,10 @@ import { assertIsNonNullable } from '../../utils/asserts';
 
 // returns a CardEffect with defaults
 export function getEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {
-  return Object.assign({ target: 'opponent', name: 'damage', value: value(1) }, partialEffect);
+  partialEffect.target = partialEffect.target || 'opponent';
+  partialEffect.name = partialEffect.name || 'damage';
+  partialEffect.value = partialEffect.value || value(1);
+  return partialEffect as CardEffect;
 }
 
 // returns a CardState with defaults

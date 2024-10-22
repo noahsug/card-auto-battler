@@ -4,17 +4,17 @@ import { styled } from 'styled-components';
 import { NUM_CARD_SELECTION_OPTIONS, NUM_RELIC_SELECTION_OPTIONS } from '../../../game/constants';
 import { CardState, GameState, RelicState } from '../../../game/gameState';
 import { getRandomCards } from '../../../game/utils/getRandomCards';
+import { getRandomRelics } from '../../../game/utils/getRandomRelics';
 import { getBattleWinner, isGameOver, shouldPickRelic } from '../../../game/utils/selectors';
 import { useGameState } from '../../hooks/useGameState';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
 import { CardSelectionScreen } from '../CardSelectionScreen';
+import { RelicSelectionScreen } from '../RelicSelectionScreen';
 import { OverlayBackground } from '../shared/OverlayBackground';
 import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
-import { getRandomRelics } from '../../../game/utils/getRandomRelics';
-import { RelicSelectionScreen } from '../RelicSelectionScreen';
 
 type ScreenType = 'start' | 'cardSelection' | 'relicSelection' | 'battle';
 type OverlayType = 'battleResult' | 'deck' | 'none';
@@ -39,7 +39,7 @@ export function App() {
   const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const { game, actions, undoManager } = useGameState();
-  const { addCards, addRelic, endBattle, resetGame } = actions;
+  const { addCards, addRelic, startBattle, endBattle, resetGame } = actions;
   const { clearUndo } = undoManager;
 
   // passed to battle screen so it doesn't update after battle is over
@@ -52,9 +52,12 @@ export function App() {
     (screen: ScreenType) => {
       setScreen(screen);
       setOverlay('none');
-      clearUndo();
+      if (screen === 'battle') {
+        startBattle();
+        clearUndo();
+      }
     },
-    [clearUndo],
+    [clearUndo, startBattle],
   );
 
   const startCardSelection = useCallback(() => {

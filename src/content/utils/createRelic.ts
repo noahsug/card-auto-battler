@@ -1,11 +1,13 @@
 import { RelicEffect, RelicState } from '../../game/gameState';
-import { value } from './createCard';
 
-type EffectBuilder = Partial<Omit<RelicEffect, 'name'>> & Pick<RelicEffect, 'name'>;
+type EffectBuilder = Partial<Omit<RelicEffect, 'statusEffectName'>> &
+  Pick<RelicEffect, 'statusEffectName'>;
 
 // returns a RelicEffect with defaults
 export function getEffect(partialEffect: EffectBuilder): RelicEffect {
-  return Object.assign({ target: 'self', value: value(1) }, partialEffect);
+  partialEffect.target = partialEffect.target || 'self';
+  partialEffect.value = partialEffect.value || 1;
+  return partialEffect as RelicEffect;
 }
 
 // returns a RelicState with defaults

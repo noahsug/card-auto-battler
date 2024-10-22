@@ -31,13 +31,15 @@ export function useGameState() {
     const actionEntries = Object.entries(actions) as [keyof typeof actions, Action][];
     return actionEntries.reduce((acc, [name, action]) => {
       acc[name] = (...args: Tail<Parameters<Action>>) => {
-        let returnValue: ReturnType<Action>;
-        const nextGameState = produce(gameState, (draft) => {
-          returnValue = action(draft, ...args);
-        });
-        setGameState(nextGameState);
+        setGameState(
+          produce((gameState) => {
+            action(gameState, ...args);
+          }),
+        );
         setPast((past) => [...past, gameState]);
-        return returnValue;
+        // TODO: implement a promise return type since setGameState is async
+        // TODO: undo when battle starts is messed up, prob cuz of this async issue
+        return [] as ReturnType<Action>;
       };
       return acc;
     }, {} as BoundActions);
