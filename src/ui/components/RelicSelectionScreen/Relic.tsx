@@ -3,6 +3,7 @@ import { styled } from 'styled-components';
 import { RelicState } from '../../../game/gameState';
 import { getHandDrawnBorderRadius, maskImage } from '../../style';
 import { Row } from '../shared/Row';
+import { DescriptionText } from '../DescriptionText';
 
 interface Props {
   relic: RelicState;
@@ -47,7 +48,9 @@ export function Relic({ relic, onClick, style }: Props) {
       <RelicImage src={relic.image} $color={relic.color} />
       <TextContainer>
         <Title>{relic.name}</Title>
-        <Text>{relic.description}</Text>
+        <Text>
+          <DescriptionText text={relic.description} />
+        </Text>
       </TextContainer>
     </Root>
   );

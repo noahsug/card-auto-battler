@@ -12,7 +12,7 @@ export const allRelics: Record<string, RelicState> = {
     { statusEffectName: 'permaBleed', target: 'opponent' },
     {
       name: 'Open Wound',
-      description: 'Adds one bleed to the opponent that never goes away.',
+      description: 'Adds 1 permanent bleed to the opponent.',
       image: openWoundImage,
       color: getColor(330),
     },

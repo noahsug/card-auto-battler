@@ -39,6 +39,7 @@ h2 {
   --color-bg-opaque: #08080869;
   --color-bg-light: #202020;
   --font-text: 'IndieFlower', sans-serif;
+  --font-number: 'rabiohead', sans-serif;
   --font-heading: 'AmaticBold', sans-serif;
   --letter-spacing-heading: 0.05em;
   --font-title: '3Dumb', sans-serif;
@@ -50,8 +51,13 @@ h2 {
 }
 
 @font-face {
+  font-family: 'rabiohead';
+  src: url('./fonts/rabiohead.ttf');
+}
+
+@font-face {
   font-family: 'IndieFlower';
-  src: url('./fonts/IndieFLower.ttf');
+  src: url('./fonts/IndieFlower.ttf');
 }
 
 @font-face {

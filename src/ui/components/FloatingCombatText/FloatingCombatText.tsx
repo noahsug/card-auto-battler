@@ -36,6 +36,7 @@ function getTextShadow({ $type }: { $type: BattleEvent['type'] }) {
 const Text = styled(animated.div)<{ $type: BattleEvent['type'] }>`
   position: absolute;
   color: ${getTextColor};
+  font-family: ${(props) => (props.$type === 'miss' ? '' : 'var(--font-number)')};
   font-size: ${(props) => (props.$type === 'miss' ? 3 : 4)}rem;
   font-weight: bold;
   text-shadow: ${getTextShadow};

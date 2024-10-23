@@ -4,6 +4,7 @@ import { CardState } from '../../../game/gameState';
 import { getHandDrawnBorderRadius, maskImage } from '../../style';
 import { Container } from '../shared/Container';
 import textBackground from './text-background.png';
+import { DescriptionText } from '../DescriptionText';
 
 export const baseCardSize = { width: 12, height: 20 };
 
@@ -81,11 +82,6 @@ const Text = styled.div`
   }
 `;
 
-const Value = styled.span`
-  font-weight: bold;
-  font-size: 1.1em;
-`;
-
 interface Props {
   card: CardState;
   size: 'small' | 'medium' | 'large';
@@ -96,22 +92,8 @@ interface Props {
 
 type CardColor = 'regular' | 'red' | 'green';
 
-function CardTextLine({ text }: { text: string }) {
-  const parts = text.split(/(\d+)/);
-  return (
-    <div>
-      {parts.map((part, i) => {
-        const isValue = /\d+/.test(part);
-        return isValue ? <Value key={i}>{part}</Value> : part;
-      })}
-      .
-    </div>
-  );
-}
-
 export function Card({ size, color = 'regular', card, onClick, style }: Props) {
   const { name, description, image } = card;
-  const lines = description.split('.').slice(0, -1);
 
   return (
     <CardRoot $size={size} className="card" onClick={onClick} style={style}>
@@ -120,9 +102,7 @@ export function Card({ size, color = 'regular', card, onClick, style }: Props) {
           <Image src={image} alt="{name}" />
           <Title>{name}</Title>
           <Text>
-            {lines.map((text, i) => (
-              <CardTextLine text={text} key={i} />
-            ))}
+            <DescriptionText text={description} />
           </Text>
         </OuterContainer>
       </ThemeProvider>
