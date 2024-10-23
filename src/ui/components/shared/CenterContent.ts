@@ -7,3 +7,8 @@ export const CenterContent = styled.div`
   flex-direction: column;
   flex: 1;
 `;
+
+export const ScrollingCenterContent = styled(CenterContent)`
+  overflow-y: auto;
+  padding-bottom: 0;
+`;

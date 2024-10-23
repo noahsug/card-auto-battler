@@ -4,15 +4,16 @@ import { styled } from 'styled-components';
 import { NUM_CARD_SELECTION_PICKS } from '../../../game/constants';
 import { CardState, GameState } from '../../../game/gameState';
 import { Card } from '../Card';
-import { Button } from '../shared/Button';
-import { Container } from '../shared/Container';
 import { HUD } from '../HUD';
-import { CenterContent } from '../shared/CenterContent';
+import { Button } from '../shared/Button';
+import { ScrollingCenterContent } from '../shared/CenterContent';
+import { Container } from '../shared/Container';
 
 const CardGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  overflow-y: auto;
 
   > * {
     margin: 0.25rem;
@@ -68,7 +69,7 @@ export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }
     <Container>
       <HUD game={game} onViewDeck={onViewDeck} />
 
-      <CenterContent>
+      <ScrollingCenterContent>
         <CardGrid>
           {cards.map((card, i) => (
             <Card
@@ -80,7 +81,7 @@ export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }
             />
           ))}
         </CardGrid>
-      </CenterContent>
+      </ScrollingCenterContent>
 
       <BottomRow>
         {numCardsToPick > 0 && <Message>Select {numCardsToPick} Cards</Message>}

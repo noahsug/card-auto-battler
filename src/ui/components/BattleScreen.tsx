@@ -45,7 +45,7 @@ export function BattleScreen({
 
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const battleEventsRef = useRef(cloneDeep(EMPTY_BATTLE_EVENTS));
+  const [battleEvents, setBattleEvents] = useState(EMPTY_BATTLE_EVENTS);
 
   const userProfileRef = useRef<HTMLDivElement>(null);
   const enemyProfileRef = useRef<HTMLDivElement>(null);
@@ -56,14 +56,15 @@ export function BattleScreen({
 
   const handleUndo = useCallback(() => {
     undo();
-    battleEventsRef.current = cloneDeep(EMPTY_BATTLE_EVENTS);
+    setBattleEvents(EMPTY_BATTLE_EVENTS);
   }, [undo]);
 
-  const handlePlayNextCard = useCallback(() => {
-    // TODO: pass in game state
-    const battleEvents = playCard();
-    battleEventsRef.current.user = battleEvents.filter(({ target }) => target === userTarget);
-    battleEventsRef.current.enemy = battleEvents.filter(({ target }) => target === enemyTarget);
+  const handlePlayNextCard = useCallback(async () => {
+    const battleEvents = await playCard();
+    setBattleEvents({
+      user: battleEvents.filter(({ target }) => target === userTarget),
+      enemy: battleEvents.filter(({ target }) => target === enemyTarget),
+    });
   }, [playCard, userTarget, enemyTarget]);
 
   const isBattleOver = getBattleWinner(game) != null;
@@ -91,11 +92,11 @@ export function BattleScreen({
             <PlayerProfile
               src={user.image}
               profileRef={userProfileRef}
-              battleEvents={battleEventsRef.current.user}
+              battleEvents={battleEvents.user}
               isDead={user.health <= 0}
             />
             <FloatingCombatText
-              battleEvents={battleEventsRef.current.user}
+              battleEvents={battleEvents.user}
               targetElement={userProfileRef.current}
             />
             <HealthBar health={user.health} maxHealth={user.startingHealth} />
@@ -107,11 +108,11 @@ export function BattleScreen({
               src={enemy.image}
               flip={true}
               profileRef={enemyProfileRef}
-              battleEvents={battleEventsRef.current.enemy}
+              battleEvents={battleEvents.enemy}
               isDead={enemy.health <= 0}
             />
             <FloatingCombatText
-              battleEvents={battleEventsRef.current.enemy}
+              battleEvents={battleEvents.enemy}
               targetElement={userProfileRef.current}
             />
             <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
@@ -139,7 +140,7 @@ export function BattleScreen({
       </CenterContent>
 
       <BattleControls
-        onBack={hasOverlay || !canUndo ? undefined : handleUndo}
+        onBack={hasOverlay || !canUndo() ? undefined : handleUndo}
         onTogglePlay={hasOverlay ? undefined : handleTogglePlayPause}
         isPaused={isPlaying}
         onNext={isBattleOver || hasOverlay ? undefined : handlePlayNextCard}

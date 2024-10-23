@@ -49,7 +49,7 @@ export function App() {
   const relicSelectionOptionsRef = useRef<RelicState[]>([]);
 
   const goToScreen = useCallback(
-    (screen: ScreenType) => {
+    async (screen: ScreenType) => {
       setScreen(screen);
       setOverlay('none');
       if (screen === 'battle') {

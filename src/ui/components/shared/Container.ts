@@ -7,5 +7,9 @@ export const Container = styled.div`
   margin: auto;
   flex-flow: column;
   padding: 1rem 0.5rem;
-  overflow: scroll;
+`;
+
+export const ScrollingContainer = styled(Container)`
+  overflow-y: auto;
+  padding-bottom: 0;
 `;

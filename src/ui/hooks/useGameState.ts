@@ -4,11 +4,12 @@ import { useMemo, useState } from 'react';
 import * as actions from '../../game/actions';
 import { createGameState, GameState } from '../../game/gameState';
 import { Tail } from '../../utils/types';
+import { getResolvablePromise } from '../../utils/promise';
 
 type BoundActions = {
   [K in keyof typeof actions]: (
     ...args: Tail<Parameters<(typeof actions)[K]>>
-  ) => ReturnType<(typeof actions)[K]>;
+  ) => Promise<ReturnType<(typeof actions)[K]>>;
 };
 
 export type PlayCard = BoundActions['playCard'];
@@ -30,23 +31,30 @@ export function useGameState() {
   const boundActions = useMemo(() => {
     const actionEntries = Object.entries(actions) as [keyof typeof actions, Action][];
     return actionEntries.reduce((acc, [name, action]) => {
+      const { promise, resolve } = getResolvablePromise<ReturnType<Action>>();
       acc[name] = (...args: Tail<Parameters<Action>>) => {
         setGameState(
           produce((gameState) => {
-            action(gameState, ...args);
+            resolve(action(gameState, ...args));
           }),
         );
-        setPast((past) => [...past, gameState]);
-        // TODO: implement a promise return type since setGameState is async
-        // TODO: undo when battle starts is messed up, prob cuz of this async issue
-        return [] as ReturnType<Action>;
+        setPast((past) => {
+          return [...past, gameState];
+        });
+        return promise;
       };
       return acc;
     }, {} as BoundActions);
   }, [gameState]);
 
-  const canUndo = () => past.length > 0;
-  const clearUndo = () => setPast([]);
+  const canUndo = () => {
+    return past.length > 0;
+  };
+  const clearUndo = () => {
+    setPast(() => {
+      return [];
+    });
+  };
   const undo = () => {
     const nextGameState = past[past.length - 1];
     setGameState(nextGameState);

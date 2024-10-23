@@ -101,25 +101,6 @@ function getDamageAnimation({
   };
 }
 
-function getDeathAnimation({
-  u,
-  direction,
-  windowWidth,
-}: {
-  u: UnitFn;
-  direction: Direction;
-  windowWidth: number;
-}) {
-  return {
-    x: (windowWidth / 2) * direction,
-    y: u(-100),
-    hue: 0,
-    delay: CARD_ANIMATION_DELAY + 75,
-    rotate: 360 * direction,
-    config: { easing: easings.easeOutCubic, duration: 4000 },
-  };
-}
-
 function getBattleAnimation({
   battleEvents,
   direction,
@@ -136,10 +117,30 @@ function getBattleAnimation({
   return getDamageAnimation({ damage, direction, u });
 }
 
+function getDeathAnimation({
+  u,
+  direction,
+  windowWidth,
+}: {
+  u: UnitFn;
+  direction: Direction;
+  windowWidth: number;
+}) {
+  console.log('x = ', windowWidth / 2, direction);
+  return {
+    x: (windowWidth / 2) * direction,
+    y: u(-100),
+    hue: 180,
+    delay: CARD_ANIMATION_DELAY,
+    rotate: 360 * direction,
+    config: { easing: easings.easeOutCubic, duration: 5000 },
+  };
+}
+
 export function PlayerProfile({ flip, battleEvents, src, profileRef, isDead }: Props) {
   const [u, windowDimensions] = useUnits();
 
-  // move in the opposite direction the image is facing
+  // recoil in the opposite direction the image is facing
   const direction = flip ? 1 : -1;
 
   const [animationProps, animationController] = useSpring(
@@ -154,14 +155,15 @@ export function PlayerProfile({ flip, battleEvents, src, profileRef, isDead }: P
   );
 
   useEffect(() => {
+    if (isDead) return;
+
     if (battleEvents.length > 0) {
       const battleAnimation = getBattleAnimation({ battleEvents, direction, u });
       if (battleAnimation) animationController.start(battleAnimation);
     } else {
       animationController.set(startPosition);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animationController, battleEvents, direction]);
+  }, [animationController, battleEvents, direction, isDead, u]);
 
   useEffect(() => {
     if (!isDead) return;
@@ -169,8 +171,7 @@ export function PlayerProfile({ flip, battleEvents, src, profileRef, isDead }: P
     animationController.start(
       getDeathAnimation({ u, direction, windowWidth: windowDimensions.width }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animationController, isDead, direction]);
+  }, [animationController, isDead, direction, u, windowDimensions.width]);
 
   const filter = to(
     [animationProps.hue, animationProps.brightness],

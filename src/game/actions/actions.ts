@@ -33,13 +33,11 @@ export function addCards(game: GameState, cards: CardState[]) {
 
 export function addRelic(game: GameState, relic: RelicState) {
   game.user.relics.push(relic);
-  console.log('add relic', game.user.relics.length);
 }
 
 function applyRelicStatusEffects({ self, opponent }: { self: PlayerState; opponent: PlayerState }) {
   self.relics.forEach((relic) => {
     const { target, statusEffectName, value } = relic.effect;
-    console.log('relic effect', target, statusEffectName, value);
     const targetPlayer = target === 'self' ? self : opponent;
     targetPlayer[statusEffectName] += value;
   });
@@ -61,8 +59,6 @@ export function startBattle(game: GameState) {
 
   triggerStartOfBattleEffects(userPerspective);
   triggerStartOfBattleEffects(enemyPerspective);
-
-  console.log('start battle', game.user.permaBleed, game.user.bleed, game.enemy.bleed);
 }
 
 export function playCard(game: GameState): BattleEvent[] {
@@ -110,6 +106,7 @@ function resetPlayerAfterBattle(player: PlayerState) {
 export function endBattle(game: GameState) {
   const winner = getBattleWinner(game);
   winner === 'user' ? game.wins++ : game.losses++;
+  game.turn = 0;
   resetPlayerAfterBattle(game.user);
   resetPlayerAfterBattle(game.enemy);
 }

@@ -14,7 +14,7 @@ const meta = {
     onViewDeck: fn(),
     canUndo: () => false,
     undo: fn(),
-    playCard: () => [],
+    playCard: () => Promise.resolve([]),
   },
 } satisfies Meta<typeof BattleScreen>;
 

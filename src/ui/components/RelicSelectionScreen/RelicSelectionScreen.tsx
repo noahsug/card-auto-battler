@@ -5,7 +5,7 @@ import { GameState, RelicState } from '../../../game/gameState';
 import { assertIsNonNullable } from '../../../utils/asserts';
 import { HUD } from '../HUD';
 import { Button } from '../shared/Button';
-import { CenterContent } from '../shared/CenterContent';
+import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
 import { Relic } from './Relic';
 
@@ -13,6 +13,7 @@ const RelicList = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow-y: auto;
 
   > * {
     margin: 0.5rem;
@@ -65,7 +66,7 @@ export function RelicSelectionScreen({ game, relics, onRelicSelected, onViewDeck
     <Container>
       <HUD game={game} onViewDeck={onViewDeck} />
 
-      <CenterContent>
+      <ScrollingCenterContent>
         <RelicList>
           {relics.map((relic, i) => (
             <Relic
@@ -76,7 +77,7 @@ export function RelicSelectionScreen({ game, relics, onRelicSelected, onViewDeck
             />
           ))}
         </RelicList>
-      </CenterContent>
+      </ScrollingCenterContent>
 
       <BottomRow>
         {selectedRelicIndex == null ? (

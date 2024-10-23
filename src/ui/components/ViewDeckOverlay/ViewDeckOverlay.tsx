@@ -2,7 +2,7 @@ import { styled } from 'styled-components';
 
 import { GameState } from '../../../game/gameState';
 import { Card } from '../Card';
-import { CenterContent } from '../shared/CenterContent';
+import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
 import { Button } from '../shared/Button';
 import { Row } from '../shared/Row';
@@ -11,9 +11,10 @@ const CardGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  overflow-y: auto;
 
   > * {
-    margin: 0.25rem 0.25rem;
+    margin: 0.25rem;
   }
 `;
 
@@ -41,13 +42,13 @@ export function ViewDeckOverlay({ game, onBack }: Props) {
         <BackButton>back</BackButton>
       </Row>
 
-      <CenterContent>
+      <ScrollingCenterContent>
         <CardGrid>
           {game.user.cards.map((card, i) => (
             <Card key={i} card={card} size={'small'} />
           ))}
         </CardGrid>
-      </CenterContent>
+      </ScrollingCenterContent>
     </Container>
   );
 }

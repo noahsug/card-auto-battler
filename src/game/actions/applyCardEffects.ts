@@ -163,19 +163,19 @@ function dealDamage(
 
   const targetPlayer = target === 'self' ? self : opponent;
   targetPlayer.health -= value;
-
   events.push({ type: 'damage', target, value });
 
   // bleed
   if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
     opponent.health -= BLEED_DAMAGE;
-    opponent.bleed -= 1;
-    events.push({ type: 'damage', target, value });
-  }
+    events.push({ type: 'damage', target, value: BLEED_DAMAGE });
 
-  // permaBleed
-  if (opponent.bleed <= 0) {
-    opponent.bleed += opponent.permaBleed;
+    opponent.bleed -= 1;
+
+    // permaBleed
+    if (opponent.bleed <= 0) {
+      opponent.bleed += opponent.permaBleed;
+    }
   }
 }
 
