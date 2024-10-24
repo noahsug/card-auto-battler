@@ -47,10 +47,15 @@ export function applyCardEffects(
   return events;
 }
 
-function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitCount: number = 1) {
+function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft?: number) {
   if (effect.if) {
     const success = evaluateIf(effect.if, context);
     if (!success) return;
+  }
+
+  if (effect.multiHit && multiHitsLeft == null) {
+    multiHitsLeft = getValue(effect.multiHit, context) - 1;
+    if (multiHitsLeft < 0) return;
   }
 
   let value = getValue(effect.value, context);
@@ -86,8 +91,8 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitCount
       context[effect.target][effect.name] += value;
   }
 
-  if (effect.multiHit && multiHitCount < effect.multiHit) {
-    applyEffect(effect, context, multiHitCount + 1);
+  if (multiHitsLeft) {
+    applyEffect(effect, context, multiHitsLeft - 1);
   }
 }
 

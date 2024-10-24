@@ -78,7 +78,7 @@ describe('damage', () => {
 
 describe('permaBleed', () => {
   it('adds 1 bleed whenever bleed reaches 0', () => {
-    effect.multiHit = 3;
+    effect.multiHit = v(3);
     const { diff } = getPlayCardResult({ opponent: { permaBleed: 1, bleed: 1 } });
 
     const damage = 3 * (1 + BLEED_DAMAGE);
@@ -254,13 +254,22 @@ describe('effect based on player value', () => {
 
 describe('multi-hit', () => {
   beforeEach(() => {
-    effect.multiHit = 2;
+    effect.multiHit = v(2);
   });
 
   it('deals damage twice', () => {
     const { diff } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
 
-    expect(diff).toEqual({ opponent: { health: -6 - BLEED_DAMAGE * 2, bleed: -2 } });
+    const damage = 2 * (3 + BLEED_DAMAGE);
+    expect(diff).toEqual({ opponent: { health: -damage, bleed: -2 } });
+  });
+
+  it('deals damage 1 time for each opponent bleed', () => {
+    effect.multiHit = v('opponent', 'bleed');
+    const { diff } = getPlayCardResult({ opponent: { bleed: 2 } });
+
+    const damage = 2 * (1 + BLEED_DAMAGE);
+    expect(diff).toEqual({ opponent: { health: -damage, bleed: -2 } });
   });
 });
 

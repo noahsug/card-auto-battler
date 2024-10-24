@@ -53,7 +53,7 @@ export interface CardEffect {
   value: ValueDescriptor;
   add?: MaybeValue;
   multiply?: MaybeValue<BasicValueDescriptor>;
-  multiHit?: number;
+  multiHit?: ValueDescriptor;
   if?: If;
 }
 

@@ -57,12 +57,12 @@ export const allCards: Record<string, CardState> = {
     [
       {
         value: v(2),
+        multiHit: v('opponent', 'bleed'),
       },
     ],
     {
-      repeat: { value: v('opponent', 'bleed') },
       name: 'Eviscerate',
-      description: 'Deal 2 damage. Repeat for each bleed the enemy has.',
+      description: 'Deal 2 damage 1 time for every bleed the enemy has.',
       image: eviscerate,
     },
   ),

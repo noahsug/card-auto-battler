@@ -40,7 +40,15 @@ Create card art via Gemini prompt: "Create an image that would match the text "S
 
 Remove background via <https://www.remove.bg/upload>
 
-## analysis
+## Cards (10/23/24)
+
+3 Colors: Yellow = Fruit,
+
+NotFM
+
+- Wolf = transform, bleed, damage on attack
+
+## Analysis
 
 Analysis TODO:
 
