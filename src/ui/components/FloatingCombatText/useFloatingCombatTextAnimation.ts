@@ -30,7 +30,7 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
     if (targetElement == null) return { x: 0, y: 0 };
 
     const { width, height } = targetElement.getBoundingClientRect();
-    return { x: u(20) + (width - u(80)) * xOffsetRatio, y: (height / 2) * yOffsetRatio };
+    return { x: width * xOffsetRatio, y: (height / 2) * yOffsetRatio };
   }
 
   function getAnimationStart(textAnimation: TextAnimation) {
