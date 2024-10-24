@@ -1,7 +1,8 @@
 import { styled } from 'styled-components';
 import { assert } from '../../utils/asserts';
+import { Number } from './shared/Number';
 
-const Value = styled.span`
+const Value = styled(Number)`
   font-weight: bold;
   font-size: 1.1em;
 `;

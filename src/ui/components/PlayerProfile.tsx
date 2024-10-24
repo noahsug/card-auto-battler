@@ -126,7 +126,6 @@ function getDeathAnimation({
   direction: Direction;
   windowWidth: number;
 }) {
-  console.log('x = ', windowWidth / 2, direction);
   return {
     x: (windowWidth / 2) * direction,
     y: u(-100),

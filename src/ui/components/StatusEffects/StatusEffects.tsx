@@ -8,6 +8,7 @@ import bleedImage from './drop.png';
 import { StatusEffects as StatusEffectsType } from '../../../game/gameState';
 import { maskImage } from '../../style';
 import { Row } from '../shared/Row';
+import { Number } from '../shared/Number';
 
 const effectToImage: Partial<Record<keyof StatusEffectsType, string>> = {
   bleed: bleedImage,
@@ -51,7 +52,7 @@ export function StatusEffects({ statusEffects }: Props) {
           !!statusEffects[effectName] && (
             <StatusEffectValue key={i}>
               <Icon src={effectToImage[effectName]!} />
-              {statusEffects[effectName]}
+              <Number>{statusEffects[effectName]}</Number>
             </StatusEffectValue>
           ),
       )}

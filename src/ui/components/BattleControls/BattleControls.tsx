@@ -1,9 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { styled } from 'styled-components';
 
 import nextImage from './next.png';
 import pauseImage from './pause.png';
 import playImage from './play.png';
+import { useTimeout } from '../../hooks/useTimeout';
+
+const AUTO_PLAY_CARD_DELAY = 1000;
 
 const ControlsRow = styled.div`
   display: flex;
@@ -62,6 +65,10 @@ function useKeyboardShortcuts({
 
 export function BattleControls({ onBack, onTogglePlay, onNext, isPaused }: Props) {
   useKeyboardShortcuts({ onBack, onTogglePlay, onNext });
+
+  const callback = onNext || (() => {});
+
+  useTimeout(callback, AUTO_PLAY_CARD_DELAY, { stop: isPaused || !onNext });
 
   return (
     <ControlsRow>

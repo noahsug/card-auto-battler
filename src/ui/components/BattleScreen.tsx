@@ -43,16 +43,12 @@ export function BattleScreen({
   const { user, enemy, turn } = game;
   const [userTarget, enemyTarget] = getPlayerTargets(game);
 
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const [battleEvents, setBattleEvents] = useState(EMPTY_BATTLE_EVENTS);
 
   const userProfileRef = useRef<HTMLDivElement>(null);
   const enemyProfileRef = useRef<HTMLDivElement>(null);
-
-  const handleTogglePlayPause = useCallback(() => {
-    setIsPlaying((prev) => !prev);
-  }, []);
 
   const handleUndo = useCallback(() => {
     undo();
@@ -66,6 +62,14 @@ export function BattleScreen({
       enemy: battleEvents.filter(({ target }) => target === enemyTarget),
     });
   }, [playCard, userTarget, enemyTarget]);
+
+  const handleTogglePlayPause = useCallback(() => {
+    if (isPaused) {
+      // immediately play next card when unpausing
+      handlePlayNextCard();
+    }
+    setIsPaused((prev) => !prev);
+  }, [handlePlayNextCard, isPaused]);
 
   const isBattleOver = getBattleWinner(game) != null;
   const endBattleTimeout = useRef<NodeJS.Timeout>();
@@ -142,7 +146,7 @@ export function BattleScreen({
       <BattleControls
         onBack={hasOverlay || !canUndo() ? undefined : handleUndo}
         onTogglePlay={hasOverlay ? undefined : handleTogglePlayPause}
-        isPaused={isPlaying}
+        isPaused={isPaused}
         onNext={isBattleOver || hasOverlay ? undefined : handlePlayNextCard}
       />
     </Container>
