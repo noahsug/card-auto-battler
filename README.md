@@ -40,14 +40,6 @@ Create card art via Gemini prompt: "Create an image that would match the text "S
 
 Remove background via <https://www.remove.bg/upload>
 
-## Cards (10/23/24)
-
-3 Colors: Yellow = Fruit,
-
-NotFM
-
-- Wolf = transform, bleed, damage on attack
-
 ## Analysis
 
 Analysis TODO:
@@ -234,6 +226,101 @@ possible decks for caching to have impact.
 
 ## gameplay
 
+### Cards (10/23/24)
+
+Colors
+
+- green (nature, giant): scaling
+- purple (shadow, sneaky): combos
+- red (fire, monster): upfront damage
+
+Green cards (heal, strength, high hp, high dmg, x = turn, toxic, chill)
+
+- Heal for each card played this battle.
+- Gain 3 strength.
+- Deal damage equal to your last heal this battle.
+- Apply 3 toxicity (-1/turn, take X damage at end of turn)
+- Deal 4 damage. Play another card if this deals >= 7 damage.
+- Deal 4 damage. This card is affected by strength three times.
+- Deal damage equal to 30% of your current health.
+- Gain 3 strength if your last card played was green.
+- Enemy loses all armor. Deal 4 damage.
+- Chill (-1/turn, 3 stacks = frozen = deal 0 damage this turn)
+- Ice bolt: deals triple damage if enemy is frozen. Apply 1 chill.
+- Double damage if no self buffs, remove all self effects
+- Deal 10 damage if you dealt do damage last turn.
+- Relic: your healing deals damage instead.
+- Relic: +5 HP. Win the game when you reach 40 HP.
+- Relic: ignore all damage <= 2
+- Relic: +3 toxicity to self. +3 strength while toxic
+
+Red Cards (bleed, burn, multihit, lifesteal, low hp, trash, same name, armor)
+
+- deal 2 damage for each bleed
+- apply 3 bleed
+- Deal 4 damage. Lifesteal.
+- Deals damage equal to the last damage you dealt.
+- Deal 6 damage. Take 2 damage.
+- Deal 7 damage. Trash.
+- Deal damage equal to your missing health.
+- Trash 2 cards, play 2 cards.
+- Deal 3 damage. Play all other cards named X.
+- Gain 6 armor.
+- Gain 2 armor. Double your armor.
+- Deal X damage, where X = times you've taken damage this battle.
+- Deal +3 damage if you took damage this turn.
+- Apply 5 bleed to self and opponent.
+- Lose all armor, deal 2x damage.
+- Lifesteal if your last card played was red.
+- Apply 3 burn (-half/turn, take X damage at start of turn)
+- Deal X damage where X = enemy burn.
+- Double enemy burn.
+- Execute: Deals double damage if the enemy has < 7 hp.
+- Relic: First card each battle is played twice.
+- Relic: Deal +X damage for every consecutive turn you've taken damage.
+- Relic: Deal +3 damage when bleeding / when at < 50% hp.
+- Relic: cards with the same name deal +X damage, where X = # of those cards
+- Relic: Immune to damage on your turn.
+- Relic: Gaining armor gives strength instead.
+- Relic: Play an additional card. Apply a permanent 3 burn to self.
+
+Purple Cards (% chance, crit, play again, debuff, dodge, shock)
+
+- Play another card.
+- Deal 2 damage. Repeat for each card played this turn.
+- This card is treated as the damaging card you used.
+- Deal 1 damage 1-3 times.
+- Deal 2 dodge.
+- Apply -1 strength to enemy.
+- Deal 2 damage. Deals double damage next time its played.
+- End your turn. Gain 99 dodge until next turn.
+- Apply 1 shock (-all stacks/turn, +X dmg this turn, 3 shock = stun = enemy skips next turn)
+- Play the top card of the enemies deck
+- Play again if the last card played was purple.
+- The next card is a critical hit
+- Deal 0 damage 3 times. 100% critical hit chance.
+- Relic: 25% chance to dodge damage.
+- Relic: your next card deals 2x damage after you dodge
+- Relic: Play another card for every 5 times the enemy takes damage.
+- Relic: "Play another card" changes to "Repeat 1 additional time"
+- Relic: shock only loses half stacks at end of turn
+- Relic: Deal 1 damage whenever you play a card.
+- Relic: ranges of values always give the best result
+- Relic: +25% chance to crit after dodging.
+- Relic: Play another card when you crit.
+
+Color Mechanics
+
+- Do X if last card played is RED
+- Deal X = # of RED cards
+
+Shuffle mechanics
+
+- Cards are played in alphabetical order / order picked up / by color (R,P,G) / by damage
+- This card is always played before/after a RED card if possible
+- Choose card order
+- Choose combos (strings of cards)
+
 effects implemented
 
 - bleed: 0,
@@ -256,14 +343,14 @@ archetypes implemented
 - trash -
 - multicard - +1 damage for each card played this turn
 
-## simple card effects
+### simple card effects
 
 - gain 1 strength each turn
 - reduce all dmg to 1 next turn
 - gain dodge whenever you deal more than X damage
 - dmg for each card played this turn
 
-## archetypes
+### archetypes
 
 - buff stacking (next dmg card is played twice, +2 dmg, applies bleed for each dmg, 2x damage, 25% lifesteal, etc)
 - ✅ bleed (hit 3 times, bleed 2, hit for each bleed, dmg causes bleed, 2x bleed)
@@ -278,7 +365,7 @@ archetypes implemented
 - non-damaging cards (non-damaging cards have play another card, non-damaging have +3 heal, no damage can be delt until your next turn)
 - block (3 block - stops X damage then block is reduced by X, deal dmg = to block, 2x block, multihit when block > 10)
 
-## relic reward screen
+### relic reward screen
 
 - 25% life steal while HP is lower than 50%
 - upgrades are 2x more likely to be seen

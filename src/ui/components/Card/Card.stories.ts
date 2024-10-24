@@ -14,7 +14,7 @@ type Story = StoryObj<typeof meta>;
 export const Punch: Story = {
   args: {
     size: 'large',
-    color: 'regular',
+    color: 'basic',
     card: allCards.punch,
   },
 };
@@ -28,7 +28,14 @@ export const Fireball: Story = {
 export const Eviscerate: Story = {
   args: {
     size: 'large',
-    color: 'regular',
+    color: 'purple',
     card: allCards.eviscerate,
+  },
+};
+export const Channel: Story = {
+  args: {
+    size: 'large',
+    color: 'green',
+    card: allCards.channel,
   },
 };

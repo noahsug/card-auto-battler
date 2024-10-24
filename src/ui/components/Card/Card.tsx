@@ -19,9 +19,10 @@ const CardRoot = styled.div<{ $size: Props['size'] }>`
 `;
 
 const hsl = {
-  regular: [67, 18, 85],
-  red: [0, 20, 78],
-  green: [118, 15, 73],
+  basic: [67, 18, 85],
+  purple: [267, 28, 80],
+  red: [0, 28, 80],
+  green: [118, 28, 80],
 };
 function getHSLString(hue: number, saturation: number, lightness: number) {
   return `hsl(${hue} ${saturation}% ${lightness}%)`;
@@ -90,9 +91,9 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-type CardColor = 'regular' | 'red' | 'green';
+type CardColor = 'basic' | 'purple' | 'red' | 'green';
 
-export function Card({ size, color = 'regular', card, onClick, style }: Props) {
+export function Card({ size, color = 'basic', card, onClick, style }: Props) {
   const { name, description, image } = card;
 
   return (
