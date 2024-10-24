@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { styled } from 'styled-components';
 
+import { useTimeout } from '../../hooks/useTimeout';
 import nextImage from './next.png';
 import pauseImage from './pause.png';
 import playImage from './play.png';
-import { useTimeout } from '../../hooks/useTimeout';
 
 const AUTO_PLAY_CARD_DELAY = 1000;
 
@@ -42,18 +42,18 @@ function useKeyboardShortcuts({
   onBack,
   onTogglePlay,
   onNext,
-}: Pick<Props, 'onBack' | 'onTogglePlay' | 'onNext'>) {
+}: Pick<Required<Props>, 'onBack' | 'onTogglePlay' | 'onNext'>) {
   useEffect(() => {
     function handleKeyboardShortcuts(event: globalThis.KeyboardEvent) {
       switch (event.key) {
         case ' ':
-          onTogglePlay?.();
+          onTogglePlay();
           break;
         case 'ArrowRight':
-          onNext?.();
+          onNext();
           break;
         case 'ArrowLeft':
-          onBack?.();
+          onBack();
           break;
       }
     }
@@ -64,7 +64,38 @@ function useKeyboardShortcuts({
 }
 
 export function BattleControls({ onBack, onTogglePlay, onNext, isPaused }: Props) {
-  useKeyboardShortcuts({ onBack, onTogglePlay, onNext });
+  function handleOnBack() {
+    if (!onBack) return;
+    if (!isPaused) {
+      // pause
+      onTogglePlay?.();
+    }
+    onBack();
+  }
+
+  function handleOnTogglePlay() {
+    if (!onTogglePlay) return;
+    if (isPaused) {
+      // immediately play next card when unpausing
+      onNext?.();
+    }
+    onTogglePlay();
+  }
+
+  function handleOnNext() {
+    if (!onNext) return;
+    if (!isPaused) {
+      // pause
+      onTogglePlay?.();
+    }
+    onNext();
+  }
+
+  useKeyboardShortcuts({
+    onBack: handleOnBack,
+    onTogglePlay: handleOnTogglePlay,
+    onNext: handleOnNext,
+  });
 
   const callback = onNext || (() => {});
 
@@ -72,15 +103,15 @@ export function BattleControls({ onBack, onTogglePlay, onNext, isPaused }: Props
 
   return (
     <ControlsRow>
-      <ControlButton onClick={onBack} disabled={!onBack} $flip={true}>
+      <ControlButton onClick={handleOnBack} disabled={!onBack} $flip={true}>
         <img src={nextImage} alt="back" />
       </ControlButton>
 
-      <ControlButton onClick={onTogglePlay} disabled={!onTogglePlay}>
+      <ControlButton onClick={handleOnTogglePlay} disabled={!onTogglePlay}>
         <img src={isPaused ? playImage : pauseImage} alt="play/pause" />
       </ControlButton>
 
-      <ControlButton onClick={onNext} disabled={!onNext}>
+      <ControlButton onClick={handleOnNext} disabled={!onNext}>
         <img src={nextImage} alt="next" />
       </ControlButton>
     </ControlsRow>

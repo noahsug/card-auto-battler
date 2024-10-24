@@ -64,12 +64,8 @@ export function BattleScreen({
   }, [playCard, userTarget, enemyTarget]);
 
   const handleTogglePlayPause = useCallback(() => {
-    if (isPaused) {
-      // immediately play next card when unpausing
-      handlePlayNextCard();
-    }
     setIsPaused((prev) => !prev);
-  }, [handlePlayNextCard, isPaused]);
+  }, []);
 
   const isBattleOver = getBattleWinner(game) != null;
   const endBattleTimeout = useRef<NodeJS.Timeout>();
