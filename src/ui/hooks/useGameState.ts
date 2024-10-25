@@ -12,8 +12,8 @@ type BoundActions = {
   ) => Promise<ReturnType<(typeof actions)[K]>>;
 };
 
-export type PlayCard = BoundActions['playCard'];
 export type AddCards = BoundActions['addCards'];
+export type PlayCard = BoundActions['playCard'];
 export type EndBattle = BoundActions['endBattle'];
 export type ResetGame = BoundActions['resetGame'];
 

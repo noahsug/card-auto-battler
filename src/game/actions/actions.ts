@@ -13,14 +13,17 @@ import {
 import { getBattleWinner, getPlayers } from '../utils/selectors';
 import { applyCardEffects } from './applyCardEffects';
 
-interface MissBattleEvent {
-  type: 'miss';
+interface BattleEventShared {
   target: Target;
+  source: 'card' | 'statusEffect';
 }
 
-interface BattleEventWithValue {
+interface MissBattleEvent extends BattleEventShared {
+  type: 'miss';
+}
+
+interface BattleEventWithValue extends BattleEventShared {
   type: 'damage' | 'heal';
-  target: Target;
   value: number;
 }
 
@@ -63,24 +66,30 @@ export function startBattle(game: GameState) {
 
 export function playCard(game: GameState): BattleEvent[] {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
+  const card = activePlayer.cards[activePlayer.currentCardIndex];
 
-  // TODO: make this its own start turn function
+  const events: BattleEvent[] = [];
+
+  // start turn
   if (activePlayer.cardsPlayedThisTurn === 0) {
     if (activePlayer.regen > 0) {
       // regen
       activePlayer.health += activePlayer.regen;
-      // events.push({ type: 'heal', target: 'self', value: activePlayer.regen });
+      events.push({
+        type: 'heal',
+        target: 'self',
+        value: activePlayer.regen,
+        source: 'statusEffect',
+      });
       activePlayer.regen -= 1;
     }
   }
-
-  const card = activePlayer.cards[activePlayer.currentCardIndex];
 
   // die if out of cards
   if (card == null) {
     const damage = activePlayer.health;
     activePlayer.health = 0;
-    return [{ type: 'damage', target: 'self', value: damage }];
+    return [{ type: 'damage', target: 'self', value: damage, source: 'statusEffect' }];
   }
 
   if (activePlayer.cardsPlayedThisTurn > 0) {
@@ -90,7 +99,12 @@ export function playCard(game: GameState): BattleEvent[] {
   activePlayer.cardsPlayedThisTurn += 1;
 
   // play card
-  const events = applyCardEffects(card, { game, self: activePlayer, opponent: nonActivePlayer });
+  const playCardEvents = applyCardEffects(card, {
+    game,
+    self: activePlayer,
+    opponent: nonActivePlayer,
+  });
+  events.push(...playCardEvents);
 
   activePlayer.currentCardIndex += 1;
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {

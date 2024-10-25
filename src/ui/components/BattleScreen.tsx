@@ -57,10 +57,10 @@ export function BattleScreen({
   const handlePlayNextCard = useCallback(async () => {
     const events = await playCard();
 
-    setBattleEvents({
-      user: events.filter(({ target }) => target === userTarget),
-      enemy: events.filter(({ target }) => target === enemyTarget),
-    });
+    setBattleEvents((existingEvents) => ({
+      user: [...existingEvents.user, ...events.filter(({ target }) => target === userTarget)],
+      enemy: [...existingEvents.enemy, ...events.filter(({ target }) => target === enemyTarget)],
+    }));
   }, [playCard, userTarget, enemyTarget]);
 
   const handleTogglePlayPause = useCallback(() => {

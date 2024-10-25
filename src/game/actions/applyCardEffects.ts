@@ -171,7 +171,7 @@ function dodgeDamage(effect: CardEffect, { opponent, events }: PlayCardContext) 
   if (opponent.dodge <= 0) return false;
 
   opponent.dodge -= 1;
-  events.push({ type: 'miss', target: effect.target });
+  events.push({ type: 'miss', target: effect.target, source: 'card' });
   return true;
 }
 
@@ -188,12 +188,12 @@ function dealDamage(
 
   const targetPlayer = target === 'self' ? self : opponent;
   targetPlayer.health -= value;
-  events.push({ type: 'damage', target, value });
+  events.push({ type: 'damage', target, value, source: 'card' });
 
   // bleed
   if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
     opponent.health -= BLEED_DAMAGE;
-    events.push({ type: 'damage', target, value: BLEED_DAMAGE });
+    events.push({ type: 'damage', target, value: BLEED_DAMAGE, source: 'card' });
 
     opponent.bleed -= 1;
 
@@ -213,7 +213,7 @@ function applyHeal(
   const targetPlayer = target === 'self' ? self : opponent;
   targetPlayer.health += value;
 
-  events.push({ type: 'heal', target, value });
+  events.push({ type: 'heal', target, value, source: 'card' });
 }
 
 function trashCards({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {

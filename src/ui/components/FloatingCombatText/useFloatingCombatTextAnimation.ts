@@ -21,10 +21,11 @@ function createTextAnimation(battleEvent: BattleEvent) {
   };
 }
 
+// We assume battle events is an every growing list that is only ever added to or cleared completely.
 export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: Props) {
   const [u] = useUnits();
-
   const animationController = useSpringRef();
+  const textAnimationsRef = useRef<TextAnimation[]>([]);
 
   function getXY({ xOffsetRatio, yOffsetRatio }: { xOffsetRatio: number; yOffsetRatio: number }) {
     if (targetElement == null) return { x: 0, y: 0 };
@@ -42,7 +43,7 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
       await next({
         opacity: 1,
         immediate: true,
-        delay: CARD_ANIMATION_DELAY,
+        delay: textAnimation.battleEvent.source === 'card' ? CARD_ANIMATION_DELAY : 0,
       });
       await next(getAnimationEnd(textAnimation));
     };
@@ -60,7 +61,6 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
     };
   }
 
-  const textAnimationsRef = useRef<TextAnimation[]>([]);
   useMemo(() => {
     if (battleEvents.length === 0) {
       textAnimationsRef.current = [];
