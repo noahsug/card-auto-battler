@@ -56,6 +56,7 @@ export function BattleScreen({
   }, [undo]);
 
   const handlePlayNextCard = useCallback(async () => {
+    // TODO: battle events are F'd, maybe due to useGameState changes
     const battleEvents = await playCard();
     setBattleEvents({
       user: battleEvents.filter(({ target }) => target === userTarget),

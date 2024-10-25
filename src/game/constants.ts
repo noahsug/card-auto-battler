@@ -13,4 +13,4 @@ export const NUM_STARTING_CARDS = 3;
 // the player with the highest health wins after this many turns
 export const MAX_TURNS_IN_BATTLE = 40;
 
-export const STARTING_HEALTH = 30;
+export const STARTING_HEALTH = 40;

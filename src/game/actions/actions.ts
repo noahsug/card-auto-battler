@@ -64,6 +64,16 @@ export function startBattle(game: GameState) {
 export function playCard(game: GameState): BattleEvent[] {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
 
+  // TODO: make this its own start turn function
+  if (activePlayer.cardsPlayedThisTurn === 0) {
+    if (activePlayer.regen > 0) {
+      // regen
+      activePlayer.health += activePlayer.regen;
+      // events.push({ type: 'heal', target: 'self', value: activePlayer.regen });
+      activePlayer.regen -= 1;
+    }
+  }
+
   const card = activePlayer.cards[activePlayer.currentCardIndex];
 
   // die if out of cards

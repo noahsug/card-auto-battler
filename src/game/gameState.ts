@@ -11,6 +11,7 @@ export const statusEffectNames = [
   'extraCardPlays',
   'dodge',
   'strength',
+  'regen',
 ] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;
@@ -122,7 +123,8 @@ export function createGameState(): GameState {
   const { attack, heal, fireball } = allCards;
 
   const user = createPlayer(allHeroes.warrior);
-  user.cards = [attack, attack, heal];
+  // user.cards = [attack, attack, heal];
+  user.cards = [allCards.damageForGreen, allCards.damagePerTurn, allCards.regen];
 
   const enemy = createPlayer(allEnemies.fireMonster);
   enemy.cards = [fireball, fireball, fireball];

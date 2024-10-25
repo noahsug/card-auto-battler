@@ -254,7 +254,7 @@ Green cards (heal, strength, high hp, high dmg, x = turn, toxic, chill)
 - Relic: ignore all damage <= 2
 - Relic: +3 toxicity to self. +3 strength while toxic
 
-Red Cards (bleed, burn, multihit, lifesteal, low hp, trash, same name, armor)
+Red Cards (bleed, burn, strength, multihit, lifesteal, low hp, trash, same name, armor)
 
 - deal 2 damage for each bleed
 - apply 3 bleed

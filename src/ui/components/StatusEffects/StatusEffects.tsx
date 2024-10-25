@@ -1,9 +1,10 @@
 import { styled } from 'styled-components';
 
-import strengthImage from './biceps.png';
-import dodgeImage from './body-balance.png';
-import extraCardPlaysImage from './card-play.png';
-import bleedImage from './drop.png';
+import strengthImage from './images/biceps.png';
+import dodgeImage from './images/body-balance.png';
+import extraCardPlaysImage from './images/card-play.png';
+import bleedImage from './images/drop.png';
+import regenImage from './images/falling-leaf.png';
 
 import { StatusEffects as StatusEffectsType } from '../../../game/gameState';
 import { maskImage } from '../../style';
@@ -15,6 +16,7 @@ const effectToImage: Partial<Record<keyof StatusEffectsType, string>> = {
   dodge: dodgeImage,
   extraCardPlays: extraCardPlaysImage,
   strength: strengthImage,
+  regen: regenImage,
 };
 
 const visibleStatusEffects = Object.keys(effectToImage) as (keyof StatusEffectsType)[];

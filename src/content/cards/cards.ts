@@ -11,6 +11,7 @@ import growingClub from './images/growing-club.png';
 import treeFall from './images/tree-fall.png';
 import bless from './images/bless.jpeg';
 import forestPath from './images/forest-path.jpeg';
+import curledLeaf from './images/curled-leaf.png';
 
 import type { CardState } from '../../game/gameState';
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
@@ -20,7 +21,7 @@ export const basicCards = {
   attack: createCard(
     [
       {
-        value: v(3),
+        value: v(5),
       },
     ],
     {
@@ -34,7 +35,7 @@ export const basicCards = {
       {
         target: 'self',
         name: 'heal',
-        value: v(3),
+        value: v(5),
       },
     ],
     {
@@ -49,7 +50,7 @@ export const greenCards = {
   damagePerTurn: createCard(
     [
       {
-        value: v('self', 'turn', 1),
+        value: v('self', 'turn', 2),
       },
     ],
     {
@@ -58,12 +59,12 @@ export const greenCards = {
       image: growingClub,
     },
   ),
-  largeDamage: createCard(
+  damageForGreen: createCard(
     [
       {
-        value: v(2),
+        value: v(4),
         add: {
-          value: v(5),
+          value: v(6),
           if: ifCompare('self', 'percentGreen', '>=', 50),
         },
       },
@@ -74,6 +75,30 @@ export const greenCards = {
       image: treeFall,
     },
   ),
+  // healForGreen: createCard([], {
+  //   name: 'Regrowth',
+  //   description: `Gain $V HP. Repeat if your previous card played was green.`,
+  //   image: bless,
+  // }),
+  regen: createCard(
+    [
+      {
+        target: 'self',
+        name: 'regen',
+        value: v(3),
+      },
+    ],
+    {
+      name: 'Regeneration',
+      description: `Gain $V regeneration.`,
+      image: curledLeaf,
+    },
+  ),
+  // healAndStrength: createCard([], {
+  //   name: 'Regrowth',
+  //   description: `Gain 3 HP and 2 strength.`,
+  //   image: bless,
+  // }),
 };
 
 Object.values(greenCards).forEach((card) => {
