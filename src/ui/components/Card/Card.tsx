@@ -50,10 +50,10 @@ const Title = styled('h2')`
 `;
 
 const Image = styled.img`
+  background: radial-gradient(white 0%, ${(props) => getCardColor(props.theme.color)} 80%);
   height: 55%;
   object-fit: cover;
   object-position: center;
-  border-bottom: solid 0.25em ${(props) => getBorderColor(props.theme.color)};
 `;
 
 const Text = styled.div`

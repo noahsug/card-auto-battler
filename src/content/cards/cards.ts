@@ -7,8 +7,10 @@ import phoenix from './images/phoenix.jpeg';
 import punch from './images/punch.png';
 import volcano from './images/volcano.jpeg';
 import cross from './images/cross.png';
-import log from './images/log.png';
 import growingClub from './images/growing-club.png';
+import treeFall from './images/tree-fall.png';
+import bless from './images/bless.jpeg';
+import forestPath from './images/forest-path.jpeg';
 
 import type { CardState } from '../../game/gameState';
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
@@ -47,7 +49,7 @@ export const greenCards = {
   damagePerTurn: createCard(
     [
       {
-        value: v('self', 'turn', 2),
+        value: v('self', 'turn', 1),
       },
     ],
     {
@@ -59,17 +61,17 @@ export const greenCards = {
   largeDamage: createCard(
     [
       {
-        value: v(3),
-        multiply: {
-          value: v(2),
+        value: v(2),
+        add: {
+          value: v(5),
           if: ifCompare('self', 'percentGreen', '>=', 50),
         },
       },
     ],
     {
       name: 'Treefall',
-      description: `Deal 3 damage. Deal double damage if at least half your cards are green.`,
-      image: log,
+      description: `Deal $V damage. Deal $A extra damage if at least half your cards are green.`,
+      image: treeFall,
     },
   ),
 };
