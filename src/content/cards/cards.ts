@@ -12,6 +12,7 @@ import treeFall from './images/tree-fall.png';
 import bless from './images/bless.jpeg';
 import forestPath from './images/forest-path.jpeg';
 import curledLeaf from './images/curled-leaf.png';
+import regrowth from './images/regrowth.jpeg';
 
 import type { CardState } from '../../game/gameState';
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
@@ -75,11 +76,24 @@ export const greenCards = {
       image: treeFall,
     },
   ),
-  // healForGreen: createCard([], {
-  //   name: 'Regrowth',
-  //   description: `Gain $V HP. Repeat if your previous card played was green.`,
-  //   image: bless,
-  // }),
+  healForGreen: createCard(
+    [
+      {
+        target: 'self',
+        name: 'heal',
+        value: v(4),
+      },
+    ],
+    {
+      repeat: {
+        value: v(1),
+        if: ifHas('self', 'prevCardIsGreen'),
+      },
+      name: 'Regrowth',
+      description: `Gain $V HP. Repeat if your previous card played was green.`,
+      image: regrowth,
+    },
+  ),
   regen: createCard(
     [
       {
@@ -94,11 +108,6 @@ export const greenCards = {
       image: curledLeaf,
     },
   ),
-  // healAndStrength: createCard([], {
-  //   name: 'Regrowth',
-  //   description: `Gain 3 HP and 2 strength.`,
-  //   image: bless,
-  // }),
 };
 
 Object.values(greenCards).forEach((card) => {

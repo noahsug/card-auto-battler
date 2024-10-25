@@ -19,9 +19,18 @@ export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
   statusEffectNames.map((effectName) => [effectName, 0]),
 ) as StatusEffects;
 
-type CalculatedPlayerValueName = 'percentGreen' | 'percentRed' | 'percentPurple' | 'turn';
+type CalculatedPlayerValueName =
+  | 'percentGreen'
+  | 'percentRed'
+  | 'percentPurple'
+  | 'prevCardIsGreen'
+  | 'prevCardIsRed'
+  | 'prevCardIsPurple'
+  | 'turn';
 
-export type PlayerValueName = keyof Omit<PlayerState, 'name' | 'image'> | CalculatedPlayerValueName;
+export type PlayerValueName =
+  | keyof Omit<PlayerState, 'name' | 'image' | 'previousCard'>
+  | CalculatedPlayerValueName;
 
 export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
 
@@ -93,6 +102,7 @@ export interface PlayerState extends StatusEffects {
   relics: RelicState[];
   currentCardIndex: number;
   cardsPlayedThisTurn: number;
+  previousCard?: CardState;
   name: string;
   image: string;
 }

@@ -106,6 +106,7 @@ export function playCard(game: GameState): BattleEvent[] {
   });
   events.push(...playCardEvents);
 
+  activePlayer.previousCard = card;
   activePlayer.currentCardIndex += 1;
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
     activePlayer.currentCardIndex = 0;
@@ -122,6 +123,8 @@ export function playCard(game: GameState): BattleEvent[] {
 function resetPlayerAfterBattle(player: PlayerState) {
   player.health = player.startingHealth;
   player.currentCardIndex = 0;
+  player.cardsPlayedThisTurn = 0;
+  player.previousCard = undefined;
   statusEffectNames.forEach((statusEffectName) => {
     player[statusEffectName] = 0;
   });

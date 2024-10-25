@@ -146,6 +146,17 @@ function getPlayerValue({ target, name }: PlayerValueDescriptor, context: PlayCa
     return calculatePercentColor(player, 'purple');
   }
 
+  const previousCardColor = player.previousCard?.color;
+  if (name === 'prevCardIsGreen') {
+    return previousCardColor === 'green' ? 1 : 0;
+  }
+  if (name === 'prevCardIsRed') {
+    return previousCardColor === 'red' ? 1 : 0;
+  }
+  if (name === 'prevCardIsPurple') {
+    return previousCardColor === 'purple' ? 1 : 0;
+  }
+
   const value = player[name];
   // e.g. number of trashed cards
   if (Array.isArray(value)) {

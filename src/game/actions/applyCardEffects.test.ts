@@ -1,6 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
-import { createCard, ifCompare, value as v } from '../../content/utils/createCard';
+import { createCard, ifCompare, ifHas, value as v } from '../../content/utils/createCard';
 import { diffValues } from '../../utils/objects';
 import { applyCardEffects } from './applyCardEffects';
 import { BLEED_DAMAGE } from '../constants';
@@ -253,6 +253,20 @@ describe('if', () => {
     });
     expect(majorityGreen.diff).toEqual({ opponent: { health: -1 } });
   });
+});
+
+it('compares to the previous card color', () => {
+  effect.if = ifHas('self', 'prevCardIsGreen');
+
+  const prevCardNotGreen = getPlayCardResult({
+    self: { previousCard: createCard() },
+  });
+  expect(prevCardNotGreen.diff).toEqual({});
+
+  const prevCardGreen = getPlayCardResult({
+    self: { previousCard: createCard([{}], { color: 'green' }) },
+  });
+  expect(prevCardGreen.diff).toEqual({ opponent: { health: -1 } });
 });
 
 describe('effect based on player value', () => {
