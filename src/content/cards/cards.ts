@@ -6,11 +6,110 @@ import parry from './images/parry.png';
 import phoenix from './images/phoenix.jpeg';
 import punch from './images/punch.png';
 import volcano from './images/volcano.jpeg';
+import cross from './images/cross.png';
+import log from './images/log.png';
+import growingClub from './images/growing-club.png';
 
 import type { CardState } from '../../game/gameState';
-import { createCard, value as v } from '../utils/createCard';
+import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
+import { multiply } from 'lodash';
 
-const fireCards = {
+export const basicCards = {
+  attack: createCard(
+    [
+      {
+        value: v(3),
+      },
+    ],
+    {
+      name: 'Punch',
+      description: `Deal $V damage.`,
+      image: punch,
+    },
+  ),
+  heal: createCard(
+    [
+      {
+        target: 'self',
+        name: 'heal',
+        value: v(3),
+      },
+    ],
+    {
+      name: 'Mend',
+      description: 'Gain $V HP.',
+      image: cross,
+    },
+  ),
+};
+
+export const greenCards = {
+  damagePerTurn: createCard(
+    [
+      {
+        value: v('self', 'turn', 2),
+      },
+    ],
+    {
+      name: 'Evergrowing Club',
+      description: `Deal 0 damage. Grow +$V damage at the end of your turn.`,
+      image: growingClub,
+    },
+  ),
+  largeDamage: createCard(
+    [
+      {
+        value: v(3),
+        multiply: {
+          value: v(2),
+          if: ifCompare('self', 'percentGreen', '>=', 50),
+        },
+      },
+    ],
+    {
+      name: 'Treefall',
+      description: `Deal 3 damage. Deal double damage if at least half your cards are green.`,
+      image: log,
+    },
+  ),
+};
+
+Object.values(greenCards).forEach((card) => {
+  card.color = 'green';
+});
+
+export const redCards = {
+  fireball: createCard(
+    [
+      {
+        value: v('self', 'cardsPlayedThisTurn', 3),
+      },
+    ],
+    {
+      name: 'Fireball',
+      description: 'Deal $V damage for each card played this turn.',
+      image: fireball,
+    },
+  ),
+  eviscerate: createCard(
+    [
+      {
+        value: v(2),
+        multiHit: v('opponent', 'bleed'),
+      },
+    ],
+    {
+      name: 'Eviscerate',
+      description: 'Deal $V damage 1 time for every bleed the enemy has.',
+      image: eviscerate,
+    },
+  ),
+};
+Object.values(redCards).forEach((card) => {
+  card.color = 'red';
+});
+
+export const purpleCards = {
   channel: createCard(
     [
       {
@@ -24,46 +123,15 @@ const fireCards = {
       image: channel,
     },
   ),
-  fireball: createCard(
-    [
-      {
-        value: v('self', 'cardsPlayedThisTurn', 3),
-      },
-    ],
-    {
-      name: 'Fireball',
-      description: 'Deal 3 damage for each card played this turn.',
-      image: fireball,
-    },
-  ),
 };
 
-export const allCards: Record<string, CardState> = {
-  ...fireCards,
-  punch: createCard(
-    [
-      {
-        value: v(7),
-      },
-    ],
-    {
-      name: 'Serious Punch',
-      description: 'Deal 7 damage.',
-      image: punch,
-    },
-  ),
+Object.values(purpleCards).forEach((card) => {
+  card.color = 'purple';
+});
 
-  eviscerate: createCard(
-    [
-      {
-        value: v(2),
-        multiHit: v('opponent', 'bleed'),
-      },
-    ],
-    {
-      name: 'Eviscerate',
-      description: 'Deal 2 damage 1 time for every bleed the enemy has.',
-      image: eviscerate,
-    },
-  ),
+export const allCards = {
+  ...basicCards,
+  ...redCards,
+  ...greenCards,
+  ...purpleCards,
 };

@@ -33,19 +33,19 @@ export function useGameState() {
     return actionEntries.reduce((acc, [name, action]) => {
       const { promise, resolve } = getResolvablePromise<ReturnType<Action>>();
       acc[name] = (...args: Tail<Parameters<Action>>) => {
-        setGameState(
-          produce((gameState) => {
-            resolve(action(gameState, ...args));
-          }),
-        );
-        setPast((past) => {
-          return [...past, gameState];
+        setGameState((gameState) => {
+          setPast((past) => {
+            return [...past, gameState];
+          });
+          return produce(gameState, (draft) => {
+            resolve(action(draft, ...args));
+          });
         });
         return promise;
       };
       return acc;
     }, {} as BoundActions);
-  }, [gameState]);
+  }, []);
 
   const canUndo = () => {
     return past.length > 0;

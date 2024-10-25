@@ -15,7 +15,7 @@ export const Punch: Story = {
   args: {
     size: 'large',
     color: 'basic',
-    card: allCards.punch,
+    card: allCards.attack,
   },
 };
 export const Fireball: Story = {

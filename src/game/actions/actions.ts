@@ -80,7 +80,7 @@ export function playCard(game: GameState): BattleEvent[] {
   activePlayer.cardsPlayedThisTurn += 1;
 
   // play card
-  const events = applyCardEffects(card, { self: activePlayer, opponent: nonActivePlayer });
+  const events = applyCardEffects(card, { game, self: activePlayer, opponent: nonActivePlayer });
 
   activePlayer.currentCardIndex += 1;
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {

@@ -8,6 +8,8 @@ import {
   Target,
   ValueDescriptor,
   PlayerState,
+  GameState,
+  CardColor,
 } from '../gameState';
 import { BLEED_DAMAGE } from '../constants';
 import { assert } from '../../utils/asserts';
@@ -15,6 +17,7 @@ import { BattleEvent } from './actions';
 import { readonlyIncludes } from '../../utils/iterators';
 
 interface PlayCardContext {
+  game: GameState;
   self: PlayerState;
   opponent: PlayerState;
   events: BattleEvent[];
@@ -28,10 +31,10 @@ interface EffectOptions {
 
 export function applyCardEffects(
   card: CardState,
-  { self, opponent }: { self: PlayerState; opponent: PlayerState },
+  { game, self, opponent }: { game: GameState; self: PlayerState; opponent: PlayerState },
 ) {
   const events: BattleEvent[] = [];
-  const context = { self, opponent, events };
+  const context = { game, self, opponent, events };
 
   let activations = 1;
   if (card.repeat) {
@@ -122,15 +125,32 @@ function getValue(descriptor: ValueDescriptor, context: PlayCardContext): number
   }
 }
 
+function calculatePercentColor(player: PlayerState, color: CardColor): number {
+  return (player.cards.filter((card) => card.color === color).length / player.cards.length) * 100;
+}
+
 function getPlayerValue({ target, name }: PlayerValueDescriptor, context: PlayCardContext): number {
   const player = context[target];
-  const value = player[name];
 
-  if (Array.isArray(value)) {
-    // e.g. number of trashed cards
-    return value.length;
+  if (name === 'turn') {
+    return Math.floor(context.game.turn / 2);
   }
 
+  if (name === 'percentGreen') {
+    return calculatePercentColor(player, 'green');
+  }
+  if (name === 'percentRed') {
+    return calculatePercentColor(player, 'red');
+  }
+  if (name === 'percentPurple') {
+    return calculatePercentColor(player, 'purple');
+  }
+
+  const value = player[name];
+  // e.g. number of trashed cards
+  if (Array.isArray(value)) {
+    return value.length;
+  }
   return value;
 }
 

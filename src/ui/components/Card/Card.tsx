@@ -1,10 +1,12 @@
 import { styled, ThemeProvider } from 'styled-components';
 
-import { CardState } from '../../../game/gameState';
+import { CardState, CardColor } from '../../../game/gameState';
 import { getHandDrawnBorderRadius, maskImage } from '../../style';
 import { Container } from '../shared/Container';
 import textBackground from './text-background.png';
 import { DescriptionText } from '../DescriptionText';
+import { parseDescriptionTemplate } from './parseDescriptionTemplate';
+import { getCardColor } from './cardColor';
 
 export const baseCardSize = { width: 12, height: 20 };
 
@@ -18,30 +20,11 @@ const CardRoot = styled.div<{ $size: Props['size'] }>`
   font-size: ${({ $size }) => cardSizeScaling[$size]}rem;
 `;
 
-const hsl = {
-  basic: [67, 18, 85],
-  purple: [267, 28, 80],
-  red: [0, 28, 80],
-  green: [118, 28, 80],
-};
-function getHSLString(hue: number, saturation: number, lightness: number) {
-  return `hsl(${hue} ${saturation}% ${lightness}%)`;
-}
-function getBackgroundColor(color: CardColor) {
-  const [hue, saturation, lightness] = hsl[color];
-  return getHSLString(hue, saturation, lightness);
-}
 function getTitleColor(color: CardColor) {
-  const [hue, saturation] = hsl[color];
-  let lightness = hsl[color][2];
-  lightness += 10;
-  return getHSLString(hue, saturation, lightness);
+  return getCardColor(color, { brighten: 10 });
 }
 function getBorderColor(color: CardColor) {
-  const [hue, saturation] = hsl[color];
-  let lightness = hsl[color][2];
-  lightness = 15;
-  return getHSLString(hue, saturation, lightness);
+  return getCardColor(color, { brighten: -62 });
 }
 
 const OuterContainer = styled(Container)`
@@ -49,7 +32,7 @@ const OuterContainer = styled(Container)`
   width: ${baseCardSize.width}em;
   text-align: center;
   color: var(--color-bg);
-  background-color: ${(props) => getBackgroundColor(props.theme.color)};
+  background-color: ${(props) => getCardColor(props.theme.color)};
   ${getHandDrawnBorderRadius}
   border: solid 0.5em ${(props) => getBorderColor(props.theme.color)};
   padding: 0;
@@ -86,19 +69,17 @@ const Text = styled.div`
 interface Props {
   card: CardState;
   size: 'small' | 'medium' | 'large';
-  color?: CardColor;
   onClick?: (event: React.MouseEvent) => void;
   style?: React.CSSProperties;
 }
 
-type CardColor = 'basic' | 'purple' | 'red' | 'green';
-
-export function Card({ size, color = 'basic', card, onClick, style }: Props) {
-  const { name, description, image } = card;
+export function Card({ size, card, onClick, style }: Props) {
+  const { name, image } = card;
+  const description = parseDescriptionTemplate(card);
 
   return (
     <CardRoot $size={size} className="card" onClick={onClick} style={style}>
-      <ThemeProvider theme={{ color }}>
+      <ThemeProvider theme={{ color: card.color }}>
         <OuterContainer>
           <Image src={image} alt="{name}" />
           <Title>{name}</Title>

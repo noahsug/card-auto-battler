@@ -4,6 +4,7 @@ import { fn } from '@storybook/test';
 import { createGameState } from '../../../game/gameState';
 import { getRandomCards } from '../../../game/utils/getRandomCards';
 import { CardSelectionScreen } from './CardSelectionScreen';
+import { allCards } from '../../../content/cards';
 
 const meta = {
   title: 'CardSelectionScreen',
@@ -20,6 +21,14 @@ export const Primary: Story = {
   args: {
     game: createGameState(),
     cards: getRandomCards(6),
+    onCardsSelected: fn,
+  },
+};
+
+export const AllCards: Story = {
+  args: {
+    game: createGameState(),
+    cards: Object.values(allCards),
     onCardsSelected: fn,
   },
 };

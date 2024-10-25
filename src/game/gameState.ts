@@ -18,7 +18,9 @@ export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
   statusEffectNames.map((effectName) => [effectName, 0]),
 ) as StatusEffects;
 
-export type PlayerValueName = keyof Omit<PlayerState, 'name' | 'image'>;
+type CalculatedPlayerValueName = 'percentGreen' | 'percentRed' | 'percentPurple' | 'turn';
+
+export type PlayerValueName = keyof Omit<PlayerState, 'name' | 'image'> | CalculatedPlayerValueName;
 
 export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
 
@@ -57,12 +59,16 @@ export interface CardEffect {
   if?: If;
 }
 
+export const cardColors = ['basic', 'purple', 'red', 'green'] as const;
+export type CardColor = (typeof cardColors)[number];
+
 export interface CardState {
   effects: CardEffect[];
   repeat?: MaybeValue;
   name: string;
   description: string;
   image: string;
+  color: CardColor;
 }
 
 export interface RelicEffect {
@@ -113,10 +119,10 @@ function createPlayer({ name, image }: { name: string; image: string }): PlayerS
 }
 
 export function createGameState(): GameState {
-  const { punch, fireball, eviscerate } = allCards;
+  const { attack, heal, fireball } = allCards;
 
   const user = createPlayer(allHeroes.warrior);
-  user.cards = [punch, fireball, eviscerate];
+  user.cards = [attack, attack, heal];
 
   const enemy = createPlayer(allEnemies.fireMonster);
   enemy.cards = [fireball, fireball, fireball];

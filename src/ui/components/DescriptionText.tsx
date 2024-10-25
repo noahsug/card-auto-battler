@@ -1,22 +1,39 @@
 import { styled } from 'styled-components';
+import { CardColor, cardColors } from '../../game/gameState';
 import { assert } from '../../utils/asserts';
-import { Number } from './shared/Number';
+import { getCardColor } from './Card/cardColor';
 
-const Value = styled(Number)`
+const Value = styled.span`
   font-weight: bold;
-  font-size: 1.1em;
 `;
 
+const numericWords = ['double', 'triple', 'quadruple', 'quintuple'];
+
+const cardColorsToHighlight: string[] = cardColors.filter((color) => color !== 'basic');
+
 function TextLine({ text }: { text: string }) {
-  const parts = text.split(/(\d+)/);
+  const parts = text.split(
+    new RegExp(`(\\d+|${numericWords.join('|')}|${cardColorsToHighlight.join('|')})`),
+  );
   return (
     <div>
       {parts.map((part, i) => {
-        if (!/\d+/.test(part)) return part;
+        const isNumber = part.match(/^\d+$/) != null;
+        const isNumericWord = numericWords.includes(part);
+        const isColor = cardColorsToHighlight.includes(part);
+        if (!isNumber && !isNumericWord && !isColor) return part;
 
-        const fontFamily = 'var(--font-number)';
+        const style: React.CSSProperties = {};
+        if (isNumber) {
+          style.fontFamily = 'var(--font-number)';
+          style.fontSize = '1.2em';
+        } else if (isColor) {
+          style.color = getCardColor(part as CardColor, { saturate: 100, brighten: -62 });
+          style.textDecoration = 'uppercase';
+        }
+
         return (
-          <Value style={{ fontFamily }} key={i}>
+          <Value style={style} key={i}>
             {part}
           </Value>
         );

@@ -1,6 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
-import { createCard, value as v } from '../../content/utils/createCard';
+import { createCard, ifCompare, value as v } from '../../content/utils/createCard';
 import { diffValues } from '../../utils/objects';
 import { applyCardEffects } from './applyCardEffects';
 import { BLEED_DAMAGE } from '../constants';
@@ -17,11 +17,16 @@ beforeEach(() => {
 function getPlayCardResult({
   self: selfOverrides,
   opponent: opponentOverrides,
+  turn: turnOverride,
 }: {
   self?: Partial<PlayerState>;
   opponent?: Partial<PlayerState>;
+  turn?: number;
 } = {}) {
-  const { user, enemy } = createGameState();
+  const game = createGameState();
+  game.turn = turnOverride || 0;
+
+  const { user, enemy } = game;
   user.cards = [createCard(), createCard(), createCard()];
   enemy.cards = [createCard(), createCard(), createCard()];
 
@@ -29,7 +34,7 @@ function getPlayCardResult({
   const opponent = Object.assign(enemy, opponentOverrides);
   const init = cloneDeep({ self, opponent });
 
-  const events = applyCardEffects(card, { self, opponent });
+  const events = applyCardEffects(card, { game, self, opponent });
 
   const diff = diffValues(init, { self, opponent });
   return { self, opponent, init, diff, events };
@@ -231,6 +236,23 @@ describe('if', () => {
     const lessThanHalfHealth = getPlayCardResult({ self: { health: 9 } });
     expect(lessThanHalfHealth.diff).toEqual({ opponent: { health: -1 } });
   });
+
+  it('compares to percentGreen', () => {
+    effect.if = ifCompare('self', 'percentGreen', '>=', 50);
+
+    const basicCard = createCard();
+    const greenCard = createCard([{}], { color: 'green' });
+
+    const majorityBasic = getPlayCardResult({
+      self: { cards: [basicCard, basicCard, greenCard] },
+    });
+    expect(majorityBasic.diff).toEqual({});
+
+    const majorityGreen = getPlayCardResult({
+      self: { cards: [basicCard, basicCard, greenCard, greenCard] },
+    });
+    expect(majorityGreen.diff).toEqual({ opponent: { health: -1 } });
+  });
 });
 
 describe('effect based on player value', () => {
@@ -249,6 +271,13 @@ describe('effect based on player value', () => {
     const { diff } = getPlayCardResult({ opponent: { strength: 2 } });
 
     expect(diff).toEqual({ opponent: { health: -6 } });
+  });
+
+  it('deals damage equal to self turns passed', () => {
+    effect.value = v('self', 'turn');
+    const { diff } = getPlayCardResult({ turn: 5 });
+
+    expect(diff).toEqual({ opponent: { health: -2 } });
   });
 });
 

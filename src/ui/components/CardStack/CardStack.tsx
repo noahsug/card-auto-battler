@@ -40,13 +40,12 @@ export function CardStack(props: Props) {
     cardDealDirection,
   });
 
-  const cardColor = playerType === 'user' ? 'regular' : 'red';
   return (
     <div>
       <StackedCardsContainer ref={container}>
         {render((style, { card }) => (
           <AnimatedContainer style={style}>
-            <Card card={card} size="medium" color={cardColor} />
+            <Card card={card} size="medium" />
           </AnimatedContainer>
         ))}
       </StackedCardsContainer>

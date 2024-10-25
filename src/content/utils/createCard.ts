@@ -21,7 +21,13 @@ export function getEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {
 // returns a CardState with defaults
 export function createCard(
   effects: Partial<CardEffect>[] = [{}],
-  { repeat, name = '', description = '', image = '' }: Partial<Omit<CardState, 'effects'>> = {},
+  {
+    repeat,
+    name = '',
+    description = '',
+    image = '',
+    color = 'basic',
+  }: Partial<Omit<CardState, 'effects'>> = {},
 ): CardState {
   return {
     effects: effects.map(getEffect),
@@ -29,6 +35,7 @@ export function createCard(
     name,
     description,
     image,
+    color,
   };
 }
 
