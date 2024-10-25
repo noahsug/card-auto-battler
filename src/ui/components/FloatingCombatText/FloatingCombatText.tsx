@@ -43,6 +43,7 @@ const Text = styled(animated.div)<{ $type: BattleEvent['type'] }>`
   inset: 0;
   width: 0;
   height: 0;
+  z-index: 100;
 `;
 
 function getTextFromBattleEvent(battleEvent: BattleEvent) {

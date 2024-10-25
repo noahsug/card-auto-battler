@@ -1,21 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
-import cloneDeep from 'lodash/cloneDeep';
 
 import { BattleEvent } from '../../game/actions';
 import { GameState } from '../../game/gameState';
 import { getBattleWinner, getIsUserTurn, getPlayerTargets } from '../../game/utils/selectors';
+import { CanUndo, PlayCard, Undo } from '../hooks/useGameState';
 import { BattleControls } from './BattleControls';
 import { CardStack } from './CardStack';
 import { FloatingCombatText } from './FloatingCombatText';
 import { HealthBar } from './HealthBar';
 import { HUD } from './HUD';
 import { PlayerProfile } from './PlayerProfile';
+import { CenterContent } from './shared/CenterContent';
 import { Container } from './shared/Container';
 import { Row } from './shared/Row';
-import { CenterContent } from './shared/CenterContent';
 import { StatusEffects } from './StatusEffects';
-import { CanUndo, PlayCard, Undo } from '../hooks/useGameState';
 
 const EMPTY_BATTLE_EVENTS: { user: BattleEvent[]; enemy: BattleEvent[] } = { user: [], enemy: [] };
 
@@ -43,7 +42,7 @@ export function BattleScreen({
   const { user, enemy, turn } = game;
   const [userTarget, enemyTarget] = getPlayerTargets(game);
 
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
 
   const [battleEvents, setBattleEvents] = useState(EMPTY_BATTLE_EVENTS);
 
@@ -56,11 +55,11 @@ export function BattleScreen({
   }, [undo]);
 
   const handlePlayNextCard = useCallback(async () => {
-    // TODO: battle events are F'd, maybe due to useGameState changes
-    const battleEvents = await playCard();
+    const events = await playCard();
+
     setBattleEvents({
-      user: battleEvents.filter(({ target }) => target === userTarget),
-      enemy: battleEvents.filter(({ target }) => target === enemyTarget),
+      user: events.filter(({ target }) => target === userTarget),
+      enemy: events.filter(({ target }) => target === enemyTarget),
     });
   }, [playCard, userTarget, enemyTarget]);
 

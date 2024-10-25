@@ -45,7 +45,9 @@ export function useGameState() {
       };
       return acc;
     }, {} as BoundActions);
-  }, []);
+    // without this dep, actions somehow return memoized results
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState]);
 
   const canUndo = () => {
     return past.length > 0;
