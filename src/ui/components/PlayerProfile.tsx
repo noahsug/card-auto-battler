@@ -101,7 +101,7 @@ function getDamageAnimation({
   };
 }
 
-function getBattleAnimation({
+function getBattleAnimationForPhase({
   battleEvents,
   direction,
   u,
@@ -115,6 +115,31 @@ function getBattleAnimation({
   if (misses > 0 && damage <= 0) return getDodgeAnimation({ u });
   if (damage < 0) return getHealAnimation({ u });
   return getDamageAnimation({ damage, direction, u });
+}
+
+function getBattleAnimation({
+  battleEvents,
+  direction,
+  u,
+}: {
+  battleEvents: BattleEvent[];
+  direction: Direction;
+  u: UnitFn;
+}) {
+  const startOfTurnEvents = battleEvents.filter((event) => event.source === 'startOfTurn');
+  const startOfTurnAnimation = getBattleAnimationForPhase({
+    battleEvents: startOfTurnEvents,
+    direction,
+    u,
+  });
+  if (startOfTurnAnimation) {
+    startOfTurnAnimation.delay = 0;
+  }
+
+  const cardEvents = battleEvents.filter((event) => event.source === 'card');
+  const cardAnimation = getBattleAnimationForPhase({ battleEvents: cardEvents, direction, u });
+
+  return [startOfTurnAnimation, cardAnimation];
 }
 
 function getDeathAnimation({
