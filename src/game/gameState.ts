@@ -69,8 +69,8 @@ export interface CardEffect {
   if?: If;
 }
 
-export const cardColors = ['basic', 'purple', 'red', 'green'] as const;
-export type CardColor = (typeof cardColors)[number];
+export const tribes = ['basic', 'purple', 'red', 'green'] as const;
+export type Tribe = (typeof tribes)[number];
 
 export interface CardState {
   effects: CardEffect[];
@@ -78,7 +78,7 @@ export interface CardState {
   name: string;
   description: string;
   image: string;
-  color: CardColor;
+  tribe: Tribe;
 }
 
 export interface RelicEffect {

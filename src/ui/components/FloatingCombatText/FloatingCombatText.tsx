@@ -1,13 +1,12 @@
-import { styled } from 'styled-components';
 import { animated } from '@react-spring/web';
+import { styled } from 'styled-components';
 
-import {
-  useFloatingCombatTextAnimation,
-  Props as AnimationProps,
-} from './useFloatingCombatTextAnimation';
 import { BattleEvent } from '../../../game/actions/battleEvent';
 import { Z_INDEX } from '../../constants';
-import { useMemo } from 'react';
+import {
+  Props as AnimationProps,
+  useFloatingCombatTextAnimation,
+} from './useFloatingCombatTextAnimation';
 
 export type Props = AnimationProps;
 

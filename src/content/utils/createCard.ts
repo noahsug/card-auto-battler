@@ -26,7 +26,7 @@ export function createCard(
     name = '',
     description = '',
     image = '',
-    color = 'basic',
+    tribe = 'basic',
   }: Partial<Omit<CardState, 'effects'>> = {},
 ): CardState {
   return {
@@ -35,7 +35,7 @@ export function createCard(
     name,
     description,
     image,
-    color,
+    tribe,
   };
 }
 

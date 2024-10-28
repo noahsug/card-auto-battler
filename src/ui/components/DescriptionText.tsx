@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-import { CardColor, cardColors } from '../../game/gameState';
+import { Tribe, tribes } from '../../game/gameState';
 import { assert } from '../../utils/asserts';
 import { getCardColor } from './Card/cardColor';
 
@@ -9,26 +9,26 @@ const Value = styled.span`
 
 const numericWords = ['double', 'triple', 'quadruple', 'quintuple'];
 
-const cardColorsToHighlight: string[] = cardColors.filter((color) => color !== 'basic');
+const tribeTextToHighlight: string[] = tribes.filter((tribe) => tribe !== 'basic');
 
 function TextLine({ text }: { text: string }) {
   const parts = text.split(
-    new RegExp(`(\\d+%{0,1}|${numericWords.join('|')}|${cardColorsToHighlight.join('|')})`),
+    new RegExp(`(\\d+%{0,1}|${numericWords.join('|')}|${tribeTextToHighlight.join('|')})`),
   );
   return (
     <div>
       {parts.map((part, i) => {
         const isNumber = part.match(/^\d+%{0,1}$/) != null;
         const isNumericWord = numericWords.includes(part);
-        const isColor = cardColorsToHighlight.includes(part);
-        if (!isNumber && !isNumericWord && !isColor) return part;
+        const isTribe = tribeTextToHighlight.includes(part);
+        if (!isNumber && !isNumericWord && !isTribe) return part;
 
         const style: React.CSSProperties = {};
         if (isNumber) {
           style.fontFamily = 'var(--font-number)';
           style.fontSize = '1.2em';
-        } else if (isColor) {
-          style.color = getCardColor(part as CardColor, { saturate: 100, brighten: -62 });
+        } else if (isTribe) {
+          style.color = getCardColor(part as Tribe, { saturate: 100, brighten: -62 });
           style.textDecoration = 'uppercase';
         }
 

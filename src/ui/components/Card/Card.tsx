@@ -1,6 +1,6 @@
 import { styled, ThemeProvider } from 'styled-components';
 
-import { CardState, CardColor } from '../../../game/gameState';
+import { CardState, Tribe } from '../../../game/gameState';
 import { getHandDrawnBorderRadius, maskImage } from '../../style';
 import { Container } from '../shared/Container';
 import textBackground from './text-background.png';
@@ -21,11 +21,11 @@ const CardRoot = styled.div<{ $size: Props['size'] }>`
   font-size: ${({ $size }) => cardSizeScaling[$size]}rem;
 `;
 
-function getTitleColor(color: CardColor) {
-  return getCardColor(color, { brighten: 10 });
+function getTitleColor(tribe: Tribe) {
+  return getCardColor(tribe, { brighten: 10 });
 }
-function getBorderColor(color: CardColor) {
-  return getCardColor(color, { brighten: -62 });
+function getBorderColor(tribe: Tribe) {
+  return getCardColor(tribe, { brighten: -62 });
 }
 
 const OuterContainer = styled(Container)`
@@ -33,9 +33,9 @@ const OuterContainer = styled(Container)`
   width: ${baseCardSize.width}em;
   text-align: center;
   color: var(--color-bg);
-  background-color: ${(props) => getCardColor(props.theme.color)};
+  background-color: ${(props) => getCardColor(props.theme.tribe)};
   ${getHandDrawnBorderRadius}
-  border: solid 0.5em ${(props) => getBorderColor(props.theme.color)};
+  border: solid 0.5em ${(props) => getBorderColor(props.theme.tribe)};
   padding: 0;
   position: relative;
 `;
@@ -43,7 +43,7 @@ const OuterContainer = styled(Container)`
 const Title = styled('h2')`
   width: 95%;
   ${maskImage({ src: textBackground })};
-  color: ${(props) => getTitleColor(props.theme.color)};
+  color: ${(props) => getTitleColor(props.theme.tribe)};
   height: 1.15em;
   background-color: var(--color-bg);
   position: absolute;
@@ -51,7 +51,7 @@ const Title = styled('h2')`
 `;
 
 const CardImage = styled(Image)`
-  background: radial-gradient(white 0%, ${(props) => getCardColor(props.theme.color)} 80%);
+  background: radial-gradient(white 0%, ${(props) => getCardColor(props.theme.tribe)} 80%);
   height: 55%;
 `;
 
@@ -78,7 +78,7 @@ export function Card({ size, card, onClick, style }: Props) {
 
   return (
     <CardRoot $size={size} className="card" onClick={onClick} style={style}>
-      <ThemeProvider theme={{ color: card.color }}>
+      <ThemeProvider theme={{ tribe: card.tribe }}>
         <OuterContainer>
           <CardImage src={image} alt="{name}" />
           <Title>{name}</Title>

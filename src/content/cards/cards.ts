@@ -158,7 +158,7 @@ export const greenCards = {
 };
 
 Object.values(greenCards).forEach((card) => {
-  card.color = 'green';
+  card.tribe = 'green';
 });
 
 export const redCards = {
@@ -189,7 +189,7 @@ export const redCards = {
   ),
 };
 Object.values(redCards).forEach((card) => {
-  card.color = 'red';
+  card.tribe = 'red';
 });
 
 export const purpleCards = {
@@ -209,7 +209,7 @@ export const purpleCards = {
 };
 
 Object.values(purpleCards).forEach((card) => {
-  card.color = 'purple';
+  card.tribe = 'purple';
 });
 
 export const allCards = {

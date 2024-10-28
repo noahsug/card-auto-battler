@@ -9,7 +9,7 @@ import {
   ValueDescriptor,
   PlayerState,
   GameState,
-  CardColor,
+  Tribe,
 } from '../gameState';
 import { BLEED_DAMAGE } from '../constants';
 import { assert } from '../../utils/asserts';
@@ -125,8 +125,8 @@ function getValue(descriptor: ValueDescriptor, context: PlayCardContext): number
   }
 }
 
-function calculatePercentColor(player: PlayerState, color: CardColor): number {
-  return (player.cards.filter((card) => card.color === color).length / player.cards.length) * 100;
+function calculateTribePercent(player: PlayerState, tribe: Tribe): number {
+  return (player.cards.filter((card) => card.tribe === tribe).length / player.cards.length) * 100;
 }
 
 function getPlayerValue({ target, name }: PlayerValueDescriptor, context: PlayCardContext): number {
@@ -137,24 +137,24 @@ function getPlayerValue({ target, name }: PlayerValueDescriptor, context: PlayCa
   }
 
   if (name === 'percentGreen') {
-    return calculatePercentColor(player, 'green');
+    return calculateTribePercent(player, 'green');
   }
   if (name === 'percentRed') {
-    return calculatePercentColor(player, 'red');
+    return calculateTribePercent(player, 'red');
   }
   if (name === 'percentPurple') {
-    return calculatePercentColor(player, 'purple');
+    return calculateTribePercent(player, 'purple');
   }
 
-  const previousCardColor = player.previousCard?.color;
+  const previousCardTribe = player.previousCard?.tribe;
   if (name === 'prevCardIsGreen') {
-    return previousCardColor === 'green' ? 1 : 0;
+    return previousCardTribe === 'green' ? 1 : 0;
   }
   if (name === 'prevCardIsRed') {
-    return previousCardColor === 'red' ? 1 : 0;
+    return previousCardTribe === 'red' ? 1 : 0;
   }
   if (name === 'prevCardIsPurple') {
-    return previousCardColor === 'purple' ? 1 : 0;
+    return previousCardTribe === 'purple' ? 1 : 0;
   }
 
   const value = player[name];

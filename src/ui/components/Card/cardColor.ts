@@ -1,6 +1,6 @@
-import { CardColor } from '../../../game/gameState';
+import { Tribe } from '../../../game/gameState';
 
-const hsl: Record<CardColor, [number, number, number]> = {
+const hsl: Record<Tribe, [number, number, number]> = {
   basic: [67, 0, 80],
   purple: [267, 30, 80],
   red: [0, 30, 80],
@@ -17,11 +17,11 @@ interface CardColorOptions {
   brighten?: number;
 }
 
-export function getCardColor(color: CardColor, options: CardColorOptions = {}) {
+export function getCardColor(tribe: Tribe, options: CardColorOptions = {}) {
   const hueShift = options.hueShift || 0;
   const saturate = options.saturate || 0;
   const brighten = options.brighten || 0;
 
-  const [hue, saturation, lightness] = hsl[color];
+  const [hue, saturation, lightness] = hsl[tribe];
   return getHSLString(hue + hueShift, saturation + saturate, lightness + brighten);
 }

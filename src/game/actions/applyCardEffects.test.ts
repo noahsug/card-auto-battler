@@ -241,7 +241,7 @@ describe('if', () => {
     effect.if = ifCompare('self', 'percentGreen', '>=', 50);
 
     const basicCard = createCard();
-    const greenCard = createCard([{}], { color: 'green' });
+    const greenCard = createCard([{}], { tribe: 'green' });
 
     const majorityBasic = getPlayCardResult({
       self: { cards: [basicCard, basicCard, greenCard] },
@@ -254,7 +254,7 @@ describe('if', () => {
     expect(majorityGreen.diff).toEqual({ opponent: { health: -1 } });
   });
 
-  it('compares to the previous card color', () => {
+  it('compares to the previous card tribe', () => {
     effect.if = ifHas('self', 'prevCardIsGreen');
 
     const prevCardNotGreen = getPlayCardResult({
@@ -263,7 +263,7 @@ describe('if', () => {
     expect(prevCardNotGreen.diff).toEqual({});
 
     const prevCardGreen = getPlayCardResult({
-      self: { previousCard: createCard([{}], { color: 'green' }) },
+      self: { previousCard: createCard([{}], { tribe: 'green' }) },
     });
     expect(prevCardGreen.diff).toEqual({ opponent: { health: -1 } });
   });
