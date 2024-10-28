@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { BattleEvent } from '../../game/actions';
+import { BattleEvent } from '../../game/actions/battleEvent';
 import { GameState } from '../../game/gameState';
 import { getBattleWinner, getIsUserTurn, getPlayerTargets } from '../../game/utils/selectors';
 import { CanUndo, PlayCard, Undo } from '../hooks/useGameState';
@@ -57,10 +57,10 @@ export function BattleScreen({
   const handlePlayNextCard = useCallback(async () => {
     const events = await playCard();
 
-    setBattleEvents((existingEvents) => ({
-      user: [...existingEvents.user, ...events.filter(({ target }) => target === userTarget)],
-      enemy: [...existingEvents.enemy, ...events.filter(({ target }) => target === enemyTarget)],
-    }));
+    setBattleEvents({
+      user: [...events.filter(({ target }) => target === userTarget)],
+      enemy: [...events.filter(({ target }) => target === enemyTarget)],
+    });
   }, [playCard, userTarget, enemyTarget]);
 
   const handleTogglePlayPause = useCallback(() => {

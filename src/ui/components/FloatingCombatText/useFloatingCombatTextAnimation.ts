@@ -1,8 +1,8 @@
 import { useSpringRef, useTransition } from '@react-spring/web';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 
+import { BattleEvent } from '../../../game/actions/battleEvent';
 import { useUnits } from '../../hooks/useUnits';
-import { BattleEvent } from '../../../game/actions';
 import { CARD_ANIMATION_DELAY } from '../CardStack/useCardStackAnimation';
 
 export interface Props {
@@ -10,7 +10,7 @@ export interface Props {
   targetElement: Element | null;
 }
 
-type TextAnimation = ReturnType<typeof createTextAnimation>;
+type AnimationData = ReturnType<typeof createTextAnimation>;
 
 function createTextAnimation(battleEvent: BattleEvent) {
   return {
@@ -24,7 +24,7 @@ function createTextAnimation(battleEvent: BattleEvent) {
 export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: Props) {
   const [u] = useUnits();
   const animationController = useSpringRef();
-  const textAnimationsRef = useRef<TextAnimation[]>([]);
+  const animations = useMemo(() => battleEvents.map(createTextAnimation), [battleEvents]);
 
   function getXY({ xOffsetRatio, yOffsetRatio }: { xOffsetRatio: number; yOffsetRatio: number }) {
     if (targetElement == null) return { x: 0, y: 0 };
@@ -33,11 +33,11 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
     return { x: width * xOffsetRatio, y: (height / 2) * yOffsetRatio };
   }
 
-  function getAnimationStart(textAnimation: TextAnimation) {
+  function getAnimationStart(textAnimation: AnimationData) {
     return { ...getXY(textAnimation), opacity: 0 };
   }
 
-  function animateCombatText(textAnimation: TextAnimation) {
+  function animateCombatText(textAnimation: AnimationData) {
     // delay the animation until the play is played
     const delay = textAnimation.battleEvent.source === 'card' ? CARD_ANIMATION_DELAY : 0;
 
@@ -51,7 +51,7 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
     };
   }
 
-  function getAnimationEnd(textAnimation: TextAnimation) {
+  function getAnimationEnd(textAnimation: AnimationData) {
     const { x, y: startY } = getXY(textAnimation);
     const y = startY + u(-10);
     return {
@@ -63,17 +63,8 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
     };
   }
 
-  useMemo(() => {
-    if (battleEvents.length === 0) {
-      textAnimationsRef.current = [];
-    } else {
-      const newBattleEvents = battleEvents.slice(textAnimationsRef.current.length);
-      textAnimationsRef.current.push(...newBattleEvents.map(createTextAnimation));
-    }
-  }, [battleEvents]);
-
-  const render = useTransition(textAnimationsRef.current, {
-    key: ({ key }: TextAnimation) => key,
+  const render = useTransition(animations, {
+    key: ({ key }: AnimationData) => key,
     from: getAnimationStart,
     enter: animateCombatText,
     leave: getAnimationEnd,
@@ -82,7 +73,7 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
 
   useEffect(() => {
     animationController.start();
-  }, [animationController, textAnimationsRef.current.length]);
+  }, [animationController, animations]);
 
   return render;
 }

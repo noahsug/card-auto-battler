@@ -13,12 +13,7 @@ import {
 } from '../gameState';
 import { BLEED_DAMAGE } from '../constants';
 import { assert } from '../../utils/asserts';
-import {
-  BattleEvent,
-  createDamageEvent,
-  createHealEvent,
-  createMissEvent,
-} from '../utils/battleEvent';
+import { BattleEvent, createDamageEvent, createHealEvent, createMissEvent } from './battleEvent';
 import { readonlyIncludes } from '../../utils/iterators';
 
 interface PlayCardContext {

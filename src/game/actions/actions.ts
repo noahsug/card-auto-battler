@@ -11,7 +11,7 @@ import {
 } from '../gameState';
 import { getBattleWinner, getPlayers } from '../utils/selectors';
 import { applyCardEffects } from './applyCardEffects';
-import { BattleEvent, createDamageEvent, createHealEvent } from '../utils/battleEvent';
+import { BattleEvent, createDamageEvent, createHealEvent } from './battleEvent';
 
 export function addCards(game: GameState, cards: CardState[]) {
   game.user.cards.push(...cards);

@@ -3,7 +3,7 @@ import { RefObject, useEffect } from 'react';
 import { animated, useSpring, easings, to } from '@react-spring/web';
 import clamp from 'lodash/clamp';
 
-import { BattleEvent } from '../../game/actions';
+import { BattleEvent } from '../../game/actions/battleEvent';
 import { useUnits, UnitFn } from '../hooks/useUnits';
 import { Direction } from '../../utils/types';
 import { CARD_ANIMATION_DELAY } from './CardStack/useCardStackAnimation';

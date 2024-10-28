@@ -39,7 +39,7 @@ export function App() {
   const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const { game, actions, undoManager } = useGameState();
-  const { addCards, addRelic, startBattle, endBattle, resetGame } = actions;
+  const { addCards, addRelic, endBattle, resetGame } = actions;
   const { clearUndo } = undoManager;
 
   // passed to battle screen so it doesn't update after battle is over
@@ -53,11 +53,10 @@ export function App() {
       setScreen(screen);
       setOverlay('none');
       if (screen === 'battle') {
-        startBattle();
         clearUndo();
       }
     },
-    [clearUndo, startBattle],
+    [clearUndo],
   );
 
   const startCardSelection = useCallback(() => {

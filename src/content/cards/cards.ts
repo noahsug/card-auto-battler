@@ -12,11 +12,9 @@ import treeFall from './images/tree-fall.png';
 import bless from './images/bless.jpeg';
 import forestPath from './images/forest-path.jpeg';
 import curledLeaf from './images/curled-leaf.png';
-import regrowth from './images/regrowth.jpeg';
+import regrowth from './images/regrowth.png';
 
-import type { CardState } from '../../game/gameState';
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
-import { multiply } from 'lodash';
 
 export const basicCards = {
   attack: createCard(

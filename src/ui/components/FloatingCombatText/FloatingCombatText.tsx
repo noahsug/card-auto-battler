@@ -1,11 +1,13 @@
 import { styled } from 'styled-components';
 import { animated } from '@react-spring/web';
 
-import { BattleEvent } from '../../../game/actions';
 import {
   useFloatingCombatTextAnimation,
   Props as AnimationProps,
 } from './useFloatingCombatTextAnimation';
+import { BattleEvent } from '../../../game/actions/battleEvent';
+import { Z_INDEX } from '../constants';
+import { useMemo } from 'react';
 
 export type Props = AnimationProps;
 
@@ -43,7 +45,7 @@ const Text = styled(animated.div)<{ $type: BattleEvent['type'] }>`
   inset: 0;
   width: 0;
   height: 0;
-  z-index: 100;
+  z-index: ${Z_INDEX.floatingCombatText};
 `;
 
 function getTextFromBattleEvent(battleEvent: BattleEvent) {
