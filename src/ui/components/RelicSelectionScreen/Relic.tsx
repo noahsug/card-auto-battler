@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
 
-import { RelicState } from '../../../game/gameState';
+import { RelicState, Tribe } from '../../../game/gameState';
 import { getHandDrawnBorderRadius, maskImage } from '../../style';
 import { Row } from '../shared/Row';
 import { DescriptionText } from '../DescriptionText';
@@ -24,11 +24,25 @@ const Root = styled(Row)`
   border: solid 0.5em var(--color-bg-light);
 `;
 
-export const RelicImage = styled.div<{ src: string; $color: string }>`
+function getHue(tribe: Tribe) {
+  switch (tribe) {
+    case 'basic':
+      return 0;
+    case 'green':
+      return 118;
+    case 'red':
+      return 330;
+    case 'purple':
+      return 267;
+  }
+  tribe satisfies never;
+}
+
+export const RelicImage = styled.div<{ src: string; $tribe: Tribe }>`
   width: 6rem;
   height: 6rem;
   ${maskImage}
-  background-color: ${(props) => props.$color};
+  background-color: hsl(${(props) => getHue(props.$tribe)}, 33%, 75%);
 `;
 
 const Title = styled('h2')`
@@ -45,7 +59,7 @@ const Text = styled.div`
 export function Relic({ relic, onClick, style }: Props) {
   return (
     <Root onClick={onClick} style={style}>
-      <RelicImage src={relic.image} $color={relic.color} />
+      <RelicImage src={relic.image} $tribe={relic.tribe} />
       <TextContainer>
         <Title>{relic.name}</Title>
         <Text>

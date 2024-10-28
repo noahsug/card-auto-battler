@@ -75,7 +75,7 @@ export function HUD({ game, onViewDeck }: Props) {
       </IconRow>
       <RelicRow>
         {user.relics.map((relic, i) => (
-          <HUDRelicImage key={i} src={relic.image} $color={relic.color} />
+          <HUDRelicImage key={i} src={relic.image} $color={relic.tribe} />
         ))}
       </RelicRow>
     </>

@@ -92,7 +92,7 @@ export interface RelicState {
   name: string;
   description: string;
   image: string;
-  color: string;
+  tribe: Tribe;
 }
 
 export interface PlayerState extends StatusEffects {
