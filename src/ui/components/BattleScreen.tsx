@@ -15,8 +15,11 @@ import { CenterContent } from './shared/CenterContent';
 import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
+import { useInterval } from '../hooks/useInterval';
 
 const EMPTY_BATTLE_EVENTS: { user: BattleEvent[]; enemy: BattleEvent[] } = { user: [], enemy: [] };
+
+const AUTO_PLAY_CARD_DELAY = 1000;
 
 interface Props {
   game: GameState;
@@ -41,6 +44,8 @@ export function BattleScreen({
 }: Props) {
   const { user, enemy, turn } = game;
   const [userTarget, enemyTarget] = getPlayerTargets(game);
+  const isBattleOver = getBattleWinner(game) != null;
+  const canPlayNextCard = !isBattleOver && !hasOverlay;
 
   const [isPaused, setIsPaused] = useState(true);
 
@@ -52,22 +57,36 @@ export function BattleScreen({
   const handleUndo = useCallback(() => {
     undo();
     setBattleEvents(EMPTY_BATTLE_EVENTS);
+    setIsPaused(true);
   }, [undo]);
 
-  const handlePlayNextCard = useCallback(async () => {
+  const playNextCard = useCallback(async () => {
     const events = await playCard();
-
     setBattleEvents({
       user: [...events.filter(({ target }) => target === userTarget)],
       enemy: [...events.filter(({ target }) => target === enemyTarget)],
     });
-  }, [playCard, userTarget, enemyTarget]);
+  }, [enemyTarget, playCard, userTarget]);
+
+  const handlePlayNextCard = useCallback(async () => {
+    playNextCard();
+    setIsPaused(true);
+  }, [playNextCard]);
 
   const handleTogglePlayPause = useCallback(() => {
-    setIsPaused((prev) => !prev);
-  }, []);
+    setIsPaused((isPaused) => {
+      if (isPaused) {
+        // immediately play next card when unpausing
+        playNextCard();
+      }
+      return !isPaused;
+    });
+  }, [playNextCard]);
 
-  const isBattleOver = getBattleWinner(game) != null;
+  useInterval(playNextCard, AUTO_PLAY_CARD_DELAY, {
+    stop: isPaused || !canPlayNextCard,
+  });
+
   const endBattleTimeout = useRef<NodeJS.Timeout>();
   if (!isBattleOver) {
     clearTimeout(endBattleTimeout.current);
@@ -143,7 +162,7 @@ export function BattleScreen({
         onBack={hasOverlay || !canUndo() ? undefined : handleUndo}
         onTogglePlay={hasOverlay ? undefined : handleTogglePlayPause}
         isPaused={isPaused}
-        onNext={isBattleOver || hasOverlay ? undefined : handlePlayNextCard}
+        onNext={canPlayNextCard ? handlePlayNextCard : undefined}
       />
     </Container>
   );

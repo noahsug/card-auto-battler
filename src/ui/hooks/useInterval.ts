@@ -4,7 +4,7 @@ interface Options {
   stop?: boolean;
 }
 
-export function useTimeout(callback: () => void, ms: number, options: Options = {}) {
+export function useInterval(callback: () => void, ms: number, options: Options = {}) {
   const timeoutInfo = useRef<{ timeoutStart: number; timeout: NodeJS.Timeout }>();
 
   useEffect(() => {
