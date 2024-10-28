@@ -136,6 +136,8 @@ function getDeathAnimation({
   };
 }
 
+// TODO: Implement battleEvents correctly (they grow forever or are completely cleared) or rework
+// battle events
 export function PlayerProfile({ flip, battleEvents, src, profileRef, isDead }: Props) {
   const [u, windowDimensions] = useUnits();
 

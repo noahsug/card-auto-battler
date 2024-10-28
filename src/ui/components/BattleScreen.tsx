@@ -113,7 +113,7 @@ export function BattleScreen({
             />
             <FloatingCombatText
               battleEvents={battleEvents.enemy}
-              targetElement={userProfileRef.current}
+              targetElement={enemyProfileRef.current}
             />
             <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
           </Player>

@@ -80,7 +80,7 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
 
   useEffect(() => {
     animationController.start();
-  }, [animationController, battleEvents]);
+  }, [animationController, textAnimationsRef.current.length]);
 
   return render;
 }
