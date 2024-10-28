@@ -6,6 +6,7 @@ import { CardState } from '../../../game/gameState';
 import { Direction } from '../../../utils/types';
 import { cancelableWait } from '../../../utils/wait';
 import { useUnits } from '../../hooks/useUnits';
+import { ControllerUpdate, TransitionTo } from '../../utils/reactSpring';
 
 export interface Props {
   cards: CardState[];
@@ -138,7 +139,7 @@ export function useCardStackAnimation({
     const zIndex = cardAnimationsRef.current.length - index;
     animationController.current[index]?.set({ zIndex });
 
-    return async (next: (...args: unknown[]) => Promise<void>) => {
+    return async (next: (options: object) => Promise<void>) => {
       let speedUp = false;
       let cancelWaitFn = () => {};
       animatedCard.speedUpAnimation = () => {

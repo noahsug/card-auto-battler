@@ -6,7 +6,7 @@ import {
   Props as AnimationProps,
 } from './useFloatingCombatTextAnimation';
 import { BattleEvent } from '../../../game/actions/battleEvent';
-import { Z_INDEX } from '../constants';
+import { Z_INDEX } from '../../constants';
 import { useMemo } from 'react';
 
 export type Props = AnimationProps;

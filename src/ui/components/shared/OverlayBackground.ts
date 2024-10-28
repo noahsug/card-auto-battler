@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-import { Z_INDEX } from '../constants';
+import { Z_INDEX } from '../../constants';
 
 export const OverlayBackground = styled.div`
   position: absolute;

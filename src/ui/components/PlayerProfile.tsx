@@ -7,6 +7,7 @@ import { BattleEvent } from '../../game/actions/battleEvent';
 import { useUnits, UnitFn } from '../hooks/useUnits';
 import { Direction } from '../../utils/types';
 import { CARD_ANIMATION_DELAY } from './CardStack/useCardStackAnimation';
+import { ControllerUpdate } from '../utils/reactSpring';
 
 const oneDropShadow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
 const dropShadow = new Array(4).fill(oneDropShadow).join(' ');
@@ -39,6 +40,8 @@ const startPosition = {
   delay: 0,
 };
 
+type AnimationOptions = ControllerUpdate<typeof startPosition>;
+
 function summarizeBattleEvents(battleEvents: BattleEvent[]) {
   const summary = {
     damage: 0,
@@ -69,7 +72,7 @@ function getDodgeAnimation({ u }: { u: UnitFn }) {
     hue: 0,
     delay: 0,
     config: { easing: easings.easeOutExpo, duration: 600 },
-  };
+  } satisfies AnimationOptions;
 }
 
 function getHealAnimation({ u }: { u: UnitFn }) {
@@ -79,7 +82,7 @@ function getHealAnimation({ u }: { u: UnitFn }) {
     brightness: 2,
     delay: CARD_ANIMATION_DELAY,
     config: { easing: easings.easeOutCirc, duration: 200 },
-  };
+  } satisfies AnimationOptions;
 }
 
 function getDamageAnimation({
@@ -98,7 +101,7 @@ function getDamageAnimation({
     hue: 20 + 160 * magnitude,
     delay: CARD_ANIMATION_DELAY,
     config: { easing: easings.easeOutExpo, duration: 100 + 100 * magnitude },
-  };
+  } satisfies AnimationOptions;
 }
 
 function getBattleAnimationForPhase({
@@ -111,7 +114,7 @@ function getBattleAnimationForPhase({
   u: UnitFn;
 }) {
   const { misses, damage } = summarizeBattleEvents(battleEvents);
-  if (damage === 0 && misses === 0) return null;
+  if (damage === 0 && misses === 0) return undefined;
   if (misses > 0 && damage <= 0) return getDodgeAnimation({ u });
   if (damage < 0) return getHealAnimation({ u });
   return getDamageAnimation({ damage, direction, u });
@@ -150,7 +153,7 @@ function getDeathAnimation({
   u: UnitFn;
   direction: Direction;
   windowWidth: number;
-}) {
+}): AnimationOptions {
   return {
     x: (windowWidth / 2) * direction,
     y: u(-100),
@@ -183,6 +186,7 @@ export function PlayerProfile({ flip, battleEvents, src, profileRef, isDead }: P
 
     if (battleEvents.length > 0) {
       const battleAnimation = getBattleAnimation({ battleEvents, direction, u });
+      // @ts-expect-error - start does in fact take an array
       if (battleAnimation) animationController.start(battleAnimation);
     } else {
       animationController.set(startPosition);
