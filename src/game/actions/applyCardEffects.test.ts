@@ -253,20 +253,40 @@ describe('if', () => {
     });
     expect(majorityGreen.diff).toEqual({ opponent: { health: -1 } });
   });
-});
 
-it('compares to the previous card color', () => {
-  effect.if = ifHas('self', 'prevCardIsGreen');
+  it('compares to the previous card color', () => {
+    effect.if = ifHas('self', 'prevCardIsGreen');
 
-  const prevCardNotGreen = getPlayCardResult({
-    self: { previousCard: createCard() },
+    const prevCardNotGreen = getPlayCardResult({
+      self: { previousCard: createCard() },
+    });
+    expect(prevCardNotGreen.diff).toEqual({});
+
+    const prevCardGreen = getPlayCardResult({
+      self: { previousCard: createCard([{}], { color: 'green' }) },
+    });
+    expect(prevCardGreen.diff).toEqual({ opponent: { health: -1 } });
   });
-  expect(prevCardNotGreen.diff).toEqual({});
 
-  const prevCardGreen = getPlayCardResult({
-    self: { previousCard: createCard([{}], { color: 'green' }) },
+  it('compares to damage dealt this turn', () => {
+    effect.if = ifCompare('self', 'damageDealtThisTurn', '>=', 7);
+
+    const noDamage = getPlayCardResult({ self: { damageDealtThisTurn: 0 } });
+    expect(noDamage.diff).toEqual({});
+
+    const damage = getPlayCardResult({ self: { damageDealtThisTurn: 7 } });
+    expect(damage.diff).toEqual({ opponent: { health: -1 } });
   });
-  expect(prevCardGreen.diff).toEqual({ opponent: { health: -1 } });
+
+  it('compares to damage dealt last turn', () => {
+    effect.if = ifCompare('self', 'damageDealtLastTurn', '=', 0);
+
+    const damage = getPlayCardResult({ self: { damageDealtLastTurn: 7 } });
+    expect(damage.diff).toEqual({});
+
+    const noDamage = getPlayCardResult({ self: { damageDealtLastTurn: 0 } });
+    expect(noDamage.diff).toEqual({ opponent: { health: -1 } });
+  });
 });
 
 describe('effect based on player value', () => {

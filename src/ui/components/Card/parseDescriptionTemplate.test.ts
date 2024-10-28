@@ -26,3 +26,37 @@ it('parses basic values from multiple effects', () => {
   );
   expect(description).toBe('Deals 1 damage. Deals 3 damage.');
 });
+
+it('handles percentages', () => {
+  const description = parseDescriptionTemplate(
+    createCard(
+      [
+        {
+          value: v('self', 'health', 0.3),
+        },
+      ],
+      {
+        description: 'Deal $V% of your current health as damage.',
+      },
+    ),
+  );
+  expect(description).toBe('Deal 30% of your current health as damage.');
+});
+
+it('handles addition', () => {
+  const description = parseDescriptionTemplate(
+    createCard(
+      [
+        {
+          add: {
+            value: v('self', 'strength', 2),
+          },
+        },
+      ],
+      {
+        description: 'Deal $V damage. Strength affects this card $A+1 times.',
+      },
+    ),
+  );
+  expect(description).toBe('Deal 1 damage. Strength affects this card 3 times.');
+});

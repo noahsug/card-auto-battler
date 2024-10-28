@@ -78,9 +78,26 @@ export function parseDescriptionTemplate(card: CardState) {
   };
 
   function replaceTemplate(templateStr: string) {
+    let suffix = '';
+    let multiplier = 1;
+    let offset = 0;
+
+    if (templateStr.endsWith('%')) {
+      templateStr = templateStr.slice(0, -1);
+      suffix = '%';
+      multiplier = 100;
+    }
+
+    const addMatch = templateStr.match(/[+](\d+)$/);
+    if (addMatch) {
+      const [entireMatch, addValue] = addMatch;
+      templateStr = templateStr.slice(0, -entireMatch.length);
+      offset = Number(addValue);
+    }
+
     const value = templateMap[templateStr];
     assertIsNonNullable(value);
-    return String(value);
+    return value * multiplier + offset + suffix;
   }
 
   return card.description.replaceAll(/\$\S+/g, replaceTemplate);

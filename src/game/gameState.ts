@@ -103,6 +103,8 @@ export interface PlayerState extends StatusEffects {
   currentCardIndex: number;
   cardsPlayedThisTurn: number;
   previousCard?: CardState;
+  damageDealtThisTurn: number;
+  damageDealtLastTurn: number;
   name: string;
   image: string;
 }
@@ -124,6 +126,8 @@ function createPlayer({ name, image }: { name: string; image: string }): PlayerS
     relics: [],
     currentCardIndex: 0,
     cardsPlayedThisTurn: 0,
+    damageDealtThisTurn: 0,
+    damageDealtLastTurn: 0,
     name,
     image,
   };

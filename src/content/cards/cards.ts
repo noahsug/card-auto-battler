@@ -13,6 +13,8 @@ import bless from './images/bless.jpeg';
 import forestPath from './images/forest-path.jpeg';
 import curledLeaf from './images/curled-leaf.png';
 import regrowth from './images/regrowth.png';
+import angryGiant from './images/angry-giant.jpeg';
+import heavyRock from './images/heavy-rock.jpeg';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
@@ -49,12 +51,12 @@ export const greenCards = {
   damagePerTurn: createCard(
     [
       {
-        value: v('self', 'turn', 2),
+        value: v('self', 'turn', 1),
       },
     ],
     {
       name: 'Evergrowing Club',
-      description: `Deal 0 damage. Grow +$V damage at the end of your turn.`,
+      description: `Deal 1 damage. Grow +$V damage at the end of your turn.`,
       image: growingClub,
     },
   ),
@@ -62,15 +64,15 @@ export const greenCards = {
     [
       {
         value: v(4),
-        add: {
-          value: v(6),
+        multiply: {
+          value: v(2),
           if: ifCompare('self', 'percentGreen', '>=', 50),
         },
       },
     ],
     {
       name: 'Treefall',
-      description: `Deal $V damage. Deal $A extra damage if at least half your cards are green.`,
+      description: `Deal $V damage. Deal double damage if at least half your cards are green.`,
       image: treeFall,
     },
   ),
@@ -104,6 +106,53 @@ export const greenCards = {
       name: 'Regeneration',
       description: `Gain $V regeneration.`,
       image: curledLeaf,
+    },
+  ),
+  gainStrengthAndRegen: createCard(
+    [
+      {
+        target: 'self',
+        name: 'strength',
+        value: v('self', 'regen'),
+      },
+      {
+        target: 'self',
+        name: 'regen',
+        value: v(2),
+      },
+    ],
+    {
+      name: `Bless`,
+      description: `Gain strength equal to your regeneration. Gain $2V regeneration.`,
+      image: bless,
+    },
+  ),
+  damageIfNoDamage: createCard(
+    [
+      {
+        value: v('self', 'health', 0.3),
+        if: ifCompare('self', 'damageDealtLastTurn', '=', 0),
+      },
+    ],
+    {
+      name: 'Not So Gentle',
+      description: `Deal $V% of your current health as damage if you dealt no damage last turn.`,
+      image: angryGiant,
+    },
+  ),
+  damageFromStrength: createCard(
+    [
+      {
+        value: v(3),
+        add: {
+          value: v('self', 'strength', 2),
+        },
+      },
+    ],
+    {
+      name: 'Boulder Bash',
+      description: `Deal $V damage. Strength affects this card $A+1 times.`,
+      image: heavyRock,
     },
   ),
 };

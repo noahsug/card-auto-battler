@@ -52,6 +52,9 @@ function startTurn(game: GameState) {
   const [activePlayer] = getPlayers(game);
   const events: BattleEvent[] = [];
 
+  activePlayer.damageDealtLastTurn = activePlayer.damageDealtThisTurn;
+  activePlayer.damageDealtThisTurn = 0;
+
   if (activePlayer.regen > 0) {
     // regen
     activePlayer.health += activePlayer.regen;
@@ -103,6 +106,14 @@ export function playCard(game: GameState): BattleEvent[] {
     activePlayer.currentCardIndex = 0;
   }
 
+  const damageDealt = events.reduce((damageDealt, event) => {
+    if (event.type === 'damage' && event.target === 'opponent') {
+      damageDealt += event.value;
+    }
+    return damageDealt;
+  }, 0);
+  activePlayer.damageDealtThisTurn += damageDealt;
+
   if (activePlayer.extraCardPlays === 0) {
     activePlayer.cardsPlayedThisTurn = 0;
     game.turn++;
@@ -115,6 +126,8 @@ function resetPlayerAfterBattle(player: PlayerState) {
   player.health = player.startingHealth;
   player.currentCardIndex = 0;
   player.cardsPlayedThisTurn = 0;
+  player.damageDealtThisTurn = 0;
+  player.damageDealtLastTurn = 0;
   player.previousCard = undefined;
   statusEffectNames.forEach((statusEffectName) => {
     player[statusEffectName] = 0;

@@ -13,12 +13,12 @@ const cardColorsToHighlight: string[] = cardColors.filter((color) => color !== '
 
 function TextLine({ text }: { text: string }) {
   const parts = text.split(
-    new RegExp(`(\\d+|${numericWords.join('|')}|${cardColorsToHighlight.join('|')})`),
+    new RegExp(`(\\d+%{0,1}|${numericWords.join('|')}|${cardColorsToHighlight.join('|')})`),
   );
   return (
     <div>
       {parts.map((part, i) => {
-        const isNumber = part.match(/^\d+$/) != null;
+        const isNumber = part.match(/^\d+%{0,1}$/) != null;
         const isNumericWord = numericWords.includes(part);
         const isColor = cardColorsToHighlight.includes(part);
         if (!isNumber && !isNumericWord && !isColor) return part;
@@ -45,7 +45,7 @@ function TextLine({ text }: { text: string }) {
 
 export function DescriptionText({ text }: { text: string }) {
   // 'hi there. bob.' -> '[hi there, bob]'
-  assert(text.endsWith('.'));
+  assert(text.endsWith('.'), 'description text must end with a period');
   const textLines = text.split('.').slice(0, -1);
 
   return (

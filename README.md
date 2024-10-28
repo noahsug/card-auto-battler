@@ -253,6 +253,8 @@ Green cards (heal, strength, high hp, high dmg, x = turn, toxic, chill)
 - Relic: +5 HP. Win the game when you reach 40 HP.
 - Relic: ignore all damage <= 2
 - Relic: +3 toxicity to self. +3 strength while toxic
+- Relic: strength affects your healing
+- Relic: you can only play 1 card. +3 strength
 
 Red Cards (bleed, burn, strength, multihit, lifesteal, low hp, trash, same name, armor)
 
