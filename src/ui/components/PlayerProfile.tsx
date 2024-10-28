@@ -8,6 +8,7 @@ import { useUnits, UnitFn } from '../hooks/useUnits';
 import { Direction } from '../../utils/types';
 import { CARD_ANIMATION_DELAY } from './CardStack/useCardStackAnimation';
 import { ControllerUpdate } from '../utils/reactSpring';
+import { Image } from './shared/Image';
 
 const oneDropShadow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
 const dropShadow = new Array(4).fill(oneDropShadow).join(' ');
@@ -16,7 +17,7 @@ const ProfileImageContainer = styled(animated.div)`
   filter: ${dropShadow};
 `;
 
-const ProfileImage = styled(animated.img)<{ $flip?: boolean }>`
+const ProfileImage = styled(animated(Image))<{ $flip?: boolean }>`
   width: 12rem;
   margin-bottom: 0.5rem;
   transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};

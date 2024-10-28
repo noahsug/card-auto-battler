@@ -5,6 +5,7 @@ import { useTimeout } from '../../hooks/useTimeout';
 import nextImage from './next.png';
 import pauseImage from './pause.png';
 import playImage from './play.png';
+import { Image } from '../shared/Image';
 
 const AUTO_PLAY_CARD_DELAY = 1000;
 
@@ -26,7 +27,7 @@ const ControlButton = styled.button<{ $flip?: boolean }>`
     cursor: not-allowed;
   }
 
-  img {
+  ${Image} {
     height: 2rem;
   }
 `;
@@ -104,15 +105,15 @@ export function BattleControls({ onBack, onTogglePlay, onNext, isPaused }: Props
   return (
     <ControlsRow>
       <ControlButton onClick={handleOnBack} disabled={!onBack} $flip={true}>
-        <img src={nextImage} alt="back" />
+        <Image src={nextImage} alt="back" />
       </ControlButton>
 
       <ControlButton onClick={handleOnTogglePlay} disabled={!onTogglePlay}>
-        <img src={isPaused ? playImage : pauseImage} alt="play/pause" />
+        <Image src={isPaused ? playImage : pauseImage} alt="play/pause" />
       </ControlButton>
 
       <ControlButton onClick={handleOnNext} disabled={!onNext}>
-        <img src={nextImage} alt="next" />
+        <Image src={nextImage} alt="next" />
       </ControlButton>
     </ControlsRow>
   );

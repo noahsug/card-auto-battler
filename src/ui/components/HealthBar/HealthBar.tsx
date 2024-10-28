@@ -6,6 +6,7 @@ import { styled } from 'styled-components';
 import { CARD_ANIMATION_DELAY } from '../CardStack/useCardStackAnimation';
 import healthBarBorderImage from './health-bar-border.png';
 import healthBarInnerImage from './health-bar-inner.png';
+import { Image } from '../shared/Image';
 
 const WIDTH = 10;
 
@@ -15,7 +16,7 @@ const Root = styled.div`
   height: ${WIDTH / 5.5}rem;
   font-size: 2rem;
 
-  img {
+  ${Image} {
     max-width: 100%;
     max-height: 100%;
   }
@@ -72,7 +73,7 @@ export function HealthBar({ health, maxHealth }: Props) {
 
   return (
     <Root>
-      <img src={healthBarBorderImage} alt="health-bar" />
+      <Image src={healthBarBorderImage} alt="health-bar" />
       <Bar style={animationProps} />
       <Label>
         {displayedHealth} / {displayedMaxHealth}

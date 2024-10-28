@@ -7,6 +7,7 @@ import textBackground from './text-background.png';
 import { DescriptionText } from '../DescriptionText';
 import { parseDescriptionTemplate } from './parseDescriptionTemplate';
 import { getCardColor } from './cardColor';
+import { Image } from '../shared/Image';
 
 export const baseCardSize = { width: 12, height: 20 };
 
@@ -49,11 +50,9 @@ const Title = styled('h2')`
   inset: 49.5% 0 0;
 `;
 
-const Image = styled.img`
+const CardImage = styled(Image)`
   background: radial-gradient(white 0%, ${(props) => getCardColor(props.theme.color)} 80%);
   height: 55%;
-  object-fit: cover;
-  object-position: center;
 `;
 
 const Text = styled.div`
@@ -81,7 +80,7 @@ export function Card({ size, card, onClick, style }: Props) {
     <CardRoot $size={size} className="card" onClick={onClick} style={style}>
       <ThemeProvider theme={{ color: card.color }}>
         <OuterContainer>
-          <Image src={image} alt="{name}" />
+          <CardImage src={image} alt="{name}" />
           <Title>{name}</Title>
           <Text>
             <DescriptionText text={description} />
