@@ -13,7 +13,12 @@ import {
 } from '../gameState';
 import { BLEED_DAMAGE } from '../constants';
 import { assert } from '../../utils/asserts';
-import { BattleEvent } from './actions';
+import {
+  BattleEvent,
+  createDamageEvent,
+  createHealEvent,
+  createMissEvent,
+} from '../utils/battleEvent';
 import { readonlyIncludes } from '../../utils/iterators';
 
 interface PlayCardContext {
@@ -182,7 +187,7 @@ function dodgeDamage(effect: CardEffect, { opponent, events }: PlayCardContext) 
   if (opponent.dodge <= 0) return false;
 
   opponent.dodge -= 1;
-  events.push({ type: 'miss', target: effect.target, source: 'card' });
+  events.push(createMissEvent(effect.target));
   return true;
 }
 
@@ -199,12 +204,12 @@ function dealDamage(
 
   const targetPlayer = target === 'self' ? self : opponent;
   targetPlayer.health -= value;
-  events.push({ type: 'damage', target, value, source: 'card' });
+  events.push(createDamageEvent(value, target));
 
   // bleed
   if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
     opponent.health -= BLEED_DAMAGE;
-    events.push({ type: 'damage', target, value: BLEED_DAMAGE, source: 'card' });
+    events.push(createDamageEvent(BLEED_DAMAGE, target));
 
     opponent.bleed -= 1;
 
@@ -224,7 +229,7 @@ function applyHeal(
   const targetPlayer = target === 'self' ? self : opponent;
   targetPlayer.health += value;
 
-  events.push({ type: 'heal', target, value, source: 'card' });
+  events.push(createHealEvent(value, target));
 }
 
 function trashCards({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {

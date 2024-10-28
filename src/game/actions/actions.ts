@@ -6,28 +6,12 @@ import {
   GameState,
   PlayerState,
   RelicState,
-  Target,
   createGameState,
   statusEffectNames,
 } from '../gameState';
 import { getBattleWinner, getPlayers } from '../utils/selectors';
 import { applyCardEffects } from './applyCardEffects';
-
-interface BattleEventShared {
-  target: Target;
-  source: 'card' | 'statusEffect';
-}
-
-interface MissBattleEvent extends BattleEventShared {
-  type: 'miss';
-}
-
-interface BattleEventWithValue extends BattleEventShared {
-  type: 'damage' | 'heal';
-  value: number;
-}
-
-export type BattleEvent = MissBattleEvent | BattleEventWithValue;
+import { BattleEvent, createDamageEvent, createHealEvent } from '../utils/battleEvent';
 
 export function addCards(game: GameState, cards: CardState[]) {
   game.user.cards.push(...cards);
@@ -53,7 +37,7 @@ function triggerStartOfBattleEffects({ self }: { self: PlayerState; opponent: Pl
   }
 }
 
-export function startBattle(game: GameState) {
+function startBattle(game: GameState) {
   const userPerspective = { self: game.user, opponent: game.enemy };
   const enemyPerspective = { self: game.enemy, opponent: game.user };
 
@@ -64,32 +48,39 @@ export function startBattle(game: GameState) {
   triggerStartOfBattleEffects(enemyPerspective);
 }
 
-export function playCard(game: GameState): BattleEvent[] {
-  const [activePlayer, nonActivePlayer] = getPlayers(game);
-  const card = activePlayer.cards[activePlayer.currentCardIndex];
-
+function startTurn(game: GameState) {
+  const [activePlayer] = getPlayers(game);
   const events: BattleEvent[] = [];
 
-  // start turn
-  if (activePlayer.cardsPlayedThisTurn === 0) {
-    if (activePlayer.regen > 0) {
-      // regen
-      activePlayer.health += activePlayer.regen;
-      events.push({
-        type: 'heal',
-        target: 'self',
-        value: activePlayer.regen,
-        source: 'statusEffect',
-      });
-      activePlayer.regen -= 1;
-    }
+  if (activePlayer.regen > 0) {
+    // regen
+    activePlayer.health += activePlayer.regen;
+    events.push(createHealEvent(activePlayer.regen, 'self', 'startOfTurn'));
+    activePlayer.regen -= 1;
   }
+
+  return events;
+}
+
+export function playCard(game: GameState): BattleEvent[] {
+  const [activePlayer, nonActivePlayer] = getPlayers(game);
+  const events: BattleEvent[] = [];
+
+  if (activePlayer.cardsPlayedThisTurn === 0) {
+    if (game.turn === 0) {
+      startBattle(game);
+    }
+    const startTurnEvents = startTurn(game);
+    events.push(...startTurnEvents);
+  }
+
+  const card = activePlayer.cards[activePlayer.currentCardIndex];
 
   // die if out of cards
   if (card == null) {
     const damage = activePlayer.health;
     activePlayer.health = 0;
-    return [{ type: 'damage', target: 'self', value: damage, source: 'statusEffect' }];
+    return [createDamageEvent(damage, 'self', 'startOfTurn')];
   }
 
   if (activePlayer.cardsPlayedThisTurn > 0) {

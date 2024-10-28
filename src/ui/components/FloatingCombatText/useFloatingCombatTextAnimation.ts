@@ -21,7 +21,6 @@ function createTextAnimation(battleEvent: BattleEvent) {
   };
 }
 
-// We assume battle events is an every growing list that is only ever added to or cleared completely.
 export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: Props) {
   const [u] = useUnits();
   const animationController = useSpringRef();
@@ -39,11 +38,14 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
   }
 
   function animateCombatText(textAnimation: TextAnimation) {
+    // delay the animation until the play is played
+    const delay = textAnimation.battleEvent.source === 'card' ? CARD_ANIMATION_DELAY : 0;
+
     return async (next: (...args: unknown[]) => Promise<void>) => {
       await next({
         opacity: 1,
         immediate: true,
-        delay: textAnimation.battleEvent.source === 'card' ? CARD_ANIMATION_DELAY : 0,
+        delay,
       });
       await next(getAnimationEnd(textAnimation));
     };
