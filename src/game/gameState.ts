@@ -12,6 +12,7 @@ export const statusEffectNames = [
   'dodge',
   'strength',
   'regen',
+  'thickBark',
 ] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;

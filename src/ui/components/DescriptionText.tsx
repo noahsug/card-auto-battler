@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 import { Tribe, tribes } from '../../game/gameState';
 import { assert } from '../../utils/asserts';
-import { getCardColor } from './Card/cardColor';
+import { getCardColor } from './Card/getCardColor';
 
 const Value = styled.span`
   font-weight: bold;
@@ -13,7 +13,7 @@ const tribeTextToHighlight: string[] = tribes.filter((tribe) => tribe !== 'basic
 
 function TextLine({ text }: { text: string }) {
   const parts = text.split(
-    new RegExp(`(\\d+%{0,1}|${numericWords.join('|')}|${tribeTextToHighlight.join('|')})`),
+    new RegExp(`\\b(\\d+%{0,1}|${numericWords.join('|')}|${tribeTextToHighlight.join('|')})\\b`),
   );
   return (
     <div>

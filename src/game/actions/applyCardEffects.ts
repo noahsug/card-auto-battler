@@ -186,26 +186,20 @@ function dodgeDamage(effect: CardEffect, { opponent, events }: PlayCardContext) 
   return true;
 }
 
-function dealDamage(
-  { value, multiplier = 1, target }: EffectOptions,
-  { self, opponent, events }: PlayCardContext,
-) {
+function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
+  const { self, opponent, events } = context;
+
   // strength
   if (target === 'opponent') {
     value += self.strength;
   }
 
   value = updateValue(value, multiplier);
-
-  const targetPlayer = target === 'self' ? self : opponent;
-  targetPlayer.health -= value;
-  events.push(createDamageEvent(value, target));
+  reduceHealth(value, target, context);
 
   // bleed
   if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
-    opponent.health -= BLEED_DAMAGE;
-    events.push(createDamageEvent(BLEED_DAMAGE, target));
-
+    reduceHealth(BLEED_DAMAGE, target, context);
     opponent.bleed -= 1;
 
     // permaBleed
@@ -241,4 +235,16 @@ function trashCards({ value, multiplier = 1, target }: EffectOptions, context: P
 function updateValue(value: number, multiplier: number = 1) {
   value *= multiplier;
   return Math.floor(value);
+}
+
+function reduceHealth(value: number, target: Target, { self, opponent, events }: PlayCardContext) {
+  const targetPlayer = target === 'self' ? self : opponent;
+
+  // thick bark
+  if (targetPlayer.thickBark > 0 && value <= 4) {
+    value = 1;
+  }
+
+  targetPlayer.health -= value;
+  events.push(createDamageEvent(value, target));
 }

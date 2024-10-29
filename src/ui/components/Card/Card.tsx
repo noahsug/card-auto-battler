@@ -6,7 +6,7 @@ import { Container } from '../shared/Container';
 import textBackground from './text-background.png';
 import { DescriptionText } from '../DescriptionText';
 import { parseDescriptionTemplate } from './parseDescriptionTemplate';
-import { getCardColor } from './cardColor';
+import { getCardColor } from './getCardColor';
 import { Image } from '../shared/Image';
 
 export const baseCardSize = { width: 12, height: 20 };

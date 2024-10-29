@@ -41,7 +41,7 @@ export const basicCards = {
     ],
     {
       name: 'Mend',
-      description: 'Gain $V HP.',
+      description: 'Heal $V HP.',
       image: cross,
     },
   ),
@@ -90,7 +90,7 @@ export const greenCards = {
         if: ifHas('self', 'prevCardIsGreen'),
       },
       name: 'Regrowth',
-      description: `Gain $V HP. Repeat if your previous card played was green.`,
+      description: `Heal $V HP. Repeat if your previous card played was green.`,
       image: regrowth,
     },
   ),

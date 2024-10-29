@@ -29,7 +29,7 @@ function getHue(tribe: Tribe) {
     case 'basic':
       return 0;
     case 'green':
-      return 118;
+      return 142;
     case 'red':
       return 330;
     case 'purple':
@@ -42,7 +42,7 @@ export const RelicImage = styled.div<{ src: string; $tribe: Tribe }>`
   width: 6rem;
   height: 6rem;
   ${maskImage}
-  background-color: hsl(${(props) => getHue(props.$tribe)}, 33%, 75%);
+  background-color: hsl(${(props) => getHue(props.$tribe)}, 20%, 75%);
 `;
 
 const Title = styled('h2')`

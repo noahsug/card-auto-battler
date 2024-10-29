@@ -91,6 +91,20 @@ describe('permaBleed', () => {
   });
 });
 
+describe('thick bark', () => {
+  it('reduces damage to 1 when 4 or less', () => {
+    effect.value = v(4);
+    const { diff } = getPlayCardResult({ opponent: { thickBark: 1 } });
+    expect(diff).toEqual({ opponent: { health: -1 } });
+  });
+
+  it('does nothing when damage is 5 or more', () => {
+    effect.value = v(5);
+    const { diff } = getPlayCardResult({ opponent: { thickBark: 1 } });
+    expect(diff).toEqual({ opponent: { health: -5 } });
+  });
+});
+
 describe('self damage', () => {
   beforeEach(() => {
     effect.target = 'self';

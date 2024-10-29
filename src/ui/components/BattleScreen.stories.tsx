@@ -5,6 +5,7 @@ import { createGameState, statusEffectNames } from '../../game/gameState';
 import { getRandomCards } from '../../game/utils/getRandomCards';
 import { BattleScreen } from './BattleScreen';
 import { getRandomRelics } from '../../game/utils/getRandomRelics';
+import { allRelics } from '../../content/relics';
 
 const meta = {
   title: 'BattleScreen',
@@ -48,7 +49,7 @@ statusEffectNames.forEach((effectName) => {
   hasStatusEffectsAndRelics.enemy[effectName] = 3;
 });
 hasStatusEffectsAndRelics.user.strength = -5;
-hasStatusEffectsAndRelics.user.relics = getRandomRelics(3);
+hasStatusEffectsAndRelics.user.relics = Object.values(allRelics);
 export const StatusEffectsAndRelics: Story = {
   args: {
     game: hasStatusEffectsAndRelics,
