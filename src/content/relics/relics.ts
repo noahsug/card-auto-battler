@@ -1,4 +1,4 @@
-import { RelicName, RelicState } from '../../game/gameState';
+import { RelicState } from '../../game/gameState';
 import { createRelic } from '../utils/createRelic';
 
 import openWoundImage from './images/dripping-knife.png';
@@ -30,7 +30,7 @@ export const strengthAffectsHealing = createRelic({
   image: necklaceImage,
 });
 
-export const greenRelics: Partial<Record<RelicName, RelicState>> = {
+export const greenRelics = {
   reduceLowDamage,
   regenForHighDamage,
   strengthAffectsHealing,
@@ -47,7 +47,7 @@ export const permaBleed = createRelic({
   image: openWoundImage,
 });
 
-export const redRelics: Partial<Record<RelicName, RelicState>> = {
+export const redRelics = {
   permaBleed,
 };
 Object.values(redRelics).forEach((relic) => {
@@ -59,5 +59,7 @@ export const allRelics = {
   ...redRelics,
 };
 Object.entries(allRelics).forEach(([name, relic]) => {
-  relic.name = name as RelicName;
+  relic.name = name;
 });
+
+export type RelicName = keyof typeof allRelics;

@@ -1,4 +1,5 @@
-import { GameState, PlayerState, RelicName, Target } from '../gameState';
+import { GameState, PlayerState, Target } from '../gameState';
+import { RelicName } from '../../content/relics/relics';
 import { MAX_WINS, MAX_LOSSES } from '../constants';
 
 export function getIsUserTurn(game: GameState) {

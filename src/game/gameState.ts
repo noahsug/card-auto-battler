@@ -1,6 +1,6 @@
 import { allCards } from '../content/cards';
-import { allHeroes } from '../content/heroes';
 import { allEnemies } from '../content/enemies';
+import { allHeroes } from '../content/heroes';
 import { STARTING_HEALTH } from './constants';
 
 export type Target = 'self' | 'opponent';
@@ -11,13 +11,6 @@ export type StatusEffects = Record<StatusEffectName, number>;
 export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
   statusEffectNames.map((effectName) => [effectName, 0]),
 ) as StatusEffects;
-
-// TODO: refactor
-export type RelicName =
-  | 'permaBleed'
-  | 'reduceLowDamage'
-  | 'regenForHighDamage'
-  | 'strengthAffectsHealing';
 
 type CalculatedPlayerValueName =
   | 'percentGreen'
@@ -82,7 +75,7 @@ export interface CardState {
 }
 
 export interface RelicState {
-  name: RelicName;
+  name: string;
   displayName: string;
   description: string;
   value: number;

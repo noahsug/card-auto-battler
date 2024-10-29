@@ -2,7 +2,7 @@ import { RelicState } from '../../game/gameState';
 
 // returns a RelicState with defaults
 export function createRelic({
-  name = 'reduceLowDamage',
+  name = '',
   displayName = '',
   description = '',
   value = 0,
