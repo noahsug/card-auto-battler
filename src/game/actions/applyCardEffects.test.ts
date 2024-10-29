@@ -344,7 +344,7 @@ describe('effect based on player value', () => {
 
   it('deals damage equal to self turns passed', () => {
     effect.value = v('self', 'turn');
-    const { diff } = getPlayCardResult({ turn: 5 });
+    const { diff } = getPlayCardResult({ turn: 4 });
 
     expect(diff).toEqual({ opponent: { health: -2 } });
   });
@@ -445,9 +445,9 @@ describe('battle events', () => {
 
     const { events } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
     expect(events).toEqual([
-      { type: 'damage', value: 3, target: 'opponent' },
-      { type: 'damage', value: BLEED_DAMAGE, target: 'opponent' },
-      { type: 'heal', value: 5, target: 'self' },
+      { type: 'damage', value: 3, target: 'opponent', source: 'card' },
+      { type: 'damage', value: BLEED_DAMAGE, target: 'opponent', source: 'card' },
+      { type: 'heal', value: 5, target: 'self', source: 'card' },
     ]);
   });
 
@@ -455,6 +455,6 @@ describe('battle events', () => {
     effect.value = v(0);
 
     const { events } = getPlayCardResult();
-    expect(events).toEqual([{ type: 'damage', value: 0, target: 'opponent' }]);
+    expect(events).toEqual([{ type: 'damage', value: 0, target: 'opponent', source: 'card' }]);
   });
 });
