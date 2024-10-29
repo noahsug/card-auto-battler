@@ -34,7 +34,7 @@ function getPlayCardResult({
   const opponent = Object.assign(enemy, opponentOverrides);
   const init = cloneDeep({ self, opponent });
 
-  const events = applyCardEffects(card, { game, self, opponent });
+  const events = applyCardEffects(game, card);
 
   const diff = diffValues(init, { self, opponent });
   return { self, opponent, init, diff, events };
@@ -91,17 +91,31 @@ describe('permaBleed', () => {
   });
 });
 
-describe('thick bark', () => {
+describe('reduceLowDamage', () => {
   it('reduces damage to 1 when 4 or less', () => {
     effect.value = v(4);
-    const { diff } = getPlayCardResult({ opponent: { thickBark: 1 } });
+    const { diff } = getPlayCardResult({ opponent: { reduceLowDamage: 1 } });
     expect(diff).toEqual({ opponent: { health: -1 } });
   });
 
   it('does nothing when damage is 5 or more', () => {
     effect.value = v(5);
-    const { diff } = getPlayCardResult({ opponent: { thickBark: 1 } });
+    const { diff } = getPlayCardResult({ opponent: { reduceLowDamage: 1 } });
     expect(diff).toEqual({ opponent: { health: -5 } });
+  });
+});
+
+describe('regenForHighDamage', () => {
+  it('adds regen when damage is high', () => {
+    effect.value = v(10);
+    const { diff } = getPlayCardResult({ self: { regenForHighDamage: 1 } });
+    expect(diff).toEqual({ self: { regen: 3 }, opponent: { health: -10 } });
+  });
+
+  it('does nothing when damage is low', () => {
+    effect.value = v(9);
+    const { diff } = getPlayCardResult({ self: { regenForHighDamage: 1 } });
+    expect(diff).toEqual({ opponent: { health: -9 } });
   });
 });
 

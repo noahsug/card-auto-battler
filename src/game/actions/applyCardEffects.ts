@@ -200,6 +200,11 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   value = updateValue(value, multiplier);
   reduceHealth(value, target, context);
 
+  // regenForHighDamage
+  if (self.regenForHighDamage > 0 && value >= 10) {
+    self.regen += 3;
+  }
+
   // bleed
   if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
     reduceHealth(BLEED_DAMAGE, target, context);
@@ -216,7 +221,7 @@ function reduceHealth(value: number, target: Target, { game, events }: PlayCardC
   const targetPlayer = getTargetedPlayer(game, target);
 
   // thick bark
-  if (targetPlayer.thickBark > 0 && value <= 4) {
+  if (targetPlayer.reduceLowDamage > 0 && value <= 4) {
     value = 1;
   }
 

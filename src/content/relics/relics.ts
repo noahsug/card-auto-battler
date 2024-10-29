@@ -2,15 +2,24 @@ import { RelicState } from '../../game/gameState';
 import { createRelic } from '../utils/createRelic';
 
 import openWoundImage from './images/dripping-knife.png';
-import thickBark from './images/packed-planks.png';
+import planksImage from './images/packed-planks.png';
+import sproutImage from './images/ground-sprout.png';
 
 export const greenRelics: Record<string, RelicState> = {
-  thickBark: createRelic(
-    { statusEffectName: 'thickBark', target: 'self' },
+  reduceLowDamage: createRelic(
+    { statusEffectName: 'reduceLowDamage', target: 'self' },
     {
       name: 'Thick Bark',
       description: 'Whenever you would receive 4 or less damage, reduce it to 1.',
-      image: thickBark,
+      image: planksImage,
+    },
+  ),
+  regenForHighDamage: createRelic(
+    { statusEffectName: 'regenForHighDamage', target: 'self', value: 1 },
+    {
+      name: 'Sprouter',
+      description: 'Gain 3 regen whenever you deal 10 or more damage in a single hit.',
+      image: sproutImage,
     },
   ),
 };
