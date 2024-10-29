@@ -1,10 +1,10 @@
 import { Tribe } from '../../../game/gameState';
 
 const hsl: Record<Tribe, [number, number, number]> = {
-  basic: [67, 0, 80],
-  purple: [267, 30, 80],
-  red: [0, 30, 80],
-  green: [118, 30, 80],
+  basic: [67, 0, 90],
+  purple: [267, 10, 80],
+  red: [0, 10, 80],
+  green: [118, 10, 80],
 };
 
 function getHSLString(hue: number, saturation: number, lightness: number) {

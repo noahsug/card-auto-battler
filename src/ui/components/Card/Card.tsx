@@ -25,7 +25,11 @@ function getTitleColor(tribe: Tribe) {
   return getCardColor(tribe, { brighten: 10 });
 }
 function getBorderColor(tribe: Tribe) {
-  return getCardColor(tribe, { brighten: -62 });
+  return getCardColor(tribe, { brighten: -65 });
+}
+function getTitleBackgroundColor(tribe: Tribe) {
+  const saturate = tribe === 'basic' ? 0 : 30;
+  return getCardColor(tribe, { saturate, brighten: -60 });
 }
 
 const OuterContainer = styled(Container)`
@@ -35,7 +39,7 @@ const OuterContainer = styled(Container)`
   color: var(--color-bg);
   background-color: ${(props) => getCardColor(props.theme.tribe)};
   ${getHandDrawnBorderRadius}
-  border: solid 0.5em ${(props) => getBorderColor(props.theme.tribe)};
+  border: solid 0.45em ${(props) => getBorderColor(props.theme.tribe)};
   padding: 0;
   position: relative;
 `;
@@ -45,7 +49,7 @@ const Title = styled('h2')`
   ${maskImage({ src: textBackground })};
   color: ${(props) => getTitleColor(props.theme.tribe)};
   height: 1.15em;
-  background-color: var(--color-bg);
+  background-color: ${(props) => getTitleBackgroundColor(props.theme.tribe)};
   position: absolute;
   inset: 49.5% 0 0;
 `;
