@@ -8,17 +8,8 @@ import { HUD } from '../HUD';
 import { Button } from '../shared/Button';
 import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
-
-const CardGrid = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  overflow-y: auto;
-
-  > * {
-    margin: 0.25rem;
-  }
-`;
+import { useUnits } from '../../hooks/useUnits';
+import { CardGrid, useCardSize } from '../CardGrid';
 
 const bottomRowHeight = 4;
 
@@ -42,6 +33,7 @@ interface Props {
 
 export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }: Props) {
   const [selectedCardIndexes, setSelectedCardIndexes] = useState<number[]>([]);
+  const cardSize = useCardSize();
 
   const numCardsToPick = NUM_CARD_SELECTION_PICKS - selectedCardIndexes.length;
 
@@ -75,7 +67,7 @@ export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }
             <Card
               key={i}
               card={card}
-              size={'small'}
+              size={cardSize}
               onClick={() => handleCardSelected(i)}
               style={getStyle(i)}
             />
