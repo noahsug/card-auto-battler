@@ -12,7 +12,12 @@ export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
   statusEffectNames.map((effectName) => [effectName, 0]),
 ) as StatusEffects;
 
-export type RelicName = 'permaBleed' | 'reduceLowDamage' | 'regenForHighDamage';
+// TODO: refactor
+export type RelicName =
+  | 'permaBleed'
+  | 'reduceLowDamage'
+  | 'regenForHighDamage'
+  | 'strengthAffectsHealing';
 
 type CalculatedPlayerValueName =
   | 'percentGreen'

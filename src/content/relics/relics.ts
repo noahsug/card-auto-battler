@@ -4,6 +4,7 @@ import { createRelic } from '../utils/createRelic';
 import openWoundImage from './images/dripping-knife.png';
 import planksImage from './images/packed-planks.png';
 import sproutImage from './images/ground-sprout.png';
+import necklaceImage from './images/primitive-necklace.png';
 
 // green
 export const reduceLowDamage = createRelic({
@@ -22,9 +23,17 @@ export const regenForHighDamage = createRelic({
   image: sproutImage,
 });
 
+export const strengthAffectsHealing = createRelic({
+  displayName: 'Shamanic Wisdom',
+  description: 'Healing benefits from strength. Gain $V strength.',
+  value: 1,
+  image: necklaceImage,
+});
+
 export const greenRelics: Partial<Record<RelicName, RelicState>> = {
   reduceLowDamage,
   regenForHighDamage,
+  strengthAffectsHealing,
 };
 Object.values(greenRelics).forEach((relic) => {
   relic.tribe = 'green';

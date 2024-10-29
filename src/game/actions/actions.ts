@@ -10,8 +10,9 @@ import {
   statusEffectNames,
 } from '../gameState';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
-import { applyCardEffects } from './applyCardEffects';
+import { applyCardEffects, applyHeal } from './applyCardEffects';
 import { BattleEvent, createDamageEvent, createHealEvent } from './battleEvent';
+import { strengthAffectsHealing } from '../../content/relics/relics';
 
 export function addCards(game: GameState, cards: CardState[]) {
   game.user.cards.push(...cards);
@@ -34,6 +35,12 @@ function triggerStartOfBattleEffects({
   if (permaBleed) {
     opponent.bleed += permaBleed.value;
   }
+
+  // strengthAffectsHealing
+  const strengthAffectsHealing = getRelic(self, 'strengthAffectsHealing');
+  if (strengthAffectsHealing) {
+    self.strength += strengthAffectsHealing.value;
+  }
 }
 
 function startBattle(game: GameState) {
@@ -53,16 +60,18 @@ function startTurn(game: GameState) {
 
   if (activePlayer.regen > 0) {
     // regen
-    activePlayer.health += activePlayer.regen;
-    events.push(createHealEvent(activePlayer.regen, 'self', 'startOfTurn'));
+    applyHeal({ value: activePlayer.regen, target: 'self' }, { game, events });
     activePlayer.regen -= 1;
   }
 
+  events.forEach((event) => {
+    event.source = 'startOfTurn';
+  });
   return events;
 }
 
 export function playCard(game: GameState): BattleEvent[] {
-  const [activePlayer, nonActivePlayer] = getPlayers(game);
+  const [activePlayer] = getPlayers(game);
   const events: BattleEvent[] = [];
 
   if (activePlayer.cardsPlayedThisTurn === 0) {

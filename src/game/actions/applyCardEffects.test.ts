@@ -6,6 +6,7 @@ import { applyCardEffects } from './applyCardEffects';
 import { BLEED_DAMAGE } from '../constants';
 import { CardEffect, CardState, createGameState, PlayerState } from '../gameState';
 import { permaBleed, reduceLowDamage, regenForHighDamage } from '../../content/relics';
+import { strengthAffectsHealing } from '../../content/relics/relics';
 
 let card: CardState;
 let effect: CardEffect;
@@ -123,6 +124,22 @@ describe('regenForHighDamage', () => {
     effect.value = v(9);
     const { diff } = getPlayCardResult({ self: { relics } });
     expect(diff).toEqual({ opponent: { health: -9 } });
+  });
+});
+
+describe('strengthAffectsHealing', () => {
+  const relics = [strengthAffectsHealing];
+  beforeEach(() => {
+    card.effects[0] = {
+      name: 'heal',
+      target: 'self',
+      value: v(1),
+    };
+  });
+
+  it('strength is added to healing', () => {
+    const { diff } = getPlayCardResult({ self: { relics, strength: 1 } });
+    expect(diff).toEqual({ self: { health: 2 } });
   });
 });
 

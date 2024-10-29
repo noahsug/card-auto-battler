@@ -232,13 +232,19 @@ function reduceHealth(value: number, target: Target, { game, events }: PlayCardC
   events.push(createDamageEvent(value, target));
 }
 
-function applyHeal(
+export function applyHeal(
   { value, multiplier = 1, target }: EffectOptions,
   { game, events }: PlayCardContext,
 ) {
-  value = updateValue(value, multiplier);
-
   const targetPlayer = getTargetedPlayer(game, target);
+
+  // strengthAffectsHealing
+  const strengthAffectsHealing = getRelic(targetPlayer, 'strengthAffectsHealing');
+  if (strengthAffectsHealing) {
+    value += targetPlayer.strength;
+  }
+
+  value = updateValue(value, multiplier);
   targetPlayer.health += value;
   events.push(createHealEvent(value, target));
 }
