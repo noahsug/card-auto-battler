@@ -58,7 +58,7 @@ function parseMaybeValue(maybeValue: MaybeValue | undefined, prefix: string): Te
  * }
  * ```
  */
-export function parseDescriptionTemplate(card: CardState) {
+export function parseCardDescriptionTemplate(card: CardState) {
   const effectsTemplateMap = card.effects.reduce((acc, effect, i) => {
     const prefix = i === 0 ? '$' : '$' + String(i + 1);
     return {
@@ -77,7 +77,7 @@ export function parseDescriptionTemplate(card: CardState) {
     ...parseMaybeValue(card.repeat, 'R'),
   };
 
-  function replaceTemplate(templateStr: string) {
+  return card.description.replaceAll(/\$[^ .]+/g, (templateStr: string) => {
     let suffix = '';
     let multiplier = 1;
     let offset = 0;
@@ -96,9 +96,7 @@ export function parseDescriptionTemplate(card: CardState) {
     }
 
     const value = templateMap[templateStr];
-    assertIsNonNullable(value);
+    assertIsNonNullable(value, 'invalid template string: ' + templateStr);
     return value * multiplier + offset + suffix;
-  }
-
-  return card.description.replaceAll(/\$\S+/g, replaceTemplate);
+  });
 }

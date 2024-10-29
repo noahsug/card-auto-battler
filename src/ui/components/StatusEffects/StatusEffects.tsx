@@ -11,7 +11,7 @@ import { maskImage } from '../../style';
 import { Row } from '../shared/Row';
 import { Number } from '../shared/Number';
 
-const effectToImage: Partial<Record<keyof StatusEffectsType, string>> = {
+const effectToImage: Record<keyof StatusEffectsType, string> = {
   bleed: bleedImage,
   dodge: dodgeImage,
   extraCardPlays: extraCardPlaysImage,

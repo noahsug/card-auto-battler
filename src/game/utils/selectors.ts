@@ -1,4 +1,4 @@
-import { GameState, PlayerState, Target } from '../gameState';
+import { GameState, PlayerState, RelicName, Target } from '../gameState';
 import { MAX_WINS, MAX_LOSSES } from '../constants';
 
 export function getIsUserTurn(game: GameState) {
@@ -30,6 +30,10 @@ export function getUserTarget(game: GameState): Target {
 
 export function getPlayerTargets(game: GameState): [Target, Target] {
   return getIsUserTurn(game) ? ['self', 'opponent'] : ['opponent', 'self'];
+}
+
+export function getRelic(player: PlayerState, relicName: RelicName) {
+  return player.relics.find((relic) => relic.name === relicName);
 }
 
 export function shouldPickRelic(game: GameState) {

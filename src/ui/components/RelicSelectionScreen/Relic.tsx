@@ -4,6 +4,7 @@ import { RelicState, Tribe } from '../../../game/gameState';
 import { getHandDrawnBorderRadius, maskImage } from '../../style';
 import { Row } from '../shared/Row';
 import { DescriptionText } from '../DescriptionText';
+import { parseRelicDescriptionTemplate } from './parseRelicDescriptionTemplate';
 
 interface Props {
   relic: RelicState;
@@ -57,13 +58,14 @@ const Text = styled.div`
 `;
 
 export function Relic({ relic, onClick, style }: Props) {
+  const description = parseRelicDescriptionTemplate(relic);
   return (
     <Root onClick={onClick} style={style}>
       <RelicImage src={relic.image} $tribe={relic.tribe} />
       <TextContainer>
-        <Title>{relic.name}</Title>
+        <Title>{relic.displayName}</Title>
         <Text>
-          <DescriptionText text={relic.description} />
+          <DescriptionText text={description} />
         </Text>
       </TextContainer>
     </Root>

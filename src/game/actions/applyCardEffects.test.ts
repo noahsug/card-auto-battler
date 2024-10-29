@@ -5,6 +5,7 @@ import { diffValues } from '../../utils/objects';
 import { applyCardEffects } from './applyCardEffects';
 import { BLEED_DAMAGE } from '../constants';
 import { CardEffect, CardState, createGameState, PlayerState } from '../gameState';
+import { permaBleed, reduceLowDamage, regenForHighDamage } from '../../content/relics';
 
 let card: CardState;
 let effect: CardEffect;
@@ -82,9 +83,11 @@ describe('damage', () => {
 });
 
 describe('permaBleed', () => {
+  const relics = [permaBleed];
+
   it('adds 1 bleed whenever bleed reaches 0', () => {
     effect.multiHit = v(3);
-    const { diff } = getPlayCardResult({ opponent: { permaBleed: 1, bleed: 1 } });
+    const { diff } = getPlayCardResult({ self: { relics }, opponent: { bleed: 1 } });
 
     const damage = 3 * (1 + BLEED_DAMAGE);
     expect(diff).toEqual({ opponent: { health: -damage } });
@@ -92,29 +95,33 @@ describe('permaBleed', () => {
 });
 
 describe('reduceLowDamage', () => {
+  const relics = [reduceLowDamage];
+
   it('reduces damage to 1 when 4 or less', () => {
     effect.value = v(4);
-    const { diff } = getPlayCardResult({ opponent: { reduceLowDamage: 1 } });
+    const { diff } = getPlayCardResult({ opponent: { relics } });
     expect(diff).toEqual({ opponent: { health: -1 } });
   });
 
   it('does nothing when damage is 5 or more', () => {
     effect.value = v(5);
-    const { diff } = getPlayCardResult({ opponent: { reduceLowDamage: 1 } });
+    const { diff } = getPlayCardResult({ opponent: { relics } });
     expect(diff).toEqual({ opponent: { health: -5 } });
   });
 });
 
 describe('regenForHighDamage', () => {
+  const relics = [regenForHighDamage];
+
   it('adds regen when damage is high', () => {
     effect.value = v(10);
-    const { diff } = getPlayCardResult({ self: { regenForHighDamage: 1 } });
+    const { diff } = getPlayCardResult({ self: { relics } });
     expect(diff).toEqual({ self: { regen: 3 }, opponent: { health: -10 } });
   });
 
   it('does nothing when damage is low', () => {
     effect.value = v(9);
-    const { diff } = getPlayCardResult({ self: { regenForHighDamage: 1 } });
+    const { diff } = getPlayCardResult({ self: { relics } });
     expect(diff).toEqual({ opponent: { health: -9 } });
   });
 });

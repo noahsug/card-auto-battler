@@ -1,6 +1,9 @@
-export function assertIsNonNullable<T>(value: T): asserts value is NonNullable<T> {
+export function assertIsNonNullable<T>(
+  value: T,
+  message?: string,
+): asserts value is NonNullable<T> {
   if (value == null) {
-    throw new Error(`${value} is not defined`);
+    throw new Error(message || `expected non-nullable, but got ${value}`);
   }
 }
 
@@ -12,8 +15,7 @@ export function assertIsNullable(value: unknown): asserts value is null | undefi
 
 export function assert(condition: boolean, message?: string): asserts condition is true {
   if (!condition) {
-    const expectedText = message ? `, expected ${message}` : '';
-    throw new Error(`assertion failed${expectedText}`);
+    throw new Error(message || `expected true but got ${condition}`);
   }
 }
 

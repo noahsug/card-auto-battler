@@ -5,7 +5,7 @@ import { getHandDrawnBorderRadius, maskImage } from '../../style';
 import { Container } from '../shared/Container';
 import textBackground from './text-background.png';
 import { DescriptionText } from '../DescriptionText';
-import { parseDescriptionTemplate } from './parseDescriptionTemplate';
+import { parseCardDescriptionTemplate } from './parseCardDescriptionTemplate';
 import { getCardColor } from './getCardColor';
 import { Image } from '../shared/Image';
 
@@ -55,7 +55,7 @@ const Title = styled('h2')`
 `;
 
 const CardImage = styled(Image)`
-  background: radial-gradient(white 0%, ${(props) => getCardColor(props.theme.tribe)} 80%);
+  background: radial-gradient(white 0%, ${(props) => getCardColor(props.theme.tribe)} 60%);
   height: 55%;
 `;
 
@@ -78,7 +78,7 @@ interface Props {
 
 export function Card({ size, card, onClick, style }: Props) {
   const { name, image } = card;
-  const description = parseDescriptionTemplate(card);
+  const description = parseCardDescriptionTemplate(card);
 
   return (
     <CardRoot $size={size} className="card" onClick={onClick} style={style}>

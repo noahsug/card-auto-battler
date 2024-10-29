@@ -12,7 +12,7 @@ import treeFall from './images/tree-fall.png';
 import bless from './images/bless.jpeg';
 import forestPath from './images/forest-path.jpeg';
 import curledLeaf from './images/curled-leaf.png';
-import regrowth from './images/regrowth.png';
+import regrowth from './images/regrowth.jpeg';
 import angryGiant from './images/angry-giant.jpeg';
 import heavyRock from './images/heavy-rock.jpeg';
 
@@ -156,7 +156,6 @@ export const greenCards = {
     },
   ),
 };
-
 Object.values(greenCards).forEach((card) => {
   card.tribe = 'green';
 });
@@ -207,7 +206,6 @@ export const purpleCards = {
     },
   ),
 };
-
 Object.values(purpleCards).forEach((card) => {
   card.tribe = 'purple';
 });

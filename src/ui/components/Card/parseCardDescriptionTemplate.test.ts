@@ -1,8 +1,8 @@
 import { createCard, value as v } from '../../../content/utils/createCard';
-import { parseDescriptionTemplate } from './parseDescriptionTemplate';
+import { parseCardDescriptionTemplate } from './parseCardDescriptionTemplate';
 
 it('parses basic values', () => {
-  const description = parseDescriptionTemplate(
+  const description = parseCardDescriptionTemplate(
     createCard([{}], {
       description: 'Deals $V damage',
     }),
@@ -11,7 +11,7 @@ it('parses basic values', () => {
 });
 
 it('parses basic values from multiple effects', () => {
-  const description = parseDescriptionTemplate(
+  const description = parseCardDescriptionTemplate(
     createCard(
       [
         {},
@@ -28,7 +28,7 @@ it('parses basic values from multiple effects', () => {
 });
 
 it('handles percentages', () => {
-  const description = parseDescriptionTemplate(
+  const description = parseCardDescriptionTemplate(
     createCard(
       [
         {
@@ -44,7 +44,7 @@ it('handles percentages', () => {
 });
 
 it('handles addition', () => {
-  const description = parseDescriptionTemplate(
+  const description = parseCardDescriptionTemplate(
     createCard(
       [
         {

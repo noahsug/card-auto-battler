@@ -9,7 +9,7 @@ import {
   createGameState,
   statusEffectNames,
 } from '../gameState';
-import { getBattleWinner, getPlayers } from '../utils/selectors';
+import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
 import { applyCardEffects } from './applyCardEffects';
 import { BattleEvent, createDamageEvent, createHealEvent } from './battleEvent';
 
@@ -22,27 +22,23 @@ export function addRelic(game: GameState, relic: RelicState) {
   game.user.relics.push(relic);
 }
 
-function applyRelicStatusEffects({ self, opponent }: { self: PlayerState; opponent: PlayerState }) {
-  self.relics.forEach((relic) => {
-    const { target, statusEffectName, value } = relic.effect;
-    const targetPlayer = target === 'self' ? self : opponent;
-    targetPlayer[statusEffectName] += value;
-  });
-}
-
-function triggerStartOfBattleEffects({ self }: { self: PlayerState; opponent: PlayerState }) {
+function triggerStartOfBattleEffects({
+  self,
+  opponent,
+}: {
+  self: PlayerState;
+  opponent: PlayerState;
+}) {
   // permaBleed
-  if (self.permaBleed > 0) {
-    self.bleed += self.permaBleed;
+  const permaBleed = getRelic(self, 'permaBleed');
+  if (permaBleed) {
+    opponent.bleed += permaBleed.value;
   }
 }
 
 function startBattle(game: GameState) {
   const userPerspective = { self: game.user, opponent: game.enemy };
   const enemyPerspective = { self: game.enemy, opponent: game.user };
-
-  applyRelicStatusEffects(userPerspective);
-  applyRelicStatusEffects(enemyPerspective);
 
   triggerStartOfBattleEffects(userPerspective);
   triggerStartOfBattleEffects(enemyPerspective);

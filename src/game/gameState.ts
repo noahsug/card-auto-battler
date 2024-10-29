@@ -5,21 +5,14 @@ import { STARTING_HEALTH } from './constants';
 
 export type Target = 'self' | 'opponent';
 
-export const statusEffectNames = [
-  'bleed',
-  'permaBleed',
-  'extraCardPlays',
-  'dodge',
-  'strength',
-  'regen',
-  'reduceLowDamage',
-  'regenForHighDamage',
-] as const;
+export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength', 'regen'] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;
 export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
   statusEffectNames.map((effectName) => [effectName, 0]),
 ) as StatusEffects;
+
+export type RelicName = 'permaBleed' | 'reduceLowDamage' | 'regenForHighDamage';
 
 type CalculatedPlayerValueName =
   | 'percentGreen'
@@ -83,16 +76,12 @@ export interface CardState {
   tribe: Tribe;
 }
 
-export interface RelicEffect {
-  target: Target;
-  statusEffectName: StatusEffectName;
-  value: number;
-}
-
 export interface RelicState {
-  effect: RelicEffect;
-  name: string;
+  name: RelicName;
+  displayName: string;
   description: string;
+  value: number;
+  value2: number;
   image: string;
   tribe: Tribe;
 }

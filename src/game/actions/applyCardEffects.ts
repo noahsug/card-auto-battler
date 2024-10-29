@@ -15,7 +15,7 @@ import { BLEED_DAMAGE } from '../constants';
 import { assert } from '../../utils/asserts';
 import { BattleEvent, createDamageEvent, createHealEvent, createMissEvent } from './battleEvent';
 import { readonlyIncludes } from '../../utils/iterators';
-import { getPlayers, getTargetedPlayer } from '../utils/selectors';
+import { getPlayers, getTargetedPlayer, getRelic } from '../utils/selectors';
 
 interface PlayCardContext {
   game: GameState;
@@ -201,8 +201,9 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   reduceHealth(value, target, context);
 
   // regenForHighDamage
-  if (self.regenForHighDamage > 0 && value >= 10) {
-    self.regen += 3;
+  const regenForHighDamage = getRelic(self, 'regenForHighDamage');
+  if (regenForHighDamage && value >= regenForHighDamage.value) {
+    self.regen += regenForHighDamage.value2;
   }
 
   // bleed
@@ -211,8 +212,9 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
     opponent.bleed -= 1;
 
     // permaBleed
-    if (opponent.bleed <= 0) {
-      opponent.bleed += opponent.permaBleed;
+    const permaBleed = getRelic(self, 'permaBleed');
+    if (permaBleed && opponent.bleed <= 0) {
+      opponent.bleed += permaBleed.value;
     }
   }
 }
@@ -220,9 +222,10 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
 function reduceHealth(value: number, target: Target, { game, events }: PlayCardContext) {
   const targetPlayer = getTargetedPlayer(game, target);
 
-  // thick bark
-  if (targetPlayer.reduceLowDamage > 0 && value <= 4) {
-    value = 1;
+  // reduceLowDamage
+  const reduceLowDamage = getRelic(targetPlayer, 'reduceLowDamage');
+  if (reduceLowDamage && value <= reduceLowDamage.value) {
+    value = reduceLowDamage.value2;
   }
 
   targetPlayer.health -= value;
