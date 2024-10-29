@@ -93,11 +93,7 @@ export function playCard(game: GameState): BattleEvent[] {
   activePlayer.cardsPlayedThisTurn += 1;
 
   // play card
-  const playCardEvents = applyCardEffects(card, {
-    game,
-    self: activePlayer,
-    opponent: nonActivePlayer,
-  });
+  const playCardEvents = applyCardEffects(game, card);
   events.push(...playCardEvents);
 
   activePlayer.previousCard = card;

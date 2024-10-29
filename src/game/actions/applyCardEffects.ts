@@ -15,11 +15,10 @@ import { BLEED_DAMAGE } from '../constants';
 import { assert } from '../../utils/asserts';
 import { BattleEvent, createDamageEvent, createHealEvent, createMissEvent } from './battleEvent';
 import { readonlyIncludes } from '../../utils/iterators';
+import { getPlayers, getTargetedPlayer } from '../utils/selectors';
 
 interface PlayCardContext {
   game: GameState;
-  self: PlayerState;
-  opponent: PlayerState;
   events: BattleEvent[];
 }
 
@@ -29,12 +28,9 @@ interface EffectOptions {
   multiplier?: number;
 }
 
-export function applyCardEffects(
-  card: CardState,
-  { game, self, opponent }: { game: GameState; self: PlayerState; opponent: PlayerState },
-) {
+export function applyCardEffects(game: GameState, card: CardState): BattleEvent[] {
   const events: BattleEvent[] = [];
-  const context = { game, self, opponent, events };
+  const context = { game, events };
 
   let activations = 1;
   if (card.repeat) {
@@ -72,8 +68,8 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
 
   switch (effect.name) {
     case 'damage': {
-      const dodgedDamage = dodgeDamage(effect, context);
-      if (!dodgedDamage) {
+      const dodged = dodgeDamage(effect, context);
+      if (!dodged) {
         dealDamage(effectOptions, context);
       }
       break;
@@ -88,10 +84,12 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
       break;
 
     // status effects
-    default:
+    default: {
       assert(readonlyIncludes(statusEffectNames, effect.name));
       value = updateValue(value);
-      context[effect.target][effect.name] += value;
+      const player = getTargetedPlayer(context.game, effect.target);
+      player[effect.name] += value;
+    }
   }
 
   if (multiHitsLeft) {
@@ -129,11 +127,14 @@ function calculateTribePercent(player: PlayerState, tribe: Tribe): number {
   return (player.cards.filter((card) => card.tribe === tribe).length / player.cards.length) * 100;
 }
 
-function getPlayerValue({ target, name }: PlayerValueDescriptor, context: PlayCardContext): number {
-  const player = context[target];
+function getPlayerValue(
+  { target, name }: PlayerValueDescriptor,
+  { game }: PlayCardContext,
+): number {
+  const player = getTargetedPlayer(game, target);
 
   if (name === 'turn') {
-    return Math.floor(context.game.turn / 2);
+    return Math.floor(game.turn / 2);
   }
 
   if (name === 'percentGreen') {
@@ -175,19 +176,21 @@ function compareValues(value1: number, comparison: If['comparison'], value2: num
   throw new Error(`invalid comparison: ${comparison}`);
 }
 
-function dodgeDamage(effect: CardEffect, { opponent, events }: PlayCardContext) {
+function dodgeDamage(effect: CardEffect, { game, events }: PlayCardContext) {
   // dodge doesn't apply to self damage
   if (effect.target === 'self') return false;
 
-  if (opponent.dodge <= 0) return false;
+  const player = getTargetedPlayer(game, effect.target);
 
-  opponent.dodge -= 1;
+  if (player.dodge <= 0) return false;
+
+  player.dodge -= 1;
   events.push(createMissEvent(effect.target));
   return true;
 }
 
 function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
-  const { self, opponent, events } = context;
+  const [self, opponent] = getPlayers(context.game);
 
   // strength
   if (target === 'opponent') {
@@ -209,36 +212,8 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   }
 }
 
-function applyHeal(
-  { value, multiplier = 1, target }: EffectOptions,
-  { self, opponent, events }: PlayCardContext,
-) {
-  value = updateValue(value, multiplier);
-
-  const targetPlayer = target === 'self' ? self : opponent;
-  targetPlayer.health += value;
-
-  events.push(createHealEvent(value, target));
-}
-
-function trashCards({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
-  value = updateValue(value, multiplier);
-  if (value <= 0) return;
-
-  const player = context[target];
-  const isActivePlayer = target === 'self';
-
-  // TODO
-  // trashNextCards({ player, isActivePlayer, numCardsToTrash: value });
-}
-
-function updateValue(value: number, multiplier: number = 1) {
-  value *= multiplier;
-  return Math.floor(value);
-}
-
-function reduceHealth(value: number, target: Target, { self, opponent, events }: PlayCardContext) {
-  const targetPlayer = target === 'self' ? self : opponent;
+function reduceHealth(value: number, target: Target, { game, events }: PlayCardContext) {
+  const targetPlayer = getTargetedPlayer(game, target);
 
   // thick bark
   if (targetPlayer.thickBark > 0 && value <= 4) {
@@ -247,4 +222,31 @@ function reduceHealth(value: number, target: Target, { self, opponent, events }:
 
   targetPlayer.health -= value;
   events.push(createDamageEvent(value, target));
+}
+
+function applyHeal(
+  { value, multiplier = 1, target }: EffectOptions,
+  { game, events }: PlayCardContext,
+) {
+  value = updateValue(value, multiplier);
+
+  const targetPlayer = getTargetedPlayer(game, target);
+  targetPlayer.health += value;
+  events.push(createHealEvent(value, target));
+}
+
+function trashCards({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
+  value = updateValue(value, multiplier);
+  if (value <= 0) return;
+
+  // const player = context[target];
+  // const isActivePlayer = target === 'self';
+
+  // TODO
+  // trashNextCards({ player, isActivePlayer, numCardsToTrash: value });
+}
+
+function updateValue(value: number, multiplier: number = 1) {
+  value *= multiplier;
+  return Math.floor(value);
 }

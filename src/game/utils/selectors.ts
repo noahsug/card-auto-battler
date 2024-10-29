@@ -17,6 +17,13 @@ export function getPlayers(game: GameState): [PlayerState, PlayerState] {
   return getIsUserTurn(game) ? [game.user, game.enemy] : [game.enemy, game.user];
 }
 
+export function getTargetedPlayer(game: GameState, target: Target) {
+  if (getIsUserTurn(game)) {
+    return target === 'self' ? game.user : game.enemy;
+  }
+  return target === 'self' ? game.enemy : game.user;
+}
+
 export function getUserTarget(game: GameState): Target {
   return getIsUserTurn(game) ? 'self' : 'opponent';
 }
