@@ -10,11 +10,13 @@ import cross from './images/cross.png';
 import growingClub from './images/growing-club.png';
 import treeFall from './images/tree-fall.png';
 import bless from './images/bless.jpeg';
-import forestPath from './images/forest-path.jpeg';
 import curledLeaf from './images/curled-leaf.png';
 import regrowth from './images/regrowth.jpeg';
 import angryGiant from './images/angry-giant.jpeg';
 import heavyRock from './images/heavy-rock.jpeg';
+import leftJab from './images/left-jab.png';
+import uppercut from './images/uppercut.png';
+import manyJabs from './images/many-jabs.jpeg';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
@@ -160,6 +162,8 @@ Object.values(greenCards).forEach((card) => {
   card.tribe = 'green';
 });
 
+// TODO: Channel = add temporary fireball to deck
+// Fireball = deal damage for each fireball in deck
 export const redCards = {
   fireball: createCard(
     [
@@ -173,6 +177,19 @@ export const redCards = {
       image: fireball,
     },
   ),
+  // channel: createCard(
+  //   [
+  //     {
+  //       target: 'self',
+  //       name: 'extraCardPlays',
+  //     },
+  //   ],
+  //   {
+  //     name: 'Channel',
+  //     description: 'Play another card.',
+  //     image: channel,
+  //   },
+  // ),
   eviscerate: createCard(
     [
       {
@@ -192,17 +209,49 @@ Object.values(redCards).forEach((card) => {
 });
 
 export const purpleCards = {
-  channel: createCard(
+  jabOne: createCard(
     [
+      {
+        value: v(1),
+      },
       {
         target: 'self',
         name: 'extraCardPlays',
       },
     ],
     {
-      name: 'Channel',
-      description: 'Play another card.',
-      image: channel,
+      name: 'Left Jab',
+      description: 'Deal $V damage. Play another card.',
+      image: leftJab,
+    },
+  ),
+  jabTwo: createCard(
+    [
+      {
+        value: v(4),
+        if: ifCompare('self', 'cardsPlayedThisTurn', '=', 2),
+      },
+      {
+        target: 'self',
+        name: 'extraCardPlays',
+      },
+    ],
+    {
+      name: 'Right Upper',
+      description: `Deal $V damage if this is the 2nd card played this turn. Play another card.`,
+      image: uppercut,
+    },
+  ),
+  jabThree: createCard(
+    [
+      {
+        value: v('self', 'cardsPlayedThisTurn', 2),
+      },
+    ],
+    {
+      name: 'Finisher',
+      description: `Deal $V damage 1 time for each card played this turn.`,
+      image: manyJabs,
     },
   ),
 };

@@ -258,6 +258,7 @@ Green cards (heal, strength, high hp, high dmg, x = turn, toxic, chill)
 
 Red Cards (bleed, burn, strength, multihit, lifesteal, low hp, trash, same name, armor)
 
+- blood boil - gain 1 burn for each bleed
 - deal 2 damage for each bleed
 - apply 3 bleed
 - Deal 4 damage. Lifesteal.
@@ -315,6 +316,12 @@ Color Mechanics
 
 - Do X if last card played is RED
 - Deal X = # of RED cards
+
+Color visual themes
+
+- Green: giants, nature (plants, rocks, animals) - Leader = Treebeard
+- Red: fire, blood, strength, monsters - Leader = Battle Mage
+- Purple: reflexes, punches, shadow - Leader = Shadowy Boxer
 
 Shuffle mechanics
 
