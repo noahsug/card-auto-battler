@@ -141,6 +141,7 @@ export function BattleScreen({
         <ContentRow>
           <CardStack
             cards={user.cards}
+            trashedCards={user.trashedCards}
             currentCardIndex={user.currentCardIndex}
             targetElement={enemyProfileRef.current}
             playerType="user"
@@ -149,6 +150,7 @@ export function BattleScreen({
           {
             <CardStack
               cards={enemy.cards}
+              trashedCards={enemy.trashedCards}
               currentCardIndex={enemy.currentCardIndex}
               targetElement={userProfileRef.current}
               playerType="enemy"

@@ -3,7 +3,7 @@ import { styled } from 'styled-components';
 
 import { NUM_CARD_SELECTION_OPTIONS, NUM_RELIC_SELECTION_OPTIONS } from '../../../game/constants';
 import { CardState, GameState, RelicState } from '../../../game/gameState';
-import { getRandomCards } from '../../../game/utils/getRandomCards';
+import { getRandomCards } from '../../../game/utils/cards';
 import { getRandomRelics } from '../../../game/utils/getRandomRelics';
 import { getBattleWinner, isGameOver, shouldPickRelic } from '../../../game/utils/selectors';
 import { useGameState } from '../../hooks/useGameState';

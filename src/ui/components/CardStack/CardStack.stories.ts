@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { CardStack } from './CardStack';
-import { getRandomCards } from '../../../game/utils/getRandomCards';
+import { getRandomCards } from '../../../game/utils/cards';
 import { CardState } from '../../../game/gameState';
 
 const meta = {

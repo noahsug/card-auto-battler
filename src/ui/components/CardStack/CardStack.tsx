@@ -5,8 +5,7 @@ import { styled } from 'styled-components';
 import { Card, baseCardSize, cardSizeScaling } from '../Card';
 import { Props as AnimationProps, useCardStackAnimation } from './useCardStackAnimation';
 
-interface Props
-  extends Pick<AnimationProps, 'cards' | 'currentCardIndex' | 'targetElement' | 'turn'> {
+interface Props extends Omit<AnimationProps, 'selfElement' | 'cardDealDirection'> {
   playerType: 'user' | 'enemy';
 }
 

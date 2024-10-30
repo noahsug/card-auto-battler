@@ -9,12 +9,13 @@ import {
   createGameState,
   statusEffectNames,
 } from '../gameState';
+import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal } from './applyCardEffects';
 import { BattleEvent, createDamageEvent } from './battleEvent';
 
 export function addCards(game: GameState, cards: CardState[]) {
-  game.user.cards.push(...cards);
+  addCardsToPlayer(game.user, cards);
   game.user.cards = shuffle(game.user.cards);
 }
 

@@ -229,7 +229,10 @@ export const purpleCards = {
     [
       {
         value: v(4),
-        if: ifCompare('self', 'cardsPlayedThisTurn', '=', 2),
+        multiply: {
+          value: v(2),
+          if: ifCompare('self', 'cardsPlayedThisTurn', '=', 2),
+        },
       },
       {
         target: 'self',
@@ -238,7 +241,7 @@ export const purpleCards = {
     ],
     {
       name: 'Right Upper',
-      description: `Deal $V damage if this is the 2nd card played this turn. Play another card.`,
+      description: `Deal $V damage. Deal double damage if this is the 2nd card played this turn.`,
       image: uppercut,
     },
   ),

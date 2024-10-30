@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
 import { createGameState } from '../../../game/gameState';
-import { getRandomCards } from '../../../game/utils/getRandomCards';
+import { getRandomCards } from '../../../game/utils/cards';
 import { CardSelectionScreen } from './CardSelectionScreen';
 import { allCards } from '../../../content/cards';
 

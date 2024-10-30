@@ -38,6 +38,7 @@ export function createCard(
     description,
     image,
     tribe,
+    acquiredId: 0,
   };
 }
 

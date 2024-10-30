@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
 import { createGameState, statusEffectNames } from '../../game/gameState';
-import { getRandomCards } from '../../game/utils/getRandomCards';
+import { getRandomCards } from '../../game/utils/cards';
 import { BattleScreen } from './BattleScreen';
 import { getRandomRelics } from '../../game/utils/getRandomRelics';
 import { allRelics } from '../../content/relics';

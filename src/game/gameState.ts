@@ -2,6 +2,7 @@ import { allCards } from '../content/cards';
 import { allEnemies } from '../content/enemies';
 import { allHeroes } from '../content/heroes';
 import { STARTING_HEALTH } from './constants';
+import { addCardsToPlayer } from './utils/cards';
 
 export type Target = 'self' | 'opponent';
 
@@ -73,6 +74,8 @@ export interface CardState {
   description: string;
   image: string;
   tribe: Tribe;
+  // unique ID used to sort cards from first added to last added
+  acquiredId: number;
 }
 
 export interface RelicState {
@@ -126,19 +129,17 @@ function createPlayer({ name, image }: { name: string; image: string }): PlayerS
 }
 
 export function createGameState(): GameState {
-  const { attack, heal, fireball } = allCards;
-
-  const user = createPlayer(allHeroes.warrior);
-  user.cards = [attack, attack, heal];
-
-  const enemy = createPlayer(allEnemies.fireMonster);
-  enemy.cards = [fireball, fireball, fireball];
-
-  return {
-    user,
-    enemy,
+  const game = {
+    user: createPlayer(allHeroes.warrior),
+    enemy: createPlayer(allEnemies.fireMonster),
     turn: 0,
     wins: 0,
     losses: 0,
   };
+
+  const { attack, heal, fireball } = allCards;
+  addCardsToPlayer(game.user, [attack, attack, heal]);
+  addCardsToPlayer(game.enemy, [fireball, fireball, fireball]);
+
+  return game;
 }

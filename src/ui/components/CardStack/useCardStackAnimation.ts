@@ -10,6 +10,7 @@ import { useUnits } from '../../hooks/useUnits';
 export interface Props {
   cards: CardState[];
   currentCardIndex: number;
+  trashedCards: CardState[];
   selfElement: Element | null;
   targetElement: Element | null;
   cardDealDirection: Direction;
@@ -53,11 +54,14 @@ function createCardAnimation(card: CardState) {
 export function useCardStackAnimation({
   cards,
   currentCardIndex,
+  trashedCards,
   selfElement,
   targetElement,
   cardDealDirection,
   turn,
 }: Props) {
+  // const animationStates = useAnimationStates({ cards, currentCardIndex, trashedCards });
+
   const [u, windowDimensions] = useUnits();
   const cardAnimationsRef = useRef(cards.map(createCardAnimation));
   const [isDealingCards, lastPlayedCard] = useIsDealingCards(

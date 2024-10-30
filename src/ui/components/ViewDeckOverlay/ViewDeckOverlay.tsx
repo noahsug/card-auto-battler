@@ -1,4 +1,5 @@
 import { styled } from 'styled-components';
+import sortBy from 'lodash/sortBy';
 
 import { GameState } from '../../../game/gameState';
 import { Card } from '../Card';
@@ -27,6 +28,7 @@ interface Props {
 
 export function ViewDeckOverlay({ game, onBack }: Props) {
   const cardSize = useCardSize();
+  const cards = sortBy(game.user.cards, (card) => card.acquiredId);
 
   return (
     <Container onClick={onBack}>
@@ -36,7 +38,7 @@ export function ViewDeckOverlay({ game, onBack }: Props) {
 
       <ScrollingCenterContent>
         <CardGrid>
-          {game.user.cards.map((card, i) => (
+          {cards.map((card, i) => (
             <Card key={i} card={card} size={cardSize} />
           ))}
         </CardGrid>
