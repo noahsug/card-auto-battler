@@ -159,7 +159,7 @@ function getPlayerValue(
   }
 
   const value = player[name];
-  // e.g. number of trashed cards
+  // e.g. number of relics
   if (Array.isArray(value)) {
     return value.length;
   }
@@ -250,13 +250,10 @@ export function applyHeal(
 }
 
 function trashCards({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
-  value = updateValue(value, multiplier);
-  if (value <= 0) return;
-
+  // value = updateValue(value, multiplier);
+  // if (value <= 0) return;
   // const player = context[target];
   // const isActivePlayer = target === 'self';
-
-  // TODO
   // trashNextCards({ player, isActivePlayer, numCardsToTrash: value });
 }
 

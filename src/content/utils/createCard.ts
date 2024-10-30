@@ -23,6 +23,7 @@ export function createCard(
   effects: Partial<CardEffect>[] = [{}],
   {
     repeat,
+    trash = false,
     name = '',
     description = '',
     image = '',
@@ -32,6 +33,7 @@ export function createCard(
   return {
     effects: effects.map(getEffect),
     repeat,
+    trash,
     name,
     description,
     image,

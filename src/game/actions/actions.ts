@@ -11,8 +11,7 @@ import {
 } from '../gameState';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal } from './applyCardEffects';
-import { BattleEvent, createDamageEvent, createHealEvent } from './battleEvent';
-import { strengthAffectsHealing } from '../../content/relics/relics';
+import { BattleEvent, createDamageEvent } from './battleEvent';
 
 export function addCards(game: GameState, cards: CardState[]) {
   game.user.cards.push(...cards);
@@ -101,6 +100,12 @@ export function playCard(game: GameState): BattleEvent[] {
   const playCardEvents = applyCardEffects(game, card);
   events.push(...playCardEvents);
 
+  if (card.trash) {
+    activePlayer.trashedCards.push(card);
+    activePlayer.cards.splice(activePlayer.currentCardIndex, 1);
+    activePlayer.currentCardIndex -= 1;
+  }
+
   activePlayer.previousCard = card;
   activePlayer.currentCardIndex += 1;
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
@@ -130,6 +135,8 @@ function resetPlayerAfterBattle(player: PlayerState) {
   player.damageDealtThisTurn = 0;
   player.damageDealtLastTurn = 0;
   player.previousCard = undefined;
+  player.cards = [...player.trashedCards, ...player.cards];
+  player.trashedCards = [];
   statusEffectNames.forEach((statusEffectName) => {
     player[statusEffectName] = 0;
   });

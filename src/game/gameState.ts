@@ -68,6 +68,7 @@ export type Tribe = (typeof tribes)[number];
 export interface CardState {
   effects: CardEffect[];
   repeat?: MaybeValue;
+  trash: boolean;
   name: string;
   description: string;
   image: string;
@@ -88,6 +89,7 @@ export interface PlayerState extends StatusEffects {
   health: number;
   startingHealth: number;
   cards: CardState[];
+  trashedCards: CardState[];
   relics: RelicState[];
   currentCardIndex: number;
   cardsPlayedThisTurn: number;
@@ -112,6 +114,7 @@ function createPlayer({ name, image }: { name: string; image: string }): PlayerS
     startingHealth: STARTING_HEALTH,
     ...EMPTY_STATUS_EFFECTS,
     cards: [],
+    trashedCards: [],
     relics: [],
     currentCardIndex: 0,
     cardsPlayedThisTurn: 0,
@@ -126,8 +129,7 @@ export function createGameState(): GameState {
   const { attack, heal, fireball } = allCards;
 
   const user = createPlayer(allHeroes.warrior);
-  // user.cards = [attack, attack, heal];
-  user.cards = [allCards.damageForGreen, allCards.damagePerTurn, allCards.regen];
+  user.cards = [attack, attack, heal];
 
   const enemy = createPlayer(allEnemies.fireMonster);
   enemy.cards = [fireball, fireball, fireball];

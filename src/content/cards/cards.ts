@@ -162,21 +162,21 @@ Object.values(greenCards).forEach((card) => {
   card.tribe = 'green';
 });
 
-// TODO: Channel = add temporary fireball to deck
-// Fireball = deal damage for each fireball in deck
 export const redCards = {
   fireball: createCard(
     [
       {
-        value: v('self', 'cardsPlayedThisTurn', 3),
+        value: v(7),
       },
     ],
     {
+      trash: true,
       name: 'Fireball',
-      description: 'Deal $V damage for each card played this turn.',
+      description: 'Deal $V damage. Trash.',
       image: fireball,
     },
   ),
+  // TODO: add a temporary fireball card to deck. All fireball cards deal +2 damage.
   // channel: createCard(
   //   [
   //     {
