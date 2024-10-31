@@ -1,5 +1,5 @@
 import random from 'lodash/random';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 
 import { CardState } from '../../../game/gameState';
 import { BattleEvent } from '../../../game/actions/battleEvent';
@@ -31,6 +31,7 @@ interface AnimationContext {
   windowDimensions: { width: number; height: number };
   cardDealDirection: Direction;
   animation: BattleEvent | undefined;
+  goToNextAnimation: () => void;
 }
 
 const animatedEvents = new Set<Partial<BattleEvent['type']>>([
@@ -107,23 +108,24 @@ function getDealAnimation(
 
 function getPlayAnimation(animationState: CardAnimationState, context: AnimationContext) {
   console.log('getPlayAnimation');
-  const { x, y } = getXYToTarget(context);
-  return { x, y, scale: 1.25, rotate: 0, config: config.stiff };
-}
+  const { goToNextAnimation } = context;
 
-function getShowPlayedCardAnimation(animationState: CardAnimationState, context: AnimationContext) {
   const { x, y } = getXYToTarget(context);
   return async (next: (options: object) => Promise<void>) => {
     await next({ x, y, scale: 1.25, rotate: 0, config: config.stiff });
-    console.log(2);
     await wait(2000);
-    console.log(3);
+    goToNextAnimation();
   };
 }
 
-function getDiscardAnimation(animationState: CardAnimationState, { u }: AnimationContext) {
+function getDiscardAnimation(animationState: CardAnimationState, context: AnimationContext) {
   console.log('getDiscardAnimation');
-  return { y: u(-1000), rotate: 0, config: { duration: 300, easing: easings.easeInBack } };
+  const { u, goToNextAnimation } = context;
+
+  return async (next: (options: object) => Promise<void>) => {
+    await next({ y: u(-1000), rotate: 0, config: { duration: 300, easing: easings.easeInBack } });
+    goToNextAnimation();
+  };
 }
 
 function getAnimation(animationState: CardAnimationState, context: AnimationContext) {
@@ -152,7 +154,6 @@ export function useCardStackAnimation({
   selfElement,
   targetElement,
 }: Props) {
-  console.log('render');
   const [u, windowDimensions] = useUnits();
   const cardDealDirection = getCardDealDirection(selfElement, targetElement);
   const animationController = useSpringRef();
@@ -160,7 +161,19 @@ export function useCardStackAnimation({
   const cardAnimationsRef = useRef<CardAnimationState[]>(cards.map(createCardAnimationState));
 
   const animationQueue = useRef<BattleEvent[]>([]);
-  animationQueue.current = events.filter((e) => animatedEvents.has(e.type));
+  const [animation, setAnimation] = useState<BattleEvent | undefined>();
+
+  animationQueue.current = useMemo(() => {
+    const queue = events.filter((e) => animatedEvents.has(e.type));
+    setAnimation(queue.shift());
+    return queue;
+  }, [events]);
+
+  const goToNextAnimation = useCallback(() => {
+    const next = animationQueue.current.shift();
+    console.log('goToNextAnimation', next?.type);
+    setAnimation(next);
+  }, []);
 
   // if (!animationQueue.current.length === 0) {
   //   animationController.stop();
@@ -168,7 +181,7 @@ export function useCardStackAnimation({
 
   useEffect(() => {
     animationController.start();
-  }, [animationController, events, selfElement, targetElement]);
+  }, [animationController, animation, selfElement, targetElement]);
 
   const context: AnimationContext = {
     cards,
@@ -178,7 +191,8 @@ export function useCardStackAnimation({
     u,
     windowDimensions,
     cardDealDirection,
-    animation: animationQueue.current[0],
+    animation,
+    goToNextAnimation,
   };
 
   // wait for self and target elements to be defined before rendering animations
@@ -190,15 +204,6 @@ export function useCardStackAnimation({
     enter: (c: CardAnimationState) => getAnimation(c, context),
     update: (c: CardAnimationState) => getAnimation(c, context),
     ref: animationController,
-    deps: [
-      cards,
-      events,
-      currentCardIndex,
-      selfElement,
-      targetElement,
-      u,
-      windowDimensions,
-      cardDealDirection,
-    ],
+    deps: [cards, currentCardIndex, selfElement, targetElement, u, animation],
   });
 }
