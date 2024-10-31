@@ -1,5 +1,5 @@
 import { animated } from '@react-spring/web';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { Card, baseCardSize, cardSizeScaling } from '../Card';
@@ -25,16 +25,16 @@ const AnimatedContainer = styled(animated.div)`
 `;
 
 export function CardStack(props: Props) {
-  const container = useRef<HTMLDivElement>(null);
+  const [container, setContainer] = useState<HTMLDivElement | null>(null);
 
   const render = useCardStackAnimation({
     ...props,
-    selfElement: container.current,
+    selfElement: container,
   });
 
   return (
     <div>
-      <StackedCardsContainer ref={container}>
+      <StackedCardsContainer ref={setContainer}>
         {render((style, { card }) => (
           <AnimatedContainer style={style}>
             <Card card={card} size="medium" />

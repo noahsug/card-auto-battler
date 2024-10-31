@@ -10,6 +10,8 @@ import {
 
 export type Props = AnimationProps;
 
+const battleEventsTypesWithFCT = new Set(['damage', 'heal', 'miss']);
+
 function getTextColor({ $type }: { $type: BattleEvent['type'] }) {
   switch ($type) {
     case 'damage':
@@ -19,7 +21,6 @@ function getTextColor({ $type }: { $type: BattleEvent['type'] }) {
     case 'miss':
       return 'yellow';
   }
-  return $type satisfies never;
 }
 
 function getTextShadow({ $type }: { $type: BattleEvent['type'] }) {
@@ -56,10 +57,10 @@ function getTextFromBattleEvent(battleEvent: BattleEvent) {
     case 'miss':
       return 'miss';
   }
-  battleEvent satisfies never;
 }
 
 export function FloatingCombatText({ battleEvents, targetElement: target }: Props) {
+  battleEvents = battleEvents.filter((event) => battleEventsTypesWithFCT.has(event.type));
   const render = useFloatingCombatTextAnimation({ battleEvents, targetElement: target });
 
   return render((style, { battleEvent }) => (

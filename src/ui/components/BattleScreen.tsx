@@ -42,7 +42,7 @@ export function BattleScreen({
   onViewDeck,
   hasOverlay = false,
 }: Props) {
-  const { user, enemy, turn } = game;
+  const { user, enemy } = game;
   const [userTarget, enemyTarget] = getPlayerTargets(game);
   const isBattleOver = getBattleWinner(game) != null;
   const canPlayNextCard = !isBattleOver && !hasOverlay;
@@ -51,8 +51,8 @@ export function BattleScreen({
 
   const [battleEvents, setBattleEvents] = useState(EMPTY_BATTLE_EVENTS);
 
-  const userProfileRef = useRef<HTMLDivElement>(null);
-  const enemyProfileRef = useRef<HTMLDivElement>(null);
+  const [userProfileElement, setUserProfileElement] = useState<HTMLDivElement | null>(null);
+  const [enemyProfileElement, setEnemyProfileElement] = useState<HTMLDivElement | null>(null);
 
   const handleUndo = useCallback(() => {
     undo();
@@ -110,13 +110,13 @@ export function BattleScreen({
             <StatusEffects statusEffects={user} />
             <PlayerProfile
               src={user.image}
-              profileRef={userProfileRef}
+              setProfileElement={setUserProfileElement}
               battleEvents={battleEvents.user}
               isDead={user.health <= 0}
             />
             <FloatingCombatText
               battleEvents={battleEvents.user}
-              targetElement={userProfileRef.current}
+              targetElement={userProfileElement}
             />
             <HealthBar health={user.health} maxHealth={user.startingHealth} />
           </Player>
@@ -126,13 +126,13 @@ export function BattleScreen({
             <PlayerProfile
               src={enemy.image}
               flip={true}
-              profileRef={enemyProfileRef}
+              setProfileElement={setEnemyProfileElement}
               battleEvents={battleEvents.enemy}
               isDead={enemy.health <= 0}
             />
             <FloatingCombatText
               battleEvents={battleEvents.enemy}
-              targetElement={enemyProfileRef.current}
+              targetElement={enemyProfileElement}
             />
             <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
           </Player>
@@ -143,14 +143,14 @@ export function BattleScreen({
             cards={user.cards}
             currentCardIndex={user.currentCardIndex}
             events={battleEvents.user}
-            targetElement={enemyProfileRef.current}
+            targetElement={enemyProfileElement}
           />
           {
             <CardStack
               cards={enemy.cards}
               currentCardIndex={enemy.currentCardIndex}
               events={battleEvents.enemy}
-              targetElement={userProfileRef.current}
+              targetElement={userProfileElement}
             />
           }
         </ContentRow>

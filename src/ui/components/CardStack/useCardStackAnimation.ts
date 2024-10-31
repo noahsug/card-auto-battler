@@ -68,12 +68,9 @@ function getXYToTarget({ selfElement, targetElement, cardDealDirection }: Animat
   };
 }
 
-function cardIsDiscarded(
-  { card }: CardAnimationState,
-  { cards, currentCardIndex }: AnimationContext,
-) {
+function getIsInDeck({ card }: CardAnimationState, { cards, currentCardIndex }: AnimationContext) {
   const index = cards.findIndex((c) => c.acquiredId === card.acquiredId);
-  return index < currentCardIndex;
+  return index >= currentCardIndex;
 }
 
 function getDiscardPosition({ windowDimensions, cardDealDirection }: AnimationContext) {
@@ -100,14 +97,24 @@ function getDealAnimation(
   };
 }
 
+function getPlayAnimation(animationState: CardAnimationState, context: AnimationContext) {
+  const { x, y } = getXYToTarget(context);
+  return { x, y, scale: 1.25, rotate: 0, config: config.stiff };
+}
+
 function getAnimation(animationState: CardAnimationState, context: AnimationContext) {
-  if (!context.animation) {
-    if (cardIsDiscarded(animationState, context)) {
-      return getDiscardPosition(context);
-    } else {
-      return getDealAnimation(animationState, context);
-    }
+  switch (context.animation?.type) {
+    case 'cardPlayed':
+      if (context.animation.cardId === animationState.card.acquiredId) {
+        return getPlayAnimation(animationState, context);
+      }
+      break;
   }
+
+  if (getIsInDeck(animationState, context)) {
+    return getDealAnimation(animationState, context);
+  }
+  return getDiscardPosition(context);
 }
 
 export function useCardStackAnimation({
@@ -118,12 +125,13 @@ export function useCardStackAnimation({
   targetElement,
 }: Props) {
   const animationController = useSpringRef();
-  const cardAnimations = useRef<CardAnimationState[]>(cards.map(createCardAnimationState));
+  const cardAnimationsRef = useRef<CardAnimationState[]>(cards.map(createCardAnimationState));
   const animationQueue = useRef<BattleEvent[]>(events);
 
   const animation = animationQueue.current[0];
   const [u, windowDimensions] = useUnits();
   const cardDealDirection = getCardDealDirection(selfElement, targetElement);
+
   const context: AnimationContext = {
     cards,
     currentCardIndex,
@@ -133,21 +141,44 @@ export function useCardStackAnimation({
     windowDimensions,
     cardDealDirection,
     animation,
-    // get animation() {
-    //   return animationQueue.current[0];
-    // },
   };
+
+  if (!animation) {
+    animationController.stop();
+  }
 
   useEffect(() => {
     animationController.start();
-  }, [animationController]);
+  }, [
+    animationController,
+    cards,
+    currentCardIndex,
+    selfElement,
+    targetElement,
+    u,
+    windowDimensions,
+    cardDealDirection,
+    animation,
+  ]);
 
-  return useTransition(cardAnimations.current, {
+  // wait for self and target elements to be defined before rendering animations
+  const cardAnimations = selfElement && targetElement ? cardAnimationsRef.current : [];
+
+  return useTransition(cardAnimations, {
     key: (c: CardAnimationState) => c.card.acquiredId,
     from: getDiscardPosition(context),
     enter: (c: CardAnimationState) => getAnimation(c, context),
     update: (c: CardAnimationState) => getAnimation(c, context),
     ref: animationController,
-    deps: [u, animation, events, cards, currentCardIndex],
+    deps: [
+      cards,
+      currentCardIndex,
+      selfElement,
+      targetElement,
+      u,
+      windowDimensions,
+      cardDealDirection,
+      animation,
+    ],
   });
 }

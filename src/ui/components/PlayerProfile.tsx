@@ -1,13 +1,13 @@
-import { styled } from 'styled-components';
-import { RefObject, useEffect } from 'react';
-import { animated, useSpring, easings, to } from '@react-spring/web';
+import { animated, easings, to, useSpring } from '@react-spring/web';
 import clamp from 'lodash/clamp';
+import { useEffect } from 'react';
+import { styled } from 'styled-components';
 
 import { BattleEvent } from '../../game/actions/battleEvent';
-import { useUnits, UnitFn } from '../hooks/useUnits';
 import { Direction } from '../../utils/types';
-import { CARD_ANIMATION_DELAY } from './CardStack/useCardStackAnimation2';
+import { UnitFn, useUnits } from '../hooks/useUnits';
 import { ControllerUpdate } from '../utils/reactSpring';
+import { CARD_ANIMATION_DELAY } from './CardStack/useCardStackAnimation2';
 import { Image } from './shared/Image';
 
 const oneDropShadow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
@@ -27,7 +27,7 @@ interface Props {
   flip?: boolean;
   battleEvents: BattleEvent[];
   src: string;
-  profileRef: RefObject<HTMLDivElement>;
+  setProfileElement: (e: HTMLDivElement) => void;
   isDead?: boolean;
 }
 
@@ -165,7 +165,7 @@ function getDeathAnimation({
   };
 }
 
-export function PlayerProfile({ flip, battleEvents, src, profileRef, isDead }: Props) {
+export function PlayerProfile({ flip, battleEvents, src, setProfileElement, isDead }: Props) {
   const [u, windowDimensions] = useUnits();
 
   // recoil in the opposite direction the image is facing
@@ -208,7 +208,7 @@ export function PlayerProfile({ flip, battleEvents, src, profileRef, isDead }: P
   );
 
   return (
-    <ProfileImageContainer ref={profileRef} style={animationProps}>
+    <ProfileImageContainer ref={setProfileElement} style={animationProps}>
       <ProfileImage $flip={flip} src={src} style={{ filter }} />
     </ProfileImageContainer>
   );
