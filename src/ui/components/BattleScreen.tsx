@@ -146,12 +146,12 @@ export function BattleScreen({
             targetElement={enemyProfileElement}
           />
           {
-            <CardStack
-              cards={enemy.cards}
-              currentCardIndex={enemy.currentCardIndex}
-              events={battleEvents.enemy}
-              targetElement={userProfileElement}
-            />
+            // <CardStack
+            //   cards={enemy.cards}
+            //   currentCardIndex={enemy.currentCardIndex}
+            //   events={battleEvents.enemy}
+            //   targetElement={userProfileElement}
+            // />
           }
         </ContentRow>
       </CenterContent>

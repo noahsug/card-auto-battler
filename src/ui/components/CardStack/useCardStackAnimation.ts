@@ -4,8 +4,9 @@ import { useRef, useEffect } from 'react';
 import { CardState } from '../../../game/gameState';
 import { BattleEvent } from '../../../game/actions/battleEvent';
 import { UnitFn, useUnits } from '../../hooks/useUnits';
-import { useSpringRef, useTransition, config } from '@react-spring/web';
+import { useSpringRef, useTransition, config, easings } from '@react-spring/web';
 import { Direction } from '../../../utils/types';
+import { wait } from '../../../utils/wait';
 
 export interface Props {
   cards: CardState[];
@@ -31,6 +32,14 @@ interface AnimationContext {
   cardDealDirection: Direction;
   animation: BattleEvent | undefined;
 }
+
+const animatedEvents = new Set<Partial<BattleEvent['type']>>([
+  'cardPlayed',
+  'cardDiscarded',
+  'cardTrashed',
+  'shuffled',
+  'temporaryCardAdded',
+]);
 
 function createCardAnimationState(card: CardState, index: number): CardAnimationState {
   return {
@@ -79,7 +88,6 @@ function getDiscardPosition({ windowDimensions, cardDealDirection }: AnimationCo
     y: 0,
     rotate: 0,
     scale: 1.5,
-    zIndex: 0,
   };
 }
 
@@ -98,8 +106,24 @@ function getDealAnimation(
 }
 
 function getPlayAnimation(animationState: CardAnimationState, context: AnimationContext) {
+  console.log('getPlayAnimation');
   const { x, y } = getXYToTarget(context);
   return { x, y, scale: 1.25, rotate: 0, config: config.stiff };
+}
+
+function getShowPlayedCardAnimation(animationState: CardAnimationState, context: AnimationContext) {
+  const { x, y } = getXYToTarget(context);
+  return async (next: (options: object) => Promise<void>) => {
+    await next({ x, y, scale: 1.25, rotate: 0, config: config.stiff });
+    console.log(2);
+    await wait(2000);
+    console.log(3);
+  };
+}
+
+function getDiscardAnimation(animationState: CardAnimationState, { u }: AnimationContext) {
+  console.log('getDiscardAnimation');
+  return { y: u(-1000), rotate: 0, config: { duration: 300, easing: easings.easeInBack } };
 }
 
 function getAnimation(animationState: CardAnimationState, context: AnimationContext) {
@@ -109,6 +133,10 @@ function getAnimation(animationState: CardAnimationState, context: AnimationCont
         return getPlayAnimation(animationState, context);
       }
       break;
+    case 'cardDiscarded':
+      if (context.animation.cardId === animationState.card.acquiredId) {
+        return getDiscardAnimation(animationState, context);
+      }
   }
 
   if (getIsInDeck(animationState, context)) {
@@ -124,13 +152,23 @@ export function useCardStackAnimation({
   selfElement,
   targetElement,
 }: Props) {
-  const animationController = useSpringRef();
-  const cardAnimationsRef = useRef<CardAnimationState[]>(cards.map(createCardAnimationState));
-  const animationQueue = useRef<BattleEvent[]>(events);
-
-  const animation = animationQueue.current[0];
+  console.log('render');
   const [u, windowDimensions] = useUnits();
   const cardDealDirection = getCardDealDirection(selfElement, targetElement);
+  const animationController = useSpringRef();
+
+  const cardAnimationsRef = useRef<CardAnimationState[]>(cards.map(createCardAnimationState));
+
+  const animationQueue = useRef<BattleEvent[]>([]);
+  animationQueue.current = events.filter((e) => animatedEvents.has(e.type));
+
+  // if (!animationQueue.current.length === 0) {
+  //   animationController.stop();
+  // }
+
+  useEffect(() => {
+    animationController.start();
+  }, [animationController, events, selfElement, targetElement]);
 
   const context: AnimationContext = {
     cards,
@@ -140,26 +178,8 @@ export function useCardStackAnimation({
     u,
     windowDimensions,
     cardDealDirection,
-    animation,
+    animation: animationQueue.current[0],
   };
-
-  if (!animation) {
-    animationController.stop();
-  }
-
-  useEffect(() => {
-    animationController.start();
-  }, [
-    animationController,
-    cards,
-    currentCardIndex,
-    selfElement,
-    targetElement,
-    u,
-    windowDimensions,
-    cardDealDirection,
-    animation,
-  ]);
 
   // wait for self and target elements to be defined before rendering animations
   const cardAnimations = selfElement && targetElement ? cardAnimationsRef.current : [];
@@ -172,13 +192,13 @@ export function useCardStackAnimation({
     ref: animationController,
     deps: [
       cards,
+      events,
       currentCardIndex,
       selfElement,
       targetElement,
       u,
       windowDimensions,
       cardDealDirection,
-      animation,
     ],
   });
 }

@@ -35,7 +35,9 @@ export const ScreenContainer = styled.div`
 `;
 
 export function App() {
-  const [screen, setScreen] = useState<ScreenType>('start');
+  // const [screen, setScreen] = useState<ScreenType>('start');
+  // DEBUG
+  const [screen, setScreen] = useState<ScreenType>('battle');
   const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const { game, actions, undoManager } = useGameState();
