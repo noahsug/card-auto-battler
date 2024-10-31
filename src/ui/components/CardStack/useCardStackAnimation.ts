@@ -113,7 +113,7 @@ function getPlayAnimation(animationState: CardAnimationState, context: Animation
   const { x, y } = getXYToTarget(context);
   return async (next: (options: object) => Promise<void>) => {
     await next({ x, y, scale: 1.25, rotate: 0, config: config.stiff });
-    await wait(2000);
+    await wait(500);
     goToNextAnimation();
   };
 }
