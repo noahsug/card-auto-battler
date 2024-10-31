@@ -40,8 +40,6 @@ function useIsDealingCards(
   return [isDealingCards, lastPlayedCard];
 }
 
-type CardAnimation = ReturnType<typeof createCardAnimation>;
-
 function createCardAnimation(card: CardState) {
   return {
     card,
@@ -50,6 +48,7 @@ function createCardAnimation(card: CardState) {
     speedUpAnimation: () => {},
   };
 }
+type CardAnimation = ReturnType<typeof createCardAnimation>;
 
 export function useCardStackAnimation({
   cards,

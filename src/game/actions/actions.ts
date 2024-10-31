@@ -12,7 +12,7 @@ import {
 import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal } from './applyCardEffects';
-import { BattleEvent, createDamageEvent } from './battleEvent';
+import { BattleEvent, createDamageEvent, createCardEvent, createShuffleEvent } from './battleEvent';
 
 export function addCards(game: GameState, cards: CardState[]) {
   addCardsToPlayer(game.user, cards);
@@ -98,19 +98,27 @@ export function playCard(game: GameState): BattleEvent[] {
   activePlayer.cardsPlayedThisTurn += 1;
 
   // play card
+  events.push(createCardEvent('cardPlayed', card.acquiredId));
   const playCardEvents = applyCardEffects(game, card);
   events.push(...playCardEvents);
 
+  activePlayer.previousCard = card;
+
   if (card.trash) {
+    // trash card
     activePlayer.trashedCards.push(card);
     activePlayer.cards.splice(activePlayer.currentCardIndex, 1);
-    activePlayer.currentCardIndex -= 1;
+    events.push(createCardEvent('cardTrashed', card.acquiredId));
+  } else {
+    // discard card
+    activePlayer.currentCardIndex += 1;
+    events.push(createCardEvent('cardDiscarded', card.acquiredId));
   }
 
-  activePlayer.previousCard = card;
-  activePlayer.currentCardIndex += 1;
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
+    // shuffle deck
     activePlayer.currentCardIndex = 0;
+    events.push(createShuffleEvent());
   }
 
   const damageDealt = events.reduce((damageDealt, event) => {
