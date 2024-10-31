@@ -192,7 +192,8 @@ export function PlayerProfile({ flip, battleEvents, src, setProfileElement, isDe
     } else {
       animationController.set(startPosition);
     }
-  }, [animationController, battleEvents, direction, isDead, u]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animationController, battleEvents, direction, isDead]);
 
   useEffect(() => {
     if (!isDead) return;
@@ -200,7 +201,8 @@ export function PlayerProfile({ flip, battleEvents, src, setProfileElement, isDe
     animationController.start(
       getDeathAnimation({ u, direction, windowWidth: windowDimensions.width }),
     );
-  }, [animationController, isDead, direction, u, windowDimensions.width]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animationController, isDead, direction]);
 
   const filter = to(
     [animationProps.hue, animationProps.brightness],

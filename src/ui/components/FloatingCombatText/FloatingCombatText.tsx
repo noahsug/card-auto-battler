@@ -7,6 +7,7 @@ import {
   Props as AnimationProps,
   useFloatingCombatTextAnimation,
 } from './useFloatingCombatTextAnimation';
+import { useMemo } from 'react';
 
 export type Props = AnimationProps;
 
@@ -60,8 +61,14 @@ function getTextFromBattleEvent(battleEvent: BattleEvent) {
 }
 
 export function FloatingCombatText({ battleEvents, targetElement: target }: Props) {
-  battleEvents = battleEvents.filter((event) => battleEventsTypesWithFCT.has(event.type));
-  const render = useFloatingCombatTextAnimation({ battleEvents, targetElement: target });
+  const battleEventsWithFCT = useMemo(
+    () => battleEvents.filter((event) => battleEventsTypesWithFCT.has(event.type)),
+    [battleEvents],
+  );
+  const render = useFloatingCombatTextAnimation({
+    battleEvents: battleEventsWithFCT,
+    targetElement: target,
+  });
 
   return render((style, { battleEvent }) => (
     <Text style={style} $type={battleEvent.type}>
