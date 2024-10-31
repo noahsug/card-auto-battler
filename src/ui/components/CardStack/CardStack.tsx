@@ -5,9 +5,7 @@ import { styled } from 'styled-components';
 import { Card, baseCardSize, cardSizeScaling } from '../Card';
 import { Props as AnimationProps, useCardStackAnimation } from './useCardStackAnimation';
 
-interface Props extends Omit<AnimationProps, 'selfElement' | 'cardDealDirection'> {
-  playerType: 'user' | 'enemy';
-}
+type Props = Omit<AnimationProps, 'selfElement'>;
 
 const cardSize = {
   height: baseCardSize.height * cardSizeScaling.medium,
@@ -28,15 +26,10 @@ const AnimatedContainer = styled(animated.div)`
 
 export function CardStack(props: Props) {
   const container = useRef<HTMLDivElement>(null);
-  const { playerType, ...animationProps } = props;
-
-  // for the user, cards fly out from the left to the right
-  const cardDealDirection = playerType === 'user' ? 1 : -1;
 
   const render = useCardStackAnimation({
-    ...animationProps,
+    ...props,
     selfElement: container.current,
-    cardDealDirection,
   });
 
   return (

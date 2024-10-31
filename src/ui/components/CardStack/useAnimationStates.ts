@@ -126,5 +126,5 @@ export function useCardAnimationStates({ cards, currentCardIndex, battleEvents }
   //   setAnimationStates((prev) => [...prev, ...newAnimationStates]);
   // }
 
-  return animationStates;
+  // return animationStates;
 }

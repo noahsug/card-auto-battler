@@ -15,11 +15,10 @@ type Story = StoryObj<typeof meta>;
 function getStory(cards: CardState[]): Story {
   return {
     args: {
-      currentCardIndex: 0,
-      targetElement: null,
-      playerType: 'user',
-      turn: 0,
       cards,
+      currentCardIndex: 0,
+      events: [],
+      targetElement: null,
     },
   };
 }

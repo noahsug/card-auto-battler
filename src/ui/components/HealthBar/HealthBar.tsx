@@ -3,7 +3,7 @@ import clamp from 'lodash/clamp';
 import { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { CARD_ANIMATION_DELAY } from '../CardStack/useCardStackAnimation';
+import { CARD_ANIMATION_DELAY } from '../CardStack/useCardStackAnimation2';
 import healthBarBorderImage from './health-bar-border.png';
 import healthBarInnerImage from './health-bar-inner.png';
 import { Image } from '../shared/Image';

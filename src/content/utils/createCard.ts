@@ -10,6 +10,9 @@ import {
 } from '../../game/gameState';
 import { assertIsNonNullable } from '../../utils/asserts';
 
+// used for storybook and tests
+let cardIdCounter = 0;
+
 // returns a CardEffect with defaults
 export function getEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {
   partialEffect.target = partialEffect.target || 'opponent';
@@ -38,7 +41,7 @@ export function createCard(
     description,
     image,
     tribe,
-    acquiredId: 0,
+    acquiredId: cardIdCounter++,
   };
 }
 

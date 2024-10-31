@@ -3,7 +3,7 @@ import { useEffect, useMemo } from 'react';
 
 import { BattleEvent } from '../../../game/actions/battleEvent';
 import { useUnits } from '../../hooks/useUnits';
-import { CARD_ANIMATION_DELAY } from '../CardStack/useCardStackAnimation';
+import { CARD_ANIMATION_DELAY } from '../CardStack/useCardStackAnimation2';
 
 export interface Props {
   battleEvents: BattleEvent[];

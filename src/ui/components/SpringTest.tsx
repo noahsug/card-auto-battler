@@ -62,10 +62,11 @@ export default function Test({ currentCardIndex, cards }: Props) {
 
   const transitions = useTransition(cards, {
     key: (card: number) => card,
-    from: { y: -100 },
-    enter: (_, i: number) => getEndPosition(i),
+    // from: { y: -100 },
+    from: (_, i: number) => getEndPosition(i),
+    // enter: (_, i: number) => getEndPosition(i),
     update: (_, i: number) => (i === playedCardIndex ? animatePlayCard(i) : getEndPosition(i)),
-    leave: () => [{ x: -200 }, { scale: 0.1, opacity: 0 }],
+    // leave: () => [{ x: -200 }, { scale: 0.1, opacity: 0 }],
   });
 
   return (

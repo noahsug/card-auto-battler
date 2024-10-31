@@ -6,7 +6,7 @@ import clamp from 'lodash/clamp';
 import { BattleEvent } from '../../game/actions/battleEvent';
 import { useUnits, UnitFn } from '../hooks/useUnits';
 import { Direction } from '../../utils/types';
-import { CARD_ANIMATION_DELAY } from './CardStack/useCardStackAnimation';
+import { CARD_ANIMATION_DELAY } from './CardStack/useCardStackAnimation2';
 import { ControllerUpdate } from '../utils/reactSpring';
 import { Image } from './shared/Image';
 

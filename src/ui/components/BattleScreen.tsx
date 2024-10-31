@@ -141,20 +141,16 @@ export function BattleScreen({
         <ContentRow>
           <CardStack
             cards={user.cards}
-            trashedCards={user.trashedCards}
             currentCardIndex={user.currentCardIndex}
+            events={battleEvents.user}
             targetElement={enemyProfileRef.current}
-            playerType="user"
-            turn={turn}
           />
           {
             <CardStack
               cards={enemy.cards}
-              trashedCards={enemy.trashedCards}
               currentCardIndex={enemy.currentCardIndex}
+              events={battleEvents.enemy}
               targetElement={userProfileRef.current}
-              playerType="enemy"
-              turn={turn}
             />
           }
         </ContentRow>
