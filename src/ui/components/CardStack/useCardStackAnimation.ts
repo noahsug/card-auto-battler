@@ -7,6 +7,7 @@ import { UnitFn, useUnits } from '../../hooks/useUnits';
 import { useSpringRef, useTransition, config, easings } from '@react-spring/web';
 import { Direction } from '../../../utils/types';
 import { wait } from '../../../utils/wait';
+import { Z_INDEX } from '../../constants';
 
 export interface Props {
   cards: CardState[];
@@ -19,7 +20,8 @@ export interface Props {
 interface CardAnimationState {
   card: CardState;
   rotation: number;
-  index: number;
+  deckIndex: number;
+  state: 'inDeck' | 'inDiscard';
 }
 
 interface AnimationContext {
@@ -42,11 +44,12 @@ const animatedEvents = new Set<Partial<BattleEvent['type']>>([
   'temporaryCardAdded',
 ]);
 
-function createCardAnimationState(card: CardState, index: number): CardAnimationState {
+function createCardAnimationState(card: CardState, deckIndex: number): CardAnimationState {
   return {
     card,
-    index,
+    deckIndex,
     rotation: random(-10, 10),
+    state: 'inDeck',
   };
 }
 
@@ -83,31 +86,37 @@ function getIsInDeck({ card }: CardAnimationState, { cards, currentCardIndex }: 
   return index >= currentCardIndex;
 }
 
-function getDiscardPosition({ windowDimensions, cardDealDirection }: AnimationContext) {
+function getDiscardPosition(
+  { deckIndex }: CardAnimationState,
+  { windowDimensions, cardDealDirection }: AnimationContext,
+) {
   return {
     x: windowDimensions.width * -cardDealDirection,
     y: 0,
     rotate: 0,
     scale: 1.5,
+    zIndex: Z_INDEX.cards - deckIndex,
   };
 }
 
-function getDealAnimation(
-  { index, rotation }: CardAnimationState,
+function dealCard(
+  animationState: CardAnimationState,
   { u, cardDealDirection, cards }: AnimationContext,
 ) {
+  // deal the last card first
+  const reverseIndex = cards.length - animationState.deckIndex;
+
   return {
-    x: u(index * cardDealDirection),
-    y: u(-index),
-    rotate: rotation,
+    x: u(reverseIndex * cardDealDirection),
+    y: u(-reverseIndex),
+    rotate: animationState.rotation,
     scale: 1,
-    delay: (index * 300) / Math.sqrt(cards.length),
+    delay: (reverseIndex * 300) / Math.sqrt(cards.length),
     config: config.default,
   };
 }
 
-function getPlayAnimation(animationState: CardAnimationState, context: AnimationContext) {
-  console.log('getPlayAnimation');
+function playCard(animationState: CardAnimationState, context: AnimationContext) {
   const { goToNextAnimation } = context;
 
   const { x, y } = getXYToTarget(context);
@@ -118,33 +127,38 @@ function getPlayAnimation(animationState: CardAnimationState, context: Animation
   };
 }
 
-function getDiscardAnimation(animationState: CardAnimationState, context: AnimationContext) {
-  console.log('getDiscardAnimation');
+function discardCard(animationState: CardAnimationState, context: AnimationContext) {
   const { u, goToNextAnimation } = context;
 
   return async (next: (options: object) => Promise<void>) => {
     await next({ y: u(-1000), rotate: 0, config: { duration: 300, easing: easings.easeInBack } });
+    await next({ ...getDiscardPosition(animationState, context), config: { duration: 0 } });
+    animationState.state = 'inDiscard';
     goToNextAnimation();
   };
 }
 
-function getAnimation(animationState: CardAnimationState, context: AnimationContext) {
+function animate(animationState: CardAnimationState, context: AnimationContext) {
   switch (context.animation?.type) {
     case 'cardPlayed':
       if (context.animation.cardId === animationState.card.acquiredId) {
-        return getPlayAnimation(animationState, context);
+        return playCard(animationState, context);
       }
       break;
     case 'cardDiscarded':
       if (context.animation.cardId === animationState.card.acquiredId) {
-        return getDiscardAnimation(animationState, context);
+        return discardCard(animationState, context);
       }
+      break;
+    case 'shuffled':
+      animationState.state = 'inDeck';
+      break;
   }
 
-  if (getIsInDeck(animationState, context)) {
-    return getDealAnimation(animationState, context);
+  if (animationState.state === 'inDeck') {
+    return dealCard(animationState, context);
   }
-  return getDiscardPosition(context);
+  return getDiscardPosition(animationState, context);
 }
 
 export function useCardStackAnimation({
@@ -175,7 +189,7 @@ export function useCardStackAnimation({
     setAnimation(next);
   }, []);
 
-  // if (!animationQueue.current.length === 0) {
+  // if (animation === undefined) {
   //   animationController.stop();
   // }
 
@@ -200,9 +214,9 @@ export function useCardStackAnimation({
 
   return useTransition(cardAnimations, {
     key: (c: CardAnimationState) => c.card.acquiredId,
-    from: getDiscardPosition(context),
-    enter: (c: CardAnimationState) => getAnimation(c, context),
-    update: (c: CardAnimationState) => getAnimation(c, context),
+    from: (c: CardAnimationState) => getDiscardPosition(c, context),
+    enter: (c: CardAnimationState) => animate(c, context),
+    update: (c: CardAnimationState) => animate(c, context),
     ref: animationController,
     deps: [cards, currentCardIndex, selfElement, targetElement, u, animation],
   });

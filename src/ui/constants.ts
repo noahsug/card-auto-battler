@@ -1,4 +1,5 @@
 export const Z_INDEX = {
-  floatingCombatText: 99,
-  overlay: 100,
+  cards: 99,
+  floatingCombatText: 100,
+  overlay: 101,
 };
