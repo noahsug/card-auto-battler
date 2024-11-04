@@ -2,7 +2,7 @@ import random from 'lodash/random';
 import { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 
 import { CardState } from '../../../game/gameState';
-import { BattleEvent } from '../../../game/actions/battleEvent';
+import { BattleEvent, CardBattleEvent } from '../../../game/actions/battleEvent';
 import { UnitFn, useUnits } from '../../hooks/useUnits';
 import { useSpringRef, useTransition, config, easings } from '@react-spring/web';
 import { Direction } from '../../../utils/types';
@@ -21,7 +21,7 @@ interface CardAnimationState {
   card: CardState;
   rotation: number;
   deckIndex: number;
-  state: 'inDeck' | 'inDiscard';
+  inDiscard: boolean;
 }
 
 interface AnimationContext {
@@ -49,7 +49,7 @@ function createCardAnimationState(card: CardState, deckIndex: number): CardAnima
     card,
     deckIndex,
     rotation: random(-10, 10),
-    state: 'inDeck',
+    inDiscard: true,
   };
 }
 
@@ -67,6 +67,11 @@ function getCardDealDirection(
   return selfRect.left < targetRect.left ? 1 : -1;
 }
 
+function getIsdeck({ card }: CardAnimationState, { cards, currentCardIndex }: AnimationContext) {
+  const index = cards.findIndex((c) => c.acquiredId === card.acquiredId);
+  return index >= currentCardIndex;
+}
+
 function getXYToTarget({ selfElement, targetElement, cardDealDirection }: AnimationContext) {
   if (selfElement == null || targetElement == null) return { x: 0, y: 0 };
 
@@ -79,11 +84,6 @@ function getXYToTarget({ selfElement, targetElement, cardDealDirection }: Animat
     x: targetRect.x - selfRect.x + xOffset,
     y: targetRect.y - selfRect.y,
   };
-}
-
-function getIsInDeck({ card }: CardAnimationState, { cards, currentCardIndex }: AnimationContext) {
-  const index = cards.findIndex((c) => c.acquiredId === card.acquiredId);
-  return index >= currentCardIndex;
 }
 
 function getDiscardPosition(
@@ -99,20 +99,24 @@ function getDiscardPosition(
   };
 }
 
-function dealCard(
-  animationState: CardAnimationState,
-  { u, cardDealDirection, cards }: AnimationContext,
-) {
-  // deal the last card first
-  const reverseIndex = cards.length - animationState.deckIndex;
+function dealCard(animationState: CardAnimationState, context: AnimationContext) {
+  const { u, cardDealDirection, cards, goToNextAnimation } = context;
 
-  return {
-    x: u(reverseIndex * cardDealDirection),
-    y: u(-reverseIndex),
-    rotate: animationState.rotation,
-    scale: 1,
-    delay: (reverseIndex * 300) / Math.sqrt(cards.length),
-    config: config.default,
+  // deal the last card first
+  const reverseIndex = cards.length - 1 - animationState.deckIndex;
+
+  return async (next: (options: object) => Promise<void>) => {
+    await next({
+      x: u(reverseIndex * cardDealDirection),
+      y: u(-reverseIndex),
+      rotate: animationState.rotation,
+      scale: 1,
+      opacity: 1,
+      delay: (reverseIndex * 300) / Math.sqrt(cards.length),
+    });
+
+    animationState.inDiscard = false;
+    goToNextAnimation();
   };
 }
 
@@ -123,6 +127,7 @@ function playCard(animationState: CardAnimationState, context: AnimationContext)
   return async (next: (options: object) => Promise<void>) => {
     await next({ x, y, scale: 1.25, rotate: 0, config: config.stiff });
     await wait(500);
+
     goToNextAnimation();
   };
 }
@@ -133,32 +138,41 @@ function discardCard(animationState: CardAnimationState, context: AnimationConte
   return async (next: (options: object) => Promise<void>) => {
     await next({ y: u(-1000), rotate: 0, config: { duration: 300, easing: easings.easeInBack } });
     await next({ ...getDiscardPosition(animationState, context), config: { duration: 0 } });
-    animationState.state = 'inDiscard';
+
+    animationState.inDiscard = true;
+    goToNextAnimation();
+  };
+}
+
+function trashCard(animationState: CardAnimationState, context: AnimationContext) {
+  const { goToNextAnimation } = context;
+
+  return async (next: (options: object) => Promise<void>) => {
+    await next({ opacity: 0 });
+
     goToNextAnimation();
   };
 }
 
 function animate(animationState: CardAnimationState, context: AnimationContext) {
-  switch (context.animation?.type) {
-    case 'cardPlayed':
-      if (context.animation.cardId === animationState.card.acquiredId) {
+  const cardAnimation = context.animation as CardBattleEvent | undefined;
+  if (cardAnimation?.cardId === animationState.card.acquiredId) {
+    switch (cardAnimation.type) {
+      case 'cardPlayed':
         return playCard(animationState, context);
-      }
-      break;
-    case 'cardDiscarded':
-      if (context.animation.cardId === animationState.card.acquiredId) {
+        break;
+      case 'cardDiscarded':
         return discardCard(animationState, context);
-      }
-      break;
-    case 'shuffled':
-      animationState.state = 'inDeck';
-      break;
+        break;
+      case 'cardTrashed':
+        return trashCard(animationState, context);
+    }
   }
 
-  if (animationState.state === 'inDeck') {
+  if (context.animation?.type === 'shuffled' && animationState.inDiscard) {
     return dealCard(animationState, context);
   }
-  return getDiscardPosition(animationState, context);
+  return null;
 }
 
 export function useCardStackAnimation({
@@ -177,18 +191,18 @@ export function useCardStackAnimation({
   const animationQueue = useRef<BattleEvent[]>([]);
   const [animation, setAnimation] = useState<BattleEvent | undefined>();
 
-  animationQueue.current = useMemo(() => {
-    const queue = events.filter((e) => animatedEvents.has(e.type));
-    setAnimation(queue.shift());
-    return queue;
-  }, [events]);
-
   const goToNextAnimation = useCallback(() => {
     const next = animationQueue.current.shift();
     console.log('goToNextAnimation', next?.type);
     setAnimation(next);
   }, []);
 
+  useEffect(() => {
+    animationQueue.current = events.filter((e) => animatedEvents.has(e.type));
+    goToNextAnimation();
+  }, [events, goToNextAnimation]);
+
+  // TODO: add undo event
   // if (animation === undefined) {
   //   animationController.stop();
   // }

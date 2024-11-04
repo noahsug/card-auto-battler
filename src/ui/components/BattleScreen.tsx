@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { BattleEvent } from '../../game/actions/battleEvent';
+import { BattleEvent, createShuffleEvent } from '../../game/actions/battleEvent';
 import { GameState } from '../../game/gameState';
 import { getBattleWinner, getIsUserTurn, getPlayerTargets } from '../../game/utils/selectors';
 import { CanUndo, PlayCard, Undo } from '../hooks/useGameState';
@@ -49,7 +49,10 @@ export function BattleScreen({
 
   const [isPaused, setIsPaused] = useState(true);
 
-  const [battleEvents, setBattleEvents] = useState(EMPTY_BATTLE_EVENTS);
+  const [battleEvents, setBattleEvents] = useState<{ user: BattleEvent[]; enemy: BattleEvent[] }>({
+    user: [createShuffleEvent()],
+    enemy: [createShuffleEvent()],
+  });
 
   const [userProfileElement, setUserProfileElement] = useState<HTMLDivElement | null>(null);
   const [enemyProfileElement, setEnemyProfileElement] = useState<HTMLDivElement | null>(null);
