@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 
 export type UnitFn = (value: number) => number;
+export type WindowDimensions = { width: number; height: number };
 
 export function useUnits() {
-  const [windowDimensions, setWindowDimensions] = useState({
+  const [windowDimensions, setWindowDimensions] = useState<WindowDimensions>({
     width: window.innerWidth,
     height: window.innerHeight,
   });

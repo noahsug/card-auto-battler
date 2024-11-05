@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { BattleEvent, createShuffleEvent } from '../../game/actions/battleEvent';
+import { BattleEvent, createStartBattleEvent } from '../../game/actions/battleEvent';
 import { GameState } from '../../game/gameState';
 import { getBattleWinner, getIsUserTurn, getPlayerTargets } from '../../game/utils/selectors';
 import { CanUndo, PlayCard, Undo } from '../hooks/useGameState';
+import { useInterval } from '../hooks/useInterval';
 import { BattleControls } from './BattleControls';
 import { CardStack } from './CardStack';
 import { FloatingCombatText } from './FloatingCombatText';
@@ -15,7 +16,6 @@ import { CenterContent } from './shared/CenterContent';
 import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
-import { useInterval } from '../hooks/useInterval';
 
 const EMPTY_BATTLE_EVENTS: { user: BattleEvent[]; enemy: BattleEvent[] } = { user: [], enemy: [] };
 
@@ -50,8 +50,8 @@ export function BattleScreen({
   const [isPaused, setIsPaused] = useState(true);
 
   const [battleEvents, setBattleEvents] = useState<{ user: BattleEvent[]; enemy: BattleEvent[] }>({
-    user: [createShuffleEvent()],
-    enemy: [createShuffleEvent()],
+    user: [createStartBattleEvent()],
+    enemy: [createStartBattleEvent()],
   });
 
   const [userProfileElement, setUserProfileElement] = useState<HTMLDivElement | null>(null);

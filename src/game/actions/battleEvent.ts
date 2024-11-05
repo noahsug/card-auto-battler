@@ -6,7 +6,7 @@ interface BattleEventShared {
   source: 'card' | 'startOfTurn';
 }
 export interface SimpleBattleEvent extends BattleEventShared {
-  type: 'miss' | 'shuffled';
+  type: 'miss' | 'shuffled' | 'startBattle';
 }
 export interface BattleEventWithValue extends BattleEventShared {
   type: 'damage' | 'heal';
@@ -17,6 +17,10 @@ export interface CardBattleEvent extends BattleEventShared {
   cardId: number;
 }
 export type BattleEvent = SimpleBattleEvent | BattleEventWithValue | CardBattleEvent;
+
+export function createStartBattleEvent(target: Target = 'self'): BattleEvent {
+  return { type: 'startBattle', target, source: 'card' };
+}
 
 export function createDamageEvent(
   value: number,

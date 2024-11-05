@@ -138,7 +138,7 @@ export function createGameState(): GameState {
   };
 
   const { attack, heal, fireball } = allCards;
-  addCardsToPlayer(game.user, [fireball, attack, heal, attack, heal]);
+  addCardsToPlayer(game.user, [fireball]);
   addCardsToPlayer(game.enemy, [attack]);
 
   return game;
