@@ -10,6 +10,7 @@ import { wait } from '../../../utils/wait';
 import { Z_INDEX } from '../../constants';
 import { UnitFn, useUnits, WindowDimensions } from '../../hooks/useUnits';
 import { Card } from '../Card';
+import { SpringRef } from '../../utils/reactSpring';
 
 export interface Props {
   cards: CardState[];
@@ -36,6 +37,7 @@ interface AnimationContext {
   cardDealDirection: Direction;
   event: BattleEvent | undefined;
   nextEvent: () => void;
+  animationController: SpringRef;
 }
 
 const animatedEvents = new Set<Partial<BattleEvent['type']>>([
@@ -70,13 +72,11 @@ function getCardDealDirection(selfElement: Element, targetElement: Element): Dir
 function syncCardAnimations({
   cardAnimations,
   context,
-  animationController,
 }: {
   cardAnimations: CardAnimationState[];
   context: AnimationContext;
-  animationController: ReturnType<typeof useSpringRef>;
 }) {
-  const { cards, currentCardIndex } = context;
+  const { cards, currentCardIndex, animationController } = context;
   cards.forEach((card, index) => {
     const newAnimationState = createCardAnimationState(card, index, currentCardIndex);
     const existingCardAnimation = cardAnimations.find((c) => c.card.acquiredId === card.acquiredId);
@@ -102,6 +102,13 @@ function syncCardAnimations({
     // card is in deck
     return { x: 0, y: 0, rotate: cardAnimation.rotation, scale: 1, opacity: 1 };
   });
+}
+
+function syncZIndex(cardAnimation: CardAnimationState, context: AnimationContext, index: number) {
+  cardAnimation.deckIndex = context.cards.findIndex(
+    (c) => c.acquiredId === cardAnimation.card.acquiredId,
+  );
+  context.animationController.current[index]?.set(getDiscardPosition(cardAnimation, context));
 }
 
 function getXYToTarget({ selfElement, targetElement, cardDealDirection }: AnimationContext) {
@@ -144,7 +151,6 @@ function getDeckPosition(
     rotate: cardAnimation.rotation,
     scale: 1,
     opacity: 1,
-    zIndex: Z_INDEX.cards + reverseIndex,
   };
 }
 
@@ -201,9 +207,8 @@ function trashCard(context: AnimationContext) {
   };
 }
 
-function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
+function animate(cardAnimation: CardAnimationState, index: number, context: AnimationContext) {
   const { event } = context;
-  console.log('animate', event?.type, cardAnimation);
   if (!event) return null;
 
   if ((event as CardBattleEvent).cardId === cardAnimation.card.acquiredId) {
@@ -221,10 +226,8 @@ function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
     (event.type === 'shuffled' && cardAnimation.inDiscard) ||
     (event.type === 'startBattle' && !cardAnimation.inDiscard)
   ) {
-    // update the deck index to match the new order post-shuffle
-    cardAnimation.deckIndex = context.cards.findIndex(
-      (c) => c.acquiredId === cardAnimation.card.acquiredId,
-    );
+    // update z-index to match new card order after shuffle
+    syncZIndex(cardAnimation, context, index);
     return dealCard(cardAnimation, context);
   }
   return null;
@@ -264,6 +267,7 @@ export function CardStackAnimation({
     cardDealDirection,
     event,
     nextEvent,
+    animationController,
   };
 
   // initialize card animations
@@ -271,7 +275,6 @@ export function CardStackAnimation({
     syncCardAnimations({
       cardAnimations: cardAnimationsRef.current,
       context,
-      animationController,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -289,8 +292,8 @@ export function CardStackAnimation({
   const render = useTransition(cardAnimationsRef.current, {
     key: (c: CardAnimationState) => c.card.acquiredId,
     from: (c: CardAnimationState) => getDiscardPosition(c, context),
-    enter: (c: CardAnimationState) => animate(c, context),
-    update: (c: CardAnimationState) => animate(c, context),
+    enter: (c: CardAnimationState, i: number) => animate(c, i, context),
+    update: (c: CardAnimationState, i: number) => animate(c, i, context),
     ref: animationController,
     deps: [event, u],
   });
