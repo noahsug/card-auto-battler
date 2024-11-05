@@ -2,8 +2,8 @@ import { GameState, PlayerState, Target } from '../gameState';
 import { RelicName } from '../../content/relics/relics';
 import { MAX_WINS, MAX_LOSSES } from '../constants';
 
-export function getIsUserTurn(game: GameState) {
-  return game.turn % 2 === 0;
+export function getIsUserTurn({ turn }: { turn: number }) {
+  return turn % 2 === 0;
 }
 
 export function getActivePlayer(game: GameState) {
@@ -25,12 +25,12 @@ export function getTargetedPlayer(game: GameState, target: Target) {
   return target === 'self' ? game.enemy : game.user;
 }
 
-export function getUserTarget(game: GameState): Target {
-  return getIsUserTurn(game) ? 'self' : 'opponent';
+export function getUserTarget({ turn }: { turn: number }): Target {
+  return getIsUserTurn({ turn }) ? 'self' : 'opponent';
 }
 
-export function getPlayerTargets(game: GameState): [Target, Target] {
-  return getIsUserTurn(game) ? ['self', 'opponent'] : ['opponent', 'self'];
+export function getPlayerTargets({ turn }: { turn: number }): [Target, Target] {
+  return getIsUserTurn({ turn }) ? ['self', 'opponent'] : ['opponent', 'self'];
 }
 
 export function getRelic(player: PlayerState, relicName: RelicName) {

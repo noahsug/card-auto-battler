@@ -12,10 +12,17 @@ import { UnitFn, useUnits, WindowDimensions } from '../../hooks/useUnits';
 import { Card } from '../Card';
 import { SpringRef } from '../../utils/reactSpring';
 
+// milliseconds it takes the card to animate from the deck to the player
+// note: this is slightly before the animation is done to make it feel more responsive
+const CARD_ANIMATION_DELAY = 200;
+
+export type CombatState = 'turnStart' | 'cardPlayed';
+
 export interface Props {
   cards: CardState[];
   currentCardIndex: number;
   events: BattleEvent[];
+  onNextCombatState: (combatState: CombatState) => void;
   selfElement: Element;
   targetElement: Element;
 }
@@ -242,6 +249,7 @@ export function CardStackAnimation({
   cards,
   currentCardIndex,
   events,
+  onNextCombatState,
   selfElement,
   targetElement,
 }: Props) {
@@ -251,11 +259,25 @@ export function CardStackAnimation({
 
   const cardAnimationsRef = useRef<CardAnimationState[]>([]);
   const eventQueue = useRef<BattleEvent[]>([]);
+  const cardPlayedTimeout = useRef<NodeJS.Timeout | null>(null);
   const [event, setEvent] = useState<BattleEvent>();
 
   const nextEvent = useCallback(() => {
-    setEvent(eventQueue.current.shift());
-  }, []);
+    const nextEvent = eventQueue.current.shift();
+    setEvent((prev) => {
+      if (prev != null && nextEvent == null) {
+        // start the next turn when there are no events left to animate
+        onNextCombatState('turnStart');
+      }
+      return nextEvent;
+    });
+
+    if (nextEvent?.type === 'cardPlayed') {
+      cardPlayedTimeout.current = setTimeout(() => {
+        onNextCombatState('cardPlayed');
+      }, CARD_ANIMATION_DELAY);
+    }
+  }, [onNextCombatState]);
 
   const context: AnimationContext = {
     cards,
@@ -281,6 +303,8 @@ export function CardStackAnimation({
 
   useEffect(() => {
     eventQueue.current = events.filter((e) => animatedEvents.has(e.type));
+    if (cardPlayedTimeout.current != null) clearTimeout(cardPlayedTimeout.current);
+    setEvent(undefined);
     nextEvent();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events, cards, currentCardIndex]);
@@ -289,27 +313,11 @@ export function CardStackAnimation({
     animationController.start();
   }, [animationController, event]);
 
-  let maxX: number | null = null;
-
   const render = useTransition(cardAnimationsRef.current, {
     key: (c: CardAnimationState) => c.card.acquiredId,
     from: (c: CardAnimationState) => getDiscardPosition(c, context),
     enter: (c: CardAnimationState, i: number) => animate(c, i, context),
     update: (c: CardAnimationState, i: number) => animate(c, i, context),
-    onChange(result, _, item) {
-      if (event?.type === 'cardPlayed' && event.cardId === item.card.acquiredId) {
-        if (maxX == null) {
-          maxX = result.value.x as number;
-        } else {
-          const x = result.value.x as number;
-          if (x >= maxX) {
-            maxX = x;
-          } else {
-            console.log('NOW');
-          }
-        }
-      }
-    },
     ref: animationController,
     deps: [event, u],
   });

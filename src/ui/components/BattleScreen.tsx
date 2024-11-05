@@ -16,10 +16,7 @@ import { CenterContent } from './shared/CenterContent';
 import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
-
-const EMPTY_BATTLE_EVENTS: { user: BattleEvent[]; enemy: BattleEvent[] } = { user: [], enemy: [] };
-
-const AUTO_PLAY_CARD_DELAY = 1000;
+import { CombatState } from './CardStack/CardStackAnimation';
 
 interface Props {
   game: GameState;
@@ -31,8 +28,34 @@ interface Props {
   hasOverlay?: boolean;
 }
 
-// TODO: Have "playedCard" and "currentGameState" local state, which we update to next game state
-// after the card animation is complete (instead of using 200ms delay everywhere)
+// TODO: Remove
+function getBattleEventsByCombatState(
+  battleEvents: BattleEvent[],
+): Record<CombatState, BattleEvent[]> {
+  let cardPlayed = false;
+
+  return battleEvents.reduce(
+    (acc, event) => {
+      if (event.type === 'cardPlayed') {
+        cardPlayed = true;
+      }
+
+      if (cardPlayed) {
+        acc.cardPlayed.push(event);
+      } else {
+        acc.turnStart.push(event);
+      }
+      return acc;
+    },
+    { turnStart: [], cardPlayed: [] } as Record<CombatState, BattleEvent[]>,
+  );
+}
+
+// TODO: separate functions for startTurn, playCard, endTurn
+//  - remove active battle event filtering (we get this for free now)
+//  - manually add "playCard" battle event for card animation
+//  - call playCard() after animation is complete, which updates game state
+//  - remove turn ref (we get this for free now)
 export function BattleScreen({
   game,
   playCard,
@@ -43,35 +66,55 @@ export function BattleScreen({
   hasOverlay = false,
 }: Props) {
   const { user, enemy } = game;
-  const [userTarget, enemyTarget] = getPlayerTargets(game);
   const isBattleOver = getBattleWinner(game) != null;
   const canPlayNextCard = !isBattleOver && !hasOverlay;
-
-  const [isPaused, setIsPaused] = useState(true);
-
-  const [battleEvents, setBattleEvents] = useState<{ user: BattleEvent[]; enemy: BattleEvent[] }>({
-    user: [createStartBattleEvent()],
-    enemy: [createStartBattleEvent()],
-  });
 
   const [userProfileElement, setUserProfileElement] = useState<HTMLDivElement | null>(null);
   const [enemyProfileElement, setEnemyProfileElement] = useState<HTMLDivElement | null>(null);
 
+  const [isPaused, setIsPaused] = useState(true);
+  const [combatState, setCombatState] = useState<CombatState>('turnStart');
+
+  const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([
+    createStartBattleEvent('self'),
+    createStartBattleEvent('opponent'),
+  ]);
+  // TODO: Remove
+  const battleEventsTurn = useRef(game.turn);
+
+  const [userTarget, enemyTarget] = getPlayerTargets({ turn: battleEventsTurn.current });
+  const userBattleEvents = battleEvents.filter(({ target }) => target === userTarget);
+  const enemyBattleEvents = battleEvents.filter(({ target }) => target === enemyTarget);
+
+  const activeBattleEvents = getBattleEventsByCombatState(battleEvents)[combatState];
+  const activeUserBattleEvents = activeBattleEvents.filter(({ target }) => target === userTarget);
+  const activeEnemyBattleEvents = activeBattleEvents.filter(({ target }) => target === enemyTarget);
+
+  const playNextCard = useCallback(async () => {
+    battleEventsTurn.current = game.turn;
+    const events = await playCard();
+    setBattleEvents(events);
+  }, [game.turn, playCard]);
+
+  const handleNextCombatState = useCallback(
+    async (combatState: CombatState) => {
+      setCombatState(combatState);
+      if (combatState === 'turnStart' && !isPaused) {
+        playNextCard();
+      }
+    },
+    [isPaused, playNextCard],
+  );
+
   const handleUndo = useCallback(() => {
     undo();
-    setBattleEvents(EMPTY_BATTLE_EVENTS);
+    setBattleEvents([]);
     setIsPaused(true);
   }, [undo]);
 
-  const playNextCard = useCallback(async () => {
-    const events = await playCard();
-    setBattleEvents({
-      user: [...events.filter(({ target }) => target === userTarget)],
-      enemy: [...events.filter(({ target }) => target === enemyTarget)],
-    });
-  }, [enemyTarget, playCard, userTarget]);
-
+  // TODO: Remove
   const handlePlayNextCard = useCallback(async () => {
+    setCombatState('turnStart');
     playNextCard();
     setIsPaused(true);
   }, [playNextCard]);
@@ -80,15 +123,12 @@ export function BattleScreen({
     setIsPaused((isPaused) => {
       if (isPaused) {
         // immediately play next card when unpausing
+        setCombatState('turnStart');
         playNextCard();
       }
       return !isPaused;
     });
   }, [playNextCard]);
-
-  useInterval(playNextCard, AUTO_PLAY_CARD_DELAY, {
-    stop: isPaused || !canPlayNextCard,
-  });
 
   const endBattleTimeout = useRef<NodeJS.Timeout>();
   if (!isBattleOver) {
@@ -114,14 +154,19 @@ export function BattleScreen({
             <PlayerProfile
               src={user.image}
               setProfileElement={setUserProfileElement}
-              battleEvents={battleEvents.user}
+              battleEvents={activeUserBattleEvents}
               isDead={user.health <= 0}
             />
             <FloatingCombatText
-              battleEvents={battleEvents.user}
+              battleEvents={activeUserBattleEvents}
               targetElement={userProfileElement}
             />
-            <HealthBar health={user.health} maxHealth={user.startingHealth} />
+            <HealthBar
+              // TODO: Add
+              // battleEvents={activeUserBattleEvents}
+              health={user.health}
+              maxHealth={user.startingHealth}
+            />
           </Player>
 
           <Player className={getIsUserTurn(game) ? '' : 'active'}>
@@ -130,11 +175,11 @@ export function BattleScreen({
               src={enemy.image}
               flip={true}
               setProfileElement={setEnemyProfileElement}
-              battleEvents={battleEvents.enemy}
+              battleEvents={activeEnemyBattleEvents}
               isDead={enemy.health <= 0}
             />
             <FloatingCombatText
-              battleEvents={battleEvents.enemy}
+              battleEvents={activeEnemyBattleEvents}
               targetElement={enemyProfileElement}
             />
             <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
@@ -145,14 +190,15 @@ export function BattleScreen({
           <CardStack
             cards={user.cards}
             currentCardIndex={user.currentCardIndex}
-            events={battleEvents.user}
+            onNextCombatState={handleNextCombatState}
+            events={userBattleEvents}
             targetElement={enemyProfileElement}
           />
           {
             // <CardStack
             //   cards={enemy.cards}
             //   currentCardIndex={enemy.currentCardIndex}
-            //   events={battleEvents.enemy}
+            //   events={enemyBattleEvents}
             //   targetElement={userProfileElement}
             // />
           }
