@@ -289,11 +289,27 @@ export function CardStackAnimation({
     animationController.start();
   }, [animationController, event]);
 
+  let maxX: number | null = null;
+
   const render = useTransition(cardAnimationsRef.current, {
     key: (c: CardAnimationState) => c.card.acquiredId,
     from: (c: CardAnimationState) => getDiscardPosition(c, context),
     enter: (c: CardAnimationState, i: number) => animate(c, i, context),
     update: (c: CardAnimationState, i: number) => animate(c, i, context),
+    onChange(result, _, item) {
+      if (event?.type === 'cardPlayed' && event.cardId === item.card.acquiredId) {
+        if (maxX == null) {
+          maxX = result.value.x as number;
+        } else {
+          const x = result.value.x as number;
+          if (x >= maxX) {
+            maxX = x;
+          } else {
+            console.log('NOW');
+          }
+        }
+      }
+    },
     ref: animationController,
     deps: [event, u],
   });
