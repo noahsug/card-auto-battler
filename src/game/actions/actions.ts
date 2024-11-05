@@ -118,6 +118,7 @@ export function playCard(game: GameState): BattleEvent[] {
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
     // shuffle deck
     activePlayer.currentCardIndex = 0;
+    activePlayer.cards = shuffle(activePlayer.cards);
     events.push(createShuffleEvent());
   }
 
