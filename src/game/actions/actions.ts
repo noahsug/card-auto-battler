@@ -63,10 +63,6 @@ function startTurn(game: GameState) {
     applyHeal({ value: activePlayer.regen, target: 'self' }, { game, events });
     activePlayer.regen -= 1;
   }
-
-  events.forEach((event) => {
-    event.source = 'startOfTurn';
-  });
   return events;
 }
 
@@ -88,7 +84,7 @@ export function playCard(game: GameState): BattleEvent[] {
   if (card == null) {
     const damage = activePlayer.health;
     activePlayer.health = 0;
-    return [createDamageEvent(damage, 'self', 'startOfTurn')];
+    return [createDamageEvent(damage, 'self')];
   }
 
   if (activePlayer.cardsPlayedThisTurn > 0) {

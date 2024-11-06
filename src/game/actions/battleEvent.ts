@@ -2,8 +2,6 @@ import { Target } from '../gameState';
 
 interface BattleEventShared {
   target: Target;
-  // TODO: remove, instead look at when the card is played
-  source: 'card' | 'startOfTurn';
 }
 export interface SimpleBattleEvent extends BattleEventShared {
   type: 'miss' | 'shuffled' | 'startBattle';
@@ -19,34 +17,23 @@ export interface CardBattleEvent extends BattleEventShared {
 export type BattleEvent = SimpleBattleEvent | BattleEventWithValue | CardBattleEvent;
 
 export function createStartBattleEvent(target: Target = 'self'): BattleEvent {
-  return { type: 'startBattle', target, source: 'card' };
+  return { type: 'startBattle', target };
 }
 
-export function createDamageEvent(
-  value: number,
-  target: Target,
-  source: BattleEvent['source'] = 'card',
-): BattleEvent {
-  return { type: 'damage', target, value, source };
+export function createDamageEvent(value: number, target: Target): BattleEvent {
+  return { type: 'damage', target, value };
 }
 
-export function createHealEvent(
-  value: number,
-  target: Target,
-  source: BattleEvent['source'] = 'card',
-): BattleEvent {
-  return { type: 'heal', target, value, source };
+export function createHealEvent(value: number, target: Target): BattleEvent {
+  return { type: 'heal', target, value };
 }
 
-export function createMissEvent(
-  target: Target,
-  source: BattleEvent['source'] = 'card',
-): BattleEvent {
-  return { type: 'miss', target, source };
+export function createMissEvent(target: Target): BattleEvent {
+  return { type: 'miss', target };
 }
 
 export function createShuffleEvent(target: Target = 'self'): BattleEvent {
-  return { type: 'shuffled', target, source: 'card' };
+  return { type: 'shuffled', target };
 }
 
 export function createCardEvent(
@@ -54,5 +41,5 @@ export function createCardEvent(
   cardId: number,
   target: Target = 'self',
 ): BattleEvent {
-  return { type, target, cardId, source: 'card' };
+  return { type, target, cardId };
 }

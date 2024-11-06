@@ -462,9 +462,9 @@ describe('battle events', () => {
 
     const { events } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
     expect(events).toEqual([
-      { type: 'damage', value: 3, target: 'opponent', source: 'card' },
-      { type: 'damage', value: BLEED_DAMAGE, target: 'opponent', source: 'card' },
-      { type: 'heal', value: 5, target: 'self', source: 'card' },
+      { type: 'damage', value: 3, target: 'opponent' },
+      { type: 'damage', value: BLEED_DAMAGE, target: 'opponent' },
+      { type: 'heal', value: 5, target: 'self' },
     ]);
   });
 
@@ -472,6 +472,6 @@ describe('battle events', () => {
     effect.value = v(0);
 
     const { events } = getPlayCardResult();
-    expect(events).toEqual([{ type: 'damage', value: 0, target: 'opponent', source: 'card' }]);
+    expect(events).toEqual([{ type: 'damage', value: 0, target: 'opponent' }]);
   });
 });
