@@ -7,7 +7,6 @@ import { BattleEvent } from '../../game/actions/battleEvent';
 import { Direction } from '../../utils/types';
 import { UnitFn, useUnits } from '../hooks/useUnits';
 import { ControllerUpdate } from '../utils/reactSpring';
-import { CARD_ANIMATION_DELAY } from './CardStack/useCardStackAnimation2';
 import { Image } from './shared/Image';
 
 const oneDropShadow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
@@ -81,7 +80,6 @@ function getHealAnimation({ u }: { u: UnitFn }) {
     x: 0,
     y: u(2),
     brightness: 2,
-    delay: CARD_ANIMATION_DELAY,
     config: { easing: easings.easeOutCirc, duration: 200 },
   } satisfies AnimationOptions;
 }
@@ -100,25 +98,8 @@ function getDamageAnimation({
   return {
     x: u(4 + 20 * magnitude) * direction,
     hue: 20 + 160 * magnitude,
-    delay: CARD_ANIMATION_DELAY,
     config: { easing: easings.easeOutExpo, duration: 100 + 100 * magnitude },
   } satisfies AnimationOptions;
-}
-
-function getBattleAnimationForPhase({
-  battleEvents,
-  direction,
-  u,
-}: {
-  battleEvents: BattleEvent[];
-  direction: Direction;
-  u: UnitFn;
-}) {
-  const { misses, damage } = summarizeBattleEvents(battleEvents);
-  if (damage === 0 && misses === 0) return undefined;
-  if (misses > 0 && damage <= 0) return getDodgeAnimation({ u });
-  if (damage < 0) return getHealAnimation({ u });
-  return getDamageAnimation({ damage, direction, u });
 }
 
 function getBattleAnimation({
@@ -130,20 +111,11 @@ function getBattleAnimation({
   direction: Direction;
   u: UnitFn;
 }) {
-  const startOfTurnEvents = battleEvents.filter((event) => event.source === 'startOfTurn');
-  const startOfTurnAnimation = getBattleAnimationForPhase({
-    battleEvents: startOfTurnEvents,
-    direction,
-    u,
-  });
-  if (startOfTurnAnimation) {
-    startOfTurnAnimation.delay = 0;
-  }
-
-  const cardEvents = battleEvents.filter((event) => event.source === 'card');
-  const cardAnimation = getBattleAnimationForPhase({ battleEvents: cardEvents, direction, u });
-
-  return [startOfTurnAnimation, cardAnimation];
+  const { misses, damage } = summarizeBattleEvents(battleEvents);
+  if (damage === 0 && misses === 0) return null;
+  if (misses > 0 && damage <= 0) return getDodgeAnimation({ u });
+  if (damage < 0) return getHealAnimation({ u });
+  return getDamageAnimation({ damage, direction, u });
 }
 
 function getDeathAnimation({
@@ -159,7 +131,6 @@ function getDeathAnimation({
     x: (windowWidth / 2) * direction,
     y: u(-100),
     hue: 180,
-    delay: CARD_ANIMATION_DELAY,
     rotate: 360 * direction,
     config: { easing: easings.easeOutCubic, duration: 5000 },
   };
@@ -182,19 +153,22 @@ export function PlayerProfile({ flip, battleEvents, src, setProfileElement, isDe
     [isDead],
   );
 
+  // animate battle events
   useEffect(() => {
     if (isDead) return;
 
     if (battleEvents.length > 0) {
       const battleAnimation = getBattleAnimation({ battleEvents, direction, u });
-      // @ts-expect-error - start does in fact take an array
       if (battleAnimation) animationController.start(battleAnimation);
     } else {
+      // reset when there are no battle events
       animationController.set(startPosition);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [animationController, battleEvents, direction, isDead]);
 
+  // TODO: can we combine this useEffect with the one above?
+  // animate death
   useEffect(() => {
     if (!isDead) return;
 

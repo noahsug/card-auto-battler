@@ -1,9 +1,9 @@
 import { useSpringRef, useTransition } from '@react-spring/web';
 import { useEffect, useMemo } from 'react';
+import random from 'lodash/random';
 
 import { BattleEvent } from '../../../game/actions/battleEvent';
 import { UnitFn, useUnits } from '../../hooks/useUnits';
-import { CARD_ANIMATION_DELAY } from '../CardStack/useCardStackAnimation2';
 
 export interface Props {
   battleEvents: BattleEvent[];
@@ -33,10 +33,12 @@ function getXY({ xOffsetRatio, yOffsetRatio }: AnimationData, { targetElement }:
   return { x: width * xOffsetRatio, y: (height / 2) * yOffsetRatio };
 }
 
+// start randomly within the top half of the target element
 function getAnimationStart(textAnimation: AnimationData, context: AnimationContext) {
-  return { ...getXY(textAnimation, context), opacity: 0 };
+  return { ...getXY(textAnimation, context), opacity: 1, rotate: random(-5, 5) };
 }
 
+// move up slightly and fade out
 function getAnimationEnd(textAnimation: AnimationData, context: AnimationContext) {
   const { u } = context;
 
@@ -48,20 +50,6 @@ function getAnimationEnd(textAnimation: AnimationData, context: AnimationContext
     opacity: 0,
     delay: 500,
     config: { duration: 500 },
-  };
-}
-
-function animateCombatText(textAnimation: AnimationData, context: AnimationContext) {
-  // delay the animation until the play is played
-  const delay = textAnimation.battleEvent.source === 'card' ? CARD_ANIMATION_DELAY : 0;
-
-  return async (next: (...args: unknown[]) => Promise<void>) => {
-    await next({
-      opacity: 1,
-      immediate: true,
-      delay,
-    });
-    await next(getAnimationEnd(textAnimation, context));
   };
 }
 
@@ -78,8 +66,7 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: 
   const render = useTransition(animations, {
     key: ({ key }: AnimationData) => key,
     from: (textAnimation: AnimationData) => getAnimationStart(textAnimation, context),
-    enter: (textAnimation: AnimationData) => animateCombatText(textAnimation, context),
-    leave: (textAnimation: AnimationData) => getAnimationEnd(textAnimation, context),
+    enter: (textAnimation: AnimationData) => getAnimationEnd(textAnimation, context),
     ref: animationController,
   });
 

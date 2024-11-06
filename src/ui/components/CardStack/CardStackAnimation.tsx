@@ -115,6 +115,7 @@ function syncZIndex(cardAnimation: CardAnimationState, context: AnimationContext
   cardAnimation.deckIndex = context.cards.findIndex(
     (c) => c.acquiredId === cardAnimation.card.acquiredId,
   );
+  // TODO: Remove this part and have deal card use immediate:true to set the initial zIndex
   context.animationController.current[index]?.set(getDiscardPosition(cardAnimation, context));
 }
 
@@ -233,6 +234,7 @@ function animate(cardAnimation: CardAnimationState, index: number, context: Anim
     (event.type === 'shuffled' && cardAnimation.inDiscard) ||
     (event.type === 'startBattle' && !cardAnimation.inDiscard)
   ) {
+    // TODO: Move this into nextEvent (similar to syncCardAnimations), and do it for all cards
     // update z-index to match new card order after shuffle
     syncZIndex(cardAnimation, context, index);
     return dealCard(cardAnimation, context);
@@ -272,8 +274,11 @@ export function CardStackAnimation({
       }, CARD_ANIMATION_DELAY);
     }
 
-    if (event != null && nextEvent == null) {
-      // start the next turn when there are no events left to animate
+    // start the next turn when there are no events or just the shuffle event left to animate
+    if (
+      (event != null && nextEvent == null) ||
+      (nextEvent?.type === 'shuffled' && eventQueue.current.length === 0)
+    ) {
       onNextCombatState('turnStart');
     }
   }, [event, onNextCombatState]);

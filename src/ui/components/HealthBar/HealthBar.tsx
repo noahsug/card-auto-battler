@@ -3,7 +3,6 @@ import clamp from 'lodash/clamp';
 import { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { CARD_ANIMATION_DELAY } from '../CardStack/useCardStackAnimation2';
 import healthBarBorderImage from './health-bar-border.png';
 import healthBarInnerImage from './health-bar-inner.png';
 import { Image } from '../shared/Image';
@@ -52,23 +51,13 @@ interface Props {
 }
 
 export function HealthBar({ health, maxHealth }: Props) {
-  const [displayedHealth, setDisplayedHealth] = useState(health);
-  const [displayedMaxHealth, setDisplayedMaxHealth] = useState(maxHealth);
-
-  // delay changes in the health bar so they line up with the card animation
-  useEffect(() => {
-    setTimeout(() => {
-      setDisplayedHealth(health);
-      setDisplayedMaxHealth(maxHealth);
-    }, CARD_ANIMATION_DELAY);
-  }, [health, maxHealth]);
-
   const [animationProps] = useSpring(
     {
       from: { width: '100%' },
-      to: { width: `${clamp((displayedHealth / displayedMaxHealth) * 100, 0, 100)}%` },
+      // ensure percent health remaining stays within 0% - 100%
+      to: { width: `${clamp((health / maxHealth) * 100, 0, 100)}%` },
     },
-    [displayedHealth, displayedMaxHealth],
+    [health, maxHealth],
   );
 
   return (
@@ -76,7 +65,7 @@ export function HealthBar({ health, maxHealth }: Props) {
       <Image src={healthBarBorderImage} alt="health-bar" />
       <Bar style={animationProps} />
       <Label>
-        {displayedHealth} / {displayedMaxHealth}
+        {health} / {maxHealth}
       </Label>
     </Root>
   );
