@@ -17,6 +17,7 @@ import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
 import { CombatState } from './CardStack/CardStackAnimation';
+import { doNothing } from '../../utils/functions';
 
 interface Props {
   game: GameState;
@@ -97,14 +98,23 @@ export function BattleScreen({
   }, [game.turn, playCard]);
 
   const handleNextCombatState = useCallback(
-    async (combatState: CombatState) => {
-      setCombatState(combatState);
-      if (combatState === 'turnStart' && !isPaused) {
+    async (newCombatState: CombatState) => {
+      if (newCombatState === 'turnStart') {
+        if (isPaused) return;
         playNextCard();
       }
+      setCombatState(newCombatState);
     },
     [isPaused, playNextCard],
   );
+
+  // change combat state based only on the active player actions
+  const userHandleNextCombatState = getIsUserTurn({ turn: battleEventsTurn.current })
+    ? handleNextCombatState
+    : doNothing;
+  const enemyHandleNextCombatState = getIsUserTurn({ turn: battleEventsTurn.current })
+    ? doNothing
+    : handleNextCombatState;
 
   const handleUndo = useCallback(() => {
     undo();
@@ -190,17 +200,18 @@ export function BattleScreen({
           <CardStack
             cards={user.cards}
             currentCardIndex={user.currentCardIndex}
-            onNextCombatState={handleNextCombatState}
+            onNextCombatState={userHandleNextCombatState}
             events={userBattleEvents}
             targetElement={enemyProfileElement}
           />
           {
-            // <CardStack
-            //   cards={enemy.cards}
-            //   currentCardIndex={enemy.currentCardIndex}
-            //   events={enemyBattleEvents}
-            //   targetElement={userProfileElement}
-            // />
+            <CardStack
+              cards={enemy.cards}
+              currentCardIndex={enemy.currentCardIndex}
+              onNextCombatState={enemyHandleNextCombatState}
+              events={enemyBattleEvents}
+              targetElement={userProfileElement}
+            />
           }
         </ContentRow>
       </CenterContent>

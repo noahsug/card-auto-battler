@@ -264,20 +264,19 @@ export function CardStackAnimation({
 
   const nextEvent = useCallback(() => {
     const nextEvent = eventQueue.current.shift();
-    setEvent((prev) => {
-      if (prev != null && nextEvent == null) {
-        // start the next turn when there are no events left to animate
-        onNextCombatState('turnStart');
-      }
-      return nextEvent;
-    });
+    setEvent(nextEvent);
 
     if (nextEvent?.type === 'cardPlayed') {
       cardPlayedTimeout.current = setTimeout(() => {
         onNextCombatState('cardPlayed');
       }, CARD_ANIMATION_DELAY);
     }
-  }, [onNextCombatState]);
+
+    if (event != null && nextEvent == null) {
+      // start the next turn when there are no events left to animate
+      onNextCombatState('turnStart');
+    }
+  }, [event, onNextCombatState]);
 
   const context: AnimationContext = {
     cards,
