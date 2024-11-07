@@ -249,24 +249,29 @@ export function CardStackAnimation({
   const animationController = useSpringRef();
 
   const cardAnimationsRef = useRef<CardAnimationState[]>([]);
-  const eventQueue = useRef<BattleEvent[]>([]);
+  const [eventQueue, setEventQueue] = useState<BattleEvent[]>([]);
+  const event = eventQueue[0];
   const cardPlayedTimeout = useRef<NodeJS.Timeout | null>(null);
-  const [event, setEvent] = useState<BattleEvent>();
+
+  // queue new animated events
+  useEffect(() => {
+    setEventQueue((currentEvents) => {
+      const newEvents = events.filter((e) => animatedEvents.has(e.type));
+      return [...currentEvents, ...newEvents];
+    });
+  }, [events]);
+
+  // call the onAnimationComplete callback after certain events
+  useEffect(() => {
+    if (event == null) onAnimationComplete();
+  }, [event, onAnimationComplete]);
 
   const nextEvent = useCallback(() => {
-    if (event == null && eventQueue.current.length === 0) return;
-
-    const nextEvent = eventQueue.current.shift();
-    setEvent(nextEvent);
-
-    if (nextEvent?.type === 'shuffle' && eventQueue.current.length === 0) {
-      // end the animation early if the only event left is shuffle
-      onAnimationComplete();
-    } else if (nextEvent == null && event?.type !== 'shuffle') {
-      // we have no events left to animate
-      onAnimationComplete();
-    }
-  }, [event, onAnimationComplete]);
+    setEventQueue((prev) => {
+      const [, ...next] = prev;
+      return next;
+    });
+  }, []);
 
   const context: AnimationContext = {
     cards,
@@ -289,14 +294,6 @@ export function CardStackAnimation({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    eventQueue.current = events.filter((e) => animatedEvents.has(e.type));
-    if (cardPlayedTimeout.current != null) clearTimeout(cardPlayedTimeout.current);
-    setEvent(undefined);
-    nextEvent();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [events, cards, currentCardIndex]);
 
   useEffect(() => {
     animationController.start();
