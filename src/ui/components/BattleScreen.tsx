@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-import {
-  BattleEvent,
-  createStartBattleEvent,
-  createCardEvent,
-} from '../../game/actions/battleEvent';
+import { BattleEvent, createCardEvent, createBattleEvent } from '../../game/actions/battleEvent';
 import { GameState } from '../../game/gameState';
 import {
   getActivePlayer,
@@ -60,11 +56,10 @@ export function BattleScreen({
 
   const [isPaused, setIsPaused] = useState(true);
   const [isWaitingForAnimation, setIsWaitingForAnimation] = useState(false);
-  const [nextAnimation, setNextAnimation] = useState<AnimationState>('startTurn');
 
   const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([
-    createStartBattleEvent('self'),
-    createStartBattleEvent('opponent'),
+    createBattleEvent('startBattle', 'self'),
+    createBattleEvent('startBattle', 'opponent'),
   ]);
   const [userTarget, enemyTarget] = getPlayerTargets(game);
   const [userBattleEvents, enemyBattleEvents] = useMemo(() => {
@@ -74,62 +69,6 @@ export function BattleScreen({
     ];
   }, [battleEvents, userTarget, enemyTarget]);
 
-  const handleStartTurn = useCallback(async () => {
-    const events = await startTurn();
-    const card = activePlayer.cards[activePlayer.currentCardIndex];
-    if (card) {
-      // start the play card animation
-      events.push(createCardEvent('playCard', card.acquiredId));
-    }
-    setBattleEvents(events);
-    setNextAnimation('applyCardEffects');
-  }, [activePlayer.cards, activePlayer.currentCardIndex, startTurn]);
-
-  const handleApplyCardEffects = useCallback(async () => {
-    const events = await playCard();
-    setBattleEvents(events);
-    setNextAnimation('endTurn');
-    setIsWaitingForAnimation(true);
-  }, [playCard]);
-
-  const handleEndTurn = useCallback(() => {
-    endTurn();
-    // there is no end turn animation, so we immediately start the next turn
-    handleStartTurn();
-  }, [endTurn, handleStartTurn]);
-
-  // TODO: add a 500ms wait before apply card effects
-  const startNextAnimation = useCallback(() => {
-    if (nextAnimation === 'startTurn') {
-      handleStartTurn();
-    } else if (nextAnimation === 'applyCardEffects') {
-      handleApplyCardEffects();
-    } else if (nextAnimation === 'endTurn') {
-      handleEndTurn();
-    }
-  }, [handleApplyCardEffects, handleEndTurn, handleStartTurn, nextAnimation]);
-
-  const handleAnimationComplete = useCallback(async () => {
-    setIsWaitingForAnimation(false);
-
-    if (isPaused) {
-      if (nextAnimation === 'endTurn') {
-        // end the turn and don't start the next turn until we're unpaused
-        endTurn();
-        setBattleEvents([]);
-        setNextAnimation('startTurn');
-        return;
-      }
-      if (nextAnimation === 'startTurn') return;
-    }
-
-    startNextAnimation();
-  }, [endTurn, isPaused, nextAnimation, startNextAnimation]);
-
-  // change combat state based only on the active player animations
-  const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : doNothing;
-  const enemyHandleAnimationComplete = getIsUserTurn(game) ? doNothing : handleAnimationComplete;
-
   // TODO: handle undo animations
   const handleUndo = useCallback(() => {
     undo();
@@ -137,22 +76,63 @@ export function BattleScreen({
     setIsPaused(true);
   }, [undo]);
 
-  const canPlayNextCard = !isBattleOver && !hasOverlay && isPaused && !isWaitingForAnimation;
+  const startNextTurn = useCallback(async () => {
+    const events = await startTurn();
+    const card = activePlayer.cards[activePlayer.currentCardIndex];
+    if (card) {
+      // start the play card animation
+      events.push(createCardEvent('playCard', card.acquiredId));
+    }
+    setBattleEvents(events);
+    setIsWaitingForAnimation(true);
+  }, [activePlayer.cards, activePlayer.currentCardIndex, startTurn]);
+
+  const startApplyCardEffects = useCallback(async () => {
+    const events = await playCard();
+    events.push(createBattleEvent('finishPlayingCard'));
+    setBattleEvents(events);
+  }, [playCard]);
+
+  const handleFinishPlayingCard = useCallback(() => {
+    endTurn();
+    if (isPaused) {
+      setIsWaitingForAnimation(false);
+    } else {
+      startNextTurn();
+    }
+  }, [endTurn, isPaused, startNextTurn]);
+
+  const handleAnimationComplete = useCallback(
+    async (type: BattleEvent['type']) => {
+      if (type === 'playCard') {
+        startApplyCardEffects();
+      } else if (type === 'finishPlayingCard') {
+        handleFinishPlayingCard();
+      }
+    },
+    [handleFinishPlayingCard, startApplyCardEffects],
+  );
+
   const canTogglePlayPause = !isBattleOver && !hasOverlay;
+  const canPlayNextCard = canTogglePlayPause && isPaused && !isWaitingForAnimation;
 
   // TODO: Remove and make this fast forward instead?
   const handlePlayNextCard = useCallback(async () => {
-    startNextAnimation();
-  }, [startNextAnimation]);
+    startNextTurn();
+  }, [startNextTurn]);
 
   const handleTogglePlayPause = useCallback(() => {
     setIsPaused((isCurrentlyPaused) => {
       if (isCurrentlyPaused && !isWaitingForAnimation) {
-        startNextAnimation();
+        startNextTurn();
       }
       return !isCurrentlyPaused;
     });
-  }, [startNextAnimation, isWaitingForAnimation]);
+  }, [isWaitingForAnimation, startNextTurn]);
+
+  // change combat state based only on the active player animations
+  const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : doNothing;
+  const enemyHandleAnimationComplete = getIsUserTurn(game) ? doNothing : handleAnimationComplete;
 
   // TODO: replace with useTimeout
   const endBattleTimeout = useRef<NodeJS.Timeout>();
@@ -213,15 +193,13 @@ export function BattleScreen({
             events={userBattleEvents}
             targetElement={enemyProfileElement}
           />
-          {
-            <CardStack
-              cards={enemy.cards}
-              currentCardIndex={enemy.currentCardIndex}
-              onAnimationComplete={enemyHandleAnimationComplete}
-              events={enemyBattleEvents}
-              targetElement={userProfileElement}
-            />
-          }
+          {/* <CardStack
+            cards={enemy.cards}
+            currentCardIndex={enemy.currentCardIndex}
+            onAnimationComplete={enemyHandleAnimationComplete}
+            events={enemyBattleEvents}
+            targetElement={userProfileElement}
+          /> */}
         </ContentRow>
       </CenterContent>
 

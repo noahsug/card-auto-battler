@@ -13,7 +13,7 @@ import {
 } from '../gameState';
 import { BLEED_DAMAGE } from '../constants';
 import { assert } from '../../utils/asserts';
-import { BattleEvent, createDamageEvent, createHealEvent, createMissEvent } from './battleEvent';
+import { BattleEvent, createDamageEvent, createHealEvent, createBattleEvent } from './battleEvent';
 import { readonlyIncludes } from '../../utils/iterators';
 import { getPlayers, getTargetedPlayer, getRelic } from '../utils/selectors';
 
@@ -185,7 +185,7 @@ function dodgeDamage(effect: CardEffect, { game, events }: PlayCardContext) {
   if (player.dodge <= 0) return false;
 
   player.dodge -= 1;
-  events.push(createMissEvent(effect.target));
+  events.push(createBattleEvent('miss', effect.target));
   return true;
 }
 

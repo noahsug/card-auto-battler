@@ -11,12 +11,23 @@ import { UnitFn, useUnits, WindowDimensions } from '../../hooks/useUnits';
 import { SpringRef } from '../../utils/reactSpring';
 import { Card } from '../Card';
 import { assertIsNonNullable } from '../../../utils/asserts';
+import { wait } from '../../../utils/wait';
+
+const animatedEvents = new Set<BattleEvent['type']>([
+  'startBattle',
+  'playCard',
+  'discardCard',
+  'trashCard',
+  'shuffle',
+  'addTemporaryCard',
+  'finishPlayingCard',
+]);
 
 export interface Props {
   cards: CardState[];
   currentCardIndex: number;
   events: BattleEvent[];
-  onAnimationComplete: () => void;
+  onAnimationComplete: (type: BattleEvent['type']) => void;
   selfElement: Element;
   targetElement: Element;
 }
@@ -40,15 +51,6 @@ interface AnimationContext {
   nextEvent: () => void;
   animationController: SpringRef;
 }
-
-const animatedEvents = new Set<Partial<BattleEvent['type']>>([
-  'startBattle',
-  'playCard',
-  'discardCard',
-  'trashCard',
-  'shuffle',
-  'addTemporaryCard',
-]);
 
 function createCardAnimationState(
   card: CardState,
@@ -175,7 +177,8 @@ function playCard(context: AnimationContext) {
 
   const { x, y } = getXYToTarget(context);
   return async (next: (options: object) => Promise<void>) => {
-    await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff, clamp: true } });
+    await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff } });
+    await wait(500);
     nextEvent();
   };
 }
@@ -207,6 +210,7 @@ function trashCard(context: AnimationContext) {
 function animate(cardAnimation: CardAnimationState, index: number, context: AnimationContext) {
   const { event } = context;
   if (!event) return null;
+  if (index === 0) console.log('animate', event.type);
 
   if ((event as CardBattleEvent).cardId === cardAnimation.cardId) {
     switch (event.type) {
@@ -225,7 +229,7 @@ function animate(cardAnimation: CardAnimationState, index: number, context: Anim
   ) {
     // TODO: Move this into nextEvent (similar to syncCardAnimations), and do it for all cards
     // update z-index to match new card order after shuffle
-    syncZIndex(cardAnimation, context, index);
+    // syncZIndex(cardAnimation, context, index);
     return dealCard(cardAnimation, context);
   }
   return null;
@@ -249,29 +253,52 @@ export function CardStackAnimation({
   const animationController = useSpringRef();
 
   const cardAnimationsRef = useRef<CardAnimationState[]>([]);
-  const [eventQueue, setEventQueue] = useState<BattleEvent[]>([]);
-  const event = eventQueue[0];
+  const eventQueue = useRef<BattleEvent[]>([]);
+  const [event, setEvent] = useState<BattleEvent>();
   const cardPlayedTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // initialize card animations
+  useEffect(() => {
+    syncCardAnimations({
+      cardAnimations: cardAnimationsRef.current,
+      context,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // queue new animated events
   useEffect(() => {
-    setEventQueue((currentEvents) => {
-      const newEvents = events.filter((e) => animatedEvents.has(e.type));
-      return [...currentEvents, ...newEvents];
-    });
+    const newEvents = events.filter((e) => animatedEvents.has(e.type));
+    // swap the shuffle and finishPlayingCard events so we don't have to wait for the shuffle
+    // animation to finish before calling onAnimationComplete to start the next turn
+    const [secondLastEvent, lastEvent] = newEvents.slice(-2);
+    if (lastEvent?.type === 'finishPlayingCard' && secondLastEvent?.type === 'shuffle') {
+      newEvents[newEvents.length - 1] = secondLastEvent;
+      newEvents[newEvents.length - 2] = lastEvent;
+    }
+    eventQueue.current.push(...newEvents);
   }, [events]);
 
-  // call the onAnimationComplete callback after certain events
-  useEffect(() => {
-    if (event == null) onAnimationComplete();
-  }, [event, onAnimationComplete]);
-
   const nextEvent = useCallback(() => {
-    setEventQueue((prev) => {
-      const [, ...next] = prev;
-      return next;
-    });
-  }, []);
+    const newEvent = eventQueue.current.shift();
+    setEvent(newEvent);
+
+    if (newEvent?.type === 'playCard') {
+      // mark the animation as complete slightly early to make it feel more responsive
+      cardPlayedTimeout.current = setTimeout(() => {
+        onAnimationComplete('playCard');
+      }, 200);
+    }
+
+    if (newEvent?.type === 'finishPlayingCard') {
+      onAnimationComplete('finishPlayingCard');
+      nextEvent();
+    }
+  }, [onAnimationComplete]);
+
+  // if (event == null && eventQueue.current.length > 0) {
+  //   nextEvent();
+  // }
 
   const context: AnimationContext = {
     cards,
@@ -286,19 +313,6 @@ export function CardStackAnimation({
     animationController,
   };
 
-  // initialize card animations
-  useEffect(() => {
-    syncCardAnimations({
-      cardAnimations: cardAnimationsRef.current,
-      context,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    animationController.start();
-  }, [animationController, event]);
-
   const render = useTransition(cardAnimationsRef.current, {
     key: (c: CardAnimationState) => c.cardId,
     from: (c: CardAnimationState) => getDiscardPosition(c, context),
@@ -307,6 +321,10 @@ export function CardStackAnimation({
     ref: animationController,
     deps: [event, u],
   });
+
+  useEffect(() => {
+    animationController.start();
+  }, [animationController, event]);
 
   return render((style, { cardId }) => {
     const card = cards.find((c) => c.acquiredId === cardId);

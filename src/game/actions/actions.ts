@@ -12,7 +12,7 @@ import {
 import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal } from './applyCardEffects';
-import { BattleEvent, createDamageEvent, createCardEvent, createShuffleEvent } from './battleEvent';
+import { BattleEvent, createDamageEvent, createCardEvent, createBattleEvent } from './battleEvent';
 
 export function addCards(game: GameState, cards: CardState[]) {
   addCardsToPlayer(game.user, cards);
@@ -113,7 +113,7 @@ export function playCard(game: GameState): BattleEvent[] {
     // shuffle deck
     activePlayer.currentCardIndex = 0;
     activePlayer.cards = shuffle(activePlayer.cards);
-    events.push(createShuffleEvent());
+    events.push(createBattleEvent('shuffle'));
   }
 
   // calculate damage dealt
