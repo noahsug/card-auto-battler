@@ -10,6 +10,7 @@ import { Z_INDEX } from '../../constants';
 import { UnitFn, useUnits, WindowDimensions } from '../../hooks/useUnits';
 import { SpringRef } from '../../utils/reactSpring';
 import { Card } from '../Card';
+import { assertIsNonNullable } from '../../../utils/asserts';
 
 export interface Props {
   cards: CardState[];
@@ -20,9 +21,8 @@ export interface Props {
   targetElement: Element;
 }
 
-// TODO: replace card with cardId so we don't have to keep updating it when cards change
 interface CardAnimationState {
-  card: CardState;
+  cardId: number;
   rotation: number;
   deckIndex: number;
   inDiscard: boolean;
@@ -56,7 +56,7 @@ function createCardAnimationState(
   currentCardIndex: number,
 ): CardAnimationState {
   return {
-    card,
+    cardId: card.acquiredId,
     deckIndex,
     rotation: random(-10, 10),
     inDiscard: deckIndex < currentCardIndex,
@@ -80,10 +80,9 @@ function syncCardAnimations({
   const { cards, currentCardIndex, animationController } = context;
   cards.forEach((card, index) => {
     const newAnimationState = createCardAnimationState(card, index, currentCardIndex);
-    const existingCardAnimation = cardAnimations.find((c) => c.card.acquiredId === card.acquiredId);
+    const existingCardAnimation = cardAnimations.find((c) => c.cardId === card.acquiredId);
     if (existingCardAnimation) {
       existingCardAnimation.deckIndex = newAnimationState.deckIndex;
-      existingCardAnimation.card = newAnimationState.card;
       existingCardAnimation.inDiscard = newAnimationState.inDiscard;
     } else {
       cardAnimations.push(newAnimationState);
@@ -92,7 +91,7 @@ function syncCardAnimations({
 
   animationController.set((index: number) => {
     const cardAnimation = cardAnimations[index];
-    if (!cards.includes(cardAnimation.card)) {
+    if (!cards.find((c) => c.acquiredId === cardAnimation.cardId)) {
       // card is trashed or hasn't been created yet
       cardAnimation.inDiscard = false;
       return { opacity: 0 };
@@ -106,9 +105,7 @@ function syncCardAnimations({
 }
 
 function syncZIndex(cardAnimation: CardAnimationState, context: AnimationContext, index: number) {
-  cardAnimation.deckIndex = context.cards.findIndex(
-    (c) => c.acquiredId === cardAnimation.card.acquiredId,
-  );
+  cardAnimation.deckIndex = context.cards.findIndex((c) => c.acquiredId === cardAnimation.cardId);
   // TODO: Remove this part and have deal card use immediate:true to set the initial zIndex
   context.animationController.current[index]?.set(getDiscardPosition(cardAnimation, context));
 }
@@ -211,7 +208,7 @@ function animate(cardAnimation: CardAnimationState, index: number, context: Anim
   const { event } = context;
   if (!event) return null;
 
-  if ((event as CardBattleEvent).cardId === cardAnimation.card.acquiredId) {
+  if ((event as CardBattleEvent).cardId === cardAnimation.cardId) {
     switch (event.type) {
       case 'playCard':
         return playCard(context);
@@ -264,11 +261,9 @@ export function CardStackAnimation({
 
     if (nextEvent?.type === 'shuffle' && eventQueue.current.length === 0) {
       // end the animation early if the only event left is shuffle
-      console.log('just shuffle left', selfElement);
       onAnimationComplete();
     } else if (nextEvent == null && event?.type !== 'shuffle') {
       // we have no events left to animate
-      console.log(event?.type, 'event done', selfElement);
       onAnimationComplete();
     }
   }, [event, onAnimationComplete]);
@@ -308,7 +303,7 @@ export function CardStackAnimation({
   }, [animationController, event]);
 
   const render = useTransition(cardAnimationsRef.current, {
-    key: (c: CardAnimationState) => c.card.acquiredId,
+    key: (c: CardAnimationState) => c.cardId,
     from: (c: CardAnimationState) => getDiscardPosition(c, context),
     enter: (c: CardAnimationState, i: number) => animate(c, i, context),
     update: (c: CardAnimationState, i: number) => animate(c, i, context),
@@ -316,9 +311,13 @@ export function CardStackAnimation({
     deps: [event, u],
   });
 
-  return render((style, { card }) => (
-    <AnimatedContainer style={style}>
-      <Card card={card} size="medium" />
-    </AnimatedContainer>
-  ));
+  return render((style, { cardId }) => {
+    const card = cards.find((c) => c.acquiredId === cardId);
+    assertIsNonNullable(card);
+    return (
+      <AnimatedContainer style={style}>
+        <Card card={card} size="medium" />
+      </AnimatedContainer>
+    );
+  });
 }

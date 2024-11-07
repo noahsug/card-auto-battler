@@ -100,7 +100,6 @@ export function BattleScreen({
 
   // TODO: add a 500ms wait before apply card effects
   const startNextAnimation = useCallback(() => {
-    console.log('start', nextAnimation, game.turn);
     if (nextAnimation === 'startTurn') {
       handleStartTurn();
     } else if (nextAnimation === 'applyCardEffects') {
@@ -108,10 +107,9 @@ export function BattleScreen({
     } else if (nextAnimation === 'endTurn') {
       handleEndTurn();
     }
-  }, [game.turn, handleApplyCardEffects, handleEndTurn, handleStartTurn, nextAnimation]);
+  }, [handleApplyCardEffects, handleEndTurn, handleStartTurn, nextAnimation]);
 
   const handleAnimationComplete = useCallback(async () => {
-    console.log('animation complete, next up is', nextAnimation, game.turn);
     setIsWaitingForAnimation(false);
 
     if (isPaused) {
@@ -126,7 +124,7 @@ export function BattleScreen({
     }
 
     startNextAnimation();
-  }, [endTurn, game.turn, isPaused, nextAnimation, startNextAnimation]);
+  }, [endTurn, isPaused, nextAnimation, startNextAnimation]);
 
   // change combat state based only on the active player animations
   const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : doNothing;
