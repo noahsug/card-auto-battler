@@ -4,14 +4,14 @@ interface BattleEventShared {
   target: Target;
 }
 export interface SimpleBattleEvent extends BattleEventShared {
-  type: 'miss' | 'shuffled' | 'startBattle';
+  type: 'miss' | 'shuffle' | 'startBattle';
 }
 export interface BattleEventWithValue extends BattleEventShared {
   type: 'damage' | 'heal';
   value: number;
 }
 export interface CardBattleEvent extends BattleEventShared {
-  type: 'cardPlayed' | 'cardTrashed' | 'cardDiscarded' | 'temporaryCardAdded';
+  type: 'playCard' | 'trashCard' | 'discardCard' | 'addTemporaryCard';
   cardId: number;
 }
 export type BattleEvent = SimpleBattleEvent | BattleEventWithValue | CardBattleEvent;
@@ -33,7 +33,7 @@ export function createMissEvent(target: Target): BattleEvent {
 }
 
 export function createShuffleEvent(target: Target = 'self'): BattleEvent {
-  return { type: 'shuffled', target };
+  return { type: 'shuffle', target };
 }
 
 export function createCardEvent(

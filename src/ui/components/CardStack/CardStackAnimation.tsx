@@ -1,32 +1,26 @@
+import { animated, config, easings, useSpringRef, useTransition } from '@react-spring/web';
 import random from 'lodash/random';
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-import { animated, config, easings, useSpringRef, useTransition } from '@react-spring/web';
 import { styled } from 'styled-components';
+
 import { BattleEvent, CardBattleEvent } from '../../../game/actions/battleEvent';
 import { CardState } from '../../../game/gameState';
 import { Direction } from '../../../utils/types';
-import { wait } from '../../../utils/wait';
 import { Z_INDEX } from '../../constants';
 import { UnitFn, useUnits, WindowDimensions } from '../../hooks/useUnits';
-import { Card } from '../Card';
 import { SpringRef } from '../../utils/reactSpring';
-
-// milliseconds it takes the card to animate from the deck to the player
-// note: this is slightly before the animation is done to make it feel more responsive
-const CARD_ANIMATION_DELAY = 200;
-
-export type CombatState = 'turnStart' | 'cardPlayed';
+import { Card } from '../Card';
 
 export interface Props {
   cards: CardState[];
   currentCardIndex: number;
   events: BattleEvent[];
-  onNextCombatState: (combatState: CombatState) => void;
+  onAnimationComplete: () => void;
   selfElement: Element;
   targetElement: Element;
 }
 
+// TODO: replace card with cardId so we don't have to keep updating it when cards change
 interface CardAnimationState {
   card: CardState;
   rotation: number;
@@ -49,11 +43,11 @@ interface AnimationContext {
 
 const animatedEvents = new Set<Partial<BattleEvent['type']>>([
   'startBattle',
-  'cardPlayed',
-  'cardDiscarded',
-  'cardTrashed',
-  'shuffled',
-  'temporaryCardAdded',
+  'playCard',
+  'discardCard',
+  'trashCard',
+  'shuffle',
+  'addTemporaryCard',
 ]);
 
 function createCardAnimationState(
@@ -184,9 +178,7 @@ function playCard(context: AnimationContext) {
 
   const { x, y } = getXYToTarget(context);
   return async (next: (options: object) => Promise<void>) => {
-    await next({ x, y, scale: 1.25, rotate: 0, config: config.stiff });
-    await wait(500);
-
+    await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff, clamp: true } });
     nextEvent();
   };
 }
@@ -221,17 +213,17 @@ function animate(cardAnimation: CardAnimationState, index: number, context: Anim
 
   if ((event as CardBattleEvent).cardId === cardAnimation.card.acquiredId) {
     switch (event.type) {
-      case 'cardPlayed':
+      case 'playCard':
         return playCard(context);
-      case 'cardDiscarded':
+      case 'discardCard':
         return discardCard(cardAnimation, context);
-      case 'cardTrashed':
+      case 'trashCard':
         return trashCard(context);
     }
   }
 
   if (
-    (event.type === 'shuffled' && cardAnimation.inDiscard) ||
+    (event.type === 'shuffle' && cardAnimation.inDiscard) ||
     (event.type === 'startBattle' && !cardAnimation.inDiscard)
   ) {
     // TODO: Move this into nextEvent (similar to syncCardAnimations), and do it for all cards
@@ -251,7 +243,7 @@ export function CardStackAnimation({
   cards,
   currentCardIndex,
   events,
-  onNextCombatState,
+  onAnimationComplete,
   selfElement,
   targetElement,
 }: Props) {
@@ -265,23 +257,21 @@ export function CardStackAnimation({
   const [event, setEvent] = useState<BattleEvent>();
 
   const nextEvent = useCallback(() => {
+    if (event == null && eventQueue.current.length === 0) return;
+
     const nextEvent = eventQueue.current.shift();
     setEvent(nextEvent);
 
-    if (nextEvent?.type === 'cardPlayed') {
-      cardPlayedTimeout.current = setTimeout(() => {
-        onNextCombatState('cardPlayed');
-      }, CARD_ANIMATION_DELAY);
+    if (nextEvent?.type === 'shuffle' && eventQueue.current.length === 0) {
+      // end the animation early if the only event left is shuffle
+      console.log('just shuffle left', selfElement);
+      onAnimationComplete();
+    } else if (nextEvent == null && event?.type !== 'shuffle') {
+      // we have no events left to animate
+      console.log(event?.type, 'event done', selfElement);
+      onAnimationComplete();
     }
-
-    // start the next turn when there are no events or just the shuffle event left to animate
-    if (
-      (event != null && nextEvent == null) ||
-      (nextEvent?.type === 'shuffled' && eventQueue.current.length === 0)
-    ) {
-      onNextCombatState('turnStart');
-    }
-  }, [event, onNextCombatState]);
+  }, [event, onAnimationComplete]);
 
   const context: AnimationContext = {
     cards,

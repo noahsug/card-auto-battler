@@ -51,41 +51,40 @@ function startBattle(game: GameState) {
   triggerStartOfBattleEffects(enemyPerspective);
 }
 
-function startTurn(game: GameState) {
+export function startTurn(game: GameState): BattleEvent[] {
+  // start battle
+  if (game.turn === 0) {
+    startBattle(game);
+  }
+
   const [activePlayer] = getPlayers(game);
-  const events: BattleEvent[] = [];
 
   activePlayer.damageDealtLastTurn = activePlayer.damageDealtThisTurn;
   activePlayer.damageDealtThisTurn = 0;
+  activePlayer.cardsPlayedThisTurn = 0;
+
+  // die if out of cards
+  if (activePlayer.cards.length === 0) {
+    const damage = activePlayer.health;
+    activePlayer.health = 0;
+    return [createDamageEvent(damage, 'self')];
+  }
+
+  const events: BattleEvent[] = [];
 
   if (activePlayer.regen > 0) {
     // regen
     applyHeal({ value: activePlayer.regen, target: 'self' }, { game, events });
     activePlayer.regen -= 1;
   }
+
   return events;
 }
 
 export function playCard(game: GameState): BattleEvent[] {
   const [activePlayer] = getPlayers(game);
   const events: BattleEvent[] = [];
-
-  if (activePlayer.cardsPlayedThisTurn === 0) {
-    if (game.turn === 0) {
-      startBattle(game);
-    }
-    const startTurnEvents = startTurn(game);
-    events.push(...startTurnEvents);
-  }
-
   const card = activePlayer.cards[activePlayer.currentCardIndex];
-
-  // die if out of cards
-  if (card == null) {
-    const damage = activePlayer.health;
-    activePlayer.health = 0;
-    return [createDamageEvent(damage, 'self')];
-  }
 
   if (activePlayer.cardsPlayedThisTurn > 0) {
     assert(activePlayer.extraCardPlays > 0);
@@ -94,7 +93,6 @@ export function playCard(game: GameState): BattleEvent[] {
   activePlayer.cardsPlayedThisTurn += 1;
 
   // play card
-  events.push(createCardEvent('cardPlayed', card.acquiredId));
   const playCardEvents = applyCardEffects(game, card);
   events.push(...playCardEvents);
 
@@ -104,11 +102,11 @@ export function playCard(game: GameState): BattleEvent[] {
     // trash card
     activePlayer.trashedCards.push(card);
     activePlayer.cards.splice(activePlayer.currentCardIndex, 1);
-    events.push(createCardEvent('cardTrashed', card.acquiredId));
+    events.push(createCardEvent('trashCard', card.acquiredId));
   } else {
     // discard card
     activePlayer.currentCardIndex += 1;
-    events.push(createCardEvent('cardDiscarded', card.acquiredId));
+    events.push(createCardEvent('discardCard', card.acquiredId));
   }
 
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
@@ -118,6 +116,7 @@ export function playCard(game: GameState): BattleEvent[] {
     events.push(createShuffleEvent());
   }
 
+  // calculate damage dealt
   const damageDealt = events.reduce((damageDealt, event) => {
     if (event.type === 'damage' && event.target === 'opponent') {
       damageDealt += event.value;
@@ -126,12 +125,14 @@ export function playCard(game: GameState): BattleEvent[] {
   }, 0);
   activePlayer.damageDealtThisTurn += damageDealt;
 
-  if (activePlayer.extraCardPlays === 0) {
-    activePlayer.cardsPlayedThisTurn = 0;
-    game.turn++;
-  }
-
   return events;
+}
+
+export function endTurn(game: GameState) {
+  const [activePlayer] = getPlayers(game);
+  assert(activePlayer.extraCardPlays === 0);
+
+  game.turn++;
 }
 
 function resetPlayerAfterBattle(player: PlayerState) {

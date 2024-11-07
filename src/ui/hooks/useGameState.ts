@@ -13,7 +13,9 @@ type BoundActions = {
 };
 
 export type AddCards = BoundActions['addCards'];
+export type StartTurn = BoundActions['startTurn'];
 export type PlayCard = BoundActions['playCard'];
+export type EndTurn = BoundActions['endTurn'];
 export type EndBattle = BoundActions['endBattle'];
 export type ResetGame = BoundActions['resetGame'];
 
