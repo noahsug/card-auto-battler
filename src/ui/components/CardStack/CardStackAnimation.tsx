@@ -253,7 +253,7 @@ export function CardStackAnimation({
 
   const cardAnimationsRef = useRef<CardAnimationState[]>([]);
   const [eventQueue, setEventQueue] = useState<BattleEvent[]>([]);
-  const eventToAnimate = useRef<BattleEvent>();
+  const [currentEvent, setCurrentEvent] = useState<BattleEvent>();
   const cardPlayedTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // initialize card animations
@@ -284,34 +284,32 @@ export function CardStackAnimation({
   }, [events]);
 
   const nextEvent = useCallback(() => {
+    setCurrentEvent(undefined);
     setEventQueue((prev) => {
-      eventToAnimate.current = undefined;
       const [, ...next] = prev;
       return next;
     });
   }, []);
 
+  // call onAnimationComplete when certain animations start
   useEffect(() => {
-    if (eventToAnimate.current || eventQueue.length === 0) return;
+    if (currentEvent || eventQueue.length === 0) return;
 
-    eventToAnimate.current = eventQueue[0];
+    const newEvent = eventQueue[0];
+    setCurrentEvent(newEvent);
 
-    if (eventToAnimate.current?.type === 'playCard') {
+    if (newEvent?.type === 'playCard') {
       // mark the animation as complete slightly early to make it feel more responsive
       cardPlayedTimeout.current = setTimeout(() => {
         onAnimationComplete('playCard');
       }, 200);
     }
 
-    if (eventToAnimate.current?.type === 'finishPlayingCard') {
+    if (newEvent?.type === 'finishPlayingCard') {
       onAnimationComplete('finishPlayingCard');
       nextEvent();
     }
-
-    return () => {
-      cardPlayedTimeout.current && clearTimeout(cardPlayedTimeout.current);
-    };
-  }, [eventQueue, nextEvent, onAnimationComplete]);
+  }, [currentEvent, eventQueue, nextEvent, onAnimationComplete]);
 
   const context: AnimationContext = {
     cards,
@@ -321,7 +319,7 @@ export function CardStackAnimation({
     u,
     windowDimensions,
     cardDealDirection,
-    event: eventToAnimate.current,
+    event: currentEvent,
     nextEvent,
     animationController,
   };
@@ -332,14 +330,14 @@ export function CardStackAnimation({
     enter: (c: CardAnimationState, i: number) => animate(c, i, context),
     update: (c: CardAnimationState, i: number) => animate(c, i, context),
     ref: animationController,
-    deps: [eventToAnimate.current, u],
+    deps: [currentEvent, u],
   });
 
   useEffect(() => {
-    if (eventToAnimate) {
+    if (currentEvent) {
       animationController.start();
     }
-  }, [animationController, eventQueue]);
+  }, [animationController, currentEvent]);
 
   return render((style, { cardId }) => {
     const card = cards.find((c) => c.acquiredId === cardId);
