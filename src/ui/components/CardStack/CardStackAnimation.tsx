@@ -167,6 +167,12 @@ function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) 
       config: config.default,
     });
 
+    // TODO: we're calling next event for each card dealt, where we want to call it just once when
+    // the last card is dealt. Do we need separate events for each expected animation and wait for
+    // them all to complete?
+    // TODO: why does the animation pause when we click next?
+    console.log('deal card done');
+
     cardAnimation.inDiscard = false;
     nextEvent();
   };
@@ -210,6 +216,8 @@ function trashCard(context: AnimationContext) {
 function animate(cardAnimation: CardAnimationState, index: number, context: AnimationContext) {
   const { event } = context;
   if (!event) return null;
+
+  if (index === 0) console.log('Animating', event?.type);
 
   if ((event as CardBattleEvent).cardId === cardAnimation.cardId) {
     switch (event.type) {
@@ -279,17 +287,26 @@ export function CardStackAnimation({
         newEvents[newEvents.length - 1] = secondLastEvent;
         newEvents[newEvents.length - 2] = lastEvent;
       }
+
+      console.log(
+        'Queuing',
+        newEvents.map((e) => e.type),
+        'onto',
+        currentEvents.map((e) => e.type),
+      );
+
       return [...currentEvents, ...newEvents];
     });
   }, [events]);
 
   const nextEvent = useCallback(() => {
+    console.log('next event, finished:', currentEvent?.type);
     setCurrentEvent(undefined);
     setEventQueue((prev) => {
       const [, ...next] = prev;
       return next;
     });
-  }, []);
+  }, [currentEvent?.type]);
 
   // call onAnimationComplete when certain animations start
   useEffect(() => {
@@ -324,6 +341,8 @@ export function CardStackAnimation({
     animationController,
   };
 
+  console.log('rendering', currentEvent?.type);
+
   const render = useTransition(cardAnimationsRef.current, {
     key: (c: CardAnimationState) => c.cardId,
     from: (c: CardAnimationState) => getDiscardPosition(c, context),
@@ -335,6 +354,7 @@ export function CardStackAnimation({
 
   useEffect(() => {
     if (currentEvent) {
+      console.log('start');
       animationController.start();
     }
   }, [animationController, currentEvent]);

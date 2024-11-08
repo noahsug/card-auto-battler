@@ -95,6 +95,7 @@ export function BattleScreen({
 
   const handleFinishPlayingCard = useCallback(() => {
     endTurn();
+    setBattleEvents([]);
     if (isPaused) {
       setIsWaitingForAnimation(false);
     } else {
