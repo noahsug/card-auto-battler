@@ -210,7 +210,6 @@ function trashCard(context: AnimationContext) {
 function animate(cardAnimation: CardAnimationState, index: number, context: AnimationContext) {
   const { event } = context;
   if (!event) return null;
-  console.log('animate', event.type);
 
   if ((event as CardBattleEvent).cardId === cardAnimation.cardId) {
     switch (event.type) {
@@ -229,7 +228,7 @@ function animate(cardAnimation: CardAnimationState, index: number, context: Anim
   ) {
     // TODO: Move this into nextEvent (similar to syncCardAnimations), and do it for all cards
     // update z-index to match new card order after shuffle
-    // syncZIndex(cardAnimation, context, index);
+    syncZIndex(cardAnimation, context, index);
     return dealCard(cardAnimation, context);
   }
   return null;
@@ -254,7 +253,7 @@ export function CardStackAnimation({
 
   const cardAnimationsRef = useRef<CardAnimationState[]>([]);
   const [eventQueue, setEventQueue] = useState<BattleEvent[]>([]);
-  const event = eventQueue[0];
+  const eventToAnimate = useRef<BattleEvent>();
   const cardPlayedTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // initialize card animations
@@ -269,7 +268,10 @@ export function CardStackAnimation({
   // queue new animated events
   useEffect(() => {
     setEventQueue((currentEvents) => {
-      const newEvents = events.filter((e) => animatedEvents.has(e.type));
+      // filter out existing events so we're not double queueing when this effect is called twice
+      const newEvents = events.filter(
+        (e) => animatedEvents.has(e.type) && !currentEvents.includes(e),
+      );
       // swap the shuffle and finishPlayingCard events so we don't have to wait for the shuffle
       // animation to finish before calling onAnimationComplete to start the next turn
       const [secondLastEvent, lastEvent] = newEvents.slice(-2);
@@ -283,24 +285,33 @@ export function CardStackAnimation({
 
   const nextEvent = useCallback(() => {
     setEventQueue((prev) => {
+      eventToAnimate.current = undefined;
       const [, ...next] = prev;
       return next;
     });
+  }, []);
 
-    const newEvent = eventQueue[1];
+  useEffect(() => {
+    if (eventToAnimate.current || eventQueue.length === 0) return;
 
-    if (newEvent?.type === 'playCard') {
+    eventToAnimate.current = eventQueue[0];
+
+    if (eventToAnimate.current?.type === 'playCard') {
       // mark the animation as complete slightly early to make it feel more responsive
       cardPlayedTimeout.current = setTimeout(() => {
         onAnimationComplete('playCard');
       }, 200);
     }
 
-    if (newEvent?.type === 'finishPlayingCard') {
+    if (eventToAnimate.current?.type === 'finishPlayingCard') {
       onAnimationComplete('finishPlayingCard');
       nextEvent();
     }
-  }, [eventQueue, onAnimationComplete]);
+
+    return () => {
+      cardPlayedTimeout.current && clearTimeout(cardPlayedTimeout.current);
+    };
+  }, [eventQueue, nextEvent, onAnimationComplete]);
 
   const context: AnimationContext = {
     cards,
@@ -310,7 +321,7 @@ export function CardStackAnimation({
     u,
     windowDimensions,
     cardDealDirection,
-    event,
+    event: eventToAnimate.current,
     nextEvent,
     animationController,
   };
@@ -321,14 +332,14 @@ export function CardStackAnimation({
     enter: (c: CardAnimationState, i: number) => animate(c, i, context),
     update: (c: CardAnimationState, i: number) => animate(c, i, context),
     ref: animationController,
-    deps: [event, u],
+    deps: [eventToAnimate.current, u],
   });
 
   useEffect(() => {
-    if (event) {
+    if (eventToAnimate) {
       animationController.start();
     }
-  }, [animationController, event]);
+  }, [animationController, eventQueue]);
 
   return render((style, { cardId }) => {
     const card = cards.find((c) => c.acquiredId === cardId);

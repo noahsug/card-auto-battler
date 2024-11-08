@@ -128,16 +128,16 @@ export function App() {
           ></RelicSelectionScreen>
         )}
 
-        {screen === 'battle' && (
-          <BattleScreen
-            game={endOfBattleGameRef.current || game}
-            {...actions}
-            {...undoManager}
-            onBattleOver={handleBattleOver}
-            onViewDeck={() => setOverlay('deck')}
-            hasOverlay={overlay !== 'none'}
-          ></BattleScreen>
-        )}
+        {/* {screen === 'battle' && ( */}
+        <BattleScreen
+          game={endOfBattleGameRef.current || game}
+          {...actions}
+          {...undoManager}
+          onBattleOver={handleBattleOver}
+          onViewDeck={() => setOverlay('deck')}
+          hasOverlay={overlay !== 'none'}
+        ></BattleScreen>
+        {/* )} */}
 
         {overlay !== 'none' && (
           <OverlayBackground>

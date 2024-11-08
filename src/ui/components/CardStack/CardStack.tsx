@@ -20,6 +20,8 @@ const Root = styled.div`
   width: ${cardSize.width}rem;
 `;
 
+// TODO: Combine with CardStackAnimation and make this Root container with ref a generic HOC or
+// something?
 export function CardStack(props: Props) {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
 
