@@ -17,8 +17,8 @@ export interface Props {
   currentCardIndex: number;
   event?: BattleEvent;
   onAnimationComplete: () => void;
-  deckBounds: DOMRect;
-  opponentBounds: DOMRect;
+  deckRect: DOMRect;
+  opponentRect: DOMRect;
 }
 
 const AnimatedContainer = styled(animated.div)`
@@ -53,8 +53,8 @@ interface AnimationContext {
   currentCardIndex: number;
   event?: BattleEvent;
   onCardAnimationComplete: (cardAnimation: CardAnimationState) => void;
-  deckBounds: DOMRect;
-  opponentBounds: DOMRect;
+  deckRect: DOMRect;
+  opponentRect: DOMRect;
   u: UnitFn;
   windowDimensions: WindowDimensions;
 }
@@ -64,10 +64,10 @@ function syncZIndex(cardAnimation: CardAnimationState, context: AnimationContext
 }
 
 function getCardDealDirection({
-  deckBounds,
-  opponentBounds,
-}: Pick<AnimationContext, 'deckBounds' | 'opponentBounds'>): Direction {
-  return deckBounds.left < opponentBounds.left ? 1 : -1;
+  deckRect,
+  opponentRect,
+}: Pick<AnimationContext, 'deckRect' | 'opponentRect'>): Direction {
+  return deckRect.left < opponentRect.left ? 1 : -1;
 }
 
 function getReverseIndex(
@@ -78,16 +78,16 @@ function getReverseIndex(
 }
 
 function getXYToTarget({
-  deckBounds,
-  opponentBounds,
-}: Pick<AnimationContext, 'deckBounds' | 'opponentBounds'>) {
+  deckRect,
+  opponentRect,
+}: Pick<AnimationContext, 'deckRect' | 'opponentRect'>) {
   // we're measuring movement from the top left corner of the card, so we need to reduce its x
   // movement by the width of the card or the width of the target, depending on the direction
-  const cardDealDirection = getCardDealDirection({ deckBounds, opponentBounds });
-  const xOffset = cardDealDirection === 1 ? -deckBounds.width : opponentBounds.width;
+  const cardDealDirection = getCardDealDirection({ deckRect, opponentRect });
+  const xOffset = cardDealDirection === 1 ? -deckRect.width : opponentRect.width;
   return {
-    x: opponentBounds.x - deckBounds.x + xOffset,
-    y: opponentBounds.y - deckBounds.y,
+    x: opponentRect.x - deckRect.x + xOffset,
+    y: opponentRect.y - deckRect.y,
   };
 }
 
@@ -214,8 +214,8 @@ export function CardStackAnimation({
   currentCardIndex,
   event,
   onAnimationComplete,
-  deckBounds,
-  opponentBounds,
+  deckRect,
+  opponentRect,
 }: Props) {
   const [u, windowDimensions] = useUnits();
   const animationController = useSpringRef();
@@ -237,8 +237,8 @@ export function CardStackAnimation({
     currentCardIndex,
     event,
     onCardAnimationComplete,
-    deckBounds,
-    opponentBounds,
+    deckRect,
+    opponentRect,
     u,
     windowDimensions,
   };

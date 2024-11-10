@@ -89,6 +89,8 @@ export function BattleScreen({
 
   const startApplyCardEffects = useCallback(async () => {
     const events = await playCard();
+    // TODO: remove this, just say we're ending the turn when there's no events left or just
+    // shuffle left
     events.push(createBattleEvent('finishPlayingCard'));
     setBattleEvents(events);
   }, [playCard]);

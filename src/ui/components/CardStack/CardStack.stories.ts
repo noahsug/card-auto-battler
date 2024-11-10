@@ -1,28 +1,36 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { CardStack } from './CardStack';
+import { createBattleEvent, createCardEvent } from '../../../game/actions/battleEvent';
 import { getRandomCards } from '../../../game/utils/cards';
-import { CardState } from '../../../game/gameState';
+import { CardStack } from './CardStack';
 
 const meta = {
   title: 'CardStack',
   component: CardStack,
+  args: {
+    cards: getRandomCards(3),
+    currentCardIndex: 0,
+    opponentRect: new DOMRect(400, 200, 0, 0),
+    onAnimationComplete(type) {
+      console.log(type);
+    },
+  },
 } satisfies Meta<typeof CardStack>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function getStory(cards: CardState[]): Story {
-  return {
-    args: {
-      cards,
-      currentCardIndex: 0,
-      events: [],
-      targetElement: null,
-    },
-  };
-}
-
-export const ManyCards: Story = getStory(getRandomCards(20));
-export const SomeCards: Story = getStory(getRandomCards(5));
-export const CoupleCards: Story = getStory(getRandomCards(2));
+export const StartBattle: Story = {
+  args: {
+    events: [
+      createBattleEvent('startBattle'),
+      createCardEvent('playCard', 0),
+      createCardEvent('discardCard', 0),
+      createCardEvent('playCard', 1),
+      createCardEvent('trashCard', 1),
+      createCardEvent('playCard', 2),
+      createCardEvent('discardCard', 2),
+      createBattleEvent('shuffle'),
+    ],
+  },
+};

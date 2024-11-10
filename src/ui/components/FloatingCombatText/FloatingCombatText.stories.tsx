@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { styled } from 'styled-components';
-import { BattleEvent } from '../../../game/actions';
+import { BattleEvent } from '../../../game/actions/battleEvent';
 import { useRef } from 'react';
 import { FloatingCombatText, Props } from './FloatingCombatText';
 

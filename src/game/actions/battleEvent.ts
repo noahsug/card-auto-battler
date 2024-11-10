@@ -4,7 +4,7 @@ interface BattleEventShared {
   target: Target;
 }
 export interface SimpleBattleEvent extends BattleEventShared {
-  type: 'miss' | 'shuffle' | 'startBattle' | 'finishPlayingCard';
+  type: 'miss' | 'shuffle' | 'startBattle';
 }
 export interface BattleEventWithValue extends BattleEventShared {
   type: 'damage' | 'heal';
