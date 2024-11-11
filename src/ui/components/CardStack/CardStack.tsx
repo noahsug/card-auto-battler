@@ -57,6 +57,17 @@ export function CardStack(props: Props) {
   }
   const event = events.current[eventIndex];
 
+  // undo
+  useEffect(() => {
+    const undoIndex = events.current.findLastIndex((e) => e.type === 'undo');
+    if (eventIndex < undoIndex) {
+      setEventIndex(undoIndex);
+      cardPlayedTimeout.current && clearTimeout(cardPlayedTimeout.current);
+      cardPlayedTimeout.current = undefined;
+      return;
+    }
+  }, [eventIndex, props.events]);
+
   // handle calling onAnimationComplete when certain animations are finished
   useEffect(() => {
     // ensure we don't handle the same event twice
@@ -67,14 +78,6 @@ export function CardStack(props: Props) {
       return;
     }
     visitedEventInfo.current = { eventIndex, event };
-
-    // undo
-    const undoIndex = events.current.findLastIndex((e) => e.type === 'undo');
-    if (eventIndex < undoIndex) {
-      setEventIndex(undoIndex);
-      cardPlayedTimeout.current && clearTimeout(cardPlayedTimeout.current);
-      return;
-    }
 
     const prevEvent = events.current[eventIndex - 1];
     const nextEvent = events.current[eventIndex + 1];
@@ -99,7 +102,7 @@ export function CardStack(props: Props) {
         cardPlayedTimeout.current = undefined;
       }, 200);
     }
-  }, [props.events, event, eventIndex, onAnimationComplete]);
+  }, [event, eventIndex, onAnimationComplete]);
 
   const handleAnimationComplete = useCallback(() => {
     setEventIndex((prev) => prev + 1);
