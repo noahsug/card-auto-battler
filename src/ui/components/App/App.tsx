@@ -54,9 +54,7 @@ export function App() {
     async (screen: ScreenType) => {
       setScreen(screen);
       setOverlay('none');
-      if (screen === 'battle') {
-        clearUndo();
-      }
+      clearUndo();
     },
     [clearUndo],
   );

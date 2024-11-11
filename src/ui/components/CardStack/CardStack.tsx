@@ -8,6 +8,7 @@ import { CardStackAnimation } from './CardStackAnimation';
 import { useGetBoundingRect } from '../../hooks/useBoundingRect';
 
 const ANIMATED_EVENT_TYPES = new Set<BattleEvent['type']>([
+  'undo',
   'startBattle',
   'playCard',
   'discardCard',
@@ -42,19 +43,21 @@ export function CardStack(props: Props) {
   const boundingRect = getBoundingRect();
 
   const events = useRef<BattleEvent[]>([]);
-  const visitedEventLists = useRef(new Set<BattleEvent[]>());
   const [eventIndex, setEventIndex] = useState<number>(0);
+  const visitedEventLists = useRef(new Set<BattleEvent[]>());
+  const visitedEventInfo = useRef<{ eventIndex: number; event?: BattleEvent }>({ eventIndex: -1 });
+
+  const cardPlayedTimeout = useRef<NodeJS.Timeout>();
 
   // add new events to the animation queue
   if (!visitedEventLists.current.has(props.events)) {
     visitedEventLists.current.add(props.events);
-    events.current.push(...props.events.filter((e) => ANIMATED_EVENT_TYPES.has(e.type)));
+    const newEvents = props.events.filter((e) => ANIMATED_EVENT_TYPES.has(e.type));
+    events.current.push(...newEvents);
   }
   const event = events.current[eventIndex];
 
   // handle calling onAnimationComplete when certain animations are finished
-  const cardPlayedTimeout = useRef<NodeJS.Timeout>();
-  const visitedEventInfo = useRef<{ eventIndex: number; event?: BattleEvent }>({ eventIndex: -1 });
   useEffect(() => {
     // ensure we don't handle the same event twice
     if (
@@ -65,6 +68,14 @@ export function CardStack(props: Props) {
     }
     visitedEventInfo.current = { eventIndex, event };
 
+    // undo
+    const undoIndex = events.current.findLastIndex((e) => e.type === 'undo');
+    if (eventIndex < undoIndex) {
+      setEventIndex(undoIndex);
+      cardPlayedTimeout.current && clearTimeout(cardPlayedTimeout.current);
+      return;
+    }
+
     const prevEvent = events.current[eventIndex - 1];
     const nextEvent = events.current[eventIndex + 1];
 
@@ -74,6 +85,7 @@ export function CardStack(props: Props) {
     } else if (
       !event &&
       prevEvent &&
+      prevEvent?.type !== 'undo' &&
       prevEvent?.type !== 'shuffle' &&
       prevEvent?.type !== 'startBattle' &&
       prevEvent?.type !== 'playCard'
@@ -87,7 +99,7 @@ export function CardStack(props: Props) {
         cardPlayedTimeout.current = undefined;
       }, 200);
     }
-  }, [event, eventIndex, onAnimationComplete]);
+  }, [props.events, event, eventIndex, onAnimationComplete]);
 
   const handleAnimationComplete = useCallback(() => {
     setEventIndex((prev) => prev + 1);

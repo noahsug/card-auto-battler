@@ -115,7 +115,7 @@ function getBattleAnimation({
   u: UnitFn;
 }) {
   const { misses, damage } = summarizeBattleEvents(battleEvents);
-  if (damage === 0 && misses === 0) return null;
+  if (damage === 0 && misses === 0) return startPosition;
   if (misses > 0 && damage <= 0) return getDodgeAnimation({ u });
   if (damage < 0) return getHealAnimation({ u });
   return getDamageAnimation({ damage, direction, u });
@@ -158,27 +158,11 @@ export function PlayerProfile({ flip, battleEvents, src, handleRef, isDead }: Pr
 
   // animate battle events
   useEffect(() => {
-    if (isDead) return;
-
-    if (battleEvents.length > 0) {
-      const battleAnimation = getBattleAnimation({ battleEvents, direction, u });
-      if (battleAnimation) animationController.start(battleAnimation);
-    } else {
-      // reset when there are no battle events
-      animationController.set(startPosition);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animationController, battleEvents, direction, isDead]);
-
-  // animate death
-  useEffect(() => {
-    if (!isDead) return;
-
-    animationController.start(
-      getDeathAnimation({ u, direction, windowWidth: windowDimensions.width }),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animationController, isDead, direction]);
+    const animation = isDead
+      ? getDeathAnimation({ u, direction, windowWidth: windowDimensions.width })
+      : getBattleAnimation({ battleEvents, direction, u });
+    animationController.start(animation);
+  }, [animationController, battleEvents, direction, isDead, u, windowDimensions.width]);
 
   const filter = to(
     [animationProps.hue, animationProps.brightness],

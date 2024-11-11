@@ -59,6 +59,7 @@ export function BattleScreen({
   const [isPaused, setIsPaused] = useState(true);
   const nextAnimationState = useRef<AnimationState>('startTurn');
 
+  // TODO: make certain battle events not have a target (startBattle, undo)
   const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([
     createBattleEvent('startBattle', 'self'),
     createBattleEvent('startBattle', 'opponent'),
@@ -115,10 +116,10 @@ export function BattleScreen({
     setIsPaused((prev) => !prev);
   }, [canPlayNextCard, startNextTurn]);
 
-  // TODO: handle undo animations
   const handleUndo = useCallback(() => {
     undo();
-    setBattleEvents([createBattleEvent('undo')]);
+    nextAnimationState.current = 'startTurn';
+    setBattleEvents([createBattleEvent('undo', 'self'), createBattleEvent('undo', 'opponent')]);
     setIsPaused(true);
   }, [undo]);
 
@@ -174,13 +175,13 @@ export function BattleScreen({
             events={userBattleEvents}
             opponentBoundingRect={getEnemyProfileBoundingRect()}
           />
-          <CardStack
+          {/* <CardStack
             cards={enemy.cards}
             currentCardIndex={enemy.currentCardIndex}
             onAnimationComplete={enemyHandleAnimationComplete}
             events={enemyBattleEvents}
             opponentBoundingRect={getUserProfileBoundingRect()}
-          />
+          /> */}
         </ContentRow>
       </CenterContent>
 

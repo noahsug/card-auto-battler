@@ -36,9 +36,12 @@ export function useGameState() {
       const { promise, resolve } = getResolvablePromise<ReturnType<Action>>();
       acc[name] = (...args: Tail<Parameters<Action>>) => {
         setGameState((gameState) => {
-          setPast((past) => {
-            return [...past, gameState];
-          });
+          // only allow undoing to a previous startTurn event
+          if (name === 'startTurn') {
+            setPast((past) => {
+              return [...past, gameState];
+            });
+          }
           return produce(gameState, (draft) => {
             resolve(action(draft, ...args));
           });
@@ -47,7 +50,7 @@ export function useGameState() {
       };
       return acc;
     }, {} as BoundActions);
-    // without this dep, actions somehow return memoized results
+    // without this dep, actions return memoized results for some reason
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState]);
 
