@@ -54,23 +54,29 @@ export function CardStack(props: Props) {
 
   // handle calling onAnimationComplete when certain animations are finished
   const cardPlayedTimeout = useRef<NodeJS.Timeout>();
-  const handledEventIndex = useRef<number>(-1);
+  const visitedEventInfo = useRef<{ eventIndex: number; event?: BattleEvent }>({ eventIndex: -1 });
   useEffect(() => {
     // ensure we don't handle the same event twice
-    if (eventIndex === handledEventIndex.current) return;
-    handledEventIndex.current = eventIndex;
+    if (
+      eventIndex === visitedEventInfo.current.eventIndex &&
+      event === visitedEventInfo.current.event
+    ) {
+      return;
+    }
+    visitedEventInfo.current = { eventIndex, event };
 
     const prevEvent = events.current[eventIndex - 1];
-    const nextEventType = events.current[eventIndex + 1]?.type;
+    const nextEvent = events.current[eventIndex + 1];
 
-    if (event?.type === 'shuffle' && !nextEventType) {
+    if (event?.type === 'shuffle' && !nextEvent) {
       // end the animation early if all we have left to do is shuffle the cards
       onAnimationComplete();
     } else if (
       !event &&
       prevEvent &&
       prevEvent?.type !== 'shuffle' &&
-      prevEvent?.type !== 'startBattle'
+      prevEvent?.type !== 'startBattle' &&
+      prevEvent?.type !== 'playCard'
     ) {
       // end the animation if there are no events left (unless we already ended it early due to
       // not waiting for the shuffle animation or we're starting the battle)

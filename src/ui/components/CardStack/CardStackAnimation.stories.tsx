@@ -52,7 +52,7 @@ export const Primary: Story = {
     ],
     cards: getRandomCards(3),
     currentCardIndex: 0,
-    deckRect: new DOMRect(0, 0, 0, 0),
-    opponentRect: new DOMRect(100, -100, 0, 0),
+    deckBoundingRect: new DOMRect(0, 0, 0, 0),
+    opponentBoundingRect: new DOMRect(100, -100, 0, 0),
   },
 };

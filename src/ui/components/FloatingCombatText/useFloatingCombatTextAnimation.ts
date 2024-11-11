@@ -73,7 +73,7 @@ export function useFloatingCombatTextAnimation({ battleEvents, targetBoundingRec
       enter: (textAnimation: AnimationData) => getAnimationEnd(textAnimation, context),
       leave: (textAnimation: AnimationData) => getAnimationEnd(textAnimation, context),
     },
-    [],
+    [animations],
   );
 
   useEffect(() => {

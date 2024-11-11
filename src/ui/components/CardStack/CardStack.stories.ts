@@ -10,9 +10,9 @@ const meta = {
   args: {
     cards: getRandomCards(3),
     currentCardIndex: 0,
-    opponentRect: new DOMRect(400, 200, 0, 0),
-    onAnimationComplete(type) {
-      console.log(type);
+    opponentBoundingRect: new DOMRect(400, 200, 0, 0),
+    onAnimationComplete() {
+      console.log('animation complete');
     },
   },
 } satisfies Meta<typeof CardStack>;
@@ -20,7 +20,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const StartBattle: Story = {
+export const PlayCard: Story = {
+  args: {
+    events: [createCardEvent('playCard', 0)],
+  },
+};
+
+export const TakeTurn: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
