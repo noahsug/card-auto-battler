@@ -89,6 +89,7 @@ export function BattleScreen({
   }, [activePlayer.cards, activePlayer.currentCardIndex, startTurn]);
 
   const handleAnimationComplete = useCallback(async () => {
+    if (isBattleOver) return;
     if (nextAnimationState.current === 'applyCardEffects') {
       const events = await playCard();
       setBattleEvents(events);
@@ -102,7 +103,7 @@ export function BattleScreen({
         startNextTurn();
       }
     }
-  }, [endTurn, isPaused, playCard, startNextTurn]);
+  }, [endTurn, isBattleOver, isPaused, playCard, startNextTurn]);
 
   const canTogglePlayPause = !isBattleOver && !hasOverlay;
   const canPlayNextCard =
@@ -183,13 +184,13 @@ export function BattleScreen({
             events={userBattleEvents}
             opponentBoundingRect={getEnemyProfileBoundingRect()}
           />
-          {/* <CardStack
+          <CardStack
             cards={enemy.cards}
             currentCardIndex={enemy.currentCardIndex}
             onAnimationComplete={enemyHandleAnimationComplete}
             events={enemyBattleEvents}
-            opponentRect={userProfileElement?.getBoundingClientRect()}
-          /> */}
+            opponentBoundingRect={getUserProfileBoundingRect()}
+          />
         </ContentRow>
       </CenterContent>
 
