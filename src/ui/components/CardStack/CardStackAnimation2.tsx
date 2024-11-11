@@ -15,7 +15,7 @@ import { wait } from '../../../utils/wait';
 export interface Props {
   cards: CardState[];
   currentCardIndex: number;
-  event?: BattleEvent;
+  event: BattleEvent | undefined;
   onAnimationComplete: () => void;
   deckRect: DOMRect;
   opponentRect: DOMRect;

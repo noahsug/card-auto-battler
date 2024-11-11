@@ -22,7 +22,7 @@ import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
 
-export type AnimationState = 'startTurn' | 'applyCardEffects' | 'endTurn';
+type AnimationState = 'startTurn' | 'applyCardEffects' | 'endTurn';
 
 interface Props {
   game: GameState;
@@ -55,7 +55,7 @@ export function BattleScreen({
   const [enemyProfileElement, setEnemyProfileElement] = useState<HTMLDivElement | null>(null);
 
   const [isPaused, setIsPaused] = useState(true);
-  const [isWaitingForAnimation, setIsWaitingForAnimation] = useState(false);
+  const animationState = useRef<AnimationState>('startTurn');
 
   const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([
     createBattleEvent('startBattle', 'self'),
@@ -84,40 +84,28 @@ export function BattleScreen({
       events.push(createCardEvent('playCard', card.acquiredId));
     }
     setBattleEvents(events);
-    setIsWaitingForAnimation(true);
+    animationState.current = 'applyCardEffects';
   }, [activePlayer.cards, activePlayer.currentCardIndex, startTurn]);
 
-  const startApplyCardEffects = useCallback(async () => {
-    const events = await playCard();
-    // TODO: remove this, just say we're ending the turn when there's no events left or just
-    // shuffle left
-    events.push(createBattleEvent('finishPlayingCard'));
-    setBattleEvents(events);
-  }, [playCard]);
-
-  const handleFinishPlayingCard = useCallback(() => {
-    endTurn();
-    setBattleEvents([]);
-    if (isPaused) {
-      setIsWaitingForAnimation(false);
-    } else {
-      startNextTurn();
-    }
-  }, [endTurn, isPaused, startNextTurn]);
-
-  const handleAnimationComplete = useCallback(
-    async (type: BattleEvent['type']) => {
-      if (type === 'playCard') {
-        startApplyCardEffects();
-      } else if (type === 'finishPlayingCard') {
-        handleFinishPlayingCard();
+  const handleAnimationComplete = useCallback(async () => {
+    console.log('handleAnimationComplete', animationState.current);
+    if (animationState.current === 'applyCardEffects') {
+      const events = await playCard();
+      setBattleEvents(events);
+      animationState.current = 'endTurn';
+    } else if (animationState.current === 'endTurn') {
+      endTurn();
+      setBattleEvents([]);
+      if (isPaused) {
+        animationState.current = 'startTurn';
+      } else {
+        startNextTurn();
       }
-    },
-    [handleFinishPlayingCard, startApplyCardEffects],
-  );
+    }
+  }, [endTurn, isPaused, playCard, startNextTurn]);
 
   const canTogglePlayPause = !isBattleOver && !hasOverlay;
-  const canPlayNextCard = canTogglePlayPause && isPaused && !isWaitingForAnimation;
+  const canPlayNextCard = canTogglePlayPause && isPaused && animationState.current === 'startTurn';
 
   // TODO: Remove and make this fast forward instead?
   const handlePlayNextCard = useCallback(async () => {
@@ -125,13 +113,13 @@ export function BattleScreen({
   }, [startNextTurn]);
 
   const handleTogglePlayPause = useCallback(() => {
-    setIsPaused((isCurrentlyPaused) => {
-      if (isCurrentlyPaused && !isWaitingForAnimation) {
+    setIsPaused((prevIsPaused) => {
+      if (prevIsPaused && animationState.current === 'startTurn') {
         startNextTurn();
       }
-      return !isCurrentlyPaused;
+      return !prevIsPaused;
     });
-  }, [isWaitingForAnimation, startNextTurn]);
+  }, [startNextTurn]);
 
   // change combat state based only on the active player animations
   const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : doNothing;
@@ -194,7 +182,7 @@ export function BattleScreen({
             currentCardIndex={user.currentCardIndex}
             onAnimationComplete={userHandleAnimationComplete}
             events={userBattleEvents}
-            targetElement={enemyProfileElement}
+            opponentRect={enemyProfileElement?.getBoundingClientRect()}
           />
           {/* <CardStack
             cards={enemy.cards}

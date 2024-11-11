@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { BattleEvent } from '../../../game/actions/battleEvent';
@@ -15,14 +15,12 @@ const ANIMATED_EVENT_TYPES = new Set<BattleEvent['type']>([
   'addTemporaryCard',
 ]);
 
-export type AnimationCompleteEvent = 'applyCardEffects' | 'playCard';
-
 interface Props {
   cards: CardState[];
   currentCardIndex: number;
   events: BattleEvent[];
-  onAnimationComplete: (type: AnimationCompleteEvent) => void;
-  opponentRect: DOMRect | null;
+  onAnimationComplete: () => void;
+  opponentRect: DOMRect | undefined;
 }
 
 const cardSize = {
@@ -43,53 +41,50 @@ export function CardStack(props: Props) {
 
   const events = useRef<BattleEvent[]>([]);
   const visitedEventLists = useRef(new Set<BattleEvent[]>());
-  const [eventIndex, setEventIndex] = useState<number>(-1);
-
-  const cardPlayedTimeout = useRef<NodeJS.Timeout | null>(null);
-
-  const handleNextEvent = useCallback(() => {
-    const finishedEventType = events.current[eventIndex]?.type;
-    const nextEventType = events.current[eventIndex + 1]?.type;
-    const nextNextEventType = events.current[eventIndex + 2]?.type;
-    setEventIndex((prev) => prev + 1);
-
-    if (nextEventType === 'shuffle' && !nextNextEventType) {
-      // end the animation early if all we have left to do is shuffle the cards
-      onAnimationComplete('applyCardEffects');
-    } else if (
-      !nextEventType &&
-      finishedEventType !== 'shuffle' &&
-      finishedEventType !== 'startBattle'
-    ) {
-      // end the animation if there are no events left (unless we already ended it early due to
-      // not waiting for the shuffle animation or we're starting the battle)
-      onAnimationComplete('applyCardEffects');
-    } else if (nextEventType === 'playCard') {
-      cardPlayedTimeout.current = setTimeout(() => {
-        onAnimationComplete('playCard');
-      }, 200);
-    }
-  }, [eventIndex, onAnimationComplete]);
+  const [eventIndex, setEventIndex] = useState<number>(0);
 
   // add new events to the animation queue
   if (!visitedEventLists.current.has(props.events)) {
     visitedEventLists.current.add(props.events);
-    const prevEvent = events.current[eventIndex];
     events.current.push(...props.events.filter((e) => ANIMATED_EVENT_TYPES.has(e.type)));
-    if (!prevEvent) {
-      handleNextEvent();
-    }
   }
+  const event = events.current[eventIndex];
+
+  // handle calling onAnimationComplete when certain animations are finished
+  const cardPlayedTimeout = useRef<NodeJS.Timeout>();
+  useEffect(() => {
+    const prevEvent = events.current[eventIndex - 1];
+    const nextEventType = events.current[eventIndex + 1]?.type;
+
+    if (event?.type === 'shuffle' && !nextEventType) {
+      // end the animation early if all we have left to do is shuffle the cards
+      onAnimationComplete();
+    } else if (
+      !event &&
+      prevEvent &&
+      prevEvent?.type !== 'shuffle' &&
+      prevEvent?.type !== 'startBattle'
+    ) {
+      // end the animation if there are no events left (unless we already ended it early due to
+      // not waiting for the shuffle animation or we're starting the battle)
+      onAnimationComplete();
+    } else if (event?.type === 'playCard' && cardPlayedTimeout.current == null) {
+      cardPlayedTimeout.current = setTimeout(() => {
+        onAnimationComplete();
+        cardPlayedTimeout.current = undefined;
+      }, 200);
+    }
+  }, [event, eventIndex, onAnimationComplete]);
 
   return (
     <Root ref={setContainer}>
       {container && opponentRect && (
         <CardStackAnimation
           {...props}
-          event={events.current[eventIndex]}
+          event={event}
           deckRect={container.getBoundingClientRect()}
           opponentRect={opponentRect}
-          onAnimationComplete={handleNextEvent}
+          onAnimationComplete={() => setEventIndex((prev) => prev + 1)}
         />
       )}
     </Root>
