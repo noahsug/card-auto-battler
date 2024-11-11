@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { BattleEvent, createBattleEvent, createCardEvent } from '../../../game/actions/battleEvent';
 import { getRandomCards } from '../../../game/utils/cards';
 import { CardStackAnimation, Props } from './CardStackAnimation';
+import { useTimeout } from '../../hooks/useTimeout';
 
 const Container = styled.div`
   position: relative;
@@ -14,11 +15,19 @@ const Container = styled.div`
 
 function CardStackAnimationTest({
   events,
+  undoAfterMs,
   ...props
-}: { events: BattleEvent[] } & Omit<Props, 'event' | 'onAnimationComplete'>) {
+}: { events: BattleEvent[]; undoAfterMs?: number } & Omit<Props, 'event' | 'onAnimationComplete'>) {
   const [event, setEvent] = useState<BattleEvent | undefined>(events[0]);
+  const undoTimeout = useRef<NodeJS.Timeout>();
+  if (undoAfterMs != null && undoTimeout.current == null) {
+    undoTimeout.current = setTimeout(() => {
+      setEvent(createBattleEvent('undo'));
+    }, undoAfterMs);
+  }
 
   function onAnimationComplete() {
+    console.log('animation complete');
     events.shift();
     setEvent(events[0]);
   }
@@ -33,12 +42,18 @@ function CardStackAnimationTest({
 const meta = {
   title: 'CardStackAnimation',
   component: CardStackAnimationTest,
+  args: {
+    cards: getRandomCards(3),
+    currentCardIndex: 0,
+    deckBoundingRect: new DOMRect(0, 0, 0, 0),
+    opponentBoundingRect: new DOMRect(100, -100, 0, 0),
+  },
 } satisfies Meta<typeof CardStackAnimationTest>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {
+export const TakeTurn: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
@@ -50,9 +65,23 @@ export const Primary: Story = {
       createCardEvent('discardCard', 2),
       createBattleEvent('shuffle'),
     ],
-    cards: getRandomCards(3),
-    currentCardIndex: 0,
-    deckBoundingRect: new DOMRect(0, 0, 0, 0),
-    opponentBoundingRect: new DOMRect(100, -100, 0, 0),
+  },
+};
+
+export const Undo: Story = {
+  args: {
+    events: [
+      createBattleEvent('startBattle'),
+      createCardEvent('playCard', 0),
+      createCardEvent('discardCard', 0),
+      createBattleEvent('undo'),
+    ],
+  },
+};
+
+export const SurpriseUndo: Story = {
+  args: {
+    events: [createBattleEvent('startBattle'), createCardEvent('playCard', 0)],
+    undoAfterMs: 1600,
   },
 };

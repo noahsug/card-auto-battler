@@ -71,13 +71,6 @@ export function BattleScreen({
     ];
   }, [battleEvents, userTarget, enemyTarget]);
 
-  // TODO: handle undo animations
-  const handleUndo = useCallback(() => {
-    undo();
-    setBattleEvents([]);
-    setIsPaused(true);
-  }, [undo]);
-
   const startNextTurn = useCallback(async () => {
     const events = await startTurn();
     const card = activePlayer.cards[activePlayer.currentCardIndex];
@@ -121,6 +114,13 @@ export function BattleScreen({
     }
     setIsPaused((prev) => !prev);
   }, [canPlayNextCard, startNextTurn]);
+
+  // TODO: handle undo animations
+  const handleUndo = useCallback(() => {
+    undo();
+    setBattleEvents([createBattleEvent('undo')]);
+    setIsPaused(true);
+  }, [undo]);
 
   // change combat state based only on the active player animations
   const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : doNothing;

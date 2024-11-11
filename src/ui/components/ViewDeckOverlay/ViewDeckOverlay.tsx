@@ -14,7 +14,7 @@ const BackButton = styled(Button)`
   margin-bottom: 0.5rem;
 `;
 
-// // TODO: clicking on a card expands the card, clicking anywhere else closes the overlay
+// TODO: clicking on a card expands the card, clicking anywhere else closes the overlay
 // function handleClick(event: React.MouseEvent) {
 //   if ('classList' in event.target) {
 //     console.log(event.target.classList);

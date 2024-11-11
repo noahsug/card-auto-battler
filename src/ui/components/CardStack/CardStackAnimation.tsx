@@ -1,16 +1,16 @@
-import { useSpringRef, useTransition, animated, config, easings } from '@react-spring/web';
-import { useRef, useEffect } from 'react';
+import { animated, config, easings, useTransition } from '@react-spring/web';
 import random from 'lodash/random';
+import { useEffect, useRef } from 'react';
 import { styled } from 'styled-components';
 
-import { CardState } from '../../../game/gameState';
 import { BattleEvent, CardBattleEvent } from '../../../game/actions/battleEvent';
-import { UnitFn, useUnits, WindowDimensions } from '../../hooks/useUnits';
-import { Card } from '../Card';
+import { CardState } from '../../../game/gameState';
 import { assertIsNonNullable } from '../../../utils/asserts';
 import { Direction } from '../../../utils/types';
+import { cancelableWait, wait } from '../../../utils/wait';
 import { Z_INDEX } from '../../constants';
-import { wait } from '../../../utils/wait';
+import { UnitFn, useUnits, WindowDimensions } from '../../hooks/useUnits';
+import { Card } from '../Card';
 
 export interface Props {
   cards: CardState[];
@@ -32,6 +32,7 @@ interface CardAnimationState {
   deckIndex: number;
   inDiscard: boolean;
   isAnimating: boolean;
+  cancelWait?: () => void;
 }
 
 function createCardAnimationState(
@@ -61,6 +62,11 @@ interface AnimationContext {
 
 function syncZIndex(cardAnimation: CardAnimationState, context: AnimationContext) {
   cardAnimation.deckIndex = context.cards.findIndex((c) => c.acquiredId === cardAnimation.cardId);
+}
+
+function syncCard(cardAnimation: CardAnimationState, context: AnimationContext) {
+  syncZIndex(cardAnimation, context);
+  cardAnimation.inDiscard = cardAnimation.deckIndex < context.currentCardIndex;
 }
 
 function getCardDealDirection({
@@ -94,16 +100,19 @@ function getXYToTarget({
   };
 }
 
+function getZIndex(cardAnimation: CardAnimationState, context: AnimationContext) {
+  return Z_INDEX.cards + getReverseIndex(cardAnimation, context);
+}
+
 function getDiscardPosition(cardAnimation: CardAnimationState, context: AnimationContext) {
   const cardDealDirection = getCardDealDirection(context);
-  const reverseIndex = getReverseIndex(cardAnimation, context);
   return {
     x: context.windowDimensions.width * -cardDealDirection,
     y: 0,
     rotate: 0,
     scale: 1.5,
     opacity: 1,
-    zIndex: Z_INDEX.cards + reverseIndex,
+    zIndex: getZIndex(cardAnimation, context),
   };
 }
 
@@ -126,7 +135,6 @@ function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) 
   const reverseIndex = cards.length - 1 - cardAnimation.deckIndex;
 
   return async (next: (options: object) => Promise<void>) => {
-    // set z-index
     const discardPosition = getDiscardPosition(cardAnimation, context);
     await next({
       ...discardPosition,
@@ -150,15 +158,14 @@ function playCard(cardAnimation: CardAnimationState, context: AnimationContext) 
 
   const { x, y } = getXYToTarget(context);
   return async (next: (options: object) => Promise<void>) => {
-    // const deckPosition = getDeckPosition(cardAnimation, context);
-    // await next({
-    //   ...deckPosition,
-    //   immediate: true,
-    // });
-
     await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff } });
-    await wait(500);
-    onCardAnimationComplete(cardAnimation);
+
+    const [promise, cancel, getIsCanceled] = cancelableWait(5000);
+    cardAnimation.cancelWait = cancel;
+    await promise;
+    if (!getIsCanceled()) {
+      onCardAnimationComplete(cardAnimation);
+    }
   };
 }
 
@@ -167,9 +174,6 @@ function discardCard(cardAnimation: CardAnimationState, context: AnimationContex
 
   return async (next: (options: object) => Promise<void>) => {
     await next({ y: u(-1000), rotate: 0, config: { duration: 300, easing: easings.easeInBack } });
-
-    const discardPosition = getDiscardPosition(cardAnimation, context);
-    await next({ ...discardPosition, config: { duration: 0 } });
 
     cardAnimation.inDiscard = true;
     onCardAnimationComplete(cardAnimation);
@@ -181,6 +185,24 @@ function trashCard(cardAnimation: CardAnimationState, context: AnimationContext)
 
   return async (next: (options: object) => Promise<void>) => {
     await next({ opacity: 0, config: config.default });
+    onCardAnimationComplete(cardAnimation);
+  };
+}
+
+function returnCardToCorrectPosition(cardAnimation: CardAnimationState, context: AnimationContext) {
+  console.log('undo');
+  const { onCardAnimationComplete } = context;
+
+  return async (next: (options: object) => Promise<void>) => {
+    const position = cardAnimation.inDiscard
+      ? getDiscardPosition(cardAnimation, context)
+      : getDeckPosition(cardAnimation, context);
+
+    await next({
+      ...position,
+      zIndex: getZIndex(cardAnimation, context),
+      config: { ...config.stiff, clamp: true },
+    });
 
     onCardAnimationComplete(cardAnimation);
   };
@@ -212,6 +234,11 @@ function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
   ) {
     syncZIndex(cardAnimation, context);
     return dealCard(cardAnimation, context);
+  }
+
+  if (event.type === 'undo') {
+    syncCard(cardAnimation, context);
+    return returnCardToCorrectPosition(cardAnimation, context);
   }
 
   cardAnimation.isAnimating = false;
@@ -261,6 +288,13 @@ export function CardStackAnimation({
     },
     [event],
   );
+
+  if (event?.type === 'undo') {
+    animationController.stop();
+    cardAnimationsRef.current.forEach((c) => {
+      c.cancelWait?.();
+    });
+  }
 
   useEffect(() => {
     animationController.start();

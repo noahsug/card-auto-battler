@@ -170,7 +170,6 @@ export function PlayerProfile({ flip, battleEvents, src, handleRef, isDead }: Pr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [animationController, battleEvents, direction, isDead]);
 
-  // TODO: can we combine this useEffect with the one above?
   // animate death
   useEffect(() => {
     if (!isDead) return;
