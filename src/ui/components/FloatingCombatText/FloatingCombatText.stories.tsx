@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { styled } from 'styled-components';
 import { BattleEvent } from '../../../game/actions/battleEvent';
-import { useRef } from 'react';
-import { FloatingCombatText, Props } from './FloatingCombatText';
+import { FloatingCombatText } from './FloatingCombatText';
 
 const meta = {
   title: 'FloatingCombatText',
@@ -13,30 +11,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const Container = styled.div`
-  width: 100px;
-  height: 100px;
-  position: relative;
-`;
-
-function TargetWithFloatingCombatText(props: Omit<Props, 'targetElement'>) {
-  const targetRef = useRef(null);
-  return (
-    <>
-      <Container>
-        <FloatingCombatText {...props} targetElement={targetRef.current} />
-      </Container>
-    </>
-  );
-}
-
 function getStory(battleEvents: BattleEvent[]): Story {
   return {
     args: {
       battleEvents,
-      targetElement: null,
+      targetBoundingRect: new DOMRect(200, 200, 200, 200),
     },
-    render: ({ battleEvents }) => <TargetWithFloatingCombatText battleEvents={battleEvents} />,
   };
 }
 

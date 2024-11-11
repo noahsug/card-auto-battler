@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { createBattleEvent, createCardEvent } from '../../../game/actions/battleEvent';
 import { getRandomCards } from '../../../game/utils/cards';
 import { CardStack } from './CardStack';
+import { fn } from '@storybook/test';
 
 const meta = {
   title: 'CardStack',
