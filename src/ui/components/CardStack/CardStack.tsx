@@ -4,7 +4,7 @@ import { styled } from 'styled-components';
 import { BattleEvent } from '../../../game/actions/battleEvent';
 import { CardState } from '../../../game/gameState';
 import { baseCardSize, cardSizeScaling } from '../Card';
-import { CardStackAnimation } from './CardStackAnimation2';
+import { CardStackAnimation } from './CardStackAnimation';
 import { useGetBoundingRect } from '../../hooks/useBoundingRect';
 
 const ANIMATED_EVENT_TYPES = new Set<BattleEvent['type']>([

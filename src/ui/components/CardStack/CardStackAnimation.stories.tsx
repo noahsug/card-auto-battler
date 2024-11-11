@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { styled } from 'styled-components';
 import { BattleEvent, createBattleEvent, createCardEvent } from '../../../game/actions/battleEvent';
 import { getRandomCards } from '../../../game/utils/cards';
-import { CardStackAnimation, Props } from './CardStackAnimation2';
+import { CardStackAnimation, Props } from './CardStackAnimation';
 
 const Container = styled.div`
   position: relative;
