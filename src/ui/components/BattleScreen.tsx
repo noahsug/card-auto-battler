@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { BattleEvent, createCardEvent, createBattleEvent } from '../../game/actions/battleEvent';
+import { BattleEvent, createBattleEvent, createCardEvent } from '../../game/actions/battleEvent';
 import { GameState } from '../../game/gameState';
 import {
   getActivePlayer,
@@ -10,7 +10,9 @@ import {
   getPlayerTargets,
 } from '../../game/utils/selectors';
 import { doNothing } from '../../utils/functions';
+import { useGetBoundingRect } from '../hooks/useBoundingRect';
 import { CanUndo, EndTurn, PlayCard, StartTurn, Undo } from '../hooks/useGameState';
+import { useTimeout } from '../hooks/useTimeout';
 import { BattleControls } from './BattleControls';
 import { CardStack } from './CardStack';
 import { FloatingCombatText } from './FloatingCombatText';
@@ -21,7 +23,6 @@ import { CenterContent } from './shared/CenterContent';
 import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
-import { useGetBoundingRect } from '../hooks/useBoundingRect';
 
 type AnimationState = 'startTurn' | 'applyCardEffects' | 'endTurn';
 
@@ -125,18 +126,7 @@ export function BattleScreen({
   const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : doNothing;
   const enemyHandleAnimationComplete = getIsUserTurn(game) ? doNothing : handleAnimationComplete;
 
-  // TODO: replace with useTimeout
-  const endBattleTimeout = useRef<NodeJS.Timeout>();
-  if (!isBattleOver) {
-    clearTimeout(endBattleTimeout.current);
-    endBattleTimeout.current = undefined;
-  }
-  useEffect(() => {
-    if (isBattleOver && endBattleTimeout.current == null) {
-      endBattleTimeout.current = setTimeout(onBattleOver, 1500);
-    }
-    return () => clearTimeout(endBattleTimeout.current);
-  }, [isBattleOver, onBattleOver]);
+  useTimeout(onBattleOver, 1500, { enabled: isBattleOver });
 
   return (
     <Container>
