@@ -24,7 +24,7 @@ export const basicCards = {
   attack: createCard(
     [
       {
-        value: v(50),
+        value: v(5),
       },
     ],
     {

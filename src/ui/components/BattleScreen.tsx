@@ -175,13 +175,13 @@ export function BattleScreen({
             events={userBattleEvents}
             opponentBoundingRect={getEnemyProfileBoundingRect()}
           />
-          {/* <CardStack
+          <CardStack
             cards={enemy.cards}
             currentCardIndex={enemy.currentCardIndex}
             onAnimationComplete={enemyHandleAnimationComplete}
             events={enemyBattleEvents}
             opponentBoundingRect={getUserProfileBoundingRect()}
-          /> */}
+          />
         </ContentRow>
       </CenterContent>
 

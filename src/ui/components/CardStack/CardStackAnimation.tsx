@@ -5,7 +5,6 @@ import { styled } from 'styled-components';
 
 import { BattleEvent, CardBattleEvent } from '../../../game/actions/battleEvent';
 import { CardState } from '../../../game/gameState';
-import { assertIsNonNullable } from '../../../utils/asserts';
 import { Direction } from '../../../utils/types';
 import { cancelableWait } from '../../../utils/wait';
 import { Z_INDEX } from '../../constants';
@@ -27,7 +26,7 @@ const AnimatedContainer = styled(animated.div)`
 `;
 
 interface CardAnimationState {
-  cardId: number;
+  card: CardState;
   rotation: number;
   deckIndex: number;
   inDiscard: boolean;
@@ -41,7 +40,7 @@ function createCardAnimationState(
   currentCardIndex: number,
 ): CardAnimationState {
   return {
-    cardId: card.acquiredId,
+    card,
     deckIndex,
     rotation: random(-10, 10),
     inDiscard: deckIndex < currentCardIndex,
@@ -61,7 +60,9 @@ interface AnimationContext {
 }
 
 function syncZIndex(cardAnimation: CardAnimationState, context: AnimationContext) {
-  cardAnimation.deckIndex = context.cards.findIndex((c) => c.acquiredId === cardAnimation.cardId);
+  cardAnimation.deckIndex = context.cards.findIndex(
+    (c) => c.acquiredId === cardAnimation.card.acquiredId,
+  );
 }
 
 function syncCard(cardAnimation: CardAnimationState, context: AnimationContext) {
@@ -216,7 +217,7 @@ function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
 
   cardAnimation.isAnimating = true;
 
-  if ((event as CardBattleEvent).cardId === cardAnimation.cardId) {
+  if ((event as CardBattleEvent).cardId === cardAnimation.card.acquiredId) {
     switch (event.type) {
       case 'playCard':
         return playCard(cardAnimation, context);
@@ -280,7 +281,7 @@ export function CardStackAnimation({
   const [render, animationController] = useTransition(
     cardAnimationsRef.current,
     {
-      key: (c: CardAnimationState) => c.cardId,
+      key: (c: CardAnimationState) => c.card.acquiredId,
       from: (c: CardAnimationState) => getDiscardPosition(c, context),
       enter: (c: CardAnimationState) => animate(c, context),
       update: (c: CardAnimationState) => animate(c, context),
@@ -299,9 +300,7 @@ export function CardStackAnimation({
     animationController.start();
   }, [animationController, event]);
 
-  return render((style, { cardId }) => {
-    const card = cards.find((c) => c.acquiredId === cardId);
-    assertIsNonNullable(card);
+  return render((style, { card }) => {
     return (
       <AnimatedContainer style={style}>
         <Card card={card} size="medium" />
