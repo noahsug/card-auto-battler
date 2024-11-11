@@ -27,7 +27,6 @@ function CardStackAnimationTest({
   }
 
   function onAnimationComplete() {
-    console.log('animation complete');
     events.shift();
     setEvent(events[0]);
   }
@@ -68,7 +67,7 @@ export const TakeTurn: Story = {
   },
 };
 
-export const Undo: Story = {
+export const UndoPlayCard: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
@@ -79,7 +78,18 @@ export const Undo: Story = {
   },
 };
 
-export const SurpriseUndo: Story = {
+export const UndoTrashCard: Story = {
+  args: {
+    events: [
+      createBattleEvent('startBattle'),
+      createCardEvent('playCard', 0),
+      createCardEvent('trashCard', 0),
+      createBattleEvent('undo'),
+    ],
+  },
+};
+
+export const UndoMidPlayCard: Story = {
   args: {
     events: [createBattleEvent('startBattle'), createCardEvent('playCard', 0)],
     undoAfterMs: 1600,

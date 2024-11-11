@@ -7,7 +7,7 @@ import { BattleEvent, CardBattleEvent } from '../../../game/actions/battleEvent'
 import { CardState } from '../../../game/gameState';
 import { assertIsNonNullable } from '../../../utils/asserts';
 import { Direction } from '../../../utils/types';
-import { cancelableWait, wait } from '../../../utils/wait';
+import { cancelableWait } from '../../../utils/wait';
 import { Z_INDEX } from '../../constants';
 import { UnitFn, useUnits, WindowDimensions } from '../../hooks/useUnits';
 import { Card } from '../Card';
@@ -160,7 +160,7 @@ function playCard(cardAnimation: CardAnimationState, context: AnimationContext) 
   return async (next: (options: object) => Promise<void>) => {
     await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff } });
 
-    const [promise, cancel, getIsCanceled] = cancelableWait(5000);
+    const [promise, cancel, getIsCanceled] = cancelableWait(500);
     cardAnimation.cancelWait = cancel;
     await promise;
     if (!getIsCanceled()) {
@@ -190,7 +190,6 @@ function trashCard(cardAnimation: CardAnimationState, context: AnimationContext)
 }
 
 function returnCardToCorrectPosition(cardAnimation: CardAnimationState, context: AnimationContext) {
-  console.log('undo');
   const { onCardAnimationComplete } = context;
 
   return async (next: (options: object) => Promise<void>) => {
