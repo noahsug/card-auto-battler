@@ -60,14 +60,14 @@ function getTextFromBattleEvent(battleEvent: BattleEvent) {
   }
 }
 
-export function FloatingCombatText({ battleEvents, targetElement: target }: Props) {
+export function FloatingCombatText({ battleEvents, targetBoundingRect }: Props) {
   const battleEventsWithFCT = useMemo(
     () => battleEvents.filter((event) => battleEventsTypesWithFCT.has(event.type)),
     [battleEvents],
   );
   const render = useFloatingCombatTextAnimation({
     battleEvents: battleEventsWithFCT,
-    targetElement: target,
+    targetBoundingRect,
   });
 
   return render((style, { battleEvent }) => (

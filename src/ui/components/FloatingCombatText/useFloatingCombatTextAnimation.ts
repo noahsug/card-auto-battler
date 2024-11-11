@@ -7,11 +7,11 @@ import { UnitFn, useUnits } from '../../hooks/useUnits';
 
 export interface Props {
   battleEvents: BattleEvent[];
-  targetElement: Element | null;
+  targetBoundingRect: DOMRect | null;
 }
 
 interface AnimationContext {
-  targetElement: Props['targetElement'];
+  targetBoundingRect: Props['targetBoundingRect'];
   u: UnitFn;
 }
 
@@ -26,10 +26,13 @@ function createTextAnimation(battleEvent: BattleEvent) {
   };
 }
 
-function getXY({ xOffsetRatio, yOffsetRatio }: AnimationData, { targetElement }: AnimationContext) {
-  if (targetElement == null) return { x: 0, y: 0 };
+function getXY(
+  { xOffsetRatio, yOffsetRatio }: AnimationData,
+  { targetBoundingRect }: AnimationContext,
+) {
+  if (targetBoundingRect == null) return { x: 0, y: 0 };
 
-  const { width, height } = targetElement.getBoundingClientRect();
+  const { width, height } = targetBoundingRect;
   return { x: width * xOffsetRatio, y: (height / 2) * yOffsetRatio };
 }
 
@@ -53,22 +56,25 @@ function getAnimationEnd(textAnimation: AnimationData, context: AnimationContext
   };
 }
 
-export function useFloatingCombatTextAnimation({ battleEvents, targetElement }: Props) {
+export function useFloatingCombatTextAnimation({ battleEvents, targetBoundingRect }: Props) {
   const [u] = useUnits();
-  const animationController = useSpringRef();
   const animations = useMemo(() => battleEvents.map(createTextAnimation), [battleEvents]);
 
   const context: AnimationContext = {
-    targetElement,
+    targetBoundingRect,
     u,
   };
 
-  const render = useTransition(animations, {
-    key: ({ key }: AnimationData) => key,
-    from: (textAnimation: AnimationData) => getAnimationStart(textAnimation, context),
-    enter: (textAnimation: AnimationData) => getAnimationEnd(textAnimation, context),
-    ref: animationController,
-  });
+  const [render, animationController] = useTransition(
+    animations,
+    {
+      key: ({ key }: AnimationData) => key,
+      from: (textAnimation: AnimationData) => getAnimationStart(textAnimation, context),
+      enter: (textAnimation: AnimationData) => getAnimationEnd(textAnimation, context),
+      leave: (textAnimation: AnimationData) => getAnimationEnd(textAnimation, context),
+    },
+    [],
+  );
 
   useEffect(() => {
     animationController.start();

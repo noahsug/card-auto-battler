@@ -9,15 +9,18 @@ import { UnitFn, useUnits } from '../hooks/useUnits';
 import { ControllerUpdate } from '../utils/reactSpring';
 import { Image } from './shared/Image';
 
-const oneDropShadow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
-const dropShadow = new Array(4).fill(oneDropShadow).join(' ');
+const oneDropShadowGlow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
+const dropShadowGlow = new Array(4).fill(oneDropShadowGlow).join(' ');
 
-const ProfileImageContainer = styled(animated.div)`
-  filter: ${dropShadow};
+const AnimatedContainer = styled(animated.div)`
+  filter: ${dropShadowGlow};
 `;
 
+const size = 12;
+
 const ProfileImage = styled(animated(Image))<{ $flip?: boolean }>`
-  width: 12rem;
+  width: ${size}rem;
+  height: ${size}rem;
   margin-bottom: 0.5rem;
   transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
 `;
@@ -26,7 +29,7 @@ interface Props {
   flip?: boolean;
   battleEvents: BattleEvent[];
   src: string;
-  setProfileElement: (e: HTMLDivElement) => void;
+  handleRef: (element: Element | null) => void;
   isDead?: boolean;
 }
 
@@ -136,7 +139,7 @@ function getDeathAnimation({
   };
 }
 
-export function PlayerProfile({ flip, battleEvents, src, setProfileElement, isDead }: Props) {
+export function PlayerProfile({ flip, battleEvents, src, handleRef, isDead }: Props) {
   const [u, windowDimensions] = useUnits();
 
   // recoil in the opposite direction the image is facing
@@ -184,8 +187,10 @@ export function PlayerProfile({ flip, battleEvents, src, setProfileElement, isDe
   );
 
   return (
-    <ProfileImageContainer ref={setProfileElement} style={animationProps}>
-      <ProfileImage $flip={flip} src={src} style={{ filter }} />
-    </ProfileImageContainer>
+    <div ref={handleRef}>
+      <AnimatedContainer style={animationProps}>
+        <ProfileImage $flip={flip} src={src} style={{ filter }} />
+      </AnimatedContainer>
+    </div>
   );
 }

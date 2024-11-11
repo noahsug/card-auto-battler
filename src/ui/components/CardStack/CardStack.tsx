@@ -5,6 +5,7 @@ import { BattleEvent } from '../../../game/actions/battleEvent';
 import { CardState } from '../../../game/gameState';
 import { baseCardSize, cardSizeScaling } from '../Card';
 import { CardStackAnimation } from './CardStackAnimation2';
+import { useGetBoundingRect } from '../../hooks/useBoundingRect';
 
 const ANIMATED_EVENT_TYPES = new Set<BattleEvent['type']>([
   'startBattle',
@@ -20,7 +21,7 @@ interface Props {
   currentCardIndex: number;
   events: BattleEvent[];
   onAnimationComplete: () => void;
-  opponentRect: DOMRect | undefined;
+  opponentBoundingRect: DOMRect | null;
 }
 
 const cardSize = {
@@ -36,8 +37,9 @@ const Root = styled.div`
 `;
 
 export function CardStack(props: Props) {
-  const { opponentRect, onAnimationComplete } = props;
-  const [container, setContainer] = useState<HTMLDivElement | null>(null);
+  const { opponentBoundingRect, onAnimationComplete } = props;
+  const [handleRef, getBoundingRect] = useGetBoundingRect();
+  const boundingRect = getBoundingRect();
 
   const events = useRef<BattleEvent[]>([]);
   const visitedEventLists = useRef(new Set<BattleEvent[]>());
@@ -52,7 +54,12 @@ export function CardStack(props: Props) {
 
   // handle calling onAnimationComplete when certain animations are finished
   const cardPlayedTimeout = useRef<NodeJS.Timeout>();
+  const handledEventIndex = useRef<number>(-1);
   useEffect(() => {
+    // ensure we don't handle the same event twice
+    if (eventIndex === handledEventIndex.current) return;
+    handledEventIndex.current = eventIndex;
+
     const prevEvent = events.current[eventIndex - 1];
     const nextEventType = events.current[eventIndex + 1]?.type;
 
@@ -76,15 +83,19 @@ export function CardStack(props: Props) {
     }
   }, [event, eventIndex, onAnimationComplete]);
 
+  const handleAnimationComplete = useCallback(() => {
+    setEventIndex((prev) => prev + 1);
+  }, []);
+
   return (
-    <Root ref={setContainer}>
-      {container && opponentRect && (
+    <Root ref={handleRef}>
+      {boundingRect && opponentBoundingRect && (
         <CardStackAnimation
           {...props}
           event={event}
-          deckRect={container.getBoundingClientRect()}
-          opponentRect={opponentRect}
-          onAnimationComplete={() => setEventIndex((prev) => prev + 1)}
+          deckBoundingRect={boundingRect}
+          opponentBoundingRect={opponentBoundingRect}
+          onAnimationComplete={handleAnimationComplete}
         />
       )}
     </Root>

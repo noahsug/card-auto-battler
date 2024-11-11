@@ -17,8 +17,8 @@ export interface Props {
   currentCardIndex: number;
   event: BattleEvent | undefined;
   onAnimationComplete: () => void;
-  deckRect: DOMRect;
-  opponentRect: DOMRect;
+  deckBoundingRect: DOMRect;
+  opponentBoundingRect: DOMRect;
 }
 
 const AnimatedContainer = styled(animated.div)`
@@ -53,8 +53,8 @@ interface AnimationContext {
   currentCardIndex: number;
   event?: BattleEvent;
   onCardAnimationComplete: (cardAnimation: CardAnimationState) => void;
-  deckRect: DOMRect;
-  opponentRect: DOMRect;
+  deckBoundingRect: DOMRect;
+  opponentBoundingRect: DOMRect;
   u: UnitFn;
   windowDimensions: WindowDimensions;
 }
@@ -64,10 +64,10 @@ function syncZIndex(cardAnimation: CardAnimationState, context: AnimationContext
 }
 
 function getCardDealDirection({
-  deckRect,
-  opponentRect,
-}: Pick<AnimationContext, 'deckRect' | 'opponentRect'>): Direction {
-  return deckRect.left < opponentRect.left ? 1 : -1;
+  deckBoundingRect,
+  opponentBoundingRect,
+}: Pick<AnimationContext, 'deckBoundingRect' | 'opponentBoundingRect'>): Direction {
+  return deckBoundingRect.left < opponentBoundingRect.left ? 1 : -1;
 }
 
 function getReverseIndex(
@@ -78,16 +78,19 @@ function getReverseIndex(
 }
 
 function getXYToTarget({
-  deckRect,
-  opponentRect,
-}: Pick<AnimationContext, 'deckRect' | 'opponentRect'>) {
+  deckBoundingRect: deckBoundingRect,
+  opponentBoundingRect: opponentBoundingRect,
+}: Pick<AnimationContext, 'deckBoundingRect' | 'opponentBoundingRect'>) {
   // we're measuring movement from the top left corner of the card, so we need to reduce its x
   // movement by the width of the card or the width of the target, depending on the direction
-  const cardDealDirection = getCardDealDirection({ deckRect, opponentRect });
-  const xOffset = cardDealDirection === 1 ? -deckRect.width : opponentRect.width;
+  const cardDealDirection = getCardDealDirection({
+    deckBoundingRect: deckBoundingRect,
+    opponentBoundingRect: opponentBoundingRect,
+  });
+  const xOffset = cardDealDirection === 1 ? -deckBoundingRect.width : opponentBoundingRect.width;
   return {
-    x: opponentRect.x - deckRect.x + xOffset,
-    y: opponentRect.y - deckRect.y,
+    x: opponentBoundingRect.x - deckBoundingRect.x + xOffset,
+    y: opponentBoundingRect.y - deckBoundingRect.y,
   };
 }
 
@@ -147,6 +150,12 @@ function playCard(cardAnimation: CardAnimationState, context: AnimationContext) 
 
   const { x, y } = getXYToTarget(context);
   return async (next: (options: object) => Promise<void>) => {
+    // const deckPosition = getDeckPosition(cardAnimation, context);
+    // await next({
+    //   ...deckPosition,
+    //   immediate: true,
+    // });
+
     await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff } });
     await wait(500);
     onCardAnimationComplete(cardAnimation);
@@ -214,11 +223,10 @@ export function CardStackAnimation({
   currentCardIndex,
   event,
   onAnimationComplete,
-  deckRect,
-  opponentRect,
+  deckBoundingRect,
+  opponentBoundingRect,
 }: Props) {
   const [u, windowDimensions] = useUnits();
-  const animationController = useSpringRef();
 
   const cardAnimationsRef = useRef<CardAnimationState[]>(
     cards.map((card, i) => createCardAnimationState(card, i, currentCardIndex)),
@@ -237,25 +245,25 @@ export function CardStackAnimation({
     currentCardIndex,
     event,
     onCardAnimationComplete,
-    deckRect,
-    opponentRect,
+    deckBoundingRect,
+    opponentBoundingRect,
     u,
     windowDimensions,
   };
 
-  const render = useTransition(cardAnimationsRef.current, {
-    key: (c: CardAnimationState) => c.cardId,
-    from: (c: CardAnimationState) => getDiscardPosition(c, context),
-    enter: (c: CardAnimationState, i: number) => animate(c, context),
-    update: (c: CardAnimationState, i: number) => animate(c, context),
-    ref: animationController,
-    deps: [event, u],
-  });
+  const [render, animationController] = useTransition(
+    cardAnimationsRef.current,
+    {
+      key: (c: CardAnimationState) => c.cardId,
+      from: (c: CardAnimationState) => getDiscardPosition(c, context),
+      enter: (c: CardAnimationState) => animate(c, context),
+      update: (c: CardAnimationState) => animate(c, context),
+    },
+    [event],
+  );
 
   useEffect(() => {
-    if (event) {
-      animationController.start();
-    }
+    animationController.start();
   }, [animationController, event]);
 
   return render((style, { cardId }) => {

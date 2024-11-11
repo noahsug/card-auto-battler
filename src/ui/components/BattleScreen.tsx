@@ -21,6 +21,7 @@ import { CenterContent } from './shared/CenterContent';
 import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
+import { useGetBoundingRect } from '../hooks/useBoundingRect';
 
 type AnimationState = 'startTurn' | 'applyCardEffects' | 'endTurn';
 
@@ -51,11 +52,11 @@ export function BattleScreen({
   const isBattleOver = getBattleWinner(game) != null;
   const activePlayer = getActivePlayer(game);
 
-  const [userProfileElement, setUserProfileElement] = useState<HTMLDivElement | null>(null);
-  const [enemyProfileElement, setEnemyProfileElement] = useState<HTMLDivElement | null>(null);
+  const [userProfileHandleRef, getUserProfileBoundingRect] = useGetBoundingRect();
+  const [enemyProfileHandleRef, getEnemyProfileBoundingRect] = useGetBoundingRect();
 
   const [isPaused, setIsPaused] = useState(true);
-  const animationState = useRef<AnimationState>('startTurn');
+  const nextAnimationState = useRef<AnimationState>('startTurn');
 
   const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([
     createBattleEvent('startBattle', 'self'),
@@ -84,20 +85,19 @@ export function BattleScreen({
       events.push(createCardEvent('playCard', card.acquiredId));
     }
     setBattleEvents(events);
-    animationState.current = 'applyCardEffects';
+    nextAnimationState.current = 'applyCardEffects';
   }, [activePlayer.cards, activePlayer.currentCardIndex, startTurn]);
 
   const handleAnimationComplete = useCallback(async () => {
-    console.log('handleAnimationComplete', animationState.current);
-    if (animationState.current === 'applyCardEffects') {
+    if (nextAnimationState.current === 'applyCardEffects') {
       const events = await playCard();
       setBattleEvents(events);
-      animationState.current = 'endTurn';
-    } else if (animationState.current === 'endTurn') {
+      nextAnimationState.current = 'endTurn';
+    } else if (nextAnimationState.current === 'endTurn') {
       endTurn();
       setBattleEvents([]);
       if (isPaused) {
-        animationState.current = 'startTurn';
+        nextAnimationState.current = 'startTurn';
       } else {
         startNextTurn();
       }
@@ -105,7 +105,8 @@ export function BattleScreen({
   }, [endTurn, isPaused, playCard, startNextTurn]);
 
   const canTogglePlayPause = !isBattleOver && !hasOverlay;
-  const canPlayNextCard = canTogglePlayPause && isPaused && animationState.current === 'startTurn';
+  const canPlayNextCard =
+    canTogglePlayPause && isPaused && nextAnimationState.current === 'startTurn';
 
   // TODO: Remove and make this fast forward instead?
   const handlePlayNextCard = useCallback(async () => {
@@ -113,13 +114,11 @@ export function BattleScreen({
   }, [startNextTurn]);
 
   const handleTogglePlayPause = useCallback(() => {
-    setIsPaused((prevIsPaused) => {
-      if (prevIsPaused && animationState.current === 'startTurn') {
-        startNextTurn();
-      }
-      return !prevIsPaused;
-    });
-  }, [startNextTurn]);
+    if (canPlayNextCard) {
+      startNextTurn();
+    }
+    setIsPaused((prev) => !prev);
+  }, [canPlayNextCard, startNextTurn]);
 
   // change combat state based only on the active player animations
   const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : doNothing;
@@ -148,13 +147,13 @@ export function BattleScreen({
             <StatusEffects statusEffects={user} />
             <PlayerProfile
               src={user.image}
-              setProfileElement={setUserProfileElement}
+              handleRef={userProfileHandleRef}
               battleEvents={userBattleEvents}
               isDead={user.health <= 0}
             />
             <FloatingCombatText
               battleEvents={userBattleEvents}
-              targetElement={userProfileElement}
+              targetBoundingRect={getUserProfileBoundingRect()}
             />
             <HealthBar health={user.health} maxHealth={user.startingHealth} />
           </Player>
@@ -164,13 +163,13 @@ export function BattleScreen({
             <PlayerProfile
               src={enemy.image}
               flip={true}
-              setProfileElement={setEnemyProfileElement}
+              handleRef={enemyProfileHandleRef}
               battleEvents={enemyBattleEvents}
               isDead={enemy.health <= 0}
             />
             <FloatingCombatText
               battleEvents={enemyBattleEvents}
-              targetElement={enemyProfileElement}
+              targetBoundingRect={getEnemyProfileBoundingRect()}
             />
             <HealthBar health={enemy.health} maxHealth={enemy.startingHealth} />
           </Player>
@@ -182,14 +181,14 @@ export function BattleScreen({
             currentCardIndex={user.currentCardIndex}
             onAnimationComplete={userHandleAnimationComplete}
             events={userBattleEvents}
-            opponentRect={enemyProfileElement?.getBoundingClientRect()}
+            opponentBoundingRect={getEnemyProfileBoundingRect()}
           />
           {/* <CardStack
             cards={enemy.cards}
             currentCardIndex={enemy.currentCardIndex}
             onAnimationComplete={enemyHandleAnimationComplete}
             events={enemyBattleEvents}
-            targetElement={userProfileElement}
+            opponentRect={userProfileElement?.getBoundingClientRect()}
           /> */}
         </ContentRow>
       </CenterContent>
