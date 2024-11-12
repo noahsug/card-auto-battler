@@ -152,6 +152,7 @@ function resetPlayerAfterBattle(player: PlayerState) {
 export function endBattle(game: GameState) {
   const winner = getBattleWinner(game);
   winner === 'user' ? game.wins++ : game.losses++;
+
   game.turn = 0;
   resetPlayerAfterBattle(game.user);
   resetPlayerAfterBattle(game.enemy);

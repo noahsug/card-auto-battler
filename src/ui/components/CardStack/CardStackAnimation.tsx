@@ -159,7 +159,7 @@ function playCard(cardAnimation: CardAnimationState, context: AnimationContext) 
 
   const { x, y } = getXYToTarget(context);
   return async (next: (options: object) => Promise<void>) => {
-    await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff } });
+    await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff, clamp: false } });
 
     const [promise, cancel, getIsCanceled] = cancelableWait(500);
     cardAnimation.cancelWait = cancel;

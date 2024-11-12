@@ -96,7 +96,8 @@ export function App() {
     wonLastBattleRef.current = getBattleWinner(game) === 'user';
     endBattle();
     setOverlay('battleResult');
-  }, [game, endBattle]);
+    clearUndo();
+  }, [game, endBattle, clearUndo]);
 
   const restartGame = useCallback(() => {
     resetGame();
@@ -133,7 +134,6 @@ export function App() {
           {...undoManager}
           onBattleOver={handleBattleOver}
           onViewDeck={() => setOverlay('deck')}
-          hasOverlay={overlay !== 'none'}
         ></BattleScreen>
         {/* )} */}
 

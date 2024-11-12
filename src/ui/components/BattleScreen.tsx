@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { BattleEvent, createBattleEvent, createCardEvent } from '../../game/actions/battleEvent';
@@ -35,7 +35,6 @@ interface Props {
   undo: Undo;
   onBattleOver: () => void;
   onViewDeck: () => void;
-  hasOverlay?: boolean;
 }
 
 export function BattleScreen({
@@ -47,7 +46,6 @@ export function BattleScreen({
   undo,
   onBattleOver,
   onViewDeck,
-  hasOverlay = false,
 }: Props) {
   const { user, enemy } = game;
   const isBattleOver = getBattleWinner(game) != null;
@@ -92,40 +90,38 @@ export function BattleScreen({
     } else if (nextAnimationState.current === 'endTurn') {
       endTurn();
       setBattleEvents([]);
-      if (isPaused) {
-        nextAnimationState.current = 'startTurn';
-      } else {
-        startNextTurn();
-      }
+      nextAnimationState.current = 'startTurn';
     }
-  }, [endTurn, isBattleOver, isPaused, playCard, startNextTurn]);
-
-  const canTogglePlayPause = !isBattleOver && !hasOverlay;
-  const canPlayNextCard =
-    canTogglePlayPause && isPaused && nextAnimationState.current === 'startTurn';
-
-  // TODO: Remove and make this fast forward instead?
-  const handlePlayNextCard = useCallback(async () => {
-    startNextTurn();
-  }, [startNextTurn]);
-
-  const handleTogglePlayPause = useCallback(() => {
-    if (canPlayNextCard) {
-      startNextTurn();
-    }
-    setIsPaused((prev) => !prev);
-  }, [canPlayNextCard, startNextTurn]);
-
-  const handleUndo = useCallback(() => {
-    undo();
-    nextAnimationState.current = 'startTurn';
-    setBattleEvents([createBattleEvent('undo', 'self'), createBattleEvent('undo', 'opponent')]);
-    setIsPaused(true);
-  }, [undo]);
+  }, [endTurn, isBattleOver, playCard]);
 
   // change combat state based only on the active player animations
   const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : doNothing;
   const enemyHandleAnimationComplete = getIsUserTurn(game) ? doNothing : handleAnimationComplete;
+
+  // auto-play cards
+  useEffect(() => {
+    if (isBattleOver) return;
+    if (!isPaused && nextAnimationState.current === 'startTurn') {
+      startNextTurn();
+    }
+  }, [isBattleOver, isPaused, startNextTurn]);
+
+  // TODO: make this fast forward instead?
+  const handlePlayNextCard = useCallback(() => {
+    startNextTurn();
+  }, [startNextTurn]);
+
+  const handleTogglePlayPause = useCallback(() => {
+    setIsPaused((prev) => !prev);
+  }, []);
+
+  // TODO: fix issue with multiple undos in a row taking 4 clicks to undo the last card
+  const handleUndo = useCallback(() => {
+    undo();
+    setBattleEvents([createBattleEvent('undo', 'self'), createBattleEvent('undo', 'opponent')]);
+    nextAnimationState.current = 'startTurn';
+    setIsPaused(true);
+  }, [undo]);
 
   useTimeout(onBattleOver, 1500, { enabled: isBattleOver });
 
@@ -186,10 +182,10 @@ export function BattleScreen({
       </CenterContent>
 
       <BattleControls
-        onBack={hasOverlay || !canUndo() ? undefined : handleUndo}
-        onTogglePlay={canTogglePlayPause ? handleTogglePlayPause : undefined}
+        onBack={canUndo() ? handleUndo : undefined}
+        onTogglePlay={!isBattleOver ? handleTogglePlayPause : undefined}
         isPaused={isPaused}
-        onNext={canPlayNextCard ? handlePlayNextCard : undefined}
+        onNext={!isBattleOver && isPaused ? handlePlayNextCard : undefined}
       />
     </Container>
   );
