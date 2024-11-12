@@ -73,6 +73,9 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
   const multiplier = effect.multiply && maybeGetValue(effect.multiply, context);
   const effectOptions = { value, multiplier, target: effect.target };
 
+  const player = getTargetedPlayer(context.game, effect.target);
+  value = updateValue(value, multiplier);
+
   switch (effect.name) {
     case 'damage': {
       const dodged = dodgeDamage(effect, context);
@@ -90,11 +93,13 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
       trashCards(effectOptions, context);
       break;
 
-    // status effects
+    case 'set': {
+      player[effect.valueName] = value;
+      break;
+    }
+
     default: {
-      assert(readonlyIncludes(statusEffectNames, effect.name));
-      value = updateValue(value);
-      const player = getTargetedPlayer(context.game, effect.target);
+      // status effects
       player[effect.name] += value;
     }
   }

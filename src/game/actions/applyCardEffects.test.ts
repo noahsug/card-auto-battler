@@ -10,7 +10,13 @@ import {
 import { diffValues } from '../../utils/objects';
 import { applyCardEffects } from './applyCardEffects';
 import { BLEED_DAMAGE } from '../constants';
-import { CardEffect, CardState, createGameState, PlayerState } from '../gameState';
+import {
+  CardEffect,
+  CardState,
+  createGameState,
+  PlayerState,
+  SetValueCardEffect,
+} from '../gameState';
 import { permaBleed, reduceLowDamage, regenForHighDamage } from '../../content/relics';
 import { strengthAffectsHealing } from '../../content/relics/relics';
 
@@ -190,6 +196,28 @@ describe('heal', () => {
     const { diff } = getPlayCardResult();
 
     expect(diff).toEqual({ opponent: { health: 1 } });
+  });
+});
+
+describe('set', () => {
+  beforeEach(() => {
+    effect.name = 'set';
+  });
+
+  it('sets health', () => {
+    (effect as SetValueCardEffect).valueName = 'health';
+    const { opponent } = getPlayCardResult();
+
+    expect(opponent.health).toBe(1);
+  });
+
+  it('sets bleed', () => {
+    (effect as SetValueCardEffect).valueName = 'bleed';
+    effect.target = 'self';
+    effect.value = v(0);
+    const { diff } = getPlayCardResult({ self: { bleed: 4 } });
+
+    expect(diff).toEqual({ self: { bleed: -4 } });
   });
 });
 

@@ -60,7 +60,7 @@ export interface MaybeValue<T = ValueDescriptor> {
   if?: If;
 }
 
-export interface CardEffect {
+export interface BasicCardEffect {
   target: Target;
   name: CardEffectName;
   value: ValueDescriptor;
@@ -69,6 +69,13 @@ export interface CardEffect {
   multiHit?: ValueDescriptor;
   if?: If;
 }
+
+export interface SetValueCardEffect extends Omit<BasicCardEffect, 'name'> {
+  name: 'set';
+  valueName: StatusEffectName | 'health';
+}
+
+export type CardEffect = BasicCardEffect | SetValueCardEffect;
 
 export const tribes = ['basic', 'purple', 'red', 'green'] as const;
 export type Tribe = (typeof tribes)[number];

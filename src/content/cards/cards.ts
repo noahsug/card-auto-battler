@@ -17,6 +17,7 @@ import heavyRock from './images/heavy-rock.jpeg';
 import leftJab from './images/left-jab.png';
 import uppercut from './images/uppercut.png';
 import manyJabs from './images/many-jabs.jpeg';
+import bloodbath from './images/bloodbath.jpeg';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
@@ -207,6 +208,46 @@ export const redCards = {
       image: eviscerate,
     },
   ),
+  bloodBath: createCard(
+    [
+      {
+        name: 'bleed',
+        value: v(4),
+      },
+      {
+        name: 'bleed',
+        value: v(4),
+        target: 'self',
+      },
+    ],
+    {
+      name: 'Bloodbath',
+      description: 'Apply $V bleed to yourself and the opponent.',
+      image: bloodbath,
+    },
+  ),
+  // bloodBoil: createCard(
+  //   [
+  //     {
+  //       name: 'burn',
+  //       value: v(3),
+  //     },
+  //     {
+  //       name: 'strength',
+  //       value: v('self', 'burn'),
+  //     },
+  //     {
+  //       name: 'bleed',
+  //       value: v(0),
+  //       target,
+  //     },
+  //   ],
+  //   {
+  //     name: 'Blood Boil',
+  //     description: `Gain 3 burn. Gain strength equal to your burn. Remove all bleed.`,
+  //     image: firePower,
+  //   },
+  // ),
 };
 Object.values(redCards).forEach((card) => {
   card.tribe = 'red';
