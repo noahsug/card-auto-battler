@@ -387,6 +387,21 @@ describe('if', () => {
     expect(prevCardGreen.diff).toEqual({ opponent: { health: -1 } });
   });
 
+  it('compares to damage dealt by the current card', () => {
+    card.effects[1] = createEffect({
+      name: 'bleed',
+      value: v(3),
+      if: ifCompare('opponent', 'damageDealtToTarget', '>=', 7),
+    });
+
+    const smallDamage = getPlayCardResult();
+    expect(smallDamage.diff).toEqual({ opponent: { health: -1 } });
+
+    effect.value = v(7);
+    const largeDamage = getPlayCardResult();
+    expect(largeDamage.diff).toEqual({ opponent: { health: -7, bleed: 3 } });
+  });
+
   it('compares to damage dealt this turn', () => {
     effect.if = ifCompare('self', 'damageDealtThisTurn', '>=', 7);
 

@@ -18,6 +18,7 @@ import leftJab from './images/left-jab.png';
 import uppercut from './images/uppercut.png';
 import manyJabs from './images/many-jabs.jpeg';
 import bloodbath from './images/bloodbath.jpeg';
+import bloodBoil from './images/blood-boil.jpeg';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
@@ -167,7 +168,7 @@ export const redCards = {
   fireball: createCard(
     [
       {
-        value: v(7),
+        value: v(8),
       },
     ],
     {
@@ -193,6 +194,38 @@ export const redCards = {
       description:
         'The next "fire" card you play this turn deals double damage. Play another card.',
       image: channel,
+    },
+  ),
+  fireSpears: createCard(
+    [
+      {
+        name: 'damage',
+        value: v(3),
+        multiHit: v(2),
+      },
+    ],
+    {
+      name: 'Pillars of Fire',
+      description: 'Deal $V damage $N times.',
+      image: firePower,
+    },
+  ),
+  phoenixFire: createCard(
+    [
+      {
+        name: 'damage',
+        value: v(3),
+      },
+      {
+        name: 'burn',
+        value: v('opponent', 'damageDealtToTarget'),
+        target: 'opponent',
+      },
+    ],
+    {
+      name: 'Phoenix Fire',
+      description: 'Deal $V damage. Apply burn equal to the damage dealt.',
+      image: phoenix,
     },
   ),
   eviscerate: createCard(
@@ -226,28 +259,31 @@ export const redCards = {
       image: bloodbath,
     },
   ),
-  // bloodBoil: createCard(
-  //   [
-  //     {
-  //       name: 'burn',
-  //       value: v(3),
-  //     },
-  //     {
-  //       name: 'strength',
-  //       value: v('self', 'burn'),
-  //     },
-  //     {
-  //       name: 'bleed',
-  //       value: v(0),
-  //       target,
-  //     },
-  //   ],
-  //   {
-  //     name: 'Blood Boil',
-  //     description: `Gain 3 burn. Gain strength equal to your burn. Remove all bleed.`,
-  //     image: firePower,
-  //   },
-  // ),
+  bloodBoil: createCard(
+    [
+      {
+        name: 'burn',
+        value: v(3),
+        target: 'self',
+      },
+      {
+        name: 'strength',
+        value: v('self', 'burn'),
+        target: 'self',
+      },
+      {
+        name: 'set',
+        valueName: 'bleed',
+        value: v(0),
+        target: 'self',
+      },
+    ],
+    {
+      name: 'Blood Boil',
+      description: `Gain $V burn. Gain strength equal to your burn. Remove all your bleed.`,
+      image: bloodBoil,
+    },
+  ),
 };
 Object.values(redCards).forEach((card) => {
   card.tribe = 'red';

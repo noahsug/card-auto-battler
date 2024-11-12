@@ -141,12 +141,16 @@ function calculateTribePercent(player: PlayerState, tribe: Tribe): number {
 
 function getPlayerValue(
   { target, name }: PlayerValueDescriptor,
-  { game }: PlayCardContext,
+  { game, events }: PlayCardContext,
 ): number {
   const player = getTargetedPlayer(game, target);
 
   if (name === 'turn') {
     return Math.floor(game.turn / 2);
+  }
+
+  if (name === 'damageDealtToTarget') {
+    return getDamageDealt(events, target);
   }
 
   if (name === 'percentGreen') {
@@ -283,4 +287,13 @@ function trashCards({ value, multiplier = 1, target }: EffectOptions, context: P
 function updateValue(value: number, multiplier: number = 1) {
   value *= multiplier;
   return Math.floor(value);
+}
+
+export function getDamageDealt(events: BattleEvent[], target: Target = 'opponent'): number {
+  return events.reduce((damageDealt, event) => {
+    if (event.type === 'damage' && event.target === target) {
+      damageDealt += event.value;
+    }
+    return damageDealt;
+  }, 0);
 }

@@ -44,7 +44,7 @@ function parseMaybeValue(maybeValue: MaybeValue | undefined, prefix: string): Te
  *       value: { value: $M } },
  *       if: { ..., value2: { value: $MI } },
  *     },
- *     multiHit: { value: $H },
+ *     multiHit: { value: $N },
  *   }, {
  *     value: { value: $2V },
  *   }],
@@ -66,7 +66,7 @@ export function parseCardDescriptionTemplate(card: CardState) {
       ...parseValue(effect.value, prefix + 'V'),
       ...parseMaybeValue(effect.add, prefix + 'A'),
       ...parseMaybeValue(effect.multiply, prefix + 'M'),
-      ...parseValue(effect.multiHit, prefix + 'H'),
+      ...parseValue(effect.multiHit, prefix + 'N'),
       ...parseIf(effect.if, prefix + 'I'),
     };
   }, {} as TemplateMap);

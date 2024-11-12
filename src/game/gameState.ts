@@ -28,6 +28,7 @@ type CalculatedPlayerValueName =
   | 'prevCardIsGreen'
   | 'prevCardIsRed'
   | 'prevCardIsPurple'
+  | 'damageDealtToTarget'
   | 'turn';
 
 export type PlayerValueName =
@@ -153,7 +154,12 @@ export function createGameState(): GameState {
   };
 
   const { attack, heal, fireball } = allCards;
-  addCardsToPlayer(game.user, [fireball, attack]);
+  addCardsToPlayer(game.user, [
+    allCards.bloodBath,
+    allCards.eviscerate,
+    allCards.bloodBoil,
+    attack,
+  ]);
   addCardsToPlayer(game.enemy, [attack]);
 
   return game;

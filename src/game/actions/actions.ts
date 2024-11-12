@@ -11,7 +11,7 @@ import {
 } from '../gameState';
 import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
-import { applyCardEffects, applyHeal, reduceHealth } from './applyCardEffects';
+import { applyCardEffects, applyHeal, reduceHealth, getDamageDealt } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
 
 export function addCards(game: GameState, cards: CardState[]) {
@@ -125,12 +125,7 @@ export function playCard(game: GameState): BattleEvent[] {
   }
 
   // calculate damage dealt
-  const damageDealt = events.reduce((damageDealt, event) => {
-    if (event.type === 'damage' && event.target === 'opponent') {
-      damageDealt += event.value;
-    }
-    return damageDealt;
-  }, 0);
+  const damageDealt = getDamageDealt(events);
   activePlayer.damageDealtThisTurn += damageDealt;
 
   return events;

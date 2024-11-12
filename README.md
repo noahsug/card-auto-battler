@@ -256,11 +256,12 @@ Green cards (heal, strength, high hp, high dmg, x = turn, toxic, chill)
 - Relic: strength affects your healing
 - Relic: you can only play 1 card. +3 strength
 
-Red Cards (bleed, burn, strength, multihit, lifesteal, low hp, trash, same name, armor)
+Red Cards (bleed, burn, fire spells, strength, multihit, lifesteal, low hp, trash, same name, armor)
 
 - blood boil - gain 1 burn for each bleed
 - deal 2 damage for each bleed
 - apply 3 bleed
+- revive with half HP if you die while burning
 - Deal 4 damage. Lifesteal.
 - Deals damage equal to the last damage you dealt.
 - Deal 6 damage. Take 2 damage.
@@ -279,6 +280,7 @@ Red Cards (bleed, burn, strength, multihit, lifesteal, low hp, trash, same name,
 - Deal X damage where X = enemy burn.
 - Double enemy burn.
 - Execute: Deals double damage if the enemy has < 7 hp.
+- Relic: "Fire" spells deal +2 damage while you're burning
 - Relic: First card each battle is played twice.
 - Relic: Deal +X damage for every consecutive turn you've taken damage.
 - Relic: Deal +3 damage when bleeding / when at < 50% hp.
