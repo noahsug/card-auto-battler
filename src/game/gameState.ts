@@ -6,7 +6,14 @@ import { addCardsToPlayer } from './utils/cards';
 
 export type Target = 'self' | 'opponent';
 
-export const statusEffectNames = ['bleed', 'extraCardPlays', 'dodge', 'strength', 'regen'] as const;
+export const statusEffectNames = [
+  'bleed',
+  'extraCardPlays',
+  'dodge',
+  'strength',
+  'regen',
+  'channel',
+] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;
 export const EMPTY_STATUS_EFFECTS = Object.fromEntries(

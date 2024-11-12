@@ -176,20 +176,24 @@ export const redCards = {
       image: fireball,
     },
   ),
-  // TODO: add a temporary fireball card to deck. All fireball cards deal +2 damage.
-  // channel: createCard(
-  //   [
-  //     {
-  //       target: 'self',
-  //       name: 'extraCardPlays',
-  //     },
-  //   ],
-  //   {
-  //     name: 'Channel',
-  //     description: 'Play another card.',
-  //     image: channel,
-  //   },
-  // ),
+  channel: createCard(
+    [
+      {
+        target: 'self',
+        name: 'channel',
+      },
+      {
+        target: 'self',
+        name: 'extraCardPlays',
+      },
+    ],
+    {
+      name: 'Channel',
+      description:
+        'The next "fire" card you play this turn deals double damage. Play another card.',
+      image: channel,
+    },
+  ),
   eviscerate: createCard(
     [
       {

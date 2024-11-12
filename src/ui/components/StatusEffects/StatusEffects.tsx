@@ -5,6 +5,7 @@ import dodgeImage from './images/body-balance.png';
 import extraCardPlaysImage from './images/card-play.png';
 import bleedImage from './images/drop.png';
 import regenImage from './images/falling-leaf.png';
+import channelImage from './images/fire-silhouette.png';
 
 import { StatusEffects as StatusEffectsType } from '../../../game/gameState';
 import { maskImage } from '../../style';
@@ -17,6 +18,7 @@ const effectToImage: Record<keyof StatusEffectsType, string> = {
   extraCardPlays: extraCardPlaysImage,
   strength: strengthImage,
   regen: regenImage,
+  channel: channelImage,
 };
 
 const visibleStatusEffects = Object.keys(effectToImage) as (keyof StatusEffectsType)[];

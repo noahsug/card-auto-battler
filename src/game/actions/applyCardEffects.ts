@@ -15,11 +15,13 @@ import { BLEED_DAMAGE } from '../constants';
 import { assert } from '../../utils/asserts';
 import { BattleEvent, createBattleEvent } from './battleEvent';
 import { readonlyIncludes } from '../../utils/iterators';
-import { getPlayers, getTargetedPlayer, getRelic } from '../utils/selectors';
+import { getPlayers, getTargetedPlayer, getRelic, getActivePlayer } from '../utils/selectors';
 
 interface PlayCardContext {
   game: GameState;
   events: BattleEvent[];
+  card: CardState;
+  reduceChannelStatusEffect?: boolean;
 }
 
 interface EffectOptions {
@@ -30,7 +32,7 @@ interface EffectOptions {
 
 export function applyCardEffects(game: GameState, card: CardState): BattleEvent[] {
   const events: BattleEvent[] = [];
-  const context = { game, events };
+  const context: PlayCardContext = { game, events, card };
 
   let activations = 1;
   if (card.repeat) {
@@ -41,6 +43,11 @@ export function applyCardEffects(game: GameState, card: CardState): BattleEvent[
     card.effects.forEach((effect) => {
       applyEffect(effect, context);
     });
+  }
+
+  // we reduce the status effect only after all card effects have been applied
+  if (context.reduceChannelStatusEffect) {
+    getActivePlayer(game).channel -= 1;
   }
 
   return events;
@@ -195,6 +202,12 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   // strength
   if (target === 'opponent') {
     value += self.strength;
+  }
+
+  // channel
+  if (self.channel > 0 && context.card.name.toLocaleLowerCase().includes('fire')) {
+    multiplier *= 2;
+    context.reduceChannelStatusEffect = true;
   }
 
   value = updateValue(value, multiplier);

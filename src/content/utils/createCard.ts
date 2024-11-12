@@ -14,7 +14,7 @@ import { assertIsNonNullable } from '../../utils/asserts';
 let cardIdCounter = 0;
 
 // returns a CardEffect with defaults
-export function getEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {
+export function createEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {
   partialEffect.target = partialEffect.target || 'opponent';
   partialEffect.name = partialEffect.name || 'damage';
   partialEffect.value = partialEffect.value || value(1);
@@ -34,7 +34,7 @@ export function createCard(
   }: Partial<Omit<CardState, 'effects'>> = {},
 ): CardState {
   return {
-    effects: effects.map(getEffect),
+    effects: effects.map(createEffect),
     repeat,
     trash,
     name,

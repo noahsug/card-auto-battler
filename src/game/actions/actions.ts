@@ -71,10 +71,12 @@ export function startTurn(game: GameState): BattleEvent[] {
   }
 
   const events: BattleEvent[] = [];
+  const card = activePlayer.cards[activePlayer.currentCardIndex];
+  const context = { game, events, card };
 
   if (activePlayer.regen > 0) {
     // regen
-    applyHeal({ value: activePlayer.regen, target: 'self' }, { game, events });
+    applyHeal({ value: activePlayer.regen, target: 'self' }, context);
     activePlayer.regen -= 1;
   }
 
@@ -131,6 +133,8 @@ export function playCard(game: GameState): BattleEvent[] {
 export function endTurn(game: GameState) {
   const [activePlayer] = getPlayers(game);
   assert(activePlayer.extraCardPlays === 0);
+
+  activePlayer.channel = 0;
 
   game.turn++;
 }

@@ -1,6 +1,12 @@
 import cloneDeep from 'lodash/cloneDeep';
 
-import { createCard, ifCompare, ifHas, value as v } from '../../content/utils/createCard';
+import {
+  createCard,
+  ifCompare,
+  ifHas,
+  value as v,
+  createEffect,
+} from '../../content/utils/createCard';
 import { diffValues } from '../../utils/objects';
 import { applyCardEffects } from './applyCardEffects';
 import { BLEED_DAMAGE } from '../constants';
@@ -29,7 +35,7 @@ function getPlayCardResult({
   game.turn = turnOverride || 0;
 
   const { user, enemy } = game;
-  user.cards = [createCard(), createCard(), createCard()];
+  user.cards = [card, createCard(), createCard()];
   enemy.cards = [createCard(), createCard(), createCard()];
 
   const self = Object.assign(user, selfOverrides);
@@ -210,6 +216,39 @@ describe('dodge', () => {
     const { diff } = getPlayCardResult();
 
     expect(diff).toEqual({ opponent: { dodge: 1 } });
+  });
+});
+
+describe('channel', () => {
+  beforeEach(() => {
+    card.name = 'Fireball';
+  });
+
+  it('doubles damage from next fire card', () => {
+    const { diff } = getPlayCardResult({
+      self: { channel: 1 },
+    });
+    expect(diff).toEqual({ self: { channel: -1 }, opponent: { health: -2 } });
+  });
+
+  it('applies to each effect on a fire card', () => {
+    card.effects = [
+      createEffect({ name: 'damage', value: v(1) }),
+      createEffect({ name: 'damage', value: v(2) }),
+      createEffect({ name: 'damage', value: v(3) }),
+    ];
+    const { diff } = getPlayCardResult({
+      self: { channel: 1 },
+    });
+    expect(diff).toEqual({ self: { channel: -1 }, opponent: { health: -12 } });
+  });
+
+  it('does nothing for non-fire cards', () => {
+    card.name = 'Blueball';
+    const { diff } = getPlayCardResult({
+      self: { channel: 1 },
+    });
+    expect(diff).toEqual({ opponent: { health: -1 } });
   });
 });
 
