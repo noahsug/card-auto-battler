@@ -41,6 +41,10 @@ export function shouldPickRelic(game: GameState) {
   return (game.wins + game.losses) % 2 === 1;
 }
 
+export function isTurnOver(player: PlayerState) {
+  return player.extraCardPlays === 0;
+}
+
 export function isGameOver({ wins, losses }: { wins: number; losses: number }) {
   return losses >= MAX_LOSSES || wins >= MAX_WINS;
 }

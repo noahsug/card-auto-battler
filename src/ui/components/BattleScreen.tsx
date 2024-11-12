@@ -6,12 +6,13 @@ import {
   createBattleEvent,
   eventAppliesToTarget,
 } from '../../game/actions/battleEvent';
-import { GameState } from '../../game/gameState';
+import { GameState, PlayerState } from '../../game/gameState';
 import {
   getActivePlayer,
   getBattleWinner,
   getIsUserTurn,
   getPlayerTargets,
+  isTurnOver,
 } from '../../game/utils/selectors';
 import { doNothing } from '../../utils/functions';
 import { useGetBoundingRect } from '../hooks/useBoundingRect';
@@ -28,7 +29,15 @@ import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
 
-type AnimationState = 'startTurn' | 'applyCardEffects' | 'endTurn';
+type AnimationState = 'startTurn' | 'applyCardEffects' | 'endPlayCard';
+
+function getPlayCardBattleEvents(player: PlayerState): BattleEvent[] {
+  const card = player.cards[player.currentCardIndex];
+  if (card) {
+    return [createBattleEvent('playCard', card.acquiredId)];
+  }
+  return [];
+}
 
 interface Props {
   game: GameState;
@@ -74,27 +83,28 @@ export function BattleScreen({
 
   const startNextTurn = useCallback(async () => {
     const events = await startTurn();
-    const card = activePlayer.cards[activePlayer.currentCardIndex];
-    if (card) {
-      // start the play card animation
-      events.push(createBattleEvent('playCard', card.acquiredId));
-    }
-    setBattleEvents(events);
+    // start play card animation early
+    setBattleEvents([...events, ...getPlayCardBattleEvents(activePlayer)]);
     nextAnimationState.current = 'applyCardEffects';
-  }, [activePlayer.cards, activePlayer.currentCardIndex, startTurn]);
+  }, [activePlayer, startTurn]);
 
   const handleAnimationComplete = useCallback(async () => {
     if (isBattleOver) return;
     if (nextAnimationState.current === 'applyCardEffects') {
       const events = await playCard();
       setBattleEvents(events);
-      nextAnimationState.current = 'endTurn';
-    } else if (nextAnimationState.current === 'endTurn') {
-      endTurn();
-      setBattleEvents([]);
-      nextAnimationState.current = 'startTurn';
+      nextAnimationState.current = 'endPlayCard';
+    } else if (nextAnimationState.current === 'endPlayCard') {
+      if (isTurnOver(activePlayer)) {
+        endTurn();
+        setBattleEvents([]);
+        nextAnimationState.current = 'startTurn';
+      } else {
+        setBattleEvents(getPlayCardBattleEvents(activePlayer));
+        nextAnimationState.current = 'applyCardEffects';
+      }
     }
-  }, [endTurn, isBattleOver, playCard]);
+  }, [activePlayer, endTurn, isBattleOver, playCard]);
 
   // change combat state based only on the active player animations
   const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : doNothing;

@@ -154,12 +154,7 @@ export function createGameState(): GameState {
   };
 
   const { attack, heal, fireball } = allCards;
-  addCardsToPlayer(game.user, [
-    allCards.bloodBath,
-    allCards.eviscerate,
-    allCards.bloodBoil,
-    attack,
-  ]);
+  addCardsToPlayer(game.user, [allCards.channel, allCards.fireSpears, allCards.fireball, attack]);
   addCardsToPlayer(game.enemy, [attack]);
 
   return game;

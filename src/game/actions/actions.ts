@@ -63,13 +63,6 @@ export function startTurn(game: GameState): BattleEvent[] {
   activePlayer.damageDealtThisTurn = 0;
   activePlayer.cardsPlayedThisTurn = 0;
 
-  // die if out of cards
-  if (activePlayer.cards.length === 0) {
-    const damage = activePlayer.health;
-    activePlayer.health = 0;
-    return [createBattleEvent('damage', damage, 'self')];
-  }
-
   const events: BattleEvent[] = [];
   const card = activePlayer.cards[activePlayer.currentCardIndex];
   const context = { game, events, card };
@@ -91,8 +84,16 @@ export function startTurn(game: GameState): BattleEvent[] {
 
 export function playCard(game: GameState): BattleEvent[] {
   const [activePlayer] = getPlayers(game);
-  const events: BattleEvent[] = [];
   const card = activePlayer.cards[activePlayer.currentCardIndex];
+
+  // die if out of cards
+  if (!card) {
+    const damage = activePlayer.health;
+    activePlayer.health = 0;
+    return [createBattleEvent('damage', damage, 'self')];
+  }
+
+  const events: BattleEvent[] = [];
 
   if (activePlayer.cardsPlayedThisTurn > 0) {
     assert(activePlayer.extraCardPlays > 0);
