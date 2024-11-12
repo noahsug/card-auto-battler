@@ -12,7 +12,7 @@ import {
 import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal } from './applyCardEffects';
-import { BattleEvent, createDamageEvent, createCardEvent, createBattleEvent } from './battleEvent';
+import { BattleEvent, createBattleEvent } from './battleEvent';
 
 export function addCards(game: GameState, cards: CardState[]) {
   addCardsToPlayer(game.user, cards);
@@ -67,7 +67,7 @@ export function startTurn(game: GameState): BattleEvent[] {
   if (activePlayer.cards.length === 0) {
     const damage = activePlayer.health;
     activePlayer.health = 0;
-    return [createDamageEvent(damage, 'self')];
+    return [createBattleEvent('damage', damage, 'self')];
   }
 
   const events: BattleEvent[] = [];
@@ -102,11 +102,11 @@ export function playCard(game: GameState): BattleEvent[] {
     // trash card
     activePlayer.trashedCards.push(card);
     activePlayer.cards.splice(activePlayer.currentCardIndex, 1);
-    events.push(createCardEvent('trashCard', card.acquiredId));
+    events.push(createBattleEvent('trashCard', card.acquiredId));
   } else {
     // discard card
     activePlayer.currentCardIndex += 1;
-    events.push(createCardEvent('discardCard', card.acquiredId));
+    events.push(createBattleEvent('discardCard', card.acquiredId));
   }
 
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {

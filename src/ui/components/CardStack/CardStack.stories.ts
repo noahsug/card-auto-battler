@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { createBattleEvent, createCardEvent } from '../../../game/actions/battleEvent';
+import { createBattleEvent } from '../../../game/actions/battleEvent';
 import { getRandomCards } from '../../../game/utils/cards';
 import { CardStack } from './CardStack';
 
@@ -22,7 +22,7 @@ type Story = StoryObj<typeof meta>;
 
 export const PlayCard: Story = {
   args: {
-    events: [createCardEvent('playCard', 0)],
+    events: [createBattleEvent('playCard', 0)],
   },
 };
 
@@ -30,12 +30,12 @@ export const TakeTurn: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
-      createCardEvent('playCard', 0),
-      createCardEvent('discardCard', 0),
-      createCardEvent('playCard', 1),
-      createCardEvent('trashCard', 1),
-      createCardEvent('playCard', 2),
-      createCardEvent('discardCard', 2),
+      createBattleEvent('playCard', 0),
+      createBattleEvent('discardCard', 0),
+      createBattleEvent('playCard', 1),
+      createBattleEvent('trashCard', 1),
+      createBattleEvent('playCard', 2),
+      createBattleEvent('discardCard', 2),
       createBattleEvent('shuffle'),
     ],
   },

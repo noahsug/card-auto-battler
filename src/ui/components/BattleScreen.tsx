@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { BattleEvent, createBattleEvent, createCardEvent } from '../../game/actions/battleEvent';
+import {
+  BattleEvent,
+  createBattleEvent,
+  eventAppliesToTarget,
+} from '../../game/actions/battleEvent';
 import { GameState } from '../../game/gameState';
 import {
   getActivePlayer,
@@ -57,16 +61,14 @@ export function BattleScreen({
   const [isPaused, setIsPaused] = useState(true);
   const nextAnimationState = useRef<AnimationState>('startTurn');
 
-  // TODO: make certain battle events not have a target (startBattle, undo)
   const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([
-    createBattleEvent('startBattle', 'self'),
-    createBattleEvent('startBattle', 'opponent'),
+    createBattleEvent('startBattle'),
   ]);
   const [userTarget, enemyTarget] = getPlayerTargets(game);
   const [userBattleEvents, enemyBattleEvents] = useMemo(() => {
     return [
-      battleEvents.filter(({ target }) => target === userTarget),
-      battleEvents.filter(({ target }) => target === enemyTarget),
+      battleEvents.filter((e) => eventAppliesToTarget(e, userTarget)),
+      battleEvents.filter((e) => eventAppliesToTarget(e, enemyTarget)),
     ];
   }, [battleEvents, userTarget, enemyTarget]);
 
@@ -75,7 +77,7 @@ export function BattleScreen({
     const card = activePlayer.cards[activePlayer.currentCardIndex];
     if (card) {
       // start the play card animation
-      events.push(createCardEvent('playCard', card.acquiredId));
+      events.push(createBattleEvent('playCard', card.acquiredId));
     }
     setBattleEvents(events);
     nextAnimationState.current = 'applyCardEffects';
@@ -117,7 +119,7 @@ export function BattleScreen({
 
   const handleUndo = useCallback(() => {
     undo();
-    setBattleEvents([createBattleEvent('undo', 'self'), createBattleEvent('undo', 'opponent')]);
+    setBattleEvents([createBattleEvent('undo')]);
     nextAnimationState.current = 'startTurn';
     setIsPaused(true);
   }, [undo]);

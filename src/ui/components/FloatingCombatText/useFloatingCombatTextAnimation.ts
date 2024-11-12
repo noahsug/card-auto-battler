@@ -1,6 +1,6 @@
-import { useSpringRef, useTransition } from '@react-spring/web';
-import { useEffect, useMemo } from 'react';
+import { useTransition } from '@react-spring/web';
 import random from 'lodash/random';
+import { useEffect, useMemo } from 'react';
 
 import { BattleEvent } from '../../../game/actions/battleEvent';
 import { UnitFn, useUnits } from '../../hooks/useUnits';

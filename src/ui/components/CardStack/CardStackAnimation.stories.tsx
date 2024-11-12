@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import { useRef, useState } from 'react';
 import { styled } from 'styled-components';
-import { BattleEvent, createBattleEvent, createCardEvent } from '../../../game/actions/battleEvent';
+import { BattleEvent, createBattleEvent } from '../../../game/actions/battleEvent';
 import { getRandomCards } from '../../../game/utils/cards';
 import { CardStackAnimation, Props } from './CardStackAnimation';
 
@@ -56,12 +56,12 @@ export const TakeTurn: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
-      createCardEvent('playCard', 0),
-      createCardEvent('discardCard', 0),
-      createCardEvent('playCard', 1),
-      createCardEvent('trashCard', 1),
-      createCardEvent('playCard', 2),
-      createCardEvent('discardCard', 2),
+      createBattleEvent('playCard', 0),
+      createBattleEvent('discardCard', 0),
+      createBattleEvent('playCard', 1),
+      createBattleEvent('trashCard', 1),
+      createBattleEvent('playCard', 2),
+      createBattleEvent('discardCard', 2),
       createBattleEvent('shuffle'),
     ],
   },
@@ -71,8 +71,8 @@ export const UndoPlayCard: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
-      createCardEvent('playCard', 0),
-      createCardEvent('discardCard', 0),
+      createBattleEvent('playCard', 0),
+      createBattleEvent('discardCard', 0),
       createBattleEvent('undo'),
     ],
   },
@@ -82,8 +82,8 @@ export const UndoTrashCard: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
-      createCardEvent('playCard', 0),
-      createCardEvent('trashCard', 0),
+      createBattleEvent('playCard', 0),
+      createBattleEvent('trashCard', 0),
       createBattleEvent('undo'),
     ],
   },
@@ -91,7 +91,7 @@ export const UndoTrashCard: Story = {
 
 export const UndoMidPlayCard: Story = {
   args: {
-    events: [createBattleEvent('startBattle'), createCardEvent('playCard', 0)],
+    events: [createBattleEvent('startBattle'), createBattleEvent('playCard', 0)],
     undoAfterMs: 1600,
   },
 };

@@ -13,7 +13,7 @@ import {
 } from '../gameState';
 import { BLEED_DAMAGE } from '../constants';
 import { assert } from '../../utils/asserts';
-import { BattleEvent, createDamageEvent, createHealEvent, createBattleEvent } from './battleEvent';
+import { BattleEvent, createBattleEvent } from './battleEvent';
 import { readonlyIncludes } from '../../utils/iterators';
 import { getPlayers, getTargetedPlayer, getRelic } from '../utils/selectors';
 
@@ -229,7 +229,7 @@ function reduceHealth(value: number, target: Target, { game, events }: PlayCardC
   }
 
   targetPlayer.health -= value;
-  events.push(createDamageEvent(value, target));
+  events.push(createBattleEvent('damage', value, target));
 }
 
 export function applyHeal(
@@ -246,7 +246,7 @@ export function applyHeal(
 
   value = updateValue(value, multiplier);
   targetPlayer.health += value;
-  events.push(createHealEvent(value, target));
+  events.push(createBattleEvent('heal', value, target));
 }
 
 function trashCards({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
