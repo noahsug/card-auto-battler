@@ -115,7 +115,6 @@ export function BattleScreen({
     setIsPaused((prev) => !prev);
   }, []);
 
-  // TODO: fix issue with multiple undos in a row taking 4 clicks to undo the last card
   const handleUndo = useCallback(() => {
     undo();
     setBattleEvents([createBattleEvent('undo', 'self'), createBattleEvent('undo', 'opponent')]);

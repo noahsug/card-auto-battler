@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import * as actions from '../../game/actions';
 import { createGameState, GameState } from '../../game/gameState';
@@ -28,20 +28,18 @@ type Action = (state: GameState, ...args: any[]) => any;
 
 export function useGameState(initialGameState: GameState = createGameState()) {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
-  const [past, setPast] = useState<GameState[]>([]);
+  const [undoHistory, setUndoHistory] = useState<GameState[]>([]);
 
   const boundActions = useMemo(() => {
     const actionEntries = Object.entries(actions) as [keyof typeof actions, Action][];
     return actionEntries.reduce((acc, [name, action]) => {
       const { promise, resolve } = getResolvablePromise<ReturnType<Action>>();
       acc[name] = (...args: Tail<Parameters<Action>>) => {
+        // only allow undoing to a previous startTurn event
+        if (name === 'startTurn') {
+          setUndoHistory((prev) => [...prev, gameState]);
+        }
         setGameState((gameState) => {
-          // only allow undoing to a previous startTurn event
-          if (name === 'startTurn') {
-            setPast((past) => {
-              return [...past, gameState];
-            });
-          }
           return produce(gameState, (draft) => {
             resolve(action(draft, ...args));
           });
@@ -50,25 +48,30 @@ export function useGameState(initialGameState: GameState = createGameState()) {
       };
       return acc;
     }, {} as BoundActions);
-    // without this dep, actions return memoized results for some reason
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // TODO: we should ideally remove this dep
   }, [gameState]);
 
-  const canUndo = () => {
-    return past.length > 0;
-  };
-  const clearUndo = () => {
-    setPast(() => {
-      return [];
-    });
-  };
-  const undo = () => {
-    const nextGameState = past[past.length - 1];
-    setGameState(nextGameState);
-    setPast((past) => past.slice(0, -1));
-  };
+  const canUndo = useCallback(() => {
+    return undoHistory.length > 0;
+  }, [undoHistory.length]);
 
-  const undoManager = { canUndo, clearUndo, undo };
+  const clearUndo = useCallback(() => {
+    setUndoHistory([]);
+  }, []);
+
+  const undo = useCallback(() => {
+    setUndoHistory((prev) => prev.slice(0, -1));
+    setGameState(undoHistory[undoHistory.length - 1]);
+  }, [undoHistory]);
+
+  const undoManager = useMemo(
+    () => ({
+      canUndo,
+      clearUndo,
+      undo,
+    }),
+    [canUndo, clearUndo, undo],
+  );
 
   return { game: gameState, actions: boundActions, undoManager };
 }
