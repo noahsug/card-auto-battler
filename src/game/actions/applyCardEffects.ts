@@ -1,21 +1,18 @@
+import { BLEED_DAMAGE } from '../constants';
 import {
   CardEffect,
   CardState,
+  GameState,
   If,
   MaybeValue,
-  PlayerValueDescriptor,
-  statusEffectNames,
-  Target,
-  ValueDescriptor,
   PlayerState,
-  GameState,
+  PlayerValueDescriptor,
+  Target,
   Tribe,
+  ValueDescriptor,
 } from '../gameState';
-import { BLEED_DAMAGE } from '../constants';
-import { assert } from '../../utils/asserts';
+import { getActivePlayer, getPlayers, getRelic, getTargetedPlayer } from '../utils/selectors';
 import { BattleEvent, createBattleEvent } from './battleEvent';
-import { readonlyIncludes } from '../../utils/iterators';
-import { getPlayers, getTargetedPlayer, getRelic, getActivePlayer } from '../utils/selectors';
 
 interface PlayCardContext {
   game: GameState;
@@ -245,14 +242,21 @@ export function reduceHealth(
   { value, multiplier = 1, target }: EffectOptions,
   { game, events }: PlayCardContext,
 ) {
-  value = updateValue(value, multiplier);
-
   const targetPlayer = getTargetedPlayer(game, target);
+  value = updateValue(value, multiplier);
 
   // reduceLowDamage
   const reduceLowDamage = getRelic(targetPlayer, 'reduceLowDamage');
-  if (reduceLowDamage && value <= reduceLowDamage.value) {
+  if (reduceLowDamage && value <= reduceLowDamage.value && value > reduceLowDamage.value2) {
     value = reduceLowDamage.value2;
+  }
+
+  // strengthOnSelfDamage
+  if (target === 'self' && value > 0) {
+    const strengthOnSelfDamage = getRelic(targetPlayer, 'strengthOnSelfDamage');
+    if (strengthOnSelfDamage) {
+      targetPlayer.strength += strengthOnSelfDamage.value;
+    }
   }
 
   targetPlayer.health -= value;

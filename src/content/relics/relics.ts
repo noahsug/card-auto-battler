@@ -1,9 +1,9 @@
-import { RelicState } from '../../game/gameState';
 import { createRelic } from '../utils/createRelic';
 
+import cutPalmImage from './images/cut-palm.png';
 import openWoundImage from './images/dripping-knife.png';
-import planksImage from './images/packed-planks.png';
 import sproutImage from './images/ground-sprout.png';
+import planksImage from './images/packed-planks.png';
 import necklaceImage from './images/primitive-necklace.png';
 
 // green
@@ -46,9 +46,16 @@ export const permaBleed = createRelic({
   value: 1,
   image: openWoundImage,
 });
+export const strengthOnSelfDamage = createRelic({
+  displayName: 'Masochist',
+  description: 'Gain $V strength whenever you take damage on your turn.',
+  value: 1,
+  image: cutPalmImage,
+});
 
 export const redRelics = {
   permaBleed,
+  strengthOnSelfDamage,
 };
 Object.values(redRelics).forEach((relic) => {
   relic.tribe = 'red';

@@ -18,7 +18,7 @@ import {
   SetValueCardEffect,
 } from '../gameState';
 import { permaBleed, reduceLowDamage, regenForHighDamage } from '../../content/relics';
-import { strengthAffectsHealing } from '../../content/relics/relics';
+import { strengthAffectsHealing, strengthOnSelfDamage } from '../../content/relics/relics';
 
 let card: CardState;
 let effect: CardEffect;
@@ -92,66 +92,6 @@ describe('damage', () => {
     const { diff } = getPlayCardResult();
 
     expect(diff).toEqual({ opponent: { health: -1 } });
-  });
-});
-
-describe('permaBleed', () => {
-  const relics = [permaBleed];
-
-  it('adds 1 bleed whenever bleed reaches 0', () => {
-    effect.multiHit = v(3);
-    const { diff } = getPlayCardResult({ self: { relics }, opponent: { bleed: 1 } });
-
-    const damage = 3 * (1 + BLEED_DAMAGE);
-    expect(diff).toEqual({ opponent: { health: -damage } });
-  });
-});
-
-describe('reduceLowDamage', () => {
-  const relics = [reduceLowDamage];
-
-  it('reduces damage to 1 when 4 or less', () => {
-    effect.value = v(4);
-    const { diff } = getPlayCardResult({ opponent: { relics } });
-    expect(diff).toEqual({ opponent: { health: -1 } });
-  });
-
-  it('does nothing when damage is 5 or more', () => {
-    effect.value = v(5);
-    const { diff } = getPlayCardResult({ opponent: { relics } });
-    expect(diff).toEqual({ opponent: { health: -5 } });
-  });
-});
-
-describe('regenForHighDamage', () => {
-  const relics = [regenForHighDamage];
-
-  it('adds regen when damage is high', () => {
-    effect.value = v(10);
-    const { diff } = getPlayCardResult({ self: { relics } });
-    expect(diff).toEqual({ self: { regen: 3 }, opponent: { health: -10 } });
-  });
-
-  it('does nothing when damage is low', () => {
-    effect.value = v(9);
-    const { diff } = getPlayCardResult({ self: { relics } });
-    expect(diff).toEqual({ opponent: { health: -9 } });
-  });
-});
-
-describe('strengthAffectsHealing', () => {
-  const relics = [strengthAffectsHealing];
-  beforeEach(() => {
-    card.effects[0] = {
-      name: 'heal',
-      target: 'self',
-      value: v(1),
-    };
-  });
-
-  it('strength is added to healing', () => {
-    const { diff } = getPlayCardResult({ self: { relics, strength: 1 } });
-    expect(diff).toEqual({ self: { health: 2 } });
   });
 });
 
@@ -555,5 +495,82 @@ describe('battle events', () => {
 
     const { events } = getPlayCardResult();
     expect(events).toEqual([{ type: 'damage', value: 0, target: 'opponent' }]);
+  });
+});
+
+describe('relics', () => {
+  describe('permaBleed', () => {
+    const relics = [permaBleed];
+
+    it('adds 1 bleed whenever bleed reaches 0', () => {
+      effect.multiHit = v(3);
+      const { diff } = getPlayCardResult({ self: { relics }, opponent: { bleed: 1 } });
+
+      const damage = 3 * (1 + BLEED_DAMAGE);
+      expect(diff).toEqual({ opponent: { health: -damage } });
+    });
+  });
+
+  describe('reduceLowDamage', () => {
+    const relics = [reduceLowDamage];
+
+    it('reduces damage to 1 when 4 or less', () => {
+      effect.value = v(4);
+      const { diff } = getPlayCardResult({ opponent: { relics } });
+      expect(diff).toEqual({ opponent: { health: -1 } });
+    });
+
+    it('does nothing when damage is 5 or more', () => {
+      effect.value = v(5);
+      const { diff } = getPlayCardResult({ opponent: { relics } });
+      expect(diff).toEqual({ opponent: { health: -5 } });
+    });
+  });
+
+  describe('regenForHighDamage', () => {
+    const relics = [regenForHighDamage];
+
+    it('adds regen when damage is high', () => {
+      effect.value = v(10);
+      const { diff } = getPlayCardResult({ self: { relics } });
+      expect(diff).toEqual({ self: { regen: 3 }, opponent: { health: -10 } });
+    });
+
+    it('does nothing when damage is low', () => {
+      effect.value = v(9);
+      const { diff } = getPlayCardResult({ self: { relics } });
+      expect(diff).toEqual({ opponent: { health: -9 } });
+    });
+  });
+
+  describe('strengthAffectsHealing', () => {
+    const relics = [strengthAffectsHealing];
+    beforeEach(() => {
+      card.effects[0] = {
+        name: 'heal',
+        target: 'self',
+        value: v(1),
+      };
+    });
+
+    it('strength is added to healing', () => {
+      const { diff } = getPlayCardResult({ self: { relics, strength: 1 } });
+      expect(diff).toEqual({ self: { health: 2 } });
+    });
+  });
+
+  describe('strengthOnSelfDamage', () => {
+    const relics = [strengthOnSelfDamage];
+
+    it('adds strength when taking damage on own turn', () => {
+      effect.target = 'self';
+      const { diff } = getPlayCardResult({ self: { relics } });
+      expect(diff).toEqual({ self: { strength: 1, health: -1 } });
+    });
+
+    it(`does not add strength when taking damage on opponent's turn`, () => {
+      const { diff } = getPlayCardResult({ opponent: { relics } });
+      expect(diff).toEqual({ opponent: { health: -1 } });
+    });
   });
 });
