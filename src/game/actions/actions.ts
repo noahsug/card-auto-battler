@@ -11,7 +11,7 @@ import {
 } from '../gameState';
 import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
-import { applyCardEffects, applyHeal } from './applyCardEffects';
+import { applyCardEffects, applyHeal, reduceHealth } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
 
 export function addCards(game: GameState, cards: CardState[]) {
@@ -74,10 +74,16 @@ export function startTurn(game: GameState): BattleEvent[] {
   const card = activePlayer.cards[activePlayer.currentCardIndex];
   const context = { game, events, card };
 
+  // regen
   if (activePlayer.regen > 0) {
-    // regen
     applyHeal({ value: activePlayer.regen, target: 'self' }, context);
     activePlayer.regen -= 1;
+  }
+
+  // burn
+  if (activePlayer.burn > 0) {
+    reduceHealth({ value: activePlayer.burn, target: 'self' }, context);
+    activePlayer.burn = Math.floor(activePlayer.burn / 2);
   }
 
   return events;

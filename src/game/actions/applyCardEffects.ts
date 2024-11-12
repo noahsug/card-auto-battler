@@ -216,7 +216,7 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   }
 
   value = updateValue(value, multiplier);
-  reduceHealth(value, target, context);
+  reduceHealth({ value, target }, context);
 
   // regenForHighDamage
   const regenForHighDamage = getRelic(self, 'regenForHighDamage');
@@ -226,7 +226,7 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
 
   // bleed
   if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
-    reduceHealth(BLEED_DAMAGE, target, context);
+    reduceHealth({ value: BLEED_DAMAGE, target }, context);
     opponent.bleed -= 1;
 
     // permaBleed
@@ -237,7 +237,12 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   }
 }
 
-function reduceHealth(value: number, target: Target, { game, events }: PlayCardContext) {
+export function reduceHealth(
+  { value, multiplier = 1, target }: EffectOptions,
+  { game, events }: PlayCardContext,
+) {
+  value = updateValue(value, multiplier);
+
   const targetPlayer = getTargetedPlayer(game, target);
 
   // reduceLowDamage

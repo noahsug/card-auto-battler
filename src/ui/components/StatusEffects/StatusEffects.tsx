@@ -6,6 +6,7 @@ import extraCardPlaysImage from './images/card-play.png';
 import bleedImage from './images/drop.png';
 import regenImage from './images/falling-leaf.png';
 import channelImage from './images/fire-silhouette.png';
+import burnImage from './images/flamer.png';
 
 import { StatusEffects as StatusEffectsType } from '../../../game/gameState';
 import { maskImage } from '../../style';
@@ -19,6 +20,7 @@ const effectToImage: Record<keyof StatusEffectsType, string> = {
   strength: strengthImage,
   regen: regenImage,
   channel: channelImage,
+  burn: burnImage,
 };
 
 const visibleStatusEffects = Object.keys(effectToImage) as (keyof StatusEffectsType)[];
