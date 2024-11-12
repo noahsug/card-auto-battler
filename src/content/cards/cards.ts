@@ -284,6 +284,24 @@ export const redCards = {
       image: bloodBoil,
     },
   ),
+  lifeSteal: createCard(
+    [
+      {
+        value: v(3),
+      },
+      {
+        name: 'heal',
+        value: v('opponent', 'damageDealtToTarget'),
+        target: 'self',
+      },
+    ],
+    {
+      name: 'Life Steal',
+      description: 'Deal $V damage. Heal equal to the damage dealt.',
+      // TODO: change image
+      image: parry,
+    },
+  ),
 };
 Object.values(redCards).forEach((card) => {
   card.tribe = 'red';
