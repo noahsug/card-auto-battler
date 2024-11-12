@@ -59,15 +59,16 @@ interface AnimationContext {
   windowDimensions: WindowDimensions;
 }
 
-function syncZIndex(cardAnimation: CardAnimationState, context: AnimationContext) {
+function syncDeckIndex(cardAnimation: CardAnimationState, context: AnimationContext) {
   cardAnimation.deckIndex = context.cards.findIndex(
     (c) => c.acquiredId === cardAnimation.card.acquiredId,
   );
 }
 
 function syncCard(cardAnimation: CardAnimationState, context: AnimationContext) {
-  syncZIndex(cardAnimation, context);
-  cardAnimation.inDiscard = cardAnimation.deckIndex < context.currentCardIndex;
+  syncDeckIndex(cardAnimation, context);
+  cardAnimation.inDiscard =
+    cardAnimation.deckIndex >= 0 && cardAnimation.deckIndex < context.currentCardIndex;
 }
 
 function getCardDealDirection({
@@ -194,6 +195,12 @@ function returnCardToCorrectPosition(cardAnimation: CardAnimationState, context:
   const { onCardAnimationComplete } = context;
 
   return async (next: (options: object) => Promise<void>) => {
+    // don't animate if the card is trashed
+    if (cardAnimation.deckIndex < 0) {
+      onCardAnimationComplete(cardAnimation);
+      return null;
+    }
+
     const position = cardAnimation.inDiscard
       ? getDiscardPosition(cardAnimation, context)
       : getDeckPosition(cardAnimation, context);
@@ -232,7 +239,7 @@ function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
     (event.type === 'shuffle' && cardAnimation.inDiscard) ||
     (event.type === 'startBattle' && !cardAnimation.inDiscard)
   ) {
-    syncZIndex(cardAnimation, context);
+    syncDeckIndex(cardAnimation, context);
     return dealCard(cardAnimation, context);
   }
 

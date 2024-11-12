@@ -5,7 +5,6 @@ import { styled } from 'styled-components';
 import { BattleEvent, createBattleEvent, createCardEvent } from '../../../game/actions/battleEvent';
 import { getRandomCards } from '../../../game/utils/cards';
 import { CardStackAnimation, Props } from './CardStackAnimation';
-import { useTimeout } from '../../hooks/useTimeout';
 
 const Container = styled.div`
   position: relative;
@@ -19,6 +18,7 @@ function CardStackAnimationTest({
   ...props
 }: { events: BattleEvent[]; undoAfterMs?: number } & Omit<Props, 'event' | 'onAnimationComplete'>) {
   const [event, setEvent] = useState<BattleEvent | undefined>(events[0]);
+
   const undoTimeout = useRef<NodeJS.Timeout>();
   if (undoAfterMs != null && undoTimeout.current == null) {
     undoTimeout.current = setTimeout(() => {

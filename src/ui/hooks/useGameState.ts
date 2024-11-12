@@ -26,8 +26,8 @@ export type Undo = () => void;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Action = (state: GameState, ...args: any[]) => any;
 
-export function useGameState() {
-  const [gameState, setGameState] = useState<GameState>(createGameState());
+export function useGameState(initialGameState: GameState = createGameState()) {
+  const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [past, setPast] = useState<GameState[]>([]);
 
   const boundActions = useMemo(() => {

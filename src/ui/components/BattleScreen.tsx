@@ -185,7 +185,11 @@ export function BattleScreen({
         onBack={canUndo() ? handleUndo : undefined}
         onTogglePlay={!isBattleOver ? handleTogglePlayPause : undefined}
         isPaused={isPaused}
-        onNext={!isBattleOver && isPaused ? handlePlayNextCard : undefined}
+        onNext={
+          !isBattleOver && isPaused && nextAnimationState.current === 'startTurn'
+            ? handlePlayNextCard
+            : undefined
+        }
       />
     </Container>
   );
