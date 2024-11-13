@@ -7,13 +7,18 @@ import bleedImage from './images/drop.png';
 import regenImage from './images/falling-leaf.png';
 import channelImage from './images/fire-silhouette.png';
 import burnImage from './images/flamer.png';
+import heartPlusImage from './images/heart-plus.png';
 
-import { StatusEffects as StatusEffectsType } from '../../../game/gameState';
+import { PlayerState, StatusEffectName } from '../../../game/gameState';
+import { IsSubtype } from '../../../utils/types';
 import { maskImage } from '../../style';
-import { Row } from '../shared/Row';
 import { Number } from '../shared/Number';
+import { Row } from '../shared/Row';
 
-const effectToImage: Record<keyof StatusEffectsType, string> = {
+type StatusEffectsWithoutIcons = IsSubtype<StatusEffectName, 'lifestealWhenBurning'>;
+type VisibleStatusEffectName = Exclude<StatusEffectName, StatusEffectsWithoutIcons>;
+
+const effectToImage: Record<VisibleStatusEffectName, string> = {
   bleed: bleedImage,
   dodge: dodgeImage,
   extraCardPlays: extraCardPlaysImage,
@@ -21,9 +26,10 @@ const effectToImage: Record<keyof StatusEffectsType, string> = {
   regen: regenImage,
   channel: channelImage,
   burn: burnImage,
+  lifesteal: heartPlusImage,
 };
 
-const visibleStatusEffects = Object.keys(effectToImage) as (keyof StatusEffectsType)[];
+const visibleStatusEffects = Object.keys(effectToImage) as VisibleStatusEffectName[];
 
 const size = 1.7;
 
@@ -47,18 +53,34 @@ const StatusEffectRow = styled(Row)`
 `;
 
 interface Props {
-  statusEffects: StatusEffectsType;
+  player: PlayerState;
 }
 
-export function StatusEffects({ statusEffects }: Props) {
+function getDisplayedStatusEffectValue(player: PlayerState, effectName: VisibleStatusEffectName) {
+  const value = player[effectName];
+
+  if (effectName === 'lifesteal') {
+    return `${(value * 100).toFixed(0)}%`;
+  }
+
+  return value;
+}
+
+export function StatusEffects({ player }: Props) {
+  const calculatedStatusEffects = { ...player };
+
+  if (player.burn > 0) {
+    calculatedStatusEffects.lifesteal += player.lifestealWhenBurning;
+  }
+
   return (
     <StatusEffectRow>
       {visibleStatusEffects.map(
         (effectName, i) =>
-          !!statusEffects[effectName] && (
+          !!calculatedStatusEffects[effectName] && (
             <StatusEffectValue key={i}>
               <Icon src={effectToImage[effectName]!} />
-              <Number>{statusEffects[effectName]}</Number>
+              <Number>{getDisplayedStatusEffectValue(calculatedStatusEffects, effectName)}</Number>
             </StatusEffectValue>
           ),
       )}

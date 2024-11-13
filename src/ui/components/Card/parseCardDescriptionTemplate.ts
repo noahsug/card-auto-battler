@@ -82,12 +82,14 @@ export function parseCardDescriptionTemplate(card: CardState) {
     let multiplier = 1;
     let offset = 0;
 
+    // match "%" suffix
     if (templateStr.endsWith('%')) {
       templateStr = templateStr.slice(0, -1);
       suffix = '%';
       multiplier = 100;
     }
 
+    // match "+2"
     const addMatch = templateStr.match(/[+](\d+)$/);
     if (addMatch) {
       const [entireMatch, addValue] = addMatch;
@@ -97,6 +99,6 @@ export function parseCardDescriptionTemplate(card: CardState) {
 
     const value = templateMap[templateStr];
     assertIsNonNullable(value, 'invalid template string: ' + templateStr);
-    return value * multiplier + offset + suffix;
+    return (value + offset) * multiplier + suffix;
   });
 }

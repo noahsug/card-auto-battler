@@ -1,5 +1,6 @@
 import { createCard, value as v } from '../../../content/utils/createCard';
 import { parseCardDescriptionTemplate } from './parseCardDescriptionTemplate';
+import lifesteal from '../../../content/cards/images/lifesteal.jpeg';
 
 it('parses basic values', () => {
   const description = parseCardDescriptionTemplate(
@@ -41,6 +42,22 @@ it('handles percentages', () => {
     ),
   );
   expect(description).toBe('Deal 30% of your current health as damage.');
+
+  const description2 = parseCardDescriptionTemplate(
+    createCard(
+      [
+        {
+          name: 'lifestealWhenBurning',
+          value: v(0.5),
+          target: 'self',
+        },
+      ],
+      {
+        description: 'Gain $V% lifesteal when burning.',
+      },
+    ),
+  );
+  expect(description2).toBe('Gain 50% lifesteal when burning.');
 });
 
 it('handles addition', () => {

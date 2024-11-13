@@ -7,6 +7,7 @@ import {
   MaybeValue,
   PlayerState,
   PlayerValueDescriptor,
+  PlayerValueName,
   Target,
   Tribe,
   ValueDescriptor,
@@ -67,11 +68,11 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
     value += maybeGetValue(effect.add, context) || 0;
   }
 
-  const multiplier = effect.multiply && maybeGetValue(effect.multiply, context);
+  const multiplier = (effect.multiply && maybeGetValue(effect.multiply, context)) || 1;
   const effectOptions = { value, multiplier, target: effect.target };
 
   const player = getTargetedPlayer(context.game, effect.target);
-  value = updateValue(value, multiplier);
+  value *= multiplier;
 
   switch (effect.name) {
     case 'damage': {
@@ -91,13 +92,13 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
       break;
 
     case 'set': {
-      player[effect.valueName] = value;
+      player[effect.valueName] = maybeFloorValue(value, effect.valueName);
       break;
     }
 
     default: {
       // status effects
-      player[effect.name] += value;
+      player[effect.name] += maybeFloorValue(value, effect.name);
     }
   }
 
@@ -133,7 +134,7 @@ function getValue(descriptor: ValueDescriptor, context: PlayCardContext): number
 }
 
 function calculateTribePercent(player: PlayerState, tribe: Tribe): number {
-  return (player.cards.filter((card) => card.tribe === tribe).length / player.cards.length) * 100;
+  return player.cards.filter((card) => card.tribe === tribe).length / player.cards.length;
 }
 
 function getPlayerValue(
@@ -216,13 +217,19 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
     context.reduceChannelStatusEffect = true;
   }
 
-  value = updateValue(value, multiplier);
+  value = Math.floor(value * multiplier);
   reduceHealth({ value, target }, context);
 
   // regenForHighDamage
   const regenForHighDamage = getRelic(self, 'regenForHighDamage');
   if (regenForHighDamage && value >= regenForHighDamage.value) {
     self.regen += regenForHighDamage.value2;
+  }
+
+  // lifesteal
+  const lifesteal = self.lifesteal + (self.burn > 0 ? self.lifestealWhenBurning : 0);
+  if (value > 0 && lifesteal > 0) {
+    applyHeal({ value: lifesteal * value, target: 'self' }, context);
   }
 
   // bleed
@@ -243,7 +250,7 @@ export function reduceHealth(
   { game, events }: PlayCardContext,
 ) {
   const targetPlayer = getTargetedPlayer(game, target);
-  value = updateValue(value, multiplier);
+  value = Math.floor(value * multiplier);
 
   // reduceLowDamage
   const reduceLowDamage = getRelic(targetPlayer, 'reduceLowDamage');
@@ -275,7 +282,7 @@ export function applyHeal(
     value += targetPlayer.strength;
   }
 
-  value = updateValue(value, multiplier);
+  value = Math.floor(value * multiplier);
   targetPlayer.health += value;
   events.push(createBattleEvent('heal', value, target));
 }
@@ -288,8 +295,11 @@ function trashCards({ value, multiplier = 1, target }: EffectOptions, context: P
   // trashNextCards({ player, isActivePlayer, numCardsToTrash: value });
 }
 
-function updateValue(value: number, multiplier: number = 1) {
-  value *= multiplier;
+function maybeFloorValue(value: number, name: keyof PlayerState) {
+  if (name === 'lifesteal' || name === 'lifestealWhenBurning') {
+    // these values use % so don't round them
+    return value;
+  }
   return Math.floor(value);
 }
 

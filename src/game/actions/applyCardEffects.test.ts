@@ -161,65 +161,6 @@ describe('set', () => {
   });
 });
 
-describe('dodge', () => {
-  beforeEach(() => {
-    effect.name = 'dodge';
-  });
-
-  it('increases opponent dodge', () => {
-    const { diff } = getPlayCardResult();
-
-    expect(diff).toEqual({ opponent: { dodge: 1 } });
-  });
-
-  it('increases self dodge', () => {
-    effect.target = 'self';
-    const { diff } = getPlayCardResult();
-
-    expect(diff).toEqual({ self: { dodge: 1 } });
-  });
-
-  it('rounds dodge down', () => {
-    effect.value = v(1.5);
-    const { diff } = getPlayCardResult();
-
-    expect(diff).toEqual({ opponent: { dodge: 1 } });
-  });
-});
-
-describe('channel', () => {
-  beforeEach(() => {
-    card.name = 'Fireball';
-  });
-
-  it('doubles damage from next fire card', () => {
-    const { diff } = getPlayCardResult({
-      self: { channel: 1 },
-    });
-    expect(diff).toEqual({ self: { channel: -1 }, opponent: { health: -2 } });
-  });
-
-  it('applies to each effect on a fire card', () => {
-    card.effects = [
-      createEffect({ name: 'damage', value: v(1) }),
-      createEffect({ name: 'damage', value: v(2) }),
-      createEffect({ name: 'damage', value: v(3) }),
-    ];
-    const { diff } = getPlayCardResult({
-      self: { channel: 1 },
-    });
-    expect(diff).toEqual({ self: { channel: -1 }, opponent: { health: -12 } });
-  });
-
-  it('does nothing for non-fire cards', () => {
-    card.name = 'Blueball';
-    const { diff } = getPlayCardResult({
-      self: { channel: 1 },
-    });
-    expect(diff).toEqual({ opponent: { health: -1 } });
-  });
-});
-
 // describe('trash cards', () => {
 //   beforeEach(() => {
 //     effect.name = 'trash';
@@ -297,7 +238,7 @@ describe('if', () => {
   });
 
   it('compares to percentGreen', () => {
-    effect.if = ifCompare('self', 'percentGreen', '>=', 50);
+    effect.if = ifCompare('self', 'percentGreen', '>=', 0.5);
 
     const basicCard = createCard();
     const greenCard = createCard([{}], { tribe: 'green' });
@@ -495,6 +436,100 @@ describe('battle events', () => {
 
     const { events } = getPlayCardResult();
     expect(events).toEqual([{ type: 'damage', value: 0, target: 'opponent' }]);
+  });
+});
+
+describe('status effects', () => {
+  describe('dodge', () => {
+    beforeEach(() => {
+      effect.name = 'dodge';
+    });
+
+    it('increases opponent dodge', () => {
+      const { diff } = getPlayCardResult();
+
+      expect(diff).toEqual({ opponent: { dodge: 1 } });
+    });
+
+    it('increases self dodge', () => {
+      effect.target = 'self';
+      const { diff } = getPlayCardResult();
+
+      expect(diff).toEqual({ self: { dodge: 1 } });
+    });
+
+    it('rounds dodge down', () => {
+      effect.value = v(1.5);
+      const { diff } = getPlayCardResult();
+
+      expect(diff).toEqual({ opponent: { dodge: 1 } });
+    });
+  });
+
+  describe('channel', () => {
+    beforeEach(() => {
+      card.name = 'Fireball';
+    });
+
+    it('doubles damage from next fire card', () => {
+      const { diff } = getPlayCardResult({
+        self: { channel: 1 },
+      });
+      expect(diff).toEqual({ self: { channel: -1 }, opponent: { health: -2 } });
+    });
+
+    it('applies to each effect on a fire card', () => {
+      card.effects = [
+        createEffect({ name: 'damage', value: v(1) }),
+        createEffect({ name: 'damage', value: v(2) }),
+        createEffect({ name: 'damage', value: v(3) }),
+      ];
+      const { diff } = getPlayCardResult({
+        self: { channel: 1 },
+      });
+      expect(diff).toEqual({ self: { channel: -1 }, opponent: { health: -12 } });
+    });
+
+    it('does nothing for non-fire cards', () => {
+      card.name = 'Blueball';
+      const { diff } = getPlayCardResult({
+        self: { channel: 1 },
+      });
+      expect(diff).toEqual({ opponent: { health: -1 } });
+    });
+  });
+
+  describe('lifesteal', () => {
+    it('heals self for damage dealt', () => {
+      const { diff } = getPlayCardResult({ self: { lifesteal: 1 } });
+
+      expect(diff).toEqual({ self: { health: 1 }, opponent: { health: -1 } });
+    });
+
+    it('lifestealWhenBurning adds to lifesteal', () => {
+      const { diff } = getPlayCardResult({
+        self: { lifesteal: 1, lifestealWhenBurning: 1, burn: 1 },
+      });
+
+      expect(diff).toEqual({ self: { health: 2 }, opponent: { health: -1 } });
+    });
+
+    it('does not heal when lifesteal is 0', () => {
+      const { diff } = getPlayCardResult({
+        self: { lifesteal: 0, lifestealWhenBurning: 1, burn: 0 },
+      });
+
+      expect(diff).toEqual({ opponent: { health: -1 } });
+    });
+
+    it('is added to self via card effect', () => {
+      effect.name = 'lifesteal';
+      effect.target = 'self';
+      effect.value = v(0.5);
+      const { diff } = getPlayCardResult();
+
+      expect(diff).toEqual({ self: { lifesteal: 0.5 } });
+    });
   });
 });
 

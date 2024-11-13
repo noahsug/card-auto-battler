@@ -19,6 +19,8 @@ import uppercut from './images/uppercut.png';
 import manyJabs from './images/many-jabs.jpeg';
 import bloodbath from './images/bloodbath.jpeg';
 import bloodBoil from './images/blood-boil.jpeg';
+import lifesteal from './images/lifesteal.jpeg';
+import personOnFire from './images/person-on-fire.jpeg';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
@@ -70,7 +72,7 @@ export const greenCards = {
         value: v(4),
         multiply: {
           value: v(2),
-          if: ifCompare('self', 'percentGreen', '>=', 50),
+          if: ifCompare('self', 'percentGreen', '>=', 0.5),
         },
       },
     ],
@@ -224,7 +226,7 @@ export const redCards = {
     ],
     {
       name: 'Phoenix Fire',
-      description: 'Deal $V damage. Apply burn equal to the damage dealt.',
+      description: 'Deal $V damage. Apply burn equal to damage dealt.',
       image: phoenix,
     },
   ),
@@ -245,17 +247,18 @@ export const redCards = {
     [
       {
         name: 'bleed',
-        value: v(4),
+        value: v(5),
       },
       {
         name: 'bleed',
-        value: v(4),
+        value: v(5),
         target: 'self',
       },
     ],
     {
+      trash: true,
       name: 'Bloodbath',
-      description: 'Apply $V bleed to yourself and the opponent.',
+      description: 'Apply $V bleed to yourself and the opponent. Trash.',
       image: bloodbath,
     },
   ),
@@ -297,9 +300,28 @@ export const redCards = {
     ],
     {
       name: 'Life Steal',
-      description: 'Deal $V damage. Heal equal to the damage dealt.',
-      // TODO: change image
-      image: parry,
+      description: 'Deal $V damage. Lifesteal.',
+      image: lifesteal,
+    },
+  ),
+  lifestealWithBurn: createCard(
+    [
+      {
+        name: 'lifestealWhenBurning',
+        value: v(0.5),
+        target: 'self',
+      },
+      {
+        name: 'burn',
+        value: v(3),
+        target: 'self',
+      },
+    ],
+    {
+      trash: true,
+      name: 'Consumed By Flame',
+      description: `Gain $V% lifesteal when burning. Gain $2V burn. Trash.`,
+      image: personOnFire,
     },
   ),
 };

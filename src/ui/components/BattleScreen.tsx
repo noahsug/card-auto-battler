@@ -143,7 +143,7 @@ export function BattleScreen({
       <CenterContent>
         <PlayersRow>
           <Player className={getIsUserTurn(game) ? 'active' : ''}>
-            <StatusEffects statusEffects={user} />
+            <StatusEffects player={user} />
             <PlayerProfile
               src={user.image}
               handleRef={userProfileHandleRef}
@@ -158,7 +158,7 @@ export function BattleScreen({
           </Player>
 
           <Player className={getIsUserTurn(game) ? '' : 'active'}>
-            <StatusEffects statusEffects={enemy} />
+            <StatusEffects player={enemy} />
             <PlayerProfile
               src={enemy.image}
               flip={true}

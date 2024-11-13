@@ -14,6 +14,8 @@ export const statusEffectNames = [
   'regen',
   'channel',
   'burn',
+  'lifesteal',
+  'lifestealWhenBurning',
 ] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;
@@ -154,7 +156,12 @@ export function createGameState(): GameState {
   };
 
   const { attack, heal, fireball } = allCards;
-  addCardsToPlayer(game.user, [allCards.channel, allCards.fireSpears, allCards.fireball, attack]);
+  addCardsToPlayer(game.user, [
+    allCards.lifestealWithBurn,
+    allCards.lifeSteal,
+    allCards.phoenixFire,
+    attack,
+  ]);
   addCardsToPlayer(game.enemy, [attack]);
 
   return game;

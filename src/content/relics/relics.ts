@@ -47,7 +47,7 @@ export const permaBleed = createRelic({
   image: openWoundImage,
 });
 export const strengthOnSelfDamage = createRelic({
-  displayName: 'Masochist',
+  displayName: 'Power Through Pain',
   description: 'Gain $V strength whenever you take damage on your turn.',
   value: 1,
   image: cutPalmImage,

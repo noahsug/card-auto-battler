@@ -108,7 +108,7 @@ export function value(
   multiplier?: number,
 ): ValueDescriptor {
   if (typeof valueOrTarget === 'number') {
-    return { type: 'basicValue', value: Math.floor(valueOrTarget) };
+    return { type: 'basicValue', value: valueOrTarget };
   }
   assertIsNonNullable(name);
   return { type: 'playerValue', target: valueOrTarget, name, multiplier };

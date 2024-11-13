@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { EMPTY_STATUS_EFFECTS, StatusEffectName, statusEffectNames } from '../../../game/gameState';
+import { createGameState, StatusEffectName, statusEffectNames } from '../../../game/gameState';
 import { StatusEffects } from './StatusEffects';
 
 const meta = {
@@ -11,13 +11,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const statusEffects = { ...EMPTY_STATUS_EFFECTS };
+const player = createGameState().user;
 statusEffectNames.forEach((effectName: StatusEffectName, i) => {
-  statusEffects[effectName] = i + 1;
+  player[effectName] = i + 1;
 });
 
 export const Full: Story = {
   args: {
-    statusEffects,
+    player,
   },
 };

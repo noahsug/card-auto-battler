@@ -51,3 +51,12 @@ export type ExtendUnion<T, U> = T extends unknown ? U & T : never;
 export type KeysOfUnion<T> = T extends T ? keyof T : never;
 
 export type Direction = -1 | 1;
+
+/**
+ * Throws an error if the second type is not a subtype of the first type.
+ *
+ * Usage:
+ *   IsSubtype<'a' | 'b', 'a'> => 'a'
+ *   IsSubtype<'a' | 'b', 'c'> => Error
+ */
+export type IsSubtype<T, U extends T> = U;
