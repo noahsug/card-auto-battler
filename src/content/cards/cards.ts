@@ -332,7 +332,7 @@ export const redCards = {
     [
       {
         name: 'lifestealWhenBurning',
-        value: v(0.5),
+        value: v(1),
         target: 'self',
       },
       {
@@ -344,7 +344,7 @@ export const redCards = {
     {
       trash: true,
       name: 'Power Through Flame',
-      description: `Gain $V% lifesteal when burning. Gain $2V burn. Trash.`,
+      description: `Gain lifesteal when burning. Gain $2V burn. Trash.`,
       image: personOnFireImage,
     },
   ),

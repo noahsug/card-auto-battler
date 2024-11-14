@@ -237,12 +237,6 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
     reduceHealth({ value: BLEED_DAMAGE, target }, context);
     opponent.bleed -= 1;
-
-    // permaBleed
-    const permaBleed = getRelic(self, 'permaBleed');
-    if (permaBleed && opponent.bleed <= 0) {
-      opponent.bleed += permaBleed.value;
-    }
   }
 }
 

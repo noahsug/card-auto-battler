@@ -24,19 +24,7 @@ export function addRelic(game: GameState, relic: RelicState) {
   game.user.relics.push(relic);
 }
 
-function triggerStartOfBattleEffects({
-  self,
-  opponent,
-}: {
-  self: PlayerState;
-  opponent: PlayerState;
-}) {
-  // permaBleed
-  const permaBleed = getRelic(self, 'permaBleed');
-  if (permaBleed) {
-    opponent.bleed += permaBleed.value;
-  }
-
+function triggerStartOfBattleEffects({ self }: { self: PlayerState; opponent: PlayerState }) {
   // strengthAffectsHealing
   const strengthAffectsHealing = getRelic(self, 'strengthAffectsHealing');
   if (strengthAffectsHealing) {
@@ -64,7 +52,7 @@ export function startTurn(game: GameState): BattleEvent[] {
     startBattle(game);
   }
 
-  const [activePlayer] = getPlayers(game);
+  const [activePlayer, nonActivePlayer] = getPlayers(game);
 
   activePlayer.damageDealtLastTurn = activePlayer.damageDealtThisTurn;
   activePlayer.damageDealtThisTurn = 0;
@@ -84,6 +72,12 @@ export function startTurn(game: GameState): BattleEvent[] {
   if (activePlayer.burn > 0) {
     reduceHealth({ value: activePlayer.burn, target: 'self' }, context);
     activePlayer.burn = Math.floor(activePlayer.burn / 2);
+  }
+
+  // permaBleed
+  const permaBleed = getRelic(activePlayer, 'permaBleed');
+  if (permaBleed) {
+    nonActivePlayer.bleed += permaBleed.value;
   }
 
   return events;

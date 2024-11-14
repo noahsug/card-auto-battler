@@ -60,7 +60,7 @@ Object.values(greenRelics).forEach((relic) => {
 // red
 export const permaBleed = createRelic({
   displayName: 'Eternal Wound',
-  description: 'Add $V permanent bleed to the opponent.',
+  description: 'Add $V bleed to the opponent at the start of your turn.',
   value: 1,
   image: openWoundImage,
 });
