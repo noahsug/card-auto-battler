@@ -2,13 +2,16 @@
 
 Game TODO:
 
+1. pause should pause all current animations - or at least pause after card effects have been
+   played (I want to pause and see what the card is doing)
+1. remove perma bleed cuz it's confusing
 1. shuffle discard back into deck and use UID (OrderAcquired field in CardInstance?) to fix
    animation, use seeded random to ensure shuffle is always the same
-2. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
+1. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
    up by the user on left/right
-3. clicking a card in battle screen pauses and zooms in on card
-4. clicking a card in deck view screen zooms in on card
-5. add loading screen
+1. clicking a card in battle screen pauses and zooms in on card
+1. clicking a card in deck view screen zooms in on card
+1. add loading screen
 
 Maybe TODO:
 

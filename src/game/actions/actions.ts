@@ -13,6 +13,7 @@ import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal, reduceHealth, getDamageDealt } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
+import { extraCardPlaysAtStart } from '../../content/relics/relics';
 
 export function addCards(game: GameState, cards: CardState[]) {
   addCardsToPlayer(game.user, cards);
@@ -49,6 +50,12 @@ function startBattle(game: GameState) {
 
   triggerStartOfBattleEffects(userPerspective);
   triggerStartOfBattleEffects(enemyPerspective);
+
+  // extraCardPlaysAtStart
+  const extraCardPlaysAtStart = getRelic(game.user, 'extraCardPlaysAtStart');
+  if (extraCardPlaysAtStart) {
+    game.user.extraCardPlays += extraCardPlaysAtStart.value;
+  }
 }
 
 export function startTurn(game: GameState): BattleEvent[] {
@@ -162,6 +169,9 @@ export function endBattle(game: GameState) {
   game.turn = 0;
   resetPlayerAfterBattle(game.user);
   resetPlayerAfterBattle(game.enemy);
+
+  game.enemy.startingHealth += 10;
+  game.enemy.health = game.enemy.startingHealth;
 }
 
 export function resetGame(game: GameState) {

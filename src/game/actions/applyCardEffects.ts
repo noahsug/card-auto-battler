@@ -225,9 +225,10 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   }
 
   // lifesteal
+  const relicLifesteal = getRelic(self, 'lifesteal')?.value || 0;
   const cardLifesteal = maybeGetValue(card.lifesteal, context) || 0;
   const burnLifesteal = self.burn > 0 ? self.lifestealWhenBurning : 0;
-  const lifesteal = self.lifesteal + cardLifesteal + burnLifesteal;
+  const lifesteal = self.lifesteal + cardLifesteal + burnLifesteal + relicLifesteal;
   if (value > 0 && lifesteal > 0) {
     applyHeal({ value: lifesteal * value, target: 'self' }, context);
   }

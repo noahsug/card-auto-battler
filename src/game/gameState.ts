@@ -156,14 +156,9 @@ export function createGameState(): GameState {
     losses: 0,
   };
 
-  const { attack, heal, fireball } = allCards;
-  addCardsToPlayer(game.user, [
-    allCards.lifestealWithBurn,
-    allCards.lifesteal,
-    allCards.phoenixFire,
-    attack,
-  ]);
-  addCardsToPlayer(game.enemy, [attack]);
+  const { attack, heal } = allCards;
+  addCardsToPlayer(game.user, [attack, attack, heal]);
+  addCardsToPlayer(game.enemy, [attack, attack, attack, heal]);
 
   return game;
 }

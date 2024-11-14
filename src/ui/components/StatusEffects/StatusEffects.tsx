@@ -5,7 +5,6 @@ import dodgeImage from './images/body-balance.png';
 import extraCardPlaysImage from './images/card-play.png';
 import bleedImage from './images/drop.png';
 import regenImage from './images/falling-leaf.png';
-import channelImage from './images/fire-silhouette.png';
 import burnImage from './images/flamer.png';
 import heartPlusImage from './images/heart-plus.png';
 
@@ -15,7 +14,7 @@ import { maskImage } from '../../style';
 import { Number } from '../shared/Number';
 import { Row } from '../shared/Row';
 
-type StatusEffectsWithoutIcons = IsSubtype<StatusEffectName, 'lifestealWhenBurning'>;
+type StatusEffectsWithoutIcons = IsSubtype<StatusEffectName, 'lifestealWhenBurning' | 'channel'>;
 type VisibleStatusEffectName = Exclude<StatusEffectName, StatusEffectsWithoutIcons>;
 
 const effectToImage: Record<VisibleStatusEffectName, string> = {
@@ -24,7 +23,6 @@ const effectToImage: Record<VisibleStatusEffectName, string> = {
   extraCardPlays: extraCardPlaysImage,
   strength: strengthImage,
   regen: regenImage,
-  channel: channelImage,
   burn: burnImage,
   lifesteal: heartPlusImage,
 };
