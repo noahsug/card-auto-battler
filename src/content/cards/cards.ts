@@ -1,26 +1,27 @@
-import channel from './images/channel.jpeg';
-import eviscerate from './images/eviscerate.jpeg';
-import firePower from './images/fire-power.jpeg';
-import fireball from './images/fireball.png';
-import parry from './images/parry.png';
-import phoenix from './images/phoenix.jpeg';
-import punch from './images/punch.png';
-import volcano from './images/volcano.jpeg';
-import cross from './images/cross.png';
-import growingClub from './images/growing-club.png';
-import treeFall from './images/tree-fall.png';
-import bless from './images/bless.jpeg';
-import curledLeaf from './images/curled-leaf.png';
-import regrowth from './images/regrowth.jpeg';
-import angryGiant from './images/angry-giant.jpeg';
-import heavyRock from './images/heavy-rock.jpeg';
-import leftJab from './images/left-jab.png';
-import uppercut from './images/uppercut.png';
-import manyJabs from './images/many-jabs.jpeg';
-import bloodbath from './images/bloodbath.jpeg';
-import bloodBoil from './images/blood-boil.jpeg';
-import lifesteal from './images/lifesteal.jpeg';
-import personOnFire from './images/person-on-fire.jpeg';
+import channelImage from './images/channel.jpeg';
+import eviscerateImage from './images/eviscerate.jpeg';
+import firePowerImage from './images/fire-power.png';
+import fireballImage from './images/fireball.png';
+import parryImage from './images/parry.png';
+import phoenixImage from './images/phoenix.jpeg';
+import punchImage from './images/punch.png';
+import volcanoImage from './images/volcano.jpeg';
+import crossImage from './images/cross.png';
+import growingClubImage from './images/growing-club.png';
+import treeFallImage from './images/tree-fall.png';
+import blessImage from './images/bless.jpeg';
+import curledLeafImage from './images/curled-leaf.png';
+import regrowthImage from './images/regrowth.jpeg';
+import angryGiantImage from './images/angry-giant.jpeg';
+import heavyRockImage from './images/heavy-rock.jpeg';
+import leftJabImage from './images/left-jab.png';
+import uppercutImage from './images/uppercut.png';
+import manyJabsImage from './images/many-jabs.jpeg';
+import bloodbathImage from './images/bloodbath.jpeg';
+import bloodBoilImage from './images/blood-boil.jpeg';
+import lifestealImage from './images/lifesteal.jpeg';
+import personOnFireImage from './images/person-on-fire.jpeg';
+import bladeBloodFireImage from './images/blade-blood-fire.jpeg';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
@@ -34,7 +35,7 @@ export const basicCards = {
     {
       name: 'Punch',
       description: `Deal $V damage.`,
-      image: punch,
+      image: punchImage,
     },
   ),
   heal: createCard(
@@ -48,7 +49,7 @@ export const basicCards = {
     {
       name: 'Mend',
       description: 'Heal $V HP.',
-      image: cross,
+      image: crossImage,
     },
   ),
 };
@@ -63,7 +64,7 @@ export const greenCards = {
     {
       name: 'Evergrowing Club',
       description: `Deal 1 damage. Grow +$V damage at the end of your turn.`,
-      image: growingClub,
+      image: growingClubImage,
     },
   ),
   damageForGreen: createCard(
@@ -79,7 +80,7 @@ export const greenCards = {
     {
       name: 'Treefall',
       description: `Deal $V damage. Deal double damage if at least half your cards are green.`,
-      image: treeFall,
+      image: treeFallImage,
     },
   ),
   healForGreen: createCard(
@@ -97,7 +98,7 @@ export const greenCards = {
       },
       name: 'Regrowth',
       description: `Heal $V HP. Repeat if your previous card played was green.`,
-      image: regrowth,
+      image: regrowthImage,
     },
   ),
   regen: createCard(
@@ -111,7 +112,7 @@ export const greenCards = {
     {
       name: 'Regeneration',
       description: `Gain $V regeneration.`,
-      image: curledLeaf,
+      image: curledLeafImage,
     },
   ),
   gainStrengthAndRegen: createCard(
@@ -130,7 +131,7 @@ export const greenCards = {
     {
       name: `Bless`,
       description: `Gain strength equal to your regeneration. Gain $2V regeneration.`,
-      image: bless,
+      image: blessImage,
     },
   ),
   damageIfNoDamage: createCard(
@@ -143,7 +144,7 @@ export const greenCards = {
     {
       name: 'Not So Gentle',
       description: `Deal $V% of your current health as damage if you dealt no damage last turn.`,
-      image: angryGiant,
+      image: angryGiantImage,
     },
   ),
   damageFromStrength: createCard(
@@ -158,7 +159,7 @@ export const greenCards = {
     {
       name: 'Boulder Bash',
       description: `Deal $V damage. Strength affects this card $A+1 times.`,
-      image: heavyRock,
+      image: heavyRockImage,
     },
   ),
 };
@@ -177,7 +178,7 @@ export const redCards = {
       trash: true,
       name: 'Fireball',
       description: 'Deal $V damage. Trash.',
-      image: fireball,
+      image: fireballImage,
     },
   ),
   channel: createCard(
@@ -195,7 +196,7 @@ export const redCards = {
       name: 'Channel',
       description:
         'The next "fire" card you play this turn deals double damage. Play another card.',
-      image: channel,
+      image: channelImage,
     },
   ),
   fireSpears: createCard(
@@ -209,7 +210,34 @@ export const redCards = {
     {
       name: 'Pillars of Fire',
       description: 'Deal $V damage $N times.',
-      image: firePower,
+      image: firePowerImage,
+    },
+  ),
+  hellFire: createCard(
+    [
+      {
+        name: 'damage',
+        value: v(6),
+      },
+      {
+        name: 'burn',
+        value: v(4),
+      },
+      {
+        name: 'damage',
+        value: v(6),
+        target: 'self',
+      },
+      {
+        name: 'burn',
+        value: v(4),
+        target: 'self',
+      },
+    ],
+    {
+      name: 'Hellfire',
+      description: 'Deal $V damage and $2V burn to the enemy and yourself.',
+      image: volcanoImage,
     },
   ),
   phoenixFire: createCard(
@@ -227,7 +255,7 @@ export const redCards = {
     {
       name: 'Phoenix Fire',
       description: 'Deal $V damage. Apply burn equal to damage dealt.',
-      image: phoenix,
+      image: phoenixImage,
     },
   ),
   eviscerate: createCard(
@@ -240,7 +268,7 @@ export const redCards = {
     {
       name: 'Eviscerate',
       description: 'Deal $V damage 1 time for every bleed the enemy has.',
-      image: eviscerate,
+      image: eviscerateImage,
     },
   ),
   bloodBath: createCard(
@@ -259,19 +287,19 @@ export const redCards = {
       trash: true,
       name: 'Bloodbath',
       description: 'Apply $V bleed to yourself and the opponent. Trash.',
-      image: bloodbath,
+      image: bloodbathImage,
     },
   ),
   bloodBoil: createCard(
     [
       {
         name: 'burn',
-        value: v(3),
+        value: v(4),
         target: 'self',
       },
       {
         name: 'strength',
-        value: v('self', 'burn'),
+        value: v(3),
         target: 'self',
       },
       {
@@ -283,25 +311,21 @@ export const redCards = {
     ],
     {
       name: 'Blood Boil',
-      description: `Gain $V burn. Gain strength equal to your burn. Remove all your bleed.`,
-      image: bloodBoil,
+      description: `Gain $V burn and $2V strength. Remove all your bleed.`,
+      image: bloodBoilImage,
     },
   ),
-  lifeSteal: createCard(
+  lifesteal: createCard(
     [
       {
         value: v(3),
       },
-      {
-        name: 'heal',
-        value: v('opponent', 'damageDealtToTarget'),
-        target: 'self',
-      },
     ],
     {
-      name: 'Life Steal',
+      lifesteal: { value: v(1) },
+      name: 'Reap',
       description: 'Deal $V damage. Lifesteal.',
-      image: lifesteal,
+      image: lifestealImage,
     },
   ),
   lifestealWithBurn: createCard(
@@ -313,15 +337,36 @@ export const redCards = {
       },
       {
         name: 'burn',
-        value: v(3),
+        value: v(4),
         target: 'self',
       },
     ],
     {
       trash: true,
-      name: 'Consumed By Flame',
+      name: 'Power Through Flame',
       description: `Gain $V% lifesteal when burning. Gain $2V burn. Trash.`,
-      image: personOnFire,
+      image: personOnFireImage,
+    },
+  ),
+  bleedAndBurn: createCard(
+    [
+      {
+        name: 'damage',
+        value: v(2),
+      },
+      {
+        name: 'bleed',
+        value: v(2),
+      },
+      {
+        name: 'burn',
+        value: v(2),
+      },
+    ],
+    {
+      name: 'Searing Blade',
+      description: 'Deal $V damage. Apply $2V bleed and $3V burn.',
+      image: bladeBloodFireImage,
     },
   ),
 };
@@ -343,7 +388,7 @@ export const purpleCards = {
     {
       name: 'Left Jab',
       description: 'Deal $V damage. Play another card.',
-      image: leftJab,
+      image: leftJabImage,
     },
   ),
   jabTwo: createCard(
@@ -363,7 +408,7 @@ export const purpleCards = {
     {
       name: 'Right Upper',
       description: `Deal $V damage. Deal double damage if this is the 2nd card played this turn.`,
-      image: uppercut,
+      image: uppercutImage,
     },
   ),
   jabThree: createCard(
@@ -375,7 +420,7 @@ export const purpleCards = {
     {
       name: 'Finisher',
       description: `Deal $V damage 1 time for each card played this turn.`,
-      image: manyJabs,
+      image: manyJabsImage,
     },
   ),
 };

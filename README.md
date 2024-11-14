@@ -284,10 +284,10 @@ Red Cards (bleed, burn, fire spells, strength, multihit, lifesteal, low hp, tras
 - Relic: First card each battle is played twice.
 - Relic: Deal +X damage for every consecutive turn you've taken damage.
 - Relic: Deal +3 damage when bleeding / when at < 50% hp.
-- Relic: cards with the same name deal +X damage, where X = # of those cards
 - Relic: Immune to damage on your turn.
 - Relic: Gaining armor gives strength instead.
 - Relic: Play an additional card. Apply a permanent 3 burn to self.
+- Relic: Apply double burn while you have burn. Apply double bleed while you have bleed.
 
 Purple Cards (% chance, crit, play again, debuff, dodge, shock)
 
@@ -313,6 +313,7 @@ Purple Cards (% chance, crit, play again, debuff, dodge, shock)
 - Relic: ranges of values always give the best result
 - Relic: +25% chance to crit after dodging.
 - Relic: Play another card when you crit.
+- Relic: cards with the same name deal +X damage, where X = # of those cards
 
 Color Mechanics
 

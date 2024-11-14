@@ -18,7 +18,11 @@ import {
   SetValueCardEffect,
 } from '../gameState';
 import { permaBleed, reduceLowDamage, regenForHighDamage } from '../../content/relics';
-import { strengthAffectsHealing, strengthOnSelfDamage } from '../../content/relics/relics';
+import {
+  sharedPain,
+  strengthAffectsHealing,
+  strengthOnSelfDamage,
+} from '../../content/relics/relics';
 
 let card: CardState;
 let effect: CardEffect;
@@ -514,6 +518,13 @@ describe('status effects', () => {
       expect(diff).toEqual({ self: { health: 2 }, opponent: { health: -1 } });
     });
 
+    it('card lifesteal adds to lifesteal', () => {
+      card.lifesteal = { value: v(1) };
+      const { diff } = getPlayCardResult({ self: { lifesteal: 1 } });
+
+      expect(diff).toEqual({ self: { health: 2 }, opponent: { health: -1 } });
+    });
+
     it('does not heal when lifesteal is 0', () => {
       const { diff } = getPlayCardResult({
         self: { lifesteal: 0, lifestealWhenBurning: 1, burn: 0 },
@@ -606,6 +617,15 @@ describe('relics', () => {
     it(`does not add strength when taking damage on opponent's turn`, () => {
       const { diff } = getPlayCardResult({ opponent: { relics } });
       expect(diff).toEqual({ opponent: { health: -1 } });
+    });
+  });
+
+  describe('sharedPain', () => {
+    it('deals damage to opponent when taking self damage', () => {
+      effect.target = 'self';
+      const { diff } = getPlayCardResult({ self: { relics: [sharedPain] } });
+
+      expect(diff).toEqual({ self: { health: -1 }, opponent: { health: -1 } });
     });
   });
 });

@@ -25,10 +25,10 @@ const Root = styled(Row)`
   border: solid 0.5em var(--color-bg-light);
 `;
 
-function getHue(tribe: Tribe) {
-  switch (tribe) {
+function getHue({ $tribe }: { $tribe: Tribe }) {
+  switch ($tribe) {
     case 'basic':
-      return 0;
+      return 67;
     case 'green':
       return 142;
     case 'red':
@@ -36,14 +36,18 @@ function getHue(tribe: Tribe) {
     case 'purple':
       return 267;
   }
-  tribe satisfies never;
+  $tribe satisfies never;
+}
+
+function getSaturation({ $tribe }: { $tribe: Tribe }) {
+  return $tribe === 'basic' ? 0 : 20;
 }
 
 export const RelicImage = styled.div<{ src: string; $tribe: Tribe }>`
   width: 6rem;
   height: 6rem;
   ${maskImage}
-  background-color: hsl(${(props) => getHue(props.$tribe)}, 20%, 75%);
+  background-color: hsl(${getHue}, ${getSaturation}%, 75%);
 `;
 
 const Title = styled('h2')`

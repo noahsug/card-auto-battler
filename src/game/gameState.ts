@@ -87,6 +87,7 @@ export type Tribe = (typeof tribes)[number];
 export interface CardState {
   effects: CardEffect[];
   repeat?: MaybeValue;
+  lifesteal?: MaybeValue;
   trash: boolean;
   name: string;
   description: string;
@@ -158,7 +159,7 @@ export function createGameState(): GameState {
   const { attack, heal, fireball } = allCards;
   addCardsToPlayer(game.user, [
     allCards.lifestealWithBurn,
-    allCards.lifeSteal,
+    allCards.lifesteal,
     allCards.phoenixFire,
     attack,
   ]);

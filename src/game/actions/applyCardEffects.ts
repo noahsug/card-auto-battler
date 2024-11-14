@@ -7,7 +7,6 @@ import {
   MaybeValue,
   PlayerState,
   PlayerValueDescriptor,
-  PlayerValueName,
   Target,
   Tribe,
   ValueDescriptor,
@@ -33,9 +32,7 @@ export function applyCardEffects(game: GameState, card: CardState): BattleEvent[
   const context: PlayCardContext = { game, events, card };
 
   let activations = 1;
-  if (card.repeat) {
-    activations += maybeGetValue(card.repeat, context) || 0;
-  }
+  activations += maybeGetValue(card.repeat, context) || 0;
 
   for (let i = 0; i < activations; i++) {
     card.effects.forEach((effect) => {
@@ -63,15 +60,12 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
   }
 
   let value = getValue(effect.value, context);
+  value += maybeGetValue(effect.add, context) || 0;
 
-  if (effect.add) {
-    value += maybeGetValue(effect.add, context) || 0;
-  }
-
-  const multiplier = (effect.multiply && maybeGetValue(effect.multiply, context)) || 1;
+  const multiplier = maybeGetValue(effect.multiply, context) || 1;
   const effectOptions = { value, multiplier, target: effect.target };
-
   const player = getTargetedPlayer(context.game, effect.target);
+
   value *= multiplier;
 
   switch (effect.name) {
@@ -113,7 +107,10 @@ function evaluateIf(ifStatement: If, context: PlayCardContext) {
   return compareValues(value1, ifStatement.comparison, value2);
 }
 
-function maybeGetValue({ value, if: ifStatement }: MaybeValue, context: PlayCardContext) {
+function maybeGetValue(maybeValue: MaybeValue | undefined, context: PlayCardContext) {
+  if (!maybeValue) return undefined;
+
+  const { value, if: ifStatement } = maybeValue;
   if (ifStatement) {
     const success = evaluateIf(ifStatement, context);
     if (!success) return undefined;
@@ -205,6 +202,7 @@ function dodgeDamage(effect: CardEffect, { game, events }: PlayCardContext) {
 
 function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
   const [self, opponent] = getPlayers(context.game);
+  const { card } = context;
 
   // strength
   if (target === 'opponent') {
@@ -212,7 +210,7 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   }
 
   // channel
-  if (self.channel > 0 && context.card.name.toLocaleLowerCase().includes('fire')) {
+  if (self.channel > 0 && card.name.toLocaleLowerCase().includes('fire')) {
     multiplier *= 2;
     context.reduceChannelStatusEffect = true;
   }
@@ -227,7 +225,9 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   }
 
   // lifesteal
-  const lifesteal = self.lifesteal + (self.burn > 0 ? self.lifestealWhenBurning : 0);
+  const cardLifesteal = maybeGetValue(card.lifesteal, context) || 0;
+  const burnLifesteal = self.burn > 0 ? self.lifestealWhenBurning : 0;
+  const lifesteal = self.lifesteal + cardLifesteal + burnLifesteal;
   if (value > 0 && lifesteal > 0) {
     applyHeal({ value: lifesteal * value, target: 'self' }, context);
   }
@@ -247,8 +247,9 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
 
 export function reduceHealth(
   { value, multiplier = 1, target }: EffectOptions,
-  { game, events }: PlayCardContext,
+  context: PlayCardContext,
 ) {
+  const { game, events } = context;
   const targetPlayer = getTargetedPlayer(game, target);
   value = Math.floor(value * multiplier);
 
@@ -258,11 +259,17 @@ export function reduceHealth(
     value = reduceLowDamage.value2;
   }
 
-  // strengthOnSelfDamage
   if (target === 'self' && value > 0) {
+    // strengthOnSelfDamage
     const strengthOnSelfDamage = getRelic(targetPlayer, 'strengthOnSelfDamage');
     if (strengthOnSelfDamage) {
       targetPlayer.strength += strengthOnSelfDamage.value;
+    }
+
+    // sharedPain
+    const sharedPain = getRelic(targetPlayer, 'sharedPain');
+    if (sharedPain) {
+      reduceHealth({ value: value * sharedPain.value, target: 'opponent' }, context);
     }
   }
 

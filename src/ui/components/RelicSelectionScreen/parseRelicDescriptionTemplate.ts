@@ -1,13 +1,15 @@
 import { RelicState } from '../../../game/gameState';
+import { parseDescriptionTemplate } from '../../utils/parseDescriptionTemplate';
 
 export function parseRelicDescriptionTemplate(relic: RelicState): string {
-  return relic.description.replaceAll(/\$[^ .]+/g, (templateStr: string) => {
+  function getValue(templateStr: string): number | undefined {
     if (templateStr === '$V') {
-      return String(relic.value);
+      return relic.value;
     }
     if (templateStr === '$V2') {
-      return String(relic.value2);
+      return relic.value2;
     }
-    throw new Error('Unknown template string: ' + templateStr);
-  });
+  }
+
+  return parseDescriptionTemplate(relic.description, getValue);
 }

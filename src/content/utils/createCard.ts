@@ -24,18 +24,13 @@ export function createEffect(partialEffect: Partial<CardEffect> = {}): CardEffec
 // returns a CardState with defaults
 export function createCard(
   effects: Partial<CardEffect>[] = [{}],
-  {
-    repeat,
-    trash = false,
-    name = '',
-    description = '',
-    image = '',
-    tribe = 'basic',
-  }: Partial<Omit<CardState, 'effects'>> = {},
+  cardState: Partial<Omit<CardState, 'effects'>> = {},
 ): CardState {
+  const { trash = false, name = '', description = '', image = '', tribe = 'basic' } = cardState;
+
   return {
     effects: effects.map(createEffect),
-    repeat,
+    ...cardState,
     trash,
     name,
     description,

@@ -1,5 +1,5 @@
 import { CardState, If, MaybeValue, ValueDescriptor } from '../../../game/gameState';
-import { assertIsNonNullable } from '../../../utils/asserts';
+import { parseDescriptionTemplate } from '../../utils/parseDescriptionTemplate';
 
 type TemplateMap = Record<string, number>;
 
@@ -55,6 +55,7 @@ function parseMaybeValue(maybeValue: MaybeValue | undefined, prefix: string): Te
  *       value2: { type: 'basicValue', value: $RI },
  *     },
  *   },
+ *   lifesteal: { value: $L },
  * }
  * ```
  */
@@ -75,30 +76,9 @@ export function parseCardDescriptionTemplate(card: CardState) {
   const templateMap = {
     ...effectsTemplateMap,
     ...parseMaybeValue(card.repeat, 'R'),
+    ...parseMaybeValue(card.lifesteal, 'L'),
   };
 
-  return card.description.replaceAll(/\$[^ .]+/g, (templateStr: string) => {
-    let suffix = '';
-    let multiplier = 1;
-    let offset = 0;
-
-    // match "%" suffix
-    if (templateStr.endsWith('%')) {
-      templateStr = templateStr.slice(0, -1);
-      suffix = '%';
-      multiplier = 100;
-    }
-
-    // match "+2"
-    const addMatch = templateStr.match(/[+](\d+)$/);
-    if (addMatch) {
-      const [entireMatch, addValue] = addMatch;
-      templateStr = templateStr.slice(0, -entireMatch.length);
-      offset = Number(addValue);
-    }
-
-    const value = templateMap[templateStr];
-    assertIsNonNullable(value, 'invalid template string: ' + templateStr);
-    return (value + offset) * multiplier + suffix;
-  });
+  const getValue = (templateStr: string) => templateMap[templateStr];
+  return parseDescriptionTemplate(card.description, getValue);
 }
