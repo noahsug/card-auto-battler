@@ -114,6 +114,7 @@ export function BattleScreen({
   // auto-play cards
   useEffect(() => {
     if (isBattleOver) return;
+    // console.log('B auto-play', !isPaused, nextAnimationState.current === 'startTurn');
     if (!isPaused && nextAnimationState.current === 'startTurn') {
       startNextTurn();
     }

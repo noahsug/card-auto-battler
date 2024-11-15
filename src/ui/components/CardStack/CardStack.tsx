@@ -74,6 +74,7 @@ export function CardStack(props: Props) {
   useEffect(() => {
     const undoIndex = events.current.findLastIndex((e) => e.type === 'undo');
     if (eventIndex < undoIndex) {
+      // console.log('CS undo setEventIndex', undoIndex);
       setEventIndex(undoIndex);
       cardPlayedTimeout.current && clearTimeout(cardPlayedTimeout.current);
       cardPlayedTimeout.current = undefined;

@@ -134,6 +134,7 @@ function getDeckPosition(cardAnimation: CardAnimationState, context: AnimationCo
 }
 
 function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) {
+  // console.log('CSA dealCard', cardAnimation.card.acquiredId);
   const { cards, onCardAnimationComplete } = context;
   const reverseIndex = cards.length - 1 - cardAnimation.deckIndex;
   cardAnimation.isAnimating = true;
@@ -158,6 +159,7 @@ function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) 
 }
 
 function playCard(cardAnimation: CardAnimationState, context: AnimationContext) {
+  // console.log('CSA playCard', cardAnimation.card.acquiredId);
   const { onCardAnimationComplete } = context;
   const { x, y } = getXYToTarget(context);
   cardAnimation.isAnimating = true;
@@ -175,6 +177,7 @@ function playCard(cardAnimation: CardAnimationState, context: AnimationContext) 
 }
 
 function discardCard(cardAnimation: CardAnimationState, context: AnimationContext) {
+  // console.log('CSA discardCard', cardAnimation.card.acquiredId);
   const { u, onCardAnimationComplete } = context;
   cardAnimation.isAnimating = true;
 
@@ -187,6 +190,7 @@ function discardCard(cardAnimation: CardAnimationState, context: AnimationContex
 }
 
 function trashCard(cardAnimation: CardAnimationState, context: AnimationContext) {
+  // console.log('CSA trashCard', cardAnimation.card.acquiredId);
   const { onCardAnimationComplete } = context;
   cardAnimation.isAnimating = true;
 
@@ -197,6 +201,7 @@ function trashCard(cardAnimation: CardAnimationState, context: AnimationContext)
 }
 
 function returnCardToCorrectPosition(cardAnimation: CardAnimationState, context: AnimationContext) {
+  // console.log('CSA returnCardToCorrectPosition', cardAnimation.card.acquiredId);
   const { onCardAnimationComplete } = context;
   cardAnimation.isAnimating = true;
 
@@ -302,7 +307,11 @@ export function CardStackAnimation({
     [event],
   );
 
-  if (event?.type === 'undo') {
+  // ensure we only handle the undo event once
+  const handledEventRef = useRef<BattleEvent>();
+
+  if (event?.type === 'undo' && handledEventRef.current !== event) {
+    handledEventRef.current = event;
     animationController.stop();
     cardAnimationsRef.current.forEach((c) => {
       c.cancelWait?.();
