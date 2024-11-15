@@ -68,6 +68,7 @@ export function BattleScreen({
   const [enemyProfileHandleRef, getEnemyProfileBoundingRect] = useGetBoundingRect();
 
   const [isPaused, setIsPaused] = useState(true);
+  const [isFastForwarding, setIsFastForwarding] = useState(false);
   const nextAnimationState = useRef<AnimationState>('startTurn');
 
   const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([
@@ -119,11 +120,6 @@ export function BattleScreen({
       startNextTurn();
     }
   }, [isBattleOver, isPaused, startNextTurn]);
-
-  // TODO: make this fast forward instead?
-  const handlePlayNextCard = useCallback(() => {
-    startNextTurn();
-  }, [startNextTurn]);
 
   const handleTogglePlayPause = useCallback(() => {
     setIsPaused((prev) => !prev);
@@ -184,6 +180,7 @@ export function BattleScreen({
             events={userBattleEvents}
             opponentBoundingRect={getEnemyProfileBoundingRect()}
             isPaused={isPaused}
+            isFastForwarding={isFastForwarding}
           />
           <CardStack
             cards={enemy.cards}
@@ -192,6 +189,7 @@ export function BattleScreen({
             events={enemyBattleEvents}
             opponentBoundingRect={getUserProfileBoundingRect()}
             isPaused={isPaused}
+            isFastForwarding={isFastForwarding}
           />
         </ContentRow>
       </CenterContent>
@@ -200,11 +198,8 @@ export function BattleScreen({
         onBack={canUndo() ? handleUndo : undefined}
         onTogglePlay={!isBattleOver ? handleTogglePlayPause : undefined}
         isPaused={isPaused}
-        onNext={
-          !isBattleOver && isPaused && nextAnimationState.current === 'startTurn'
-            ? handlePlayNextCard
-            : undefined
-        }
+        onToggleFastForward={() => setIsFastForwarding((prev) => !prev)}
+        isFastForwarding={isFastForwarding}
       />
     </Container>
   );

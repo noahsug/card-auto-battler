@@ -24,6 +24,7 @@ interface Props {
   onAnimationComplete: () => void;
   opponentBoundingRect: DOMRect | null;
   isPaused: boolean;
+  isFastForwarding: boolean;
 }
 
 const cardSize = {
@@ -149,6 +150,7 @@ export function CardStack(props: Props) {
           onAnimationComplete={handleAnimationComplete}
           deckBoundingRect={boundingRect}
           opponentBoundingRect={opponentBoundingRect}
+          isFastForwarding={props.isFastForwarding}
         />
       )}
     </Root>

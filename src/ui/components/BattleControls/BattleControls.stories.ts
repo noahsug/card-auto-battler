@@ -15,13 +15,15 @@ export const Enabled: Story = {
   args: {
     onBack: fn(),
     onTogglePlay: fn(),
-    onNext: fn(),
+    onToggleFastForward: fn(),
     isPaused: true,
+    isFastForwarding: true,
   },
 };
 
 export const Disabled: Story = {
   args: {
     isPaused: false,
+    isFastForwarding: false,
   },
 };

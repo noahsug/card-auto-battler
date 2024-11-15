@@ -18,6 +18,7 @@ export interface Props {
   onAnimationComplete: () => void;
   deckBoundingRect: DOMRect;
   opponentBoundingRect: DOMRect;
+  isFastForwarding: boolean;
 }
 
 const AnimatedContainer = styled(animated.div)`
@@ -58,6 +59,7 @@ interface AnimationContext {
   opponentBoundingRect: DOMRect;
   u: UnitFn;
   windowDimensions: WindowDimensions;
+  isFastForwarding: boolean;
 }
 
 function syncDeckIndex(cardAnimation: CardAnimationState, context: AnimationContext) {
@@ -167,7 +169,8 @@ function playCard(cardAnimation: CardAnimationState, context: AnimationContext) 
   return async (next: (options: object) => Promise<void>) => {
     await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff, clamp: false } });
 
-    const [promise, cancel, getIsCanceled] = cancelableWait(500);
+    const wait = context.isFastForwarding ? 0 : 700;
+    const [promise, cancel, getIsCanceled] = cancelableWait(wait);
     cardAnimation.cancelWait = cancel;
     await promise;
     if (!getIsCanceled()) {
@@ -182,7 +185,8 @@ function discardCard(cardAnimation: CardAnimationState, context: AnimationContex
   cardAnimation.isAnimating = true;
 
   return async (next: (options: object) => Promise<void>) => {
-    await next({ y: u(-1000), rotate: 0, config: { duration: 300, easing: easings.easeInBack } });
+    const duration = context.isFastForwarding ? 100 : 300;
+    await next({ y: u(-1000), rotate: 0, config: { duration, easing: easings.easeInExpo } });
 
     cardAnimation.inDiscard = true;
     onCardAnimationComplete(cardAnimation);
@@ -268,6 +272,7 @@ export function CardStackAnimation({
   onAnimationComplete,
   deckBoundingRect,
   opponentBoundingRect,
+  isFastForwarding,
 }: Props) {
   const [u, windowDimensions] = useUnits();
 
@@ -294,6 +299,7 @@ export function CardStackAnimation({
     opponentBoundingRect,
     u,
     windowDimensions,
+    isFastForwarding,
   };
 
   const [render, animationController] = useTransition(
