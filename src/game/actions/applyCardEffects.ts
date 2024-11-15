@@ -12,13 +12,14 @@ import {
   ValueDescriptor,
 } from '../gameState';
 import { getActivePlayer, getPlayers, getRelic, getTargetedPlayer } from '../utils/selectors';
-import { BattleEvent, createBattleEvent } from './battleEvent';
+import { BattleEvent, createBattleEvent, BattleEventSource, ValueBattleEvent } from './battleEvent';
 
 interface PlayCardContext {
   game: GameState;
   events: BattleEvent[];
   card: CardState;
   reduceChannelStatusEffect?: boolean;
+  cardDealsDamage?: boolean;
 }
 
 interface EffectOptions {
@@ -28,6 +29,8 @@ interface EffectOptions {
 }
 
 export function applyCardEffects(game: GameState, card: CardState): BattleEvent[] {
+  const activePlayer = getActivePlayer(game);
+
   const events: BattleEvent[] = [];
   const context: PlayCardContext = { game, events, card };
 
@@ -42,7 +45,13 @@ export function applyCardEffects(game: GameState, card: CardState): BattleEvent[
 
   // we reduce the status effect only after all card effects have been applied
   if (context.reduceChannelStatusEffect) {
-    getActivePlayer(game).channel -= 1;
+    activePlayer.channel -= 1;
+  }
+
+  // temporaryDodge, damageMultiplier
+  if (context.cardDealsDamage) {
+    activePlayer.damageMultiplier = 0;
+    activePlayer.temporaryDodge = 0;
   }
 
   return events;
@@ -70,16 +79,19 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
 
   switch (effect.name) {
     case 'damage': {
+      context.cardDealsDamage = true;
       const dodged = dodgeDamage(effect, context);
       if (!dodged) {
-        dealDamage(effectOptions, context);
+        dealCardDamage(effectOptions, context);
       }
       break;
     }
 
-    case 'heal':
-      applyHeal(effectOptions, context);
+    case 'heal': {
+      const healEvent = applyHeal(effectOptions, context);
+      healEvent.source = 'card';
       break;
+    }
 
     case 'trash':
       trashCards(effectOptions, context);
@@ -144,8 +156,8 @@ function getPlayerValue(
     return Math.floor(game.turn / 2);
   }
 
-  if (name === 'damageDealtToTarget') {
-    return getDamageDealt(events, target);
+  if (name === 'cardDamageDealtToTarget') {
+    return getDamageDealt(events, target, 'card');
   }
 
   if (name === 'percentGreen') {
@@ -193,15 +205,25 @@ function dodgeDamage(effect: CardEffect, { game, events }: PlayCardContext) {
 
   const player = getTargetedPlayer(game, effect.target);
 
-  if (player.dodge <= 0) return false;
+  // temporaryDodge
+  if (player.temporaryDodge > 0) {
+    player.temporaryDodge -= 1;
+  } else if (player.dodge > 0) {
+    player.dodge -= 1;
+  } else {
+    return false; // did not dodge
+  }
 
-  player.dodge -= 1;
   events.push(createBattleEvent('miss', effect.target));
   return true;
 }
 
-function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
+function dealCardDamage(
+  { value, multiplier = 1, target }: EffectOptions,
+  context: PlayCardContext,
+) {
   const [self, opponent] = getPlayers(context.game);
+  const targetPlayer = getTargetedPlayer(context.game, target);
   const { card } = context;
 
   // strength
@@ -215,28 +237,12 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
     context.reduceChannelStatusEffect = true;
   }
 
+  // damageMultiplier
+  if (self.damageMultiplier > 0) {
+    multiplier *= self.damageMultiplier;
+  }
+
   value = Math.floor(value * multiplier);
-  dealCardDamage({ value, target }, context);
-
-  // regenForHighDamage
-  const regenForHighDamage = getRelic(self, 'regenForHighDamage');
-  if (regenForHighDamage && value >= regenForHighDamage.value) {
-    self.regen += regenForHighDamage.value2;
-  }
-
-  // bleed
-  if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
-    dealCardDamage({ value: BLEED_DAMAGE, target }, context);
-    opponent.bleed -= 1;
-  }
-}
-
-// similar to reduceHealth but the damage counts as coming from the card, meaning effects like
-// lifesteal, shock, etc trigger
-function dealCardDamage({ value, target }: EffectOptions, context: PlayCardContext) {
-  const [self] = getPlayers(context.game);
-  const targetPlayer = getTargetedPlayer(context.game, target);
-  const { card } = context;
 
   if (value > 0) {
     // lifesteal
@@ -258,7 +264,20 @@ function dealCardDamage({ value, target }: EffectOptions, context: PlayCardConte
     }
   }
 
-  reduceHealth({ value, target }, context);
+  const damageEvent = reduceHealth({ value, target }, context);
+  damageEvent.source = 'card';
+
+  // regenForHighDamage
+  const regenForHighDamage = getRelic(self, 'regenForHighDamage');
+  if (regenForHighDamage && value >= regenForHighDamage.value) {
+    self.regen += regenForHighDamage.value2;
+  }
+
+  // bleed
+  if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
+    reduceHealth({ value: BLEED_DAMAGE, target }, context);
+    opponent.bleed -= 1;
+  }
 }
 
 export function reduceHealth(
@@ -290,7 +309,9 @@ export function reduceHealth(
   }
 
   targetPlayer.health -= value;
-  events.push(createBattleEvent('damage', value, target));
+  const event = createBattleEvent('damage', value, target);
+  events.push(event);
+  return event as ValueBattleEvent;
 }
 
 export function applyHeal(
@@ -307,7 +328,10 @@ export function applyHeal(
 
   value = Math.floor(value * multiplier);
   targetPlayer.health += value;
-  events.push(createBattleEvent('heal', value, target));
+
+  const event = createBattleEvent('heal', value, target);
+  events.push(event);
+  return event as ValueBattleEvent;
 }
 
 function trashCards({ value, multiplier = 1, target }: EffectOptions, context: PlayCardContext) {
@@ -326,11 +350,15 @@ function maybeFloorValue(value: number, name: keyof PlayerState) {
   return Math.floor(value);
 }
 
-export function getDamageDealt(events: BattleEvent[], target: Target = 'opponent'): number {
+export function getDamageDealt(
+  events: BattleEvent[],
+  target: Target | null = 'opponent',
+  source?: BattleEventSource,
+): number {
   return events.reduce((damageDealt, event) => {
-    if (event.type === 'damage' && event.target === target) {
-      damageDealt += event.value;
-    }
-    return damageDealt;
+    if (event.type !== 'damage') return damageDealt;
+    if (target && event.target !== target) return damageDealt;
+    if (source && event.source !== source) return damageDealt;
+    return damageDealt + event.value;
   }, 0);
 }

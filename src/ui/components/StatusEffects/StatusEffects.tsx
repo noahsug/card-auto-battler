@@ -9,6 +9,7 @@ import burnImage from './images/flamer.png';
 import heartPlusImage from './images/heart-plus.png';
 import lightningBranchesImage from './images/lightning-branches.png';
 import knockedOutStarsImage from './images/knocked-out-stars.png';
+import arrowScopeImage from './images/arrow-scope.png';
 
 import { PlayerState, StatusEffectName } from '../../../game/gameState';
 import { IsSubtype } from '../../../utils/types';
@@ -18,7 +19,7 @@ import { Row } from '../shared/Row';
 
 type StatusEffectsWithoutIcons = IsSubtype<
   StatusEffectName,
-  'lifestealWhenBurning' | 'channel' | 'shockOpponentNextTurn'
+  'lifestealWhenBurning' | 'channel' | 'shockOpponentNextTurn' | 'temporaryDodge'
 >;
 type VisibleStatusEffectName = Exclude<StatusEffectName, StatusEffectsWithoutIcons>;
 
@@ -32,6 +33,7 @@ const effectToImage: Record<VisibleStatusEffectName, string> = {
   lifesteal: heartPlusImage,
   shock: lightningBranchesImage,
   stun: knockedOutStarsImage,
+  damageMultiplier: arrowScopeImage,
 };
 
 const visibleStatusEffects = Object.keys(effectToImage) as VisibleStatusEffectName[];

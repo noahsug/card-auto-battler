@@ -276,7 +276,7 @@ describe('if', () => {
     card.effects[1] = createEffect({
       name: 'bleed',
       value: v(3),
-      if: ifCompare('opponent', 'damageDealtToTarget', '>=', 7),
+      if: ifCompare('opponent', 'cardDamageDealtToTarget', '>=', 7),
     });
 
     const smallDamage = getPlayCardResult();
@@ -429,9 +429,9 @@ describe('battle events', () => {
 
     const { events } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
     expect(events).toEqual([
-      { type: 'damage', value: 3, target: 'opponent' },
-      { type: 'damage', value: BLEED_DAMAGE, target: 'opponent' },
-      { type: 'heal', value: 5, target: 'self' },
+      { type: 'damage', value: 3, target: 'opponent', source: 'card' },
+      { type: 'damage', value: BLEED_DAMAGE, target: 'opponent', source: 'other' },
+      { type: 'heal', value: 5, target: 'self', source: 'card' },
     ]);
   });
 
@@ -439,7 +439,7 @@ describe('battle events', () => {
     effect.value = v(0);
 
     const { events } = getPlayCardResult();
-    expect(events).toEqual([{ type: 'damage', value: 0, target: 'opponent' }]);
+    expect(events).toEqual([{ type: 'damage', value: 0, target: 'opponent', source: 'card' }]);
   });
 });
 
@@ -510,11 +510,11 @@ describe('status effects', () => {
       expect(diff).toEqual({ self: { health: 1 }, opponent: { health: -1 } });
     });
 
-    it('heals from bleed damage', () => {
+    it('does not heal from bleed damage', () => {
       const { diff } = getPlayCardResult({ self: { lifesteal: 1 }, opponent: { bleed: 1 } });
 
       expect(diff).toEqual({
-        self: { health: 4 },
+        self: { health: 1 },
         opponent: { health: -1 - BLEED_DAMAGE, bleed: -1 },
       });
     });

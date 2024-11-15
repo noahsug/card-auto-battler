@@ -19,6 +19,8 @@ export const statusEffectNames = [
   'shock',
   'stun',
   'shockOpponentNextTurn',
+  'temporaryDodge',
+  'damageMultiplier',
 ] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;
@@ -33,7 +35,7 @@ type CalculatedPlayerValueName =
   | 'prevCardIsGreen'
   | 'prevCardIsRed'
   | 'prevCardIsPurple'
-  | 'damageDealtToTarget'
+  | 'cardDamageDealtToTarget'
   | 'turn';
 
 export type PlayerValueName =

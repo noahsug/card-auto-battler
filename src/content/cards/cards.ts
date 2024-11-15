@@ -59,6 +59,19 @@ export const basicCards = {
       image: crossImage,
     },
   ),
+  parry: createCard(
+    [
+      {
+        target: 'self',
+        name: 'dodge',
+      },
+    ],
+    {
+      name: 'Parry',
+      description: 'Gain $V dodge.',
+      image: parryImage,
+    },
+  ),
 };
 
 /**
@@ -266,7 +279,7 @@ export const redCards = {
       },
       {
         name: 'burn',
-        value: v('opponent', 'damageDealtToTarget'),
+        value: v('opponent', 'cardDamageDealtToTarget'),
       },
     ],
     {
@@ -432,7 +445,7 @@ export const purpleCards = {
       image: uppercutImage,
     },
   ),
-  jabThree: createCard(
+  finisher: createCard(
     [
       {
         value: v(3),
@@ -493,7 +506,7 @@ export const purpleCards = {
       image: yellowShockImage,
     },
   ),
-  tripleJab: createCard(
+  rapidJabs: createCard(
     [
       {
         value: v(1),
@@ -503,6 +516,26 @@ export const purpleCards = {
     {
       name: 'Rapid Jabs',
       description: 'Deal $V damage 3 times.',
+      image: manyJabsImage,
+    },
+  ),
+  stealth: createCard(
+    [
+      {
+        target: 'self',
+        name: 'temporaryDodge',
+        value: v(99),
+      },
+      {
+        target: 'self',
+        name: 'damageMultiplier',
+        value: v(1.5),
+      },
+    ],
+    {
+      name: 'Stealth',
+      description:
+        'Gin $V temporary dodge. Your next card deals $2V% damage. Lose temporary dodge the next time you play a damaging card.',
       image: manyJabsImage,
     },
   ),

@@ -1,5 +1,7 @@
 import { Target } from '../gameState';
 
+export type BattleEventSource = 'card' | 'other';
+
 interface UntargetedBattleEvent {
   type: 'startBattle' | 'undo';
 }
@@ -10,6 +12,7 @@ export interface BattleEventWithTarget {
 export interface ValueBattleEvent {
   type: 'damage' | 'heal';
   target: Target;
+  source: BattleEventSource;
   value: number;
 }
 export interface CardBattleEvent {
@@ -32,29 +35,27 @@ export function createBattleEvent(
   type: ValueBattleEvent['type'],
   value: number,
   target: Target,
+  source?: BattleEventSource,
 ): BattleEvent;
 export function createBattleEvent(
   type: CardBattleEvent['type'],
   cardId: number,
   target?: Target,
 ): BattleEvent;
-export function createBattleEvent(
-  type: BattleEvent['type'],
-  valueOrTarget?: Target | number,
-  target?: Target,
-): BattleEvent {
+export function createBattleEvent(type: BattleEvent['type'], ...args: unknown[]): BattleEvent {
   if (type === 'startBattle' || type === 'undo') {
     return { type };
   }
   if (type === 'miss' || type === 'shuffle') {
-    target = valueOrTarget as Target;
+    const [target] = args as [Target?];
     return { type, target: target || 'self' };
   }
-  const value = valueOrTarget as number;
   if (type === 'damage' || type === 'heal') {
-    return { type, value, target: target! };
+    const [value, target, source = 'other'] = args as [number, Target, BattleEventSource?];
+    return { type, value, target, source };
   }
-  return { type: type satisfies CardBattleEvent['type'], cardId: value, target: target || 'self' };
+  const [cardId, target = 'self'] = args as [number, Target?];
+  return { type: type satisfies CardBattleEvent['type'], cardId, target };
 }
 
 export function eventAppliesToTarget(event: BattleEvent, target: Target): boolean {
