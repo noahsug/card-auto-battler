@@ -25,7 +25,7 @@ function getTitleColor(tribe: Tribe) {
   return getCardColor(tribe, { brighten: 10 });
 }
 function getBorderColor(tribe: Tribe) {
-  return getCardColor(tribe, { brighten: -65 });
+  return getCardColor(tribe, { saturate: 10, brighten: -65 });
 }
 function getTitleBackgroundColor(tribe: Tribe) {
   const saturate = tribe === 'basic' ? 0 : 30;
@@ -51,7 +51,7 @@ const Title = styled('h2')`
   height: 1.15em;
   background-color: ${(props) => getTitleBackgroundColor(props.theme.tribe)};
   position: absolute;
-  inset: 49.5% 0 0;
+  inset: 50% 0 0;
 `;
 
 const CardImage = styled(Image)`

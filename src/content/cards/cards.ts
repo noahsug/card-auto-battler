@@ -25,6 +25,7 @@ import bladeBloodFireImage from './images/blade-blood-fire.jpeg';
 import yellowShockImage from './images/yellow-shock.jpeg';
 import lightningImage from './images/lightning.jpeg';
 import electricTrapImage from './images/electric-trap.png';
+import tripleStrikeImage from './images/triple-strike.png';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
@@ -218,10 +219,15 @@ export const redCards = {
         value: v(3),
         multiHit: v(2),
       },
+      {
+        target: 'self',
+        name: 'burn',
+        value: v(2),
+      },
     ],
     {
       name: 'Pillars of Fire',
-      description: 'Deal $V damage $N times.',
+      description: 'Deal $V damage $N times. Apply $2V burn to yourself.',
       image: firePowerImage,
     },
   ),
@@ -236,14 +242,14 @@ export const redCards = {
         value: v(4),
       },
       {
+        target: 'self',
         name: 'damage',
         value: v(6),
-        target: 'self',
       },
       {
+        target: 'self',
         name: 'burn',
         value: v(4),
-        target: 'self',
       },
     ],
     {
@@ -289,9 +295,9 @@ export const redCards = {
         value: v(4),
       },
       {
+        target: 'self',
         name: 'bleed',
         value: v(1),
-        target: 'self',
       },
     ],
     {
@@ -304,20 +310,20 @@ export const redCards = {
   bloodBoil: createCard(
     [
       {
+        target: 'self',
         name: 'burn',
         value: v(4),
-        target: 'self',
       },
       {
+        target: 'self',
         name: 'strength',
         value: v(3),
-        target: 'self',
       },
       {
+        target: 'self',
         name: 'set',
         valueName: 'bleed',
         value: v(0),
-        target: 'self',
       },
     ],
     {
@@ -342,14 +348,14 @@ export const redCards = {
   lifestealWithBurn: createCard(
     [
       {
+        target: 'self',
         name: 'lifestealWhenBurning',
         value: v(1),
-        target: 'self',
       },
       {
+        target: 'self',
         name: 'burn',
         value: v(4),
-        target: 'self',
       },
     ],
     {
@@ -411,18 +417,18 @@ export const purpleCards = {
         value: v(4),
         multiply: {
           value: v(2),
-          if: ifCompare('self', 'cardsPlayedThisTurn', '=', 2),
+          if: ifCompare('self', 'cardsPlayedThisTurn', '>=', 2),
         },
       },
       {
         target: 'self',
         name: 'extraCardPlays',
-        if: ifCompare('self', 'cardsPlayedThisTurn', '=', 2),
+        if: ifCompare('self', 'cardsPlayedThisTurn', '>=', 2),
       },
     ],
     {
       name: 'Right Upper',
-      description: `Deal $V damage. Deal double damage and play another card if this is the 2nd card played this turn.`,
+      description: `Deal $V damage. Deal double damage and play another card if you've played another card this turn.`,
       image: uppercutImage,
     },
   ),
@@ -436,7 +442,7 @@ export const purpleCards = {
     {
       name: 'Finisher',
       description: `Deal $V damage 1 time for each card played this turn.`,
-      image: manyJabsImage,
+      image: tripleStrikeImage,
     },
   ),
   shock: createCard(
@@ -459,15 +465,45 @@ export const purpleCards = {
   shockTrap: createCard(
     [
       {
+        target: 'self',
         name: 'shockOpponentNextTurn',
         value: v(1),
-        target: 'self',
       },
     ],
     {
       name: 'Shock Trap',
-      description: 'Apply $V shock to the enemy at the start of your next turn',
+      description: 'Apply $V shock to the enemy at the start of your next turn.',
       image: electricTrapImage,
+    },
+  ),
+  shockPunch: createCard(
+    [
+      {
+        name: 'shock',
+        value: v(1),
+      },
+      {
+        target: 'self',
+        name: 'extraCardPlays',
+      },
+    ],
+    {
+      name: 'Electric Jab',
+      description: `Apply $V shock. Play another card.`,
+      image: yellowShockImage,
+    },
+  ),
+  tripleJab: createCard(
+    [
+      {
+        value: v(1),
+        multiHit: v(3),
+      },
+    ],
+    {
+      name: 'Rapid Jabs',
+      description: 'Deal $V damage 3 times.',
+      image: manyJabsImage,
     },
   ),
 };
