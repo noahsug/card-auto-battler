@@ -138,7 +138,6 @@ function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) 
   const reverseIndex = cards.length - 1 - cardAnimation.deckIndex;
   cardAnimation.isAnimating = true;
 
-  console.log('A deal card');
   return async (next: (options: object) => Promise<void>) => {
     const discardPosition = getDiscardPosition(cardAnimation, context);
     await next({
@@ -154,7 +153,6 @@ function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) 
     });
 
     cardAnimation.inDiscard = false;
-    console.log('A done dealCard');
     onCardAnimationComplete(cardAnimation);
   };
 }
@@ -171,7 +169,6 @@ function playCard(cardAnimation: CardAnimationState, context: AnimationContext) 
     cardAnimation.cancelWait = cancel;
     await promise;
     if (!getIsCanceled()) {
-      console.log('A done playCard');
       onCardAnimationComplete(cardAnimation);
     }
   };
@@ -185,7 +182,6 @@ function discardCard(cardAnimation: CardAnimationState, context: AnimationContex
     await next({ y: u(-1000), rotate: 0, config: { duration: 300, easing: easings.easeInBack } });
 
     cardAnimation.inDiscard = true;
-    console.log('A done discardCard');
     onCardAnimationComplete(cardAnimation);
   };
 }
@@ -196,7 +192,6 @@ function trashCard(cardAnimation: CardAnimationState, context: AnimationContext)
 
   return async (next: (options: object) => Promise<void>) => {
     await next({ opacity: 0, config: config.default });
-    console.log('A done trashCard');
     onCardAnimationComplete(cardAnimation);
   };
 }
@@ -280,7 +275,7 @@ export function CardStackAnimation({
     cardAnimation.finishedAnimatingEvent = event;
     const animationsComplete = cardAnimationsRef.current.every((c) => !c.isAnimating);
     if (animationsComplete) {
-      console.log('A onAnimationComplete!', event?.type);
+      // console.log('CSA onAnimationComplete', event?.type);
       onAnimationComplete();
     }
   };
@@ -311,7 +306,6 @@ export function CardStackAnimation({
     animationController.stop();
     cardAnimationsRef.current.forEach((c) => {
       c.cancelWait?.();
-      c.isAnimating = false;
     });
   }
 

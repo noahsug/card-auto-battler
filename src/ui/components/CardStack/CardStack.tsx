@@ -63,14 +63,8 @@ export function CardStack(props: Props) {
 
   isPaused.current = props.isPaused && event?.type === 'playCard';
 
-  // // TODO: make this a const, not a ref
-  // pausedEvent.current =
-  //   props.isPaused && events.current[eventIndex - 1]?.type === 'playCard'
-  //     ? events.current[eventIndex - 1]
-  //     : undefined;
-
   // console.log(
-  //   'M',
+  //   'CS',
   //   events.current[eventIndex - 1]?.type,
   //   events.current[eventIndex]?.type,
   //   events.current[eventIndex + 1]?.type,
@@ -103,7 +97,7 @@ export function CardStack(props: Props) {
 
     if (event?.type === 'shuffle' && !nextEvent) {
       // end the animation early if all we have left to do is shuffle the cards
-      console.log('M done shuffle');
+      // console.log('M done shuffle');
       onAnimationComplete();
     } else if (
       !event &&
@@ -115,22 +109,16 @@ export function CardStack(props: Props) {
     ) {
       // end the animation if there are no events left (unless we hit a special use case like the
       // playCard timeout, or startBattle or shuffle events)
-      console.log('M done');
+      // console.log('CS done');
       onAnimationComplete();
     } else if (event?.type === 'playCard' && cardPlayedTimeout.current == null) {
       cardPlayedTimeout.current = setTimeout(() => {
-        console.log('M done playCard');
+        // console.log('CS done playCard');
         onAnimationComplete();
         cardPlayedTimeout.current = undefined;
       }, 200);
     }
   }, [event, eventIndex, isPaused, onAnimationComplete]);
-
-  // const handleAnimationComplete = useCallback(() => {
-  //   console.log('A-> M onAnimationComplete', !isPaused.current);
-  //   // if (isPaused.current) return;
-  //   setEventIndex((prev) => prev + 1);
-  // }, []);
 
   const handleAnimationComplete = useCallback(() => {
     if (animateWhenUnpaused.current) return;
