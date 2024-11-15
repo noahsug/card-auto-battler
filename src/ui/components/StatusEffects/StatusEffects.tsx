@@ -16,7 +16,10 @@ import { maskImage } from '../../style';
 import { Number } from '../shared/Number';
 import { Row } from '../shared/Row';
 
-type StatusEffectsWithoutIcons = IsSubtype<StatusEffectName, 'lifestealWhenBurning' | 'channel'>;
+type StatusEffectsWithoutIcons = IsSubtype<
+  StatusEffectName,
+  'lifestealWhenBurning' | 'channel' | 'shockOpponentNextTurn'
+>;
 type VisibleStatusEffectName = Exclude<StatusEffectName, StatusEffectsWithoutIcons>;
 
 const effectToImage: Record<VisibleStatusEffectName, string> = {

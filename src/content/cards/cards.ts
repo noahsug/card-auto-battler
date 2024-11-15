@@ -261,7 +261,6 @@ export const redCards = {
       {
         name: 'burn',
         value: v('opponent', 'damageDealtToTarget'),
-        target: 'opponent',
       },
     ],
     {
@@ -298,7 +297,7 @@ export const redCards = {
     {
       trash: true,
       name: 'Bloodbath',
-      description: 'Apply $V bleed the opponent and $2V bleed to yourself.',
+      description: 'Apply $V bleed the enemy and $2V bleed to yourself.',
       image: bloodbathImage,
     },
   ),
@@ -455,6 +454,20 @@ export const purpleCards = {
       name: 'Thunder Struck',
       description: 'Deal $V damage. Apply $2V shock.',
       image: lightningImage,
+    },
+  ),
+  shockTrap: createCard(
+    [
+      {
+        name: 'shockOpponentNextTurn',
+        value: v(1),
+        target: 'self',
+      },
+    ],
+    {
+      name: 'Shock Trap',
+      description: 'Apply $V shock to the enemy at the start of your next turn',
+      image: electricTrapImage,
     },
   ),
 };

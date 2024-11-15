@@ -62,6 +62,12 @@ export function startTurn(game: GameState): BattleEvent[] {
   const card = activePlayer.cards[activePlayer.currentCardIndex];
   const context = { game, events, card };
 
+  // shockOpponentNextTurn
+  if (activePlayer.shockOpponentNextTurn > 0) {
+    nonActivePlayer.shock = activePlayer.shockOpponentNextTurn;
+    activePlayer.shockOpponentNextTurn = 0;
+  }
+
   // regen
   if (activePlayer.regen > 0) {
     applyHeal({ value: activePlayer.regen, target: 'self' }, context);

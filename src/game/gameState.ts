@@ -18,6 +18,7 @@ export const statusEffectNames = [
   'lifestealWhenBurning',
   'shock',
   'stun',
+  'shockOpponentNextTurn',
 ] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;
