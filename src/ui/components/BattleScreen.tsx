@@ -89,6 +89,7 @@ export function BattleScreen({
   }, [activePlayer, startTurn]);
 
   const handleAnimationComplete = useCallback(async () => {
+    console.log('B start', nextAnimationState.current);
     if (isBattleOver) return;
     if (nextAnimationState.current === 'applyCardEffects') {
       const events = await playCard();
@@ -181,6 +182,7 @@ export function BattleScreen({
             onAnimationComplete={userHandleAnimationComplete}
             events={userBattleEvents}
             opponentBoundingRect={getEnemyProfileBoundingRect()}
+            isPaused={isPaused}
           />
           <CardStack
             cards={enemy.cards}
@@ -188,6 +190,7 @@ export function BattleScreen({
             onAnimationComplete={enemyHandleAnimationComplete}
             events={enemyBattleEvents}
             opponentBoundingRect={getUserProfileBoundingRect()}
+            isPaused={isPaused}
           />
         </ContentRow>
       </CenterContent>

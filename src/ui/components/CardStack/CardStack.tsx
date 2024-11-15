@@ -23,6 +23,7 @@ interface Props {
   events: BattleEvent[];
   onAnimationComplete: () => void;
   opponentBoundingRect: DOMRect | null;
+  isPaused: boolean;
 }
 
 const cardSize = {
@@ -38,9 +39,11 @@ const Root = styled.div`
 `;
 
 export function CardStack(props: Props) {
-  const { opponentBoundingRect, onAnimationComplete } = props;
+  const { opponentBoundingRect, onAnimationComplete, isPaused } = props;
   const [handleRef, getBoundingRect] = useGetBoundingRect();
   const boundingRect = getBoundingRect();
+
+  // const animateWhenUnpaused = useRef(false);
 
   const events = useRef<BattleEvent[]>([]);
   const [eventIndex, setEventIndex] = useState<number>(0);
@@ -70,6 +73,8 @@ export function CardStack(props: Props) {
 
   // handle calling onAnimationComplete when certain animations are finished
   useEffect(() => {
+    if (isPaused) return;
+
     // ensure we don't handle the same event twice
     if (
       eventIndex === visitedEventInfo.current.eventIndex &&
@@ -84,6 +89,7 @@ export function CardStack(props: Props) {
 
     if (event?.type === 'shuffle' && !nextEvent) {
       // end the animation early if all we have left to do is shuffle the cards
+      console.log('M done shuffle');
       onAnimationComplete();
     } else if (
       !event &&
@@ -93,27 +99,45 @@ export function CardStack(props: Props) {
       prevEvent?.type !== 'startBattle' &&
       prevEvent?.type !== 'playCard'
     ) {
-      // end the animation if there are no events left (unless we already ended it early due to
-      // not waiting for the shuffle animation or we're starting the battle)
+      // end the animation if there are no events left (unless we hit a special use case like the
+      // playCard timeout, or startBattle or shuffle events)
+      console.log('M done');
       onAnimationComplete();
     } else if (event?.type === 'playCard' && cardPlayedTimeout.current == null) {
       cardPlayedTimeout.current = setTimeout(() => {
+        console.log('M done playCard');
         onAnimationComplete();
         cardPlayedTimeout.current = undefined;
       }, 200);
     }
-  }, [event, eventIndex, onAnimationComplete]);
+  }, [event, eventIndex, isPaused, onAnimationComplete]);
 
   const handleAnimationComplete = useCallback(() => {
     setEventIndex((prev) => prev + 1);
   }, []);
+
+  // const handleAnimationComplete = useCallback(() => {
+  //   if (isPaused) {
+  //     // animate the next event when we unpause
+  //     animateWhenUnpaused.current = true;
+  //   } else if (!animateWhenUnpaused.current) {
+  //     setEventIndex((prev) => prev + 1);
+  //   }
+  // }, [isPaused]);
+
+  // useEffect(() => {
+  //   if (!isPaused && animateWhenUnpaused.current) {
+  //     setEventIndex((prev) => prev + 1);
+  //     animateWhenUnpaused.current = false;
+  //   }
+  // }, [isPaused]);
 
   return (
     <Root ref={handleRef}>
       {boundingRect && opponentBoundingRect && (
         <CardStackAnimation
           {...props}
-          event={event}
+          event={isPaused ? undefined : event}
           deckBoundingRect={boundingRect}
           opponentBoundingRect={opponentBoundingRect}
           onAnimationComplete={handleAnimationComplete}

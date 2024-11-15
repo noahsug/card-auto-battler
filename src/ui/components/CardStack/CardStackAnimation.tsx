@@ -18,6 +18,7 @@ export interface Props {
   onAnimationComplete: () => void;
   deckBoundingRect: DOMRect;
   opponentBoundingRect: DOMRect;
+  isPaused: boolean;
 }
 
 const AnimatedContainer = styled(animated.div)`
@@ -135,6 +136,7 @@ function getDeckPosition(cardAnimation: CardAnimationState, context: AnimationCo
 function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) {
   const { cards, onCardAnimationComplete } = context;
   const reverseIndex = cards.length - 1 - cardAnimation.deckIndex;
+  cardAnimation.isAnimating = true;
 
   return async (next: (options: object) => Promise<void>) => {
     const discardPosition = getDiscardPosition(cardAnimation, context);
@@ -151,14 +153,16 @@ function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) 
     });
 
     cardAnimation.inDiscard = false;
+    console.log('A done dealCard');
     onCardAnimationComplete(cardAnimation);
   };
 }
 
 function playCard(cardAnimation: CardAnimationState, context: AnimationContext) {
   const { onCardAnimationComplete } = context;
-
   const { x, y } = getXYToTarget(context);
+  cardAnimation.isAnimating = true;
+
   return async (next: (options: object) => Promise<void>) => {
     await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff, clamp: false } });
 
@@ -166,6 +170,7 @@ function playCard(cardAnimation: CardAnimationState, context: AnimationContext) 
     cardAnimation.cancelWait = cancel;
     await promise;
     if (!getIsCanceled()) {
+      console.log('A done playCard');
       onCardAnimationComplete(cardAnimation);
     }
   };
@@ -173,26 +178,31 @@ function playCard(cardAnimation: CardAnimationState, context: AnimationContext) 
 
 function discardCard(cardAnimation: CardAnimationState, context: AnimationContext) {
   const { u, onCardAnimationComplete } = context;
+  cardAnimation.isAnimating = true;
 
   return async (next: (options: object) => Promise<void>) => {
     await next({ y: u(-1000), rotate: 0, config: { duration: 300, easing: easings.easeInBack } });
 
     cardAnimation.inDiscard = true;
+    console.log('A done discardCard');
     onCardAnimationComplete(cardAnimation);
   };
 }
 
 function trashCard(cardAnimation: CardAnimationState, context: AnimationContext) {
   const { onCardAnimationComplete } = context;
+  cardAnimation.isAnimating = true;
 
   return async (next: (options: object) => Promise<void>) => {
     await next({ opacity: 0, config: config.default });
+    console.log('A done trashCard');
     onCardAnimationComplete(cardAnimation);
   };
 }
 
 function returnCardToCorrectPosition(cardAnimation: CardAnimationState, context: AnimationContext) {
   const { onCardAnimationComplete } = context;
+  cardAnimation.isAnimating = true;
 
   return async (next: (options: object) => Promise<void>) => {
     // don't animate if the card is trashed
@@ -218,11 +228,8 @@ function returnCardToCorrectPosition(cardAnimation: CardAnimationState, context:
 function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
   const { event } = context;
   if (!event) {
-    cardAnimation.isAnimating = false;
     return null;
   }
-
-  cardAnimation.isAnimating = true;
 
   if ((event as CardBattleEvent).cardId === cardAnimation.card.acquiredId) {
     switch (event.type) {
@@ -248,7 +255,6 @@ function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
     return returnCardToCorrectPosition(cardAnimation, context);
   }
 
-  cardAnimation.isAnimating = false;
   return null;
 }
 
@@ -270,6 +276,7 @@ export function CardStackAnimation({
     cardAnimation.isAnimating = false;
     const animationsComplete = cardAnimationsRef.current.every((c) => !c.isAnimating);
     if (animationsComplete) {
+      console.log('A onAnimationComplete');
       onAnimationComplete();
     }
   };
@@ -300,10 +307,12 @@ export function CardStackAnimation({
     animationController.stop();
     cardAnimationsRef.current.forEach((c) => {
       c.cancelWait?.();
+      c.isAnimating = false;
     });
   }
 
   useEffect(() => {
+    if (!event) return;
     animationController.start();
   }, [animationController, event]);
 
