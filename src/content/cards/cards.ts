@@ -26,6 +26,7 @@ import yellowShockImage from './images/yellow-shock.jpeg';
 import lightningImage from './images/lightning.jpeg';
 import electricTrapImage from './images/electric-trap.png';
 import tripleStrikeImage from './images/triple-strike.png';
+import stealthImage from './images/stealth.jpeg';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
@@ -221,7 +222,7 @@ export const redCards = {
     {
       name: 'Channel',
       description:
-        'The next "fire" card you play this turn deals double damage. Play another card.',
+        'The next "fire" attack played this turn deals double damage. Play another card.',
       image: channelImage,
     },
   ),
@@ -441,7 +442,7 @@ export const purpleCards = {
     ],
     {
       name: 'Right Upper',
-      description: `Deal $V damage. Deal double damage and play another card if you've played another card this turn.`,
+      description: `Deal $V damage. If you've played another card this turn, deal double damage and play another card .`,
       image: uppercutImage,
     },
   ),
@@ -535,8 +536,8 @@ export const purpleCards = {
     {
       name: 'Stealth',
       description:
-        'Gin $V temporary dodge. Your next card deals $2V% damage. Lose temporary dodge the next time you play a damaging card.',
-      image: manyJabsImage,
+        'Gain $V temporary dodge. Your next attack deals $2V% damage and removes temporary dodge.',
+      image: stealthImage,
     },
   ),
 };

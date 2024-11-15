@@ -18,7 +18,7 @@ interface PlayCardContext {
   game: GameState;
   events: BattleEvent[];
   card: CardState;
-  reduceChannelStatusEffect?: boolean;
+  // rue when a card would deal damage, even if it was dodged
   cardDealsDamage?: boolean;
 }
 
@@ -43,15 +43,17 @@ export function applyCardEffects(game: GameState, card: CardState): BattleEvent[
     });
   }
 
-  // we reduce the status effect only after all card effects have been applied
-  if (context.reduceChannelStatusEffect) {
-    activePlayer.channel -= 1;
-  }
-
-  // temporaryDodge, damageMultiplier
   if (context.cardDealsDamage) {
+    // damageMultiplier
     activePlayer.damageMultiplier = 0;
+
+    // temporaryDodge
     activePlayer.temporaryDodge = 0;
+
+    // channel
+    if (activePlayer.channel > 0 && card.name.toLocaleLowerCase().includes('fire')) {
+      activePlayer.channel -= 1;
+    }
   }
 
   return events;
@@ -234,7 +236,6 @@ function dealCardDamage(
   // channel
   if (self.channel > 0 && card.name.toLocaleLowerCase().includes('fire')) {
     multiplier *= 2;
-    context.reduceChannelStatusEffect = true;
   }
 
   // damageMultiplier
