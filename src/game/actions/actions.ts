@@ -75,9 +75,11 @@ export function startTurn(game: GameState): BattleEvent[] {
   }
 
   // permaBleed
-  const permaBleed = getRelic(activePlayer, 'permaBleed');
-  if (permaBleed) {
-    nonActivePlayer.bleed += permaBleed.value;
+  if (nonActivePlayer.bleed === 0) {
+    const permaBleed = getRelic(activePlayer, 'permaBleed');
+    if (permaBleed) {
+      nonActivePlayer.bleed += permaBleed.value;
+    }
   }
 
   return events;
@@ -92,6 +94,12 @@ export function playCard(game: GameState): BattleEvent[] {
     const damage = activePlayer.health;
     activePlayer.health = 0;
     return [createBattleEvent('damage', damage, 'self')];
+  }
+
+  // stun
+  if (activePlayer.stun > 0) {
+    activePlayer.extraCardPlays = 0;
+    return [];
   }
 
   const events: BattleEvent[] = [];
@@ -134,10 +142,14 @@ export function playCard(game: GameState): BattleEvent[] {
 }
 
 export function endTurn(game: GameState) {
-  const [activePlayer] = getPlayers(game);
+  const [activePlayer, nonActivePlayer] = getPlayers(game);
   assert(activePlayer.extraCardPlays === 0);
 
   activePlayer.channel = 0;
+  activePlayer.stun = 0;
+  activePlayer.shock = 0;
+
+  nonActivePlayer.shock = 0;
 
   game.turn++;
 }

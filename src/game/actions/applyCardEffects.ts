@@ -1,4 +1,4 @@
-import { BLEED_DAMAGE } from '../constants';
+import { BLEED_DAMAGE, MAX_SHOCK } from '../constants';
 import {
   CardEffect,
   CardState,
@@ -216,7 +216,7 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
   }
 
   value = Math.floor(value * multiplier);
-  reduceHealth({ value, target }, context);
+  dealCardDamage({ value, target }, context);
 
   // regenForHighDamage
   const regenForHighDamage = getRelic(self, 'regenForHighDamage');
@@ -224,20 +224,41 @@ function dealDamage({ value, multiplier = 1, target }: EffectOptions, context: P
     self.regen += regenForHighDamage.value2;
   }
 
-  // lifesteal
-  const relicLifesteal = getRelic(self, 'lifesteal')?.value || 0;
-  const cardLifesteal = maybeGetValue(card.lifesteal, context) || 0;
-  const burnLifesteal = self.burn > 0 ? self.lifestealWhenBurning : 0;
-  const lifesteal = self.lifesteal + cardLifesteal + burnLifesteal + relicLifesteal;
-  if (value > 0 && lifesteal > 0) {
-    applyHeal({ value: lifesteal * value, target: 'self' }, context);
-  }
-
   // bleed
   if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
-    reduceHealth({ value: BLEED_DAMAGE, target }, context);
+    dealCardDamage({ value: BLEED_DAMAGE, target }, context);
     opponent.bleed -= 1;
   }
+}
+
+// similar to reduceHealth but the damage counts as coming from the card, meaning effects like
+// lifesteal, shock, etc trigger
+function dealCardDamage({ value, target }: EffectOptions, context: PlayCardContext) {
+  const [self] = getPlayers(context.game);
+  const targetPlayer = getTargetedPlayer(context.game, target);
+  const { card } = context;
+
+  if (value > 0) {
+    // lifesteal
+    const relicLifesteal = getRelic(self, 'lifesteal')?.value || 0;
+    const cardLifesteal = maybeGetValue(card.lifesteal, context) || 0;
+    const burnLifesteal = self.burn > 0 ? self.lifestealWhenBurning : 0;
+    const lifesteal = self.lifesteal + cardLifesteal + burnLifesteal + relicLifesteal;
+    if (lifesteal > 0) {
+      applyHeal({ value: lifesteal * value, target: 'self' }, context);
+    }
+
+    // shock
+    if (targetPlayer.shock > 0) {
+      targetPlayer.shock += 1;
+      if (targetPlayer.shock >= MAX_SHOCK) {
+        targetPlayer.shock -= MAX_SHOCK;
+        targetPlayer.stun = 1;
+      }
+    }
+  }
+
+  reduceHealth({ value, target }, context);
 }
 
 export function reduceHealth(

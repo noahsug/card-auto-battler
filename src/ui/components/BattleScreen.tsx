@@ -33,7 +33,7 @@ type AnimationState = 'startTurn' | 'applyCardEffects' | 'endPlayCard';
 
 function getPlayCardBattleEvents(player: PlayerState): BattleEvent[] {
   const card = player.cards[player.currentCardIndex];
-  if (card) {
+  if (card && player.health > 0 && player.stun === 0) {
     return [createBattleEvent('playCard', card.acquiredId)];
   }
   return [];

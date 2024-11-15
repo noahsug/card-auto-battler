@@ -22,9 +22,15 @@ import bloodBoilImage from './images/blood-boil.jpeg';
 import lifestealImage from './images/lifesteal.jpeg';
 import personOnFireImage from './images/person-on-fire.jpeg';
 import bladeBloodFireImage from './images/blade-blood-fire.jpeg';
+import yellowShockImage from './images/yellow-shock.jpeg';
+import lightningImage from './images/lightning.jpeg';
+import electricTrapImage from './images/electric-trap.png';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
+/**
+ * Basic cards
+ */
 export const basicCards = {
   attack: createCard(
     [
@@ -54,6 +60,9 @@ export const basicCards = {
   ),
 };
 
+/**
+ * Green cards
+ */
 export const greenCards = {
   damagePerTurn: createCard(
     [
@@ -63,7 +72,7 @@ export const greenCards = {
     ],
     {
       name: 'Evergrowing Club',
-      description: `Deal 1 damage. Grow +$V damage at the end of your turn.`,
+      description: `Deal 1 damage. Grow +$V damage at the end of each of your turns.`,
       image: growingClubImage,
     },
   ),
@@ -167,6 +176,9 @@ Object.values(greenCards).forEach((card) => {
   card.tribe = 'green';
 });
 
+/**
+ * Red cards
+ */
 export const redCards = {
   fireball: createCard(
     [
@@ -275,18 +287,18 @@ export const redCards = {
     [
       {
         name: 'bleed',
-        value: v(5),
+        value: v(4),
       },
       {
         name: 'bleed',
-        value: v(5),
+        value: v(1),
         target: 'self',
       },
     ],
     {
       trash: true,
       name: 'Bloodbath',
-      description: 'Apply $V bleed to yourself and the opponent. Trash.',
+      description: 'Apply $V bleed the opponent and $2V bleed to yourself.',
       image: bloodbathImage,
     },
   ),
@@ -374,6 +386,9 @@ Object.values(redCards).forEach((card) => {
   card.tribe = 'red';
 });
 
+/**
+ * Purple cards
+ */
 export const purpleCards = {
   jabOne: createCard(
     [
@@ -403,24 +418,43 @@ export const purpleCards = {
       {
         target: 'self',
         name: 'extraCardPlays',
+        if: ifCompare('self', 'cardsPlayedThisTurn', '=', 2),
       },
     ],
     {
       name: 'Right Upper',
-      description: `Deal $V damage. Deal double damage if this is the 2nd card played this turn.`,
+      description: `Deal $V damage. Deal double damage and play another card if this is the 2nd card played this turn.`,
       image: uppercutImage,
     },
   ),
   jabThree: createCard(
     [
       {
-        value: v('self', 'cardsPlayedThisTurn', 2),
+        value: v(3),
+        multiHit: v('self', 'cardsPlayedThisTurn'),
       },
     ],
     {
       name: 'Finisher',
       description: `Deal $V damage 1 time for each card played this turn.`,
       image: manyJabsImage,
+    },
+  ),
+  shock: createCard(
+    [
+      {
+        name: 'damage',
+        value: v(3),
+      },
+      {
+        name: 'shock',
+        value: v(3),
+      },
+    ],
+    {
+      name: 'Thunder Struck',
+      description: 'Deal $V damage. Apply $2V shock.',
+      image: lightningImage,
     },
   ),
 };

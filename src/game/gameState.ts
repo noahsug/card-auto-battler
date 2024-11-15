@@ -16,6 +16,8 @@ export const statusEffectNames = [
   'burn',
   'lifesteal',
   'lifestealWhenBurning',
+  'shock',
+  'stun',
 ] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;

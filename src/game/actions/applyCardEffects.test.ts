@@ -9,7 +9,7 @@ import {
 } from '../../content/utils/createCard';
 import { diffValues } from '../../utils/objects';
 import { applyCardEffects } from './applyCardEffects';
-import { BLEED_DAMAGE } from '../constants';
+import { BLEED_DAMAGE, MAX_SHOCK } from '../constants';
 import {
   CardEffect,
   CardState,
@@ -510,6 +510,15 @@ describe('status effects', () => {
       expect(diff).toEqual({ self: { health: 1 }, opponent: { health: -1 } });
     });
 
+    it('heals from bleed damage', () => {
+      const { diff } = getPlayCardResult({ self: { lifesteal: 1 }, opponent: { bleed: 1 } });
+
+      expect(diff).toEqual({
+        self: { health: 4 },
+        opponent: { health: -1 - BLEED_DAMAGE, bleed: -1 },
+      });
+    });
+
     it('lifestealWhenBurning adds to lifesteal', () => {
       const { diff } = getPlayCardResult({
         self: { lifesteal: 1, lifestealWhenBurning: 1, burn: 1 },
@@ -542,21 +551,31 @@ describe('status effects', () => {
       expect(diff).toEqual({ self: { lifesteal: 0.5 } });
     });
   });
+
+  describe('shock', () => {
+    it('increases opponent shock', () => {
+      effect.name = 'shock';
+      const { diff } = getPlayCardResult();
+
+      expect(diff).toEqual({ opponent: { shock: 1 } });
+    });
+
+    it('increases when opponent takes card damage', () => {
+      const { diff } = getPlayCardResult({ opponent: { shock: 1 } });
+
+      expect(diff).toEqual({ opponent: { health: -1, shock: 1 } });
+    });
+
+    it('stuns when shock reaches max', () => {
+      const { opponent } = getPlayCardResult({ opponent: { shock: MAX_SHOCK - 1 } });
+
+      expect(opponent.shock).toEqual(0);
+      expect(opponent.stun).toEqual(1);
+    });
+  });
 });
 
 describe('relics', () => {
-  describe('permaBleed', () => {
-    const relics = [permaBleed];
-
-    it('adds 1 bleed whenever bleed reaches 0', () => {
-      effect.multiHit = v(3);
-      const { diff } = getPlayCardResult({ self: { relics }, opponent: { bleed: 1 } });
-
-      const damage = 3 * (1 + BLEED_DAMAGE);
-      expect(diff).toEqual({ opponent: { health: -damage } });
-    });
-  });
-
   describe('reduceLowDamage', () => {
     const relics = [reduceLowDamage];
 

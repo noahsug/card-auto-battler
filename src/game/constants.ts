@@ -3,6 +3,8 @@ export const MAX_LOSSES = 3;
 
 export const BLEED_DAMAGE = 3;
 
+export const MAX_SHOCK = 5;
+
 export const NUM_CARD_SELECTION_OPTIONS = 6;
 export const NUM_CARD_SELECTION_PICKS = 2;
 

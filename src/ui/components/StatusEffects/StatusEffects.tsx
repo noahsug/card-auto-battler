@@ -7,6 +7,8 @@ import bleedImage from './images/drop.png';
 import regenImage from './images/falling-leaf.png';
 import burnImage from './images/flamer.png';
 import heartPlusImage from './images/heart-plus.png';
+import lightningBranchesImage from './images/lightning-branches.png';
+import knockedOutStarsImage from './images/knocked-out-stars.png';
 
 import { PlayerState, StatusEffectName } from '../../../game/gameState';
 import { IsSubtype } from '../../../utils/types';
@@ -25,6 +27,8 @@ const effectToImage: Record<VisibleStatusEffectName, string> = {
   regen: regenImage,
   burn: burnImage,
   lifesteal: heartPlusImage,
+  shock: lightningBranchesImage,
+  stun: knockedOutStarsImage,
 };
 
 const visibleStatusEffects = Object.keys(effectToImage) as VisibleStatusEffectName[];

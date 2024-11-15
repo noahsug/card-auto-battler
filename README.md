@@ -2,9 +2,12 @@
 
 Game TODO:
 
-1. pause should pause all current animations - or at least pause after card effects have been
-   played (I want to pause and see what the card is doing)
-1. remove perma bleed cuz it's confusing
+1. add charms that help sort cards (e.g. feather = card is near top, anchor = card near bottom?,
+   chain = two cards are always played after each other), 1 charm per card? but chains can grow in
+   size
+1. add way to remove cards (maybe also via charms?)
+1. lifesteal doesn't heal from bleed, but do X for damage dealt does. Make a separate category of
+   damage for just card damage? Or have lifesteal proc off bleed?
 1. shuffle discard back into deck and use UID (OrderAcquired field in CardInstance?) to fix
    animation, use seeded random to ensure shuffle is always the same
 1. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
@@ -292,7 +295,7 @@ Red Cards (bleed, burn, fire spells, strength, multihit, lifesteal, low hp, tras
 - Relic: Play an additional card. Apply a permanent 3 burn to self.
 - Relic: Apply double burn while you have burn. Apply double bleed while you have bleed.
 
-Purple Cards (% chance, crit, play again, debuff, dodge, shock)
+Purple Cards (% chance, crit, play again, debuff, dodge, shock, self-trash)
 
 - Play another card.
 - Deal 2 damage. Repeat for each card played this turn.
