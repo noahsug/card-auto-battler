@@ -114,6 +114,12 @@ export function BattleScreen({
   // auto-play cards
   useEffect(() => {
     if (isBattleOver) return;
+    console.log(
+      'B auto-play?',
+      !isPaused,
+      nextAnimationState.current === 'startTurn',
+      nextAnimationState.current,
+    );
     if (!isPaused && nextAnimationState.current === 'startTurn') {
       startNextTurn();
     }
@@ -184,14 +190,14 @@ export function BattleScreen({
             opponentBoundingRect={getEnemyProfileBoundingRect()}
             isPaused={isPaused}
           />
-          <CardStack
+          {/* <CardStack
             cards={enemy.cards}
             currentCardIndex={enemy.currentCardIndex}
             onAnimationComplete={enemyHandleAnimationComplete}
             events={enemyBattleEvents}
             opponentBoundingRect={getUserProfileBoundingRect()}
             isPaused={isPaused}
-          />
+          /> */}
         </ContentRow>
       </CenterContent>
 

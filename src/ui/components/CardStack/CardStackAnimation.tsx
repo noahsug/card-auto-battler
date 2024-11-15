@@ -18,7 +18,6 @@ export interface Props {
   onAnimationComplete: () => void;
   deckBoundingRect: DOMRect;
   opponentBoundingRect: DOMRect;
-  isPaused: boolean;
 }
 
 const AnimatedContainer = styled(animated.div)`
@@ -32,6 +31,7 @@ interface CardAnimationState {
   deckIndex: number;
   inDiscard: boolean;
   isAnimating: boolean;
+  finishedAnimatingEvent?: BattleEvent;
   cancelWait?: () => void;
 }
 
@@ -138,6 +138,7 @@ function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) 
   const reverseIndex = cards.length - 1 - cardAnimation.deckIndex;
   cardAnimation.isAnimating = true;
 
+  console.log('A deal card');
   return async (next: (options: object) => Promise<void>) => {
     const discardPosition = getDiscardPosition(cardAnimation, context);
     await next({
@@ -227,7 +228,9 @@ function returnCardToCorrectPosition(cardAnimation: CardAnimationState, context:
 
 function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
   const { event } = context;
-  if (!event) {
+  // animating the same event a 2nd time after it's been finished causes the 2nd animation to never
+  // finish, so we check finishedAnimatingEvent to prevent that
+  if (!event || cardAnimation.finishedAnimatingEvent === event) {
     return null;
   }
 
@@ -274,9 +277,10 @@ export function CardStackAnimation({
 
   const onCardAnimationComplete = (cardAnimation: CardAnimationState) => {
     cardAnimation.isAnimating = false;
+    cardAnimation.finishedAnimatingEvent = event;
     const animationsComplete = cardAnimationsRef.current.every((c) => !c.isAnimating);
     if (animationsComplete) {
-      console.log('A onAnimationComplete');
+      console.log('A onAnimationComplete!', event?.type);
       onAnimationComplete();
     }
   };
@@ -312,7 +316,6 @@ export function CardStackAnimation({
   }
 
   useEffect(() => {
-    if (!event) return;
     animationController.start();
   }, [animationController, event]);
 
