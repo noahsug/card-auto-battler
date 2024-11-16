@@ -470,16 +470,16 @@ describe('status effects', () => {
     });
   });
 
-  describe('channel', () => {
+  describe('temporaryFireCrit', () => {
     beforeEach(() => {
       card.name = 'Fireball';
     });
 
     it('doubles damage from next fire card', () => {
       const { diff } = getPlayCardResult({
-        self: { channel: 1 },
+        self: { temporaryFireCrit: 1 },
       });
-      expect(diff).toEqual({ self: { channel: -1 }, opponent: { health: -2 } });
+      expect(diff).toEqual({ self: { temporaryFireCrit: -1 }, opponent: { health: -2 } });
     });
 
     it('applies to each effect on a fire card', () => {
@@ -489,15 +489,15 @@ describe('status effects', () => {
         createEffect({ name: 'damage', value: v(3) }),
       ];
       const { diff } = getPlayCardResult({
-        self: { channel: 1 },
+        self: { temporaryFireCrit: 1 },
       });
-      expect(diff).toEqual({ self: { channel: -1 }, opponent: { health: -12 } });
+      expect(diff).toEqual({ self: { temporaryFireCrit: -1 }, opponent: { health: -12 } });
     });
 
     it('does nothing for non-fire cards', () => {
       card.name = 'Blueball';
       const { diff } = getPlayCardResult({
-        self: { channel: 1 },
+        self: { temporaryFireCrit: 1 },
       });
       expect(diff).toEqual({ opponent: { health: -1 } });
     });

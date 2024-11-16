@@ -95,16 +95,17 @@ export const greenCards = {
   damageForGreen: createCard(
     [
       {
+        target: 'self',
+        name: 'crit',
+        if: ifCompare('self', 'percentGreen', '>=', 0.5),
+      },
+      {
         value: v(4),
-        multiply: {
-          value: v(2),
-          if: ifCompare('self', 'percentGreen', '>=', 0.5),
-        },
       },
     ],
     {
       name: 'Treefall',
-      description: `Deal $V damage. Deal double damage if at least half your cards are green.`,
+      description: `Deal $V damage. Crit if at least half your cards are green.`,
       image: treeFallImage,
     },
   ),
@@ -213,7 +214,7 @@ export const redCards = {
     [
       {
         target: 'self',
-        name: 'channel',
+        name: 'temporaryFireCrit',
       },
       {
         target: 'self',
@@ -222,8 +223,7 @@ export const redCards = {
     ],
     {
       name: 'Channel',
-      description:
-        'The next "fire" attack played this turn deals double damage. Play another card.',
+      description: 'The next "fire" attack played this turn is a crit. Play another card.',
       image: channelImage,
     },
   ),
@@ -530,7 +530,7 @@ export const purpleCards = {
       },
       {
         target: 'self',
-        name: 'critNextAttack',
+        name: 'crit',
       },
     ],
     {

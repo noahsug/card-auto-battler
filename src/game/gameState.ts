@@ -10,18 +10,22 @@ export const statusEffectNames = [
   'bleed',
   'extraCardPlays',
   'dodge',
+  // lost at the end of turn
+  'temporaryDodge',
   'strength',
+  // TODO: use strengthNextAttack for damage applied to the next attack
+  // lost after attacking
+  'temporaryStrength',
   'regen',
-  'channel',
   'burn',
   'lifesteal',
   'lifestealWhenBurning',
   'shock',
-  'stun',
   'shockOpponentNextTurn',
-  'temporaryDodge',
-  'critNextAttack',
-  'temporaryStrength',
+  'stun',
+  'crit',
+  // lost at the end of turn
+  'temporaryFireCrit',
 ] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;

@@ -7,20 +7,25 @@ const Value = styled.span`
   font-weight: bold;
 `;
 
-const numericWords = ['double', 'triple', 'quadruple', 'quintuple'];
+const numericWords = ['double', 'triple', 'quadruple', 'quintuple', 'crit'];
 
 const tribeTextToHighlight: string[] = tribes.filter((tribe) => tribe !== 'basic');
 
+function getWordListRegexString(words: string[]) {
+  const capitalizedWords = words.map((word) => word[0].toUpperCase() + word.slice(1));
+  return `${[...words, ...capitalizedWords].join('|')}`;
+}
+
 function TextLine({ text }: { text: string }) {
-  const parts = text.split(
-    new RegExp(`\\b(\\d+%{0,1}|${numericWords.join('|')}|${tribeTextToHighlight.join('|')})\\b`),
-  );
+  const wordsMatcher = getWordListRegexString([...numericWords, ...tribeTextToHighlight]);
+
+  const parts = text.split(new RegExp(`\\b(\\d+%{0,1}|${wordsMatcher})\\b`));
   return (
     <div>
       {parts.map((part, i) => {
         const isNumber = part.match(/^\d+%{0,1}$/) != null;
-        const isNumericWord = numericWords.includes(part);
-        const isTribe = tribeTextToHighlight.includes(part);
+        const isNumericWord = numericWords.includes(part.toLocaleLowerCase());
+        const isTribe = tribeTextToHighlight.includes(part.toLocaleLowerCase());
         if (!isNumber && !isNumericWord && !isTribe) return part;
 
         const style: React.CSSProperties = {};

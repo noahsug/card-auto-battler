@@ -154,7 +154,7 @@ export function endTurn(game: GameState) {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
   assert(activePlayer.extraCardPlays === 0);
 
-  activePlayer.channel = 0;
+  activePlayer.temporaryFireCrit = 0;
   activePlayer.stun = 0;
   activePlayer.shock = 0;
 

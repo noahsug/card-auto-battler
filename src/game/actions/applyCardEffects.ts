@@ -49,14 +49,14 @@ export function applyCardEffects(game: GameState, card: CardState): BattleEvent[
     // temporaryStrength
     activePlayer.temporaryStrength = 0;
 
-    // critNextAttack
-    if (activePlayer.critNextAttack > 0) {
-      activePlayer.critNextAttack -= 1;
+    // crit
+    if (activePlayer.crit > 0) {
+      activePlayer.crit -= 1;
     }
 
-    // channel
-    if (activePlayer.channel > 0 && card.name.toLocaleLowerCase().includes('fire')) {
-      activePlayer.channel -= 1;
+    // temporaryFireCrit
+    if (activePlayer.temporaryFireCrit > 0 && card.name.toLocaleLowerCase().includes('fire')) {
+      activePlayer.temporaryFireCrit -= 1;
     }
   }
 
@@ -237,13 +237,13 @@ function dealCardDamage(
     value += self.strength + self.temporaryStrength;
   }
 
-  // channel
-  if (self.channel > 0 && card.name.toLocaleLowerCase().includes('fire')) {
+  // temporaryFireCrit
+  if (self.temporaryFireCrit > 0 && card.name.toLocaleLowerCase().includes('fire')) {
     multiplier *= 2;
   }
 
-  // critNextAttack
-  if (self.critNextAttack > 0) {
+  // crit
+  if (self.crit > 0) {
     multiplier *= 2;
   }
 

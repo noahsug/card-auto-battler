@@ -20,7 +20,7 @@ import { Row } from '../shared/Row';
 type StatusEffectsWithoutIcons = IsSubtype<
   StatusEffectName,
   | 'lifestealWhenBurning'
-  | 'channel'
+  | 'temporaryFireCrit'
   | 'shockOpponentNextTurn'
   | 'temporaryDodge'
   | 'temporaryStrength'
@@ -37,7 +37,7 @@ const effectToImage: Record<VisibleStatusEffectName, string> = {
   lifesteal: heartPlusImage,
   shock: lightningBranchesImage,
   stun: knockedOutStarsImage,
-  critNextAttack: arrowScopeImage,
+  crit: arrowScopeImage,
 };
 
 const visibleStatusEffects = Object.keys(effectToImage) as VisibleStatusEffectName[];
