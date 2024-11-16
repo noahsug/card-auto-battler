@@ -20,7 +20,7 @@ export const statusEffectNames = [
   'stun',
   'shockOpponentNextTurn',
   'temporaryDodge',
-  'damageMultiplier',
+  'critNextAttack',
   'temporaryStrength',
 ] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];

@@ -37,7 +37,7 @@ const effectToImage: Record<VisibleStatusEffectName, string> = {
   lifesteal: heartPlusImage,
   shock: lightningBranchesImage,
   stun: knockedOutStarsImage,
-  damageMultiplier: arrowScopeImage,
+  critNextAttack: arrowScopeImage,
 };
 
 const visibleStatusEffects = Object.keys(effectToImage) as VisibleStatusEffectName[];
@@ -70,13 +70,15 @@ interface Props {
 function getDisplayedStatusEffectValue(player: PlayerState, effectName: VisibleStatusEffectName) {
   const value = player[effectName];
 
-  if (effectName === 'lifesteal' || effectName === 'damageMultiplier') {
+  if (effectName === 'lifesteal') {
     return `${(value * 100).toFixed(0)}%`;
   }
 
   if (value === Infinity) {
     return '∞';
   }
+
+  if (value === 1) return '';
 
   return value;
 }

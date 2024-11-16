@@ -530,14 +530,12 @@ export const purpleCards = {
       },
       {
         target: 'self',
-        name: 'damageMultiplier',
-        value: v(0.5),
+        name: 'critNextAttack',
       },
     ],
     {
       name: 'Stealth',
-      description:
-        'Dodge all attacks until your next turn. Your next attack deals $2V% more damage.',
+      description: 'Dodge all attacks until your next turn. Your next attack will crit.',
       image: stealthImage,
     },
   ),

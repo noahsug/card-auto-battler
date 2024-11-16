@@ -43,12 +43,16 @@ export function applyCardEffects(game: GameState, card: CardState): BattleEvent[
     });
   }
 
+  // TODO: replace with booleans when certain effects are applied, e.g. if a card applies this
+  // affect after it deals damage, we should not remove the effect
   if (context.cardDealsDamage) {
-    // damageMultiplier
-    activePlayer.damageMultiplier = 0;
-
     // temporaryStrength
     activePlayer.temporaryStrength = 0;
+
+    // critNextAttack
+    if (activePlayer.critNextAttack > 0) {
+      activePlayer.critNextAttack -= 1;
+    }
 
     // channel
     if (activePlayer.channel > 0 && card.name.toLocaleLowerCase().includes('fire')) {
@@ -238,9 +242,9 @@ function dealCardDamage(
     multiplier *= 2;
   }
 
-  // damageMultiplier
-  if (self.damageMultiplier > 0) {
-    multiplier *= 1 + self.damageMultiplier;
+  // critNextAttack
+  if (self.critNextAttack > 0) {
+    multiplier *= 2;
   }
 
   value = Math.floor(value * multiplier);
@@ -344,7 +348,7 @@ function trashCards({ value, multiplier = 1, target }: EffectOptions, context: P
 }
 
 function maybeFloorValue(value: number, name: keyof PlayerState) {
-  if (name === 'lifesteal' || name === 'lifestealWhenBurning' || name === 'damageMultiplier') {
+  if (name === 'lifesteal' || name === 'lifestealWhenBurning') {
     // these values use % so don't round them
     return value;
   }
