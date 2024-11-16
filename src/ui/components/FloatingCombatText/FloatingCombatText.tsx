@@ -13,6 +13,7 @@ export type Props = AnimationProps;
 
 const battleEventsTypesWithFCT = new Set(['damage', 'heal', 'miss']);
 
+// TODO: add crit color
 function getTextColor({ $type }: { $type: BattleEvent['type'] }) {
   switch ($type) {
     case 'damage':

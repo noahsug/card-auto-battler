@@ -11,9 +11,8 @@ import {
 } from '../gameState';
 import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
-import { applyCardEffects, applyHeal, reduceHealth, getDamageDealt } from './applyCardEffects';
+import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
-import { extraCardPlaysAtStart } from '../../content/relics/relics';
 
 export function addCards(game: GameState, cards: CardState[]) {
   addCardsToPlayer(game.user, cards);
@@ -62,7 +61,6 @@ export function startTurn(game: GameState): BattleEvent[] {
   const card = activePlayer.cards[activePlayer.currentCardIndex];
   const context = { game, events, card };
 
-  // temporaryDodge
   activePlayer.temporaryDodge = 0;
 
   // shockOpponentNextTurn
@@ -155,6 +153,7 @@ export function endTurn(game: GameState) {
   assert(activePlayer.extraCardPlays === 0);
 
   activePlayer.temporaryFireCrit = 0;
+  activePlayer.temporaryStrength = 0;
   activePlayer.stun = 0;
   activePlayer.shock = 0;
 

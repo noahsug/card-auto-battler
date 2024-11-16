@@ -223,7 +223,7 @@ export const redCards = {
     ],
     {
       name: 'Channel',
-      description: 'The next "fire" attack played this turn is a crit. Play another card.',
+      description: 'The next "fire" attack played this turn will crit. Play another card.',
       image: channelImage,
     },
   ),
@@ -429,11 +429,12 @@ export const purpleCards = {
   jabTwo: createCard(
     [
       {
+        target: 'self',
+        name: 'crit',
+        if: ifCompare('self', 'cardsPlayedThisTurn', '>=', 2),
+      },
+      {
         value: v(4),
-        multiply: {
-          value: v(2),
-          if: ifCompare('self', 'cardsPlayedThisTurn', '>=', 2),
-        },
       },
       {
         target: 'self',
@@ -443,7 +444,7 @@ export const purpleCards = {
     ],
     {
       name: 'Right Upper',
-      description: `Deal $V damage. If you've played another card this turn, deal double damage and play another card .`,
+      description: `Deal $V damage. Combo: crit and play another card.`,
       image: uppercutImage,
     },
   ),
@@ -464,11 +465,11 @@ export const purpleCards = {
     [
       {
         name: 'damage',
-        value: v(3),
+        value: v(4),
       },
       {
         name: 'shock',
-        value: v(3),
+        value: v(1),
       },
     ],
     {
@@ -495,7 +496,6 @@ export const purpleCards = {
     [
       {
         name: 'shock',
-        value: v(1),
       },
       {
         target: 'self',
@@ -553,7 +553,7 @@ export const purpleCards = {
     ],
     {
       name: 'Pumped Up',
-      description: 'Your next attack deals $V more damage. Play another card.',
+      description: 'Gain $V strength this turn. Play another card.',
       image: pumpUpImage,
     },
   ),

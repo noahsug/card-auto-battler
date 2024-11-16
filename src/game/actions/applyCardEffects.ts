@@ -46,15 +46,10 @@ export function applyCardEffects(game: GameState, card: CardState): BattleEvent[
   // TODO: replace with booleans when certain effects are applied, e.g. if a card applies this
   // affect after it deals damage, we should not remove the effect
   if (context.cardDealsDamage) {
-    // temporaryStrength
-    activePlayer.temporaryStrength = 0;
-
-    // crit
     if (activePlayer.crit > 0) {
       activePlayer.crit -= 1;
     }
 
-    // temporaryFireCrit
     if (activePlayer.temporaryFireCrit > 0 && card.name.toLocaleLowerCase().includes('fire')) {
       activePlayer.temporaryFireCrit -= 1;
     }
@@ -235,16 +230,23 @@ function dealCardDamage(
   // strength
   if (target === 'opponent') {
     value += self.strength + self.temporaryStrength;
+
+    // strengthWithDodge
+    const strengthWithDodge = getRelic(self, 'strengthWithDodge');
+    if (strengthWithDodge && self.dodge > 0) {
+      value += strengthWithDodge.value;
+    }
   }
 
-  // temporaryFireCrit
-  if (self.temporaryFireCrit > 0 && card.name.toLocaleLowerCase().includes('fire')) {
+  const isCrit = getIsCrit(context);
+  if (isCrit) {
     multiplier *= 2;
-  }
 
-  // crit
-  if (self.crit > 0) {
-    multiplier *= 2;
+    // shockOnCrit
+    const shockOnCrit = getRelic(self, 'shockOnCrit');
+    if (shockOnCrit) {
+      opponent.shock += shockOnCrit.value;
+    }
   }
 
   value = Math.floor(value * multiplier);
@@ -283,6 +285,29 @@ function dealCardDamage(
     reduceHealth({ value: BLEED_DAMAGE, target }, context);
     opponent.bleed -= 1;
   }
+}
+
+function getIsCrit(context: PlayCardContext) {
+  const self = getActivePlayer(context.game);
+  const { card } = context;
+
+  // temporaryFireCrit
+  if (self.temporaryFireCrit > 0 && card.name.toLocaleLowerCase().includes('fire')) {
+    return true;
+  }
+
+  // crit
+  if (self.crit > 0) {
+    return true;
+  }
+
+  // critChance
+  const critChance = getRelic(self, 'critChance');
+  if (critChance && Math.random() < critChance.value) {
+    return true;
+  }
+
+  return false;
 }
 
 export function reduceHealth(

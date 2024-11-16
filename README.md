@@ -310,6 +310,7 @@ Purple Cards (% chance, crit, play again, debuff, dodge, shock, self-trash)
 - Play again if the last card played was purple.
 - The next card is a critical hit
 - Deal 0 damage 3 times. 100% critical hit chance.
+- Relic: Critical hits apply shock
 - Relic: 25% chance to dodge damage.
 - Relic: your next card deals 2x damage after you dodge
 - Relic: Play another card for every 5 times the enemy takes damage.

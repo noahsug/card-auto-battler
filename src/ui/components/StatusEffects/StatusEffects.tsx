@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 
 import strengthImage from './images/biceps.png';
-import dodgeImage from './images/body-balance.png';
+import dodgeImage from './images/fluffy-cloud.png';
 import extraCardPlaysImage from './images/card-play.png';
 import bleedImage from './images/drop.png';
 import regenImage from './images/falling-leaf.png';
@@ -16,6 +16,7 @@ import { IsSubtype } from '../../../utils/types';
 import { maskImage } from '../../style';
 import { Number } from '../shared/Number';
 import { Row } from '../shared/Row';
+import { getRelic } from '../../../game/utils/selectors';
 
 type StatusEffectsWithoutIcons = IsSubtype<
   StatusEffectName,
@@ -88,6 +89,11 @@ export function StatusEffects({ player }: Props) {
 
   if (player.burn > 0) {
     calculatedStatusEffects.lifesteal += player.lifestealWhenBurning;
+  }
+
+  const strengthWithDodge = getRelic(player, 'strengthWithDodge');
+  if (strengthWithDodge && player.dodge > 0) {
+    calculatedStatusEffects.strength += strengthWithDodge.value;
   }
 
   calculatedStatusEffects.dodge += player.temporaryDodge;

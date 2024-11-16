@@ -1,14 +1,20 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {
+  reduceLowDamage,
+  regenForHighDamage,
+  sharedPain,
+  strengthAffectsHealing,
+  strengthOnSelfDamage,
+} from '../../content/relics';
+import {
   createCard,
+  createEffect,
   ifCompare,
   ifHas,
   value as v,
-  createEffect,
 } from '../../content/utils/createCard';
 import { diffValues } from '../../utils/objects';
-import { applyCardEffects } from './applyCardEffects';
 import { BLEED_DAMAGE, MAX_SHOCK } from '../constants';
 import {
   CardEffect,
@@ -17,12 +23,7 @@ import {
   PlayerState,
   SetValueCardEffect,
 } from '../gameState';
-import { permaBleed, reduceLowDamage, regenForHighDamage } from '../../content/relics';
-import {
-  sharedPain,
-  strengthAffectsHealing,
-  strengthOnSelfDamage,
-} from '../../content/relics/relics';
+import { applyCardEffects } from './applyCardEffects';
 
 let card: CardState;
 let effect: CardEffect;

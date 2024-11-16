@@ -8,94 +8,104 @@ import planksImage from './images/packed-planks.png';
 import necklaceImage from './images/primitive-necklace.png';
 import fireSilhouetteImage from './images/fire-silhouette.png';
 import transfuseImage from './images/transfuse.png';
+import thunderBladeImage from './images/thunder-blade.png';
+import targetingImage from './images/targeting.png';
+import cowledImage from './images/cowled.png';
 
 // basic
-export const lifesteal = createRelic({
-  displayName: 'Lifesteal',
-  description: 'Gain $V% lifesteal.',
-  value: 0.25,
-  image: lifestealImage,
-});
-
 export const basicRelics = {
-  lifesteal,
+  lifesteal: createRelic({
+    displayName: 'Lifesteal',
+    description: 'Gain $V% lifesteal.',
+    value: 0.25,
+    image: lifestealImage,
+  }),
 };
 Object.values(basicRelics).forEach((relic) => {
   relic.tribe = 'basic';
 });
 
 // green
-export const reduceLowDamage = createRelic({
-  displayName: 'Thick Bark',
-  description: 'Whenever you would receive $V or less damage, reduce it to $V2.',
-  value: 4,
-  value2: 1,
-  image: planksImage,
-});
-
-export const regenForHighDamage = createRelic({
-  displayName: 'Sprouter',
-  description: 'Gain $V2 regen whenever you deal $V or more damage in a single hit.',
-  value: 10,
-  value2: 3,
-  image: sproutImage,
-});
-
-export const strengthAffectsHealing = createRelic({
-  displayName: 'Shamanic Wisdom',
-  description: 'Healing benefits from strength. Gain $V strength.',
-  value: 1,
-  image: necklaceImage,
-});
-
 export const greenRelics = {
-  reduceLowDamage,
-  regenForHighDamage,
-  strengthAffectsHealing,
+  reduceLowDamage: createRelic({
+    displayName: 'Thick Bark',
+    description: 'Whenever you would receive $V or less damage, reduce it to $V2.',
+    value: 4,
+    value2: 1,
+    image: planksImage,
+  }),
+  regenForHighDamage: createRelic({
+    displayName: 'Sprouter',
+    description: 'Gain $V2 regen whenever you deal $V or more damage in a single hit.',
+    value: 7,
+    value2: 3,
+    image: sproutImage,
+  }),
+  strengthAffectsHealing: createRelic({
+    displayName: 'Shamanic Wisdom',
+    description: 'Healing benefits from strength. Gain $V strength.',
+    value: 1,
+    image: necklaceImage,
+  }),
 };
 Object.values(greenRelics).forEach((relic) => {
   relic.tribe = 'green';
 });
 
 // red
-export const permaBleed = createRelic({
-  displayName: 'Eternal Wound',
-  description: 'Add $V bleed to the opponent at the start of your turn.',
-  value: 1,
-  image: openWoundImage,
-});
-export const strengthOnSelfDamage = createRelic({
-  displayName: 'Madness',
-  description: 'Gain $V strength whenever you take damage on your turn.',
-  value: 1,
-  image: pyromaniacImage,
-});
-export const sharedPain = createRelic({
-  displayName: 'Pain Link',
-  description: 'Damage taken on your turn is also dealt to the enemy.',
-  value: 1,
-  image: transfuseImage,
-});
-
 export const redRelics = {
-  permaBleed,
-  strengthOnSelfDamage,
-  sharedPain,
+  permaBleed: createRelic({
+    displayName: 'Eternal Wound',
+    description: 'Add $V bleed to the opponent at the start of your turn.',
+    value: 1,
+    image: openWoundImage,
+  }),
+  strengthOnSelfDamage: createRelic({
+    displayName: 'Madness',
+    description: 'Gain $V strength whenever you take damage on your turn.',
+    value: 1,
+    image: pyromaniacImage,
+  }),
+  sharedPain: createRelic({
+    displayName: 'Pain Link',
+    description: 'Damage taken on your turn is also dealt to the enemy.',
+    value: 1,
+    image: transfuseImage,
+  }),
 };
 Object.values(redRelics).forEach((relic) => {
   relic.tribe = 'red';
 });
 
 // purple
-export const extraCardPlaysAtStart = createRelic({
-  displayName: 'Adrenaline Rush',
-  description: 'Play $V extra cards at the start of each battle.',
-  value: 2,
-  image: fireSilhouetteImage,
-});
-
 export const purpleRelics = {
-  extraCardPlaysAtStart,
+  extraCardPlaysAtStart: createRelic({
+    displayName: 'Adrenaline Rush',
+    description: 'Play $V extra cards at the start of each battle.',
+    value: 2,
+    image: fireSilhouetteImage,
+  }),
+
+  shockOnCrit: createRelic({
+    displayName: 'Thundering Strikes',
+    description: 'Whenever you crit, add $V shock to the enemy.',
+    value: 1,
+    image: thunderBladeImage,
+  }),
+
+  critChance: createRelic({
+    displayName: 'Weak Points',
+    description: 'Gain $V% crit chance.',
+    value: 0.25,
+    image: targetingImage,
+  }),
+
+  strengthWithDodge: createRelic({
+    displayName: 'Sneak Attack',
+    description: 'Gain $V strength while you have dodge.',
+    value: 4,
+    image: cowledImage,
+  }),
 };
 Object.values(purpleRelics).forEach((relic) => {
   relic.tribe = 'purple';
