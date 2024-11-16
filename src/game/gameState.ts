@@ -21,6 +21,7 @@ export const statusEffectNames = [
   'shockOpponentNextTurn',
   'temporaryDodge',
   'damageMultiplier',
+  'temporaryStrength',
 ] as const;
 export type StatusEffectName = (typeof statusEffectNames)[number];
 export type StatusEffects = Record<StatusEffectName, number>;
@@ -42,6 +43,7 @@ export type PlayerValueName =
   | keyof Omit<PlayerState, 'name' | 'image' | 'previousCard'>
   | CalculatedPlayerValueName;
 
+// TODO: Add 'selfDamage' as a type, which isn't affected by things like strength
 export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
 
 export interface BasicValueDescriptor {
@@ -162,7 +164,8 @@ export function createGameState(): GameState {
   };
 
   const { attack, heal } = allCards;
-  addCardsToPlayer(game.user, [attack, attack, heal]);
+  addCardsToPlayer(game.user, [allCards.stealth, allCards.shockTrap, allCards.pumpedUp]);
+  // addCardsToPlayer(game.user, [attack, attack, heal]);
   addCardsToPlayer(game.enemy, [attack, attack, attack, heal]);
 
   return game;

@@ -62,6 +62,9 @@ export function startTurn(game: GameState): BattleEvent[] {
   const card = activePlayer.cards[activePlayer.currentCardIndex];
   const context = { game, events, card };
 
+  // temporaryDodge
+  activePlayer.temporaryDodge = 0;
+
   // shockOpponentNextTurn
   if (activePlayer.shockOpponentNextTurn > 0) {
     nonActivePlayer.shock = activePlayer.shockOpponentNextTurn;

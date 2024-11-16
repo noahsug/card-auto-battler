@@ -47,8 +47,8 @@ export function applyCardEffects(game: GameState, card: CardState): BattleEvent[
     // damageMultiplier
     activePlayer.damageMultiplier = 0;
 
-    // temporaryDodge
-    activePlayer.temporaryDodge = 0;
+    // temporaryStrength
+    activePlayer.temporaryStrength = 0;
 
     // channel
     if (activePlayer.channel > 0 && card.name.toLocaleLowerCase().includes('fire')) {
@@ -230,7 +230,7 @@ function dealCardDamage(
 
   // strength
   if (target === 'opponent') {
-    value += self.strength;
+    value += self.strength + self.temporaryStrength;
   }
 
   // channel
@@ -240,7 +240,7 @@ function dealCardDamage(
 
   // damageMultiplier
   if (self.damageMultiplier > 0) {
-    multiplier *= self.damageMultiplier;
+    multiplier *= 1 + self.damageMultiplier;
   }
 
   value = Math.floor(value * multiplier);
@@ -344,7 +344,7 @@ function trashCards({ value, multiplier = 1, target }: EffectOptions, context: P
 }
 
 function maybeFloorValue(value: number, name: keyof PlayerState) {
-  if (name === 'lifesteal' || name === 'lifestealWhenBurning') {
+  if (name === 'lifesteal' || name === 'lifestealWhenBurning' || name === 'damageMultiplier') {
     // these values use % so don't round them
     return value;
   }

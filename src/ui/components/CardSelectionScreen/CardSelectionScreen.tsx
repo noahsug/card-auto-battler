@@ -4,12 +4,11 @@ import { styled } from 'styled-components';
 import { NUM_CARD_SELECTION_PICKS } from '../../../game/constants';
 import { CardState, GameState } from '../../../game/gameState';
 import { Card } from '../Card';
+import { CardGrid, useCardSize } from '../CardGrid';
 import { HUD } from '../HUD';
 import { Button } from '../shared/Button';
 import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
-import { useUnits } from '../../hooks/useUnits';
-import { CardGrid, useCardSize } from '../CardGrid';
 
 const bottomRowHeight = 4;
 

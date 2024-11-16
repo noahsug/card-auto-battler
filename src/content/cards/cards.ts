@@ -27,6 +27,7 @@ import lightningImage from './images/lightning.jpeg';
 import electricTrapImage from './images/electric-trap.png';
 import tripleStrikeImage from './images/triple-strike.png';
 import stealthImage from './images/stealth.jpeg';
+import pumpUpImage from './images/pump-up.png';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
@@ -525,19 +526,37 @@ export const purpleCards = {
       {
         target: 'self',
         name: 'temporaryDodge',
-        value: v(99),
+        value: v(Infinity),
       },
       {
         target: 'self',
         name: 'damageMultiplier',
-        value: v(1.5),
+        value: v(0.5),
       },
     ],
     {
       name: 'Stealth',
       description:
-        'Gain $V temporary dodge. Your next attack deals $2V% damage and removes temporary dodge.',
+        'Dodge all attacks until your next turn. Your next attack deals $2V% more damage.',
       image: stealthImage,
+    },
+  ),
+  pumpedUp: createCard(
+    [
+      {
+        target: 'self',
+        name: 'temporaryStrength',
+        value: v(2),
+      },
+      {
+        target: 'self',
+        name: 'extraCardPlays',
+      },
+    ],
+    {
+      name: 'Pumped Up',
+      description: 'Your next attack deals $V more damage. Play another card.',
+      image: pumpUpImage,
     },
   ),
 };

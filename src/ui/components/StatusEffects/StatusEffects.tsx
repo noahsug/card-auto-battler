@@ -19,7 +19,11 @@ import { Row } from '../shared/Row';
 
 type StatusEffectsWithoutIcons = IsSubtype<
   StatusEffectName,
-  'lifestealWhenBurning' | 'channel' | 'shockOpponentNextTurn' | 'temporaryDodge'
+  | 'lifestealWhenBurning'
+  | 'channel'
+  | 'shockOpponentNextTurn'
+  | 'temporaryDodge'
+  | 'temporaryStrength'
 >;
 type VisibleStatusEffectName = Exclude<StatusEffectName, StatusEffectsWithoutIcons>;
 
@@ -66,8 +70,12 @@ interface Props {
 function getDisplayedStatusEffectValue(player: PlayerState, effectName: VisibleStatusEffectName) {
   const value = player[effectName];
 
-  if (effectName === 'lifesteal') {
+  if (effectName === 'lifesteal' || effectName === 'damageMultiplier') {
     return `${(value * 100).toFixed(0)}%`;
+  }
+
+  if (value === Infinity) {
+    return '∞';
   }
 
   return value;
@@ -79,6 +87,9 @@ export function StatusEffects({ player }: Props) {
   if (player.burn > 0) {
     calculatedStatusEffects.lifesteal += player.lifestealWhenBurning;
   }
+
+  calculatedStatusEffects.dodge += player.temporaryDodge;
+  calculatedStatusEffects.strength += player.temporaryStrength;
 
   return (
     <StatusEffectRow>
