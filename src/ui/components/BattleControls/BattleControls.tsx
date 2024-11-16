@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { styled } from 'styled-components';
 
-import nextImage from './arrows.png';
+import fastForwardImage from './arrows.png';
 import undoImage from './undo.png';
 import pauseImage from './pause.png';
 import playImage from './play.png';
@@ -14,9 +14,7 @@ const ControlsRow = styled.div`
   margin-bottom: 1rem;
 `;
 
-const ControlButton = styled.button<{ $flip?: boolean }>`
-  background: none;
-  border: none;
+const ControlButton = styled.div<{ $flip?: boolean; disabled: boolean }>`
   transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
   cursor: pointer;
   width: 2.5rem;
@@ -102,7 +100,7 @@ export function BattleControls({
       </ControlButton>
 
       <ControlButton onClick={onToggleFastForward} disabled={!onToggleFastForward}>
-        <MaskedImage src={nextImage} $highlight={isFastForwarding} />
+        <MaskedImage src={fastForwardImage} $highlight={isFastForwarding} />
       </ControlButton>
     </ControlsRow>
   );
