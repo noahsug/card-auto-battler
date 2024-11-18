@@ -1,7 +1,7 @@
 import { animated } from '@react-spring/web';
 import { styled } from 'styled-components';
 
-import { BattleEvent } from '../../../game/actions/battleEvent';
+import { BattleEvent, ValueBattleEvent } from '../../../game/actions/battleEvent';
 import { Z_INDEX } from '../../constants';
 import {
   Props as AnimationProps,
@@ -13,22 +13,21 @@ export type Props = AnimationProps;
 
 const battleEventsTypesWithFCT = new Set(['damage', 'heal', 'miss']);
 
-// TODO: add crit color
-function getTextColor({ $type }: { $type: BattleEvent['type'] }) {
-  switch ($type) {
+function getTextColor({ $battleEvent }: { $battleEvent: BattleEvent }) {
+  switch ($battleEvent.type) {
     case 'damage':
-      return 'darkred';
+      return $battleEvent.isCrit ? 'hsl(0, 85%, 40%)' : 'hsl(0, 85%, 20%)';
     case 'heal':
-      return 'darkgreen';
+      return $battleEvent.isCrit ? 'hsl(120, 85%, 40%)' : 'hsl(120, 85%, 20%)';
     case 'miss':
       return 'yellow';
   }
 }
 
-function getTextShadow({ $type }: { $type: BattleEvent['type'] }) {
-  const color = $type === 'miss' ? 'black' : 'white';
-  const size = 0.3;
-  const offset = 0.1;
+function getTextShadow({ $battleEvent }: { $battleEvent: BattleEvent }) {
+  const color = $battleEvent.type === 'miss' ? 'var(--color-bg)' : 'var(--color-primary)';
+  const size = 0.05;
+  const offset = 0.05;
   return `
     ${offset}rem ${offset}rem ${size}rem ${color},
     ${offset}rem -${offset}rem ${size}rem ${color},
@@ -37,11 +36,21 @@ function getTextShadow({ $type }: { $type: BattleEvent['type'] }) {
   `;
 }
 
-const Text = styled(animated.div)<{ $type: BattleEvent['type'] }>`
+function getFontFamily({ $battleEvent }: { $battleEvent: BattleEvent }) {
+  return $battleEvent.type === 'miss' ? '' : 'var(--font-number)';
+}
+
+function getFontSize({ $battleEvent }: { $battleEvent: BattleEvent }) {
+  if ($battleEvent.type === 'miss') return 3;
+  if (($battleEvent as ValueBattleEvent).isCrit) return 4.35;
+  return 4;
+}
+
+const Text = styled(animated.div)<{ $battleEvent: BattleEvent }>`
   position: absolute;
   color: ${getTextColor};
-  font-family: ${(props) => (props.$type === 'miss' ? '' : 'var(--font-number)')};
-  font-size: ${(props) => (props.$type === 'miss' ? 3 : 4)}rem;
+  font-family: ${getFontFamily};
+  font-size: ${getFontSize}rem;
   font-weight: bold;
   text-shadow: ${getTextShadow};
   inset: 0;
@@ -53,9 +62,9 @@ const Text = styled(animated.div)<{ $type: BattleEvent['type'] }>`
 function getTextFromBattleEvent(battleEvent: BattleEvent) {
   switch (battleEvent.type) {
     case 'damage':
-      return -battleEvent.value;
+      return battleEvent.value;
     case 'heal':
-      return `+${battleEvent.value}`;
+      return `${battleEvent.value}`;
     case 'miss':
       return 'miss';
   }
@@ -72,7 +81,7 @@ export function FloatingCombatText({ battleEvents, targetBoundingRect }: Props) 
   });
 
   return render((style, { battleEvent }) => (
-    <Text style={style} $type={battleEvent.type}>
+    <Text style={style} $battleEvent={battleEvent}>
       {getTextFromBattleEvent(battleEvent)}
     </Text>
   ));

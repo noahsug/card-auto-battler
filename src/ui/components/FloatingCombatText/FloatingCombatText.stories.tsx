@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { BattleEvent } from '../../../game/actions/battleEvent';
+import { BattleEvent, createBattleEvent } from '../../../game/actions/battleEvent';
 import { FloatingCombatText } from './FloatingCombatText';
 
 const meta = {
@@ -20,14 +20,18 @@ function getStory(battleEvents: BattleEvent[]): Story {
   };
 }
 
-export const Damage = getStory([{ type: 'damage', value: 10, target: 'self' }]);
+export const Damage = getStory([createBattleEvent('damage', 10, 'opponent')]);
+
+export const DamageCrit = getStory([createBattleEvent('damage', 10, 'opponent', 'other', true)]);
 
 export const MultiHitDamage = getStory([
-  { type: 'damage', value: 10, target: 'self' },
-  { type: 'damage', value: 10, target: 'self' },
-  { type: 'damage', value: 10, target: 'self' },
+  createBattleEvent('damage', 10, 'opponent'),
+  createBattleEvent('damage', 10, 'opponent'),
+  createBattleEvent('damage', 10, 'opponent'),
 ]);
 
-export const Miss = getStory([{ type: 'miss', target: 'self' }]);
+export const Miss = getStory([createBattleEvent('miss', 'opponent')]);
 
-export const Heal = getStory([{ type: 'heal', target: 'self', value: 3 }]);
+export const Heal = getStory([createBattleEvent('heal', 10, 'self')]);
+
+export const HealCrit = getStory([createBattleEvent('heal', 10, 'self', 'other', true)]);

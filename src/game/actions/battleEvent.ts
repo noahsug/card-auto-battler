@@ -11,14 +11,15 @@ export interface BattleEventWithTarget {
 }
 export interface ValueBattleEvent {
   type: 'damage' | 'heal';
+  value: number;
   target: Target;
   source: BattleEventSource;
-  value: number;
+  isCrit: boolean;
 }
 export interface CardBattleEvent {
   type: 'playCard' | 'trashCard' | 'discardCard' | 'addTemporaryCard';
-  target: Target;
   cardId: number;
+  target: Target;
 }
 export type BattleEvent =
   | UntargetedBattleEvent
@@ -36,6 +37,7 @@ export function createBattleEvent(
   value: number,
   target: Target,
   source?: BattleEventSource,
+  isCrit?: boolean,
 ): BattleEvent;
 export function createBattleEvent(
   type: CardBattleEvent['type'],
@@ -51,8 +53,12 @@ export function createBattleEvent(type: BattleEvent['type'], ...args: unknown[])
     return { type, target: target || 'self' };
   }
   if (type === 'damage' || type === 'heal') {
-    const [value, target, source = 'other'] = args as [number, Target, BattleEventSource?];
-    return { type, value, target, source };
+    const [value, target, source = 'other', isCrit = false] = args as [
+      number,
+      Target,
+      BattleEventSource?,
+    ];
+    return { type, value, target, source, isCrit };
   }
   const [cardId, target = 'self'] = args as [number, Target?];
   return { type: type satisfies CardBattleEvent['type'], cardId, target };

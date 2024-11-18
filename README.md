@@ -6,12 +6,21 @@ Game TODO:
    chain = two cards are always played after each other), 1 charm per card? but chains can grow in
    size
 1. add way to remove cards (maybe also via charms?)
+1. more enemies
+1. more heros?
+1. add more effects that allow you to play multiple cards or remove cards, since this gets you
+   through a big deck faster and makes picking cards feel more impactful later in the game
 
 Polish TODO:
 
-1. clicking a card zooms in on it and displays what each keyword does
-2. loading screen
-3. use seeded random to ensure shuffle is always the same
+1. use seeded random to ensure shuffle is always the same
+2. queue activations (e.g. relics, effects) one at a time so it's more clear what's happening, and
+   highlight the relic/status effect that triggered it
+3. attack animation which triggers on each hit of the card
+4. clicking a card zooms in on it and displays what each keyword does
+5. loading screen
+6. add progress view? (e.g. fight -> card -> fight -> card -> relic -> etc -> boss)
+7. add achievements
 
 Maybe TODO:
 
@@ -20,12 +29,11 @@ Maybe TODO:
 
 Performance TODO:
 
-If performance becomes an issue, look into these libraries to help:
-
 1. shrink all the images + allow the browser to pick which image to use (via css I think)
-2. <https://www.npmjs.com/package/@emotion/react> for smaller bundle size than styled
-3. <https://github.com/pmndrs/zustand> or <https://github.com/pmndrs/jotai> to stop unnecessary renders
-4. pre-load fonts, e.g:
+2. have relics/cards in GameState be a simple ID rather than the entire CardState/RelicState
+3. <https://www.npmjs.com/package/@emotion/react> for smaller bundle size than styled
+4. <https://github.com/pmndrs/zustand> or <https://github.com/pmndrs/jotai> to stop unnecessary renders
+5. pre-load fonts, e.g:
 
 ```html
 <link

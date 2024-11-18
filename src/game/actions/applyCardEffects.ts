@@ -269,6 +269,7 @@ function dealCardDamage(
 
   const damageEvent = reduceHealth({ value, target }, context);
   damageEvent.source = 'card';
+  damageEvent.isCrit = isCrit;
 
   // regenForHighDamage
   const regenForHighDamage = getRelic(self, 'regenForHighDamage');

@@ -51,7 +51,8 @@ function getAnimationEnd(textAnimation: AnimationData, context: AnimationContext
     x,
     y,
     opacity: 0,
-    delay: 500,
+    // delay: 500,
+    delay: 9999999999, // DEBUG
     config: { duration: 500 },
   };
 }
