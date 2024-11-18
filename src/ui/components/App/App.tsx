@@ -36,12 +36,12 @@ export const ScreenContainer = styled.div`
 
 export function App() {
   // DEBUG
-  const [screen, setScreen] = useState<ScreenType>('battle');
-  // const [screen, setScreen] = useState<ScreenType>('start');
+  // const [screen, setScreen] = useState<ScreenType>('battle');
+  const [screen, setScreen] = useState<ScreenType>('start');
   const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const { game, actions, undoManager } = useGameState();
-  const { addCards, addRelic, endBattle, resetGame } = actions;
+  const { addCards, addRelic, endBattle, resetGame, startBattle } = actions;
   const { clearUndo } = undoManager;
 
   // passed to battle screen so it doesn't update after battle is over
@@ -54,9 +54,13 @@ export function App() {
     async (screen: ScreenType) => {
       setScreen(screen);
       setOverlay('none');
-      clearUndo();
+
+      if (screen === 'battle') {
+        startBattle();
+        clearUndo();
+      }
     },
-    [clearUndo],
+    [clearUndo, startBattle],
   );
 
   const startCardSelection = useCallback(() => {

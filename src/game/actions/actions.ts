@@ -23,7 +23,14 @@ export function addRelic(game: GameState, relic: RelicState) {
   game.user.relics.push(relic);
 }
 
-function triggerStartOfBattleEffects({ self }: { self: PlayerState; opponent: PlayerState }) {
+function triggerStartOfBattleEffects(
+  game: GameState,
+  { self }: { self: PlayerState; opponent: PlayerState },
+) {
+  const random = new Random(game.randomnessState);
+
+  shuffle(self.cards, random.next);
+
   // strengthAffectsHealing
   const strengthAffectsHealing = getRelic(self, 'strengthAffectsHealing');
   if (strengthAffectsHealing) {
@@ -31,16 +38,14 @@ function triggerStartOfBattleEffects({ self }: { self: PlayerState; opponent: Pl
   }
 }
 
-// TODO: make this it's own function and shuffle cards here
-function startBattle(game: GameState) {
+export function startBattle(game: GameState) {
+  assert(game.turn === 0);
+
   const userPerspective = { self: game.user, opponent: game.enemy };
   const enemyPerspective = { self: game.enemy, opponent: game.user };
 
-  // TODO:
-  // game.user.cards = shuffle(game.user.cards);
-
-  triggerStartOfBattleEffects(userPerspective);
-  triggerStartOfBattleEffects(enemyPerspective);
+  triggerStartOfBattleEffects(game, userPerspective);
+  triggerStartOfBattleEffects(game, enemyPerspective);
 
   // extraCardPlaysAtStart
   const extraCardPlaysAtStart = getRelic(game.user, 'extraCardPlaysAtStart');
@@ -50,11 +55,6 @@ function startBattle(game: GameState) {
 }
 
 export function startTurn(game: GameState): BattleEvent[] {
-  // start battle
-  if (game.turn === 0) {
-    startBattle(game);
-  }
-
   const [activePlayer, nonActivePlayer] = getPlayers(game);
 
   activePlayer.damageDealtLastTurn = activePlayer.damageDealtThisTurn;
@@ -148,7 +148,7 @@ export function playCard(game: GameState): BattleEvent[] {
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
     // shuffle deck
     activePlayer.currentCardIndex = 0;
-    activePlayer.cards = shuffle(activePlayer.cards, random.next);
+    shuffle(activePlayer.cards, random.next);
     events.push(createBattleEvent('shuffle'));
   }
 

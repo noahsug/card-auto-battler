@@ -1,3 +1,4 @@
+// shuffle array in place
 export function shuffle<T>(array: T[], random: () => number = Math.random): T[] {
   let currentIndex = array.length,
     randomIndex;
