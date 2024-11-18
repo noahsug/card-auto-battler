@@ -4,7 +4,7 @@ import { styled } from 'styled-components';
 import { NUM_CARD_SELECTION_OPTIONS, NUM_RELIC_SELECTION_OPTIONS } from '../../../game/constants';
 import { CardState, GameState, RelicState } from '../../../game/gameState';
 import { getRandomCards } from '../../../game/utils/cards';
-import { getRandomRelics } from '../../../game/utils/getRandomRelics';
+import { getRandomRelics } from '../../../game/utils/relics';
 import { getBattleWinner, isGameOver, shouldPickRelic } from '../../../game/utils/selectors';
 import { useGameState } from '../../hooks/useGameState';
 import { BattleResultOverlay } from '../BattleResultOverlay';
@@ -35,9 +35,9 @@ export const ScreenContainer = styled.div`
 `;
 
 export function App() {
-  // const [screen, setScreen] = useState<ScreenType>('start');
+  const [screen, setScreen] = useState<ScreenType>('start');
   // DEBUG
-  const [screen, setScreen] = useState<ScreenType>('battle');
+  // const [screen, setScreen] = useState<ScreenType>('battle');
   const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const { game, actions, undoManager } = useGameState();
@@ -73,7 +73,10 @@ export function App() {
       addCards(cards);
 
       if (shouldPickRelic(game)) {
-        relicSelectionOptionsRef.current = getRandomRelics(NUM_RELIC_SELECTION_OPTIONS);
+        relicSelectionOptionsRef.current = getRandomRelics(
+          NUM_RELIC_SELECTION_OPTIONS,
+          game.user.relics,
+        );
         goToScreen('relicSelection');
       } else {
         goToScreen('battle');

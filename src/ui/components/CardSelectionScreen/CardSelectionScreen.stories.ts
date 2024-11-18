@@ -4,7 +4,7 @@ import { fn } from '@storybook/test';
 import { createGameState } from '../../../game/gameState';
 import { getRandomCards } from '../../../game/utils/cards';
 import { CardSelectionScreen } from './CardSelectionScreen';
-import { allCards } from '../../../content/cards';
+import { cardsByName } from '../../../content/cards';
 
 const meta = {
   title: 'CardSelectionScreen',
@@ -28,7 +28,7 @@ export const Primary: Story = {
 export const AllCards: Story = {
   args: {
     game: createGameState(),
-    cards: Object.values(allCards),
+    cards: Object.values(cardsByName),
     onCardsSelected: fn,
   },
 };

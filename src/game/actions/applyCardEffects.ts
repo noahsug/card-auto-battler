@@ -264,10 +264,6 @@ function dealCardDamage(
     // shock
     if (targetPlayer.shock > 0) {
       targetPlayer.shock += 1;
-      if (targetPlayer.shock >= MAX_SHOCK) {
-        targetPlayer.shock -= MAX_SHOCK;
-        targetPlayer.stun = 1;
-      }
     }
   }
 

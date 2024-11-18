@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { allCards } from '../../content/cards';
-import { allRelics } from '../../content/relics';
+import { cardsByName } from '../../content/cards';
+import { relicsByName } from '../../content/relics';
 import { createGameState, GameState, statusEffectNames } from '../../game/gameState';
 import { getRandomCards } from '../../game/utils/cards';
 import { useGameState } from '../hooks/useGameState';
@@ -59,7 +59,7 @@ export const StatusEffectsAndRelics: Story = {
       game.enemy[effectName] = 3;
     });
     game.user.strength = -5;
-    game.user.relics = Object.values(allRelics);
+    game.user.relics = Object.values(relicsByName);
     return { game };
   })(),
 };

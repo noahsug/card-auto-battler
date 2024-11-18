@@ -22,7 +22,7 @@ type StatusEffectsWithoutIcons = IsSubtype<
   StatusEffectName,
   | 'lifestealWhenBurning'
   | 'temporaryFireCrit'
-  | 'shockOpponentNextTurn'
+  | 'delayedShock'
   | 'temporaryDodge'
   | 'temporaryStrength'
 >;

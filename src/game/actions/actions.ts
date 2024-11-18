@@ -13,6 +13,7 @@ import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
+import { MAX_SHOCK } from '../constants';
 
 export function addCards(game: GameState, cards: CardState[]) {
   addCardsToPlayer(game.user, cards);
@@ -63,10 +64,10 @@ export function startTurn(game: GameState): BattleEvent[] {
 
   activePlayer.temporaryDodge = 0;
 
-  // shockOpponentNextTurn
-  if (activePlayer.shockOpponentNextTurn > 0) {
-    nonActivePlayer.shock = activePlayer.shockOpponentNextTurn;
-    activePlayer.shockOpponentNextTurn = 0;
+  // delayedShock
+  if (activePlayer.delayedShock > 0) {
+    activePlayer.shock = activePlayer.delayedShock;
+    activePlayer.delayedShock = 0;
   }
 
   // regen
@@ -93,7 +94,7 @@ export function startTurn(game: GameState): BattleEvent[] {
 }
 
 export function playCard(game: GameState): BattleEvent[] {
-  const [activePlayer] = getPlayers(game);
+  const [activePlayer, nonActivePlayer] = getPlayers(game);
   const card = activePlayer.cards[activePlayer.currentCardIndex];
 
   // die if out of cards
@@ -120,6 +121,12 @@ export function playCard(game: GameState): BattleEvent[] {
   // play card
   const playCardEvents = applyCardEffects(game, card);
   events.push(...playCardEvents);
+
+  // shock
+  if (nonActivePlayer.shock >= MAX_SHOCK) {
+    nonActivePlayer.shock -= MAX_SHOCK;
+    nonActivePlayer.stun = 1;
+  }
 
   activePlayer.previousCard = card;
 
@@ -155,7 +162,6 @@ export function endTurn(game: GameState) {
   activePlayer.temporaryFireCrit = 0;
   activePlayer.temporaryStrength = 0;
   activePlayer.stun = 0;
-  activePlayer.shock = 0;
 
   nonActivePlayer.shock = 0;
 

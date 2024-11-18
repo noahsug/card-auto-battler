@@ -1,6 +1,3 @@
-import { createRelic } from '../utils/createRelic';
-
-import lifestealImage from '../../ui/components/StatusEffects/images/heart-plus.png';
 import pyromaniacImage from './images/pyromaniac.png';
 import openWoundImage from './images/bleeding-wound.png';
 import sproutImage from './images/ground-sprout.png';
@@ -11,6 +8,9 @@ import transfuseImage from './images/transfuse.png';
 import thunderBladeImage from './images/thunder-blade.png';
 import targetingImage from './images/targeting.png';
 import cowledImage from './images/cowled.png';
+import lifestealImage from '../../ui/components/StatusEffects/images/heart-plus.png';
+
+import { createRelic } from '../utils/createRelic';
 
 // basic
 export const basicRelics = {
@@ -37,7 +37,7 @@ export const greenRelics = {
   regenForHighDamage: createRelic({
     displayName: 'Sprouter',
     description: 'Gain $V2 regen whenever you deal $V or more damage in a single hit.',
-    value: 7,
+    value: 10,
     value2: 3,
     image: sproutImage,
   }),
@@ -56,7 +56,7 @@ Object.values(greenRelics).forEach((relic) => {
 export const redRelics = {
   permaBleed: createRelic({
     displayName: 'Eternal Wound',
-    description: 'Add $V bleed to the opponent at the start of your turn.',
+    description: 'Apply $V bleed to the enemy at the start of your turn if they have no bleed.',
     value: 1,
     image: openWoundImage,
   }),
@@ -111,14 +111,14 @@ Object.values(purpleRelics).forEach((relic) => {
   relic.tribe = 'purple';
 });
 
-export const allRelics = {
+export const relicsByName = {
   ...basicRelics,
   ...greenRelics,
   ...redRelics,
   ...purpleRelics,
 };
-Object.entries(allRelics).forEach(([name, relic]) => {
+Object.entries(relicsByName).forEach(([name, relic]) => {
   relic.name = name;
 });
 
-export type RelicName = keyof typeof allRelics;
+export type RelicName = keyof typeof relicsByName;

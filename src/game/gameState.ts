@@ -1,4 +1,4 @@
-import { allCards } from '../content/cards';
+import { cardsByName } from '../content/cards';
 import { allEnemies } from '../content/enemies';
 import { allHeroes } from '../content/heroes';
 import { STARTING_HEALTH } from './constants';
@@ -18,7 +18,7 @@ export const statusEffectNames = [
   'lifesteal',
   'lifestealWhenBurning',
   'shock',
-  'shockOpponentNextTurn',
+  'delayedShock',
   'stun',
   'crit',
   'temporaryFireCrit',
@@ -163,9 +163,9 @@ export function createGameState(): GameState {
     losses: 0,
   };
 
-  const { attack, heal } = allCards;
-  addCardsToPlayer(game.user, [allCards.stealth, allCards.shockTrap, allCards.pumpedUp]);
-  // addCardsToPlayer(game.user, [attack, attack, heal]);
+  const { attack, heal } = cardsByName;
+  // addCardsToPlayer(game.user, [cardsByName.stealth, cardsByName.shockTrap, cardsByName.pumpedUp]);
+  addCardsToPlayer(game.user, [attack, attack, heal]);
   addCardsToPlayer(game.enemy, [attack, attack, attack, heal]);
 
   return game;

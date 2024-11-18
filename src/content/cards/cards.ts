@@ -105,7 +105,7 @@ export const greenCards = {
     ],
     {
       name: 'Treefall',
-      description: `Deal $V damage. Crit if at least half your cards are green.`,
+      description: `Deal $2V damage. Crit if at least half your cards are green.`,
       image: treeFallImage,
     },
   ),
@@ -444,7 +444,7 @@ export const purpleCards = {
     ],
     {
       name: 'Right Upper',
-      description: `Deal $V damage. Combo: crit and play another card.`,
+      description: `Deal $2V damage. Combo: crit and play another card.`,
       image: uppercutImage,
     },
   ),
@@ -481,14 +481,13 @@ export const purpleCards = {
   shockTrap: createCard(
     [
       {
-        target: 'self',
-        name: 'shockOpponentNextTurn',
+        name: 'delayedShock',
         value: v(1),
       },
     ],
     {
       name: 'Shock Trap',
-      description: 'Apply $V shock to the enemy at the start of your next turn.',
+      description: 'Apply $V shock to the enemy at the start of their turn.',
       image: electricTrapImage,
     },
   ),
@@ -562,7 +561,7 @@ Object.values(purpleCards).forEach((card) => {
   card.tribe = 'purple';
 });
 
-export const allCards = {
+export const cardsByName = {
   ...basicCards,
   ...redCards,
   ...greenCards,

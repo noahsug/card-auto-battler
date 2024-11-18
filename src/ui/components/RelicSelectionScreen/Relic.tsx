@@ -32,9 +32,9 @@ function getHue({ $tribe }: { $tribe: Tribe }) {
     case 'green':
       return 142;
     case 'red':
-      return 330;
+      return 0;
     case 'purple':
-      return 267;
+      return 250;
   }
   $tribe satisfies never;
 }

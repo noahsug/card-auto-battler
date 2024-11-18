@@ -1,15 +1,12 @@
-import sample from 'lodash/sample';
+import sampleSize from 'lodash/sampleSize';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { allCards } from '../../content/cards';
+import { cardsByName } from '../../content/cards';
 import { CardState, PlayerState } from '../gameState';
 
 export function getRandomCards(length: number) {
-  const cards = new Array(length);
-  const options = Object.values(allCards);
-
+  const cards = cloneDeep(sampleSize(cardsByName, length));
   for (let i = 0; i < length; i++) {
-    cards[i] = cloneDeep(sample(options));
     cards[i].acquiredId = i;
   }
   return cards;

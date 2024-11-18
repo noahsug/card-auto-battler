@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Card } from './Card';
-import { allCards } from '../../../content/cards';
+import { cardsByName } from '../../../content/cards';
 
 const meta = {
   title: 'Card',
@@ -14,24 +14,24 @@ type Story = StoryObj<typeof meta>;
 export const Punch: Story = {
   args: {
     size: 'large',
-    card: allCards.attack,
+    card: cardsByName.attack,
   },
 };
 export const Fireball: Story = {
   args: {
     size: 'large',
-    card: allCards.fireball,
+    card: cardsByName.fireball,
   },
 };
 export const Eviscerate: Story = {
   args: {
     size: 'large',
-    card: allCards.eviscerate,
+    card: cardsByName.eviscerate,
   },
 };
 export const Channel: Story = {
   args: {
     size: 'large',
-    card: allCards.channel,
+    card: cardsByName.channel,
   },
 };

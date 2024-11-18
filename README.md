@@ -6,15 +6,12 @@ Game TODO:
    chain = two cards are always played after each other), 1 charm per card? but chains can grow in
    size
 1. add way to remove cards (maybe also via charms?)
-1. lifesteal doesn't heal from bleed, but do X for damage dealt does. Make a separate category of
-   damage for just card damage? Or have lifesteal proc off bleed?
-1. shuffle discard back into deck and use UID (OrderAcquired field in CardInstance?) to fix
-   animation, use seeded random to ensure shuffle is always the same
-1. see if we can handle animations more cleanly, e.g. have an animation queue to runs and gets sped
-   up by the user on left/right
-1. clicking a card in battle screen pauses and zooms in on card
-1. clicking a card in deck view screen zooms in on card
-1. add loading screen
+
+Polish TODO:
+
+1. clicking a card zooms in on it and displays what each keyword does
+2. loading screen
+3. use seeded random to ensure shuffle is always the same
 
 Maybe TODO:
 
@@ -321,6 +318,7 @@ Purple Cards (% chance, crit, play again, debuff, dodge, shock, self-trash)
 - Relic: +25% chance to crit after dodging.
 - Relic: Play another card when you crit.
 - Relic: cards with the same name deal +X damage, where X = # of those cards
+- Relic: Basic punch cards are played twice.
 
 Color Mechanics
 
