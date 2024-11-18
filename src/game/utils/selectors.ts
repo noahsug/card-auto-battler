@@ -1,6 +1,7 @@
 import { GameState, PlayerState, Target } from '../gameState';
 import { RelicName } from '../../content/relics/relics';
 import { MAX_WINS, MAX_LOSSES } from '../constants';
+import { Random } from '../../utils/Random';
 
 export function getIsUserTurn({ turn }: { turn: number }) {
   return turn % 2 === 0;
@@ -53,4 +54,8 @@ export function getBattleWinner(game: GameState) {
   if (game.user.health <= 0) return 'enemy';
   if (game.enemy.health <= 0) return 'user';
   return null;
+}
+
+export function getRandom({ randomnessState }: { randomnessState: GameState['randomnessState'] }) {
+  return new Random(randomnessState);
 }

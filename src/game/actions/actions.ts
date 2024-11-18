@@ -8,12 +8,10 @@ import {
   statusEffectNames,
 } from '../gameState';
 import { addCardsToPlayer } from '../utils/cards';
-import { getBattleWinner, getPlayers, getRelic } from '../utils/selectors';
+import { getBattleWinner, getPlayers, getRelic, getRandom } from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
 import { MAX_SHOCK } from '../constants';
-import { Random } from '../../utils/seededRandom';
-import { shuffle } from '../../utils/shuffle';
 
 export function addCards(game: GameState, cards: CardState[]) {
   addCardsToPlayer(game.user, cards);
@@ -27,9 +25,9 @@ function triggerStartOfBattleEffects(
   game: GameState,
   { self }: { self: PlayerState; opponent: PlayerState },
 ) {
-  const random = new Random(game.randomnessState);
+  const { shuffle } = getRandom(game);
 
-  shuffle(self.cards, random.next);
+  shuffle(self.cards);
 
   // strengthAffectsHealing
   const strengthAffectsHealing = getRelic(self, 'strengthAffectsHealing');
@@ -99,7 +97,7 @@ export function startTurn(game: GameState): BattleEvent[] {
 export function playCard(game: GameState): BattleEvent[] {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
   const card = activePlayer.cards[activePlayer.currentCardIndex];
-  const random = new Random(game.randomnessState);
+  const { shuffle } = getRandom(game);
 
   // die if out of cards
   if (!card) {
@@ -148,7 +146,7 @@ export function playCard(game: GameState): BattleEvent[] {
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
     // shuffle deck
     activePlayer.currentCardIndex = 0;
-    shuffle(activePlayer.cards, random.next);
+    shuffle(activePlayer.cards);
     events.push(createBattleEvent('shuffle'));
   }
 

@@ -1,5 +1,4 @@
-import { Random } from '../../utils/seededRandom';
-import { BLEED_DAMAGE, MAX_SHOCK } from '../constants';
+import { BLEED_DAMAGE } from '../constants';
 import {
   CardEffect,
   CardState,
@@ -12,7 +11,13 @@ import {
   Tribe,
   ValueDescriptor,
 } from '../gameState';
-import { getActivePlayer, getPlayers, getRelic, getTargetedPlayer } from '../utils/selectors';
+import {
+  getActivePlayer,
+  getPlayers,
+  getRandom,
+  getRelic,
+  getTargetedPlayer,
+} from '../utils/selectors';
 import { BattleEvent, createBattleEvent, BattleEventSource, ValueBattleEvent } from './battleEvent';
 
 interface PlayCardContext {
@@ -288,7 +293,7 @@ function dealCardDamage(
 function getIsCrit(context: PlayCardContext) {
   const self = getActivePlayer(context.game);
   const { card, game } = context;
-  const random = new Random(game.randomnessState);
+  const { random } = getRandom(game);
 
   // temporaryFireCrit
   if (self.temporaryFireCrit > 0 && card.name.toLocaleLowerCase().includes('fire')) {
@@ -302,7 +307,7 @@ function getIsCrit(context: PlayCardContext) {
 
   // critChance
   const critChance = getRelic(self, 'critChance');
-  if (critChance && random.next() < critChance.value) {
+  if (critChance && random() < critChance.value) {
     return true;
   }
 

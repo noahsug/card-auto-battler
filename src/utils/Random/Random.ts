@@ -1,3 +1,5 @@
+import { shuffle } from './shuffle';
+
 // based on https://github.com/mljs/xsadd which is based on the XORSHIFT-ADD (XSadd) algorithm
 
 const LOOP = 8;
@@ -56,19 +58,19 @@ function createState(seed: number) {
   return state;
 }
 
+export function getRandomSeed(seedSeed: number = Math.random()) {
+  if (seedSeed < 0 || seedSeed >= 1) {
+    throw new RangeError(`The seed's seed must be between 0 and 1`);
+  }
+  return Math.floor(2 ** 32 * seedSeed);
+}
+
+export function getRandomState(seed: number = getRandomSeed()) {
+  return createState(seed);
+}
+
 export class Random {
   private state: Uint32Array = new Uint32Array(4);
-
-  static getRandomSeed(seedSeed: number = Math.random()) {
-    if (seedSeed < 0 || seedSeed >= 1) {
-      throw new RangeError(`The seed's seed must be between 0 and 1`);
-    }
-    return Math.floor(2 ** 32 * seedSeed);
-  }
-
-  static getRandomState(seed: number = Random.getRandomSeed()) {
-    return createState(seed);
-  }
 
   // Initialize Random from a seed (a single Uint32) or from an existing state.
   constructor(seed?: number);
@@ -77,38 +79,45 @@ export class Random {
     if (seedOrState instanceof Uint32Array) {
       this.setStateRef(seedOrState);
     } else {
-      this.seed(seedOrState ?? Random.getRandomSeed());
+      this.seed(seedOrState ?? getRandomSeed());
     }
 
-    this.next = this.next.bind(this);
-    this.nextInt = this.nextInt.bind(this);
-  }
-
-  // Returns a pseudorandom number between 0 and 1.
-  public next() {
-    return (this.nextUint32() >>> 8) * FLOAT_MUL;
+    this.random = this.random.bind(this);
+    this.randomUint32 = this.randomUint32.bind(this);
+    this.randomInt = this.randomInt.bind(this);
+    this.shuffle = this.shuffle.bind(this);
   }
 
   // Returns a pseudorandom integer between 0 and 2^32 - 1.
-  public nextUint32() {
+  public randomUint32() {
     nextState(this.state);
     return (this.state[3] + this.state[2]) >>> 0;
   }
 
+  // Returns a pseudorandom number between 0 and 1.
+  public random() {
+    return (this.randomUint32() >>> 8) * FLOAT_MUL;
+  }
+
   // Returns a pseudorandom integer between between min (default: 0) and max, inclusive.
-  public nextInt(max: number): number;
-  public nextInt(min: number, max: number): number;
-  public nextInt(...args: unknown[]) {
+  public randomInt(max: number): number;
+  public randomInt(min: number, max: number): number;
+  public randomInt(...args: unknown[]) {
     if (args.length === 1) {
       const [max] = args as [number];
-      return this.nextInt(0, max);
+      return this.randomInt(0, max);
     }
 
     const [min, max] = args as [number, number];
     if (min > max) {
       throw new RangeError('min must be less than or equal to max');
     }
-    return Math.floor(this.next() * (max - min + 1)) + min;
+    return Math.floor(this.random() * (max - min + 1)) + min;
+  }
+
+  // shuffle array in place
+  public shuffle<T>(array: T[]): T[] {
+    return shuffle(array, this.random);
   }
 
   // Initialize with a new seed (a single Uint32)

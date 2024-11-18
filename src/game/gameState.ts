@@ -3,7 +3,7 @@ import { allEnemies } from '../content/enemies';
 import { allHeroes } from '../content/heroes';
 import { STARTING_HEALTH } from './constants';
 import { addCardsToPlayer } from './utils/cards';
-import { Random } from '../utils/seededRandom';
+import { getRandomState } from '../utils/Random';
 
 export type Target = 'self' | 'opponent';
 
@@ -163,7 +163,7 @@ export function createGameState(): GameState {
     turn: 0,
     wins: 0,
     losses: 0,
-    randomnessState: Random.getRandomState(),
+    randomnessState: getRandomState(),
   };
 
   const { attack, heal } = cardsByName;

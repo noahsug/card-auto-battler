@@ -1,24 +1,24 @@
-import { Random } from './seededRandom';
+import { Random, getRandomSeed, getRandomState } from './Random';
 
 describe('next', () => {
   it('generates a random float from 0 to 1', () => {
     const random = new Random();
-    const value = random.next();
+    const value = random.random();
 
     expect(value).toBeGreaterThanOrEqual(0);
     expect(value).toBeLessThanOrEqual(1);
   });
 
   it('is bound to the instance', () => {
-    const seed = Random.getRandomSeed();
+    const seed = getRandomSeed();
     const random = new Random();
-    const next = random.next;
+    const next = random.random;
 
     random.seed(seed);
     const value1 = next();
 
     random.seed(seed);
-    const value2 = random.next();
+    const value2 = random.random();
 
     expect(value1).toBe(value2);
   });
@@ -27,7 +27,7 @@ describe('next', () => {
 describe('nextUint32', () => {
   it('generates a random int from 0 to 2^32 - 1', () => {
     const random = new Random();
-    const value = random.nextUint32();
+    const value = random.randomUint32();
 
     expect(Number.isInteger(value)).toBe(true);
     expect(value).toBeGreaterThanOrEqual(0);
@@ -38,7 +38,7 @@ describe('nextUint32', () => {
 describe('nextInt', () => {
   it('generates a random int from min to max', () => {
     const random = new Random();
-    const value = random.nextInt(5, 10);
+    const value = random.randomInt(5, 10);
 
     expect(Number.isInteger(value)).toBe(true);
     expect(value).toBeGreaterThanOrEqual(5);
@@ -47,7 +47,7 @@ describe('nextInt', () => {
 
   it('generates a random int from 0 to max', () => {
     const random = new Random();
-    const value = random.nextInt(10);
+    const value = random.randomInt(10);
 
     expect(Number.isInteger(value)).toBe(true);
     expect(value).toBeGreaterThanOrEqual(0);
@@ -56,7 +56,7 @@ describe('nextInt', () => {
 
   it('the generated int is inclusive of min and max', () => {
     const random = new Random();
-    const value = random.nextInt(5, 5);
+    const value = random.randomInt(5, 5);
 
     expect(value).toBe(5);
   });
@@ -64,13 +64,13 @@ describe('nextInt', () => {
   it('throws an error if min is greater than max', () => {
     const random = new Random();
 
-    expect(() => random.nextInt(10, 5)).toThrowError();
+    expect(() => random.randomInt(10, 5)).toThrowError();
   });
 });
 
 describe('getRandomSeed', () => {
   it('generates a random seed between 0 and 2^32 - 1', () => {
-    const seed = Random.getRandomSeed();
+    const seed = getRandomSeed();
 
     expect(Number.isInteger(seed)).toBe(true);
     expect(seed).toBeGreaterThanOrEqual(0);
@@ -80,29 +80,29 @@ describe('getRandomSeed', () => {
   it('can seed the random seed with a value between 0 - 1', () => {
     const seedSeed = Math.random();
 
-    const seed1 = Random.getRandomSeed(seedSeed);
-    const seed2 = Random.getRandomSeed(seedSeed);
+    const seed1 = getRandomSeed(seedSeed);
+    const seed2 = getRandomSeed(seedSeed);
 
     expect(seed1).toBe(seed2);
   });
 
   it('throws an error if the seed seed is less than 0 or greater or equal to 1', () => {
-    expect(() => Random.getRandomSeed(-1)).toThrowError();
-    expect(() => Random.getRandomSeed(0)).not.toThrowError();
-    expect(() => Random.getRandomSeed(0.9999)).not.toThrowError();
-    expect(() => Random.getRandomSeed(1)).toThrowError();
+    expect(() => getRandomSeed(-1)).toThrowError();
+    expect(() => getRandomSeed(0)).not.toThrowError();
+    expect(() => getRandomSeed(0.9999)).not.toThrowError();
+    expect(() => getRandomSeed(1)).toThrowError();
   });
 });
 
 describe('seed', () => {
   it('changes the seed', () => {
-    const seed = Random.getRandomSeed();
+    const seed = getRandomSeed();
     const random = new Random(seed);
 
-    const values1 = [random.next(), random.next(), random.next()];
+    const values1 = [random.random(), random.random(), random.random()];
 
     random.seed(seed);
-    const values2 = [random.next(), random.next(), random.next()];
+    const values2 = [random.random(), random.random(), random.random()];
 
     expect(values1).toEqual(values2);
   });
@@ -119,7 +119,7 @@ describe('getState', () => {
     const random = new Random();
     const state1 = random.getState();
 
-    random.next();
+    random.random();
     const state2 = random.getState();
 
     expect(state1).not.toEqual(state2);
@@ -138,11 +138,11 @@ describe('setState', () => {
   it('sets the current state to a copy of the passed in state', () => {
     const random = new Random();
 
-    const state = Random.getRandomState();
+    const state = getRandomState();
     const initialState = new Uint32Array(state);
 
     random.setState(state);
-    random.next();
+    random.random();
 
     // state does not change after next()
     expect(state).toEqual(initialState);
@@ -153,15 +153,15 @@ describe('setState', () => {
     const random = new Random();
 
     // call next a few times to jumble the initial state
-    random.next();
-    random.next();
-    random.next();
+    random.random();
+    random.random();
+    random.random();
 
     const state = random.getState();
-    const values1 = [random.next(), random.next(), random.next()];
+    const values1 = [random.random(), random.random(), random.random()];
 
     random.setState(state);
-    const values2 = [random.next(), random.next(), random.next()];
+    const values2 = [random.random(), random.random(), random.random()];
 
     expect(values1).toEqual(values2);
   });
@@ -171,11 +171,11 @@ describe('setStateRef', () => {
   it('sets the current state reference', () => {
     const random = new Random();
 
-    const state = Random.getRandomState();
+    const state = getRandomState();
     const initialState = new Uint32Array(state);
 
     random.setStateRef(state);
-    random.next();
+    random.random();
 
     // state changes after next()
     expect(state).not.toEqual(initialState);
@@ -184,17 +184,17 @@ describe('setStateRef', () => {
 });
 
 it('generates the same random number for the same initial seed', () => {
-  const seed = Random.getRandomSeed();
+  const seed = getRandomSeed();
   const random1 = new Random(seed);
   const random2 = new Random(seed);
 
   for (let i = 0; i < 10; i++) {
-    expect(random1.next()).toBe(random2.next());
+    expect(random1.random()).toBe(random2.random());
   }
 });
 
 it('generates different random numbers for different initial seeds', () => {
-  const seed = Random.getRandomSeed();
+  const seed = getRandomSeed();
   const random1 = new Random(seed);
 
   const seed2 = seed + 100;
@@ -204,7 +204,7 @@ it('generates different random numbers for different initial seeds', () => {
   // iterations
   let foundDifferentValue = false;
   for (let i = 0; i < 10; i++) {
-    if (random1.next() !== random2.next()) {
+    if (random1.random() !== random2.random()) {
       foundDifferentValue = true;
     }
   }
@@ -218,7 +218,7 @@ it('generates adequately random numbers according to mean squared error', () => 
 
   let squareError = 0;
   for (let i = 0; i < iterations; i++) {
-    squareError += (random.next() - Math.random()) ** 2;
+    squareError += (random.random() - Math.random()) ** 2;
   }
 
   expect(squareError / iterations).toBeCloseTo(1 / 6);
