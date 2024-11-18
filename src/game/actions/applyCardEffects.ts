@@ -1,3 +1,4 @@
+import { Random } from '../../utils/seededRandom';
 import { BLEED_DAMAGE, MAX_SHOCK } from '../constants';
 import {
   CardEffect,
@@ -286,7 +287,8 @@ function dealCardDamage(
 
 function getIsCrit(context: PlayCardContext) {
   const self = getActivePlayer(context.game);
-  const { card } = context;
+  const { card, game } = context;
+  const random = new Random(game.randomnessState);
 
   // temporaryFireCrit
   if (self.temporaryFireCrit > 0 && card.name.toLocaleLowerCase().includes('fire')) {
@@ -300,7 +302,7 @@ function getIsCrit(context: PlayCardContext) {
 
   // critChance
   const critChance = getRelic(self, 'critChance');
-  if (critChance && Math.random() < critChance.value) {
+  if (critChance && random.next() < critChance.value) {
     return true;
   }
 

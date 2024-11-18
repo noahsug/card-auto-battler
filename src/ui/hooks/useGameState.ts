@@ -1,5 +1,6 @@
 import { produce } from 'immer';
 import { useCallback, useMemo, useState } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 
 import * as actions from '../../game/actions';
 import { createGameState, GameState } from '../../game/gameState';
@@ -37,7 +38,10 @@ export function useGameState(initialGameState: GameState = createGameState()) {
       acc[name] = (...args: Tail<Parameters<Action>>) => {
         // only allow undoing to a previous startTurn event
         if (name === 'startTurn') {
-          setUndoHistory((prev) => [...prev, gameState]);
+          // setUndoHistory((prev) => [...prev, gameState]);
+          setUndoHistory((prev) => {
+            return [...prev, cloneDeep(gameState)];
+          });
         }
         setGameState((gameState) => {
           return produce(gameState, (draft) => {

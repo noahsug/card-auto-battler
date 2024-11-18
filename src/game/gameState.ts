@@ -3,6 +3,7 @@ import { allEnemies } from '../content/enemies';
 import { allHeroes } from '../content/heroes';
 import { STARTING_HEALTH } from './constants';
 import { addCardsToPlayer } from './utils/cards';
+import { Random } from '../utils/seededRandom';
 
 export type Target = 'self' | 'opponent';
 
@@ -135,6 +136,7 @@ export interface GameState {
   turn: number;
   wins: number;
   losses: number;
+  randomnessState: Uint32Array;
 }
 
 function createPlayer({ name, image }: { name: string; image: string }): PlayerState {
@@ -161,11 +163,13 @@ export function createGameState(): GameState {
     turn: 0,
     wins: 0,
     losses: 0,
+    randomnessState: Random.getRandomState(),
   };
 
   const { attack, heal } = cardsByName;
   // addCardsToPlayer(game.user, [cardsByName.stealth, cardsByName.shockTrap, cardsByName.pumpedUp]);
-  addCardsToPlayer(game.user, [attack, attack, heal]);
+  addCardsToPlayer(game.user, [attack, heal, cardsByName.dodge]);
+  // addCardsToPlayer(game.user, [attack, attack, heal]);
   addCardsToPlayer(game.enemy, [attack, attack, attack, heal]);
 
   return game;

@@ -61,7 +61,7 @@ export const basicCards = {
       image: crossImage,
     },
   ),
-  parry: createCard(
+  dodge: createCard(
     [
       {
         target: 'self',
