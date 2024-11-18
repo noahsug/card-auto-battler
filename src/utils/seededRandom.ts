@@ -70,6 +70,7 @@ export class Random {
     return createState(seed);
   }
 
+  // Initialize Random from a seed (a single Uint32) or from an existing state.
   constructor(seed?: number);
   constructor(state: Uint32Array);
   constructor(seedOrState?: number | Uint32Array) {
@@ -88,16 +89,16 @@ export class Random {
     return (this.nextUint32() >>> 8) * FLOAT_MUL;
   }
 
-  // Returns a pseudorandom integer between between min (default: 0) and max (default: 2^32 - 1),
-  // inclusive.
-  public nextInt(): number;
+  // Returns a pseudorandom integer between 0 and 2^32 - 1.
+  public nextUint32() {
+    nextState(this.state);
+    return (this.state[3] + this.state[2]) >>> 0;
+  }
+
+  // Returns a pseudorandom integer between between min (default: 0) and max, inclusive.
   public nextInt(max: number): number;
   public nextInt(min: number, max: number): number;
   public nextInt(...args: unknown[]) {
-    if (args.length === 0) {
-      return this.nextUint32();
-    }
-
     if (args.length === 1) {
       const [max] = args as [number];
       return this.nextInt(0, max);
@@ -110,6 +111,7 @@ export class Random {
     return Math.floor(this.next() * (max - min + 1)) + min;
   }
 
+  // Initialize with a new seed (a single Uint32)
   public seed(seed: number) {
     this.state = createState(seed);
   }
@@ -137,11 +139,5 @@ export class Random {
       throw new TypeError('state must be an Uint32Array of length 4');
     }
     this.state = state;
-  }
-
-  // Returns a pseudorandom integer between 0 and 2^32 - 1.
-  private nextUint32() {
-    nextState(this.state);
-    return (this.state[3] + this.state[2]) >>> 0;
   }
 }

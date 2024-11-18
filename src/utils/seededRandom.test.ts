@@ -24,6 +24,17 @@ describe('next', () => {
   });
 });
 
+describe('nextUint32', () => {
+  it('generates a random int from 0 to 2^32 - 1', () => {
+    const random = new Random();
+    const value = random.nextUint32();
+
+    expect(Number.isInteger(value)).toBe(true);
+    expect(value).toBeGreaterThanOrEqual(0);
+    expect(value).toBeLessThanOrEqual(2 ** 32 - 1);
+  });
+});
+
 describe('nextInt', () => {
   it('generates a random int from min to max', () => {
     const random = new Random();
@@ -41,15 +52,6 @@ describe('nextInt', () => {
     expect(Number.isInteger(value)).toBe(true);
     expect(value).toBeGreaterThanOrEqual(0);
     expect(value).toBeLessThanOrEqual(10);
-  });
-
-  it('generates a random int from 0 to 2^32 - 1', () => {
-    const random = new Random();
-    const value = random.nextInt();
-
-    expect(Number.isInteger(value)).toBe(true);
-    expect(value).toBeGreaterThanOrEqual(0);
-    expect(value).toBeLessThanOrEqual(2 ** 32 - 1);
   });
 
   it('the generated int is inclusive of min and max', () => {
@@ -216,7 +218,7 @@ it('generates adequately random numbers according to mean squared error', () => 
 
   let squareError = 0;
   for (let i = 0; i < iterations; i++) {
-    squareError += Math.pow(random.next() - Math.random(), 2);
+    squareError += (random.next() - Math.random()) ** 2;
   }
 
   expect(squareError / iterations).toBeCloseTo(1 / 6);
