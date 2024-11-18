@@ -32,6 +32,7 @@ function triggerStartOfBattleEffects({ self }: { self: PlayerState; opponent: Pl
   }
 }
 
+// TODO: make this it's own function and shuffle cards here
 function startBattle(game: GameState) {
   const userPerspective = { self: game.user, opponent: game.enemy };
   const enemyPerspective = { self: game.enemy, opponent: game.user };
