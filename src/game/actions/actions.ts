@@ -1,4 +1,5 @@
 import { assert } from '../../utils/asserts';
+import { MAX_SHOCK } from '../constants';
 import {
   CardState,
   GameState,
@@ -8,13 +9,16 @@ import {
   statusEffectNames,
 } from '../gameState';
 import { addCardsToPlayer } from '../utils/cards';
-import { getBattleWinner, getPlayers, getRelic, getRandom } from '../utils/selectors';
+import { getBattleWinner, getPlayers, getRandom, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
-import { MAX_SHOCK } from '../constants';
 
 export function addCards(game: GameState, cards: CardState[]) {
   addCardsToPlayer(game.user, cards);
+}
+
+export function removeCards(game: GameState, cardIndexes: number[]) {
+  game.user.cards = game.user.cards.filter((_, index) => !cardIndexes.includes(index));
 }
 
 export function addRelic(game: GameState, relic: RelicState) {

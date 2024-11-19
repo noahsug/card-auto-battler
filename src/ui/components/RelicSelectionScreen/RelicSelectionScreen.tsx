@@ -8,7 +8,7 @@ import { Button } from '../shared/Button';
 import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
 import { Relic } from './Relic';
-import { Message, BottomRow } from '../CardGrid';
+import { BottomRowMessage, BottomRow } from '../shared/Row';
 
 const RelicList = styled.div`
   display: flex;
@@ -69,7 +69,7 @@ export function RelicSelectionScreen({ game, relics, onRelicSelected, onViewDeck
 
       <BottomRow>
         {selectedRelicIndex == null ? (
-          <Message>Select 1 Relic</Message>
+          <BottomRowMessage>Select 1 Relic</BottomRowMessage>
         ) : (
           <Button onClick={handleContinue}>Continue</Button>
         )}

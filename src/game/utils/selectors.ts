@@ -38,8 +38,14 @@ export function getRelic(player: PlayerState, relicName: RelicName) {
   return player.relics.find((relic) => relic.name === relicName);
 }
 
-export function shouldPickRelic(game: GameState) {
-  return (game.wins + game.losses) % 2 === 1;
+// what pick action to take after adding new cards
+export function getNextPickAction(game: GameState) {
+  const round = game.wins + game.losses;
+  // only pick cards on the first round
+  if (round === 0) return null;
+  if (round % 2 === 0) return 'removeCards';
+  if (round % 2 === 1) return 'addRelic';
+  return null;
 }
 
 export function isTurnOver(player: PlayerState) {

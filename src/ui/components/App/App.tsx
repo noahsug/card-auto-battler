@@ -5,18 +5,19 @@ import { NUM_CARD_SELECTION_OPTIONS, NUM_RELIC_SELECTION_OPTIONS } from '../../.
 import { CardState, GameState, RelicState } from '../../../game/gameState';
 import { getRandomCards } from '../../../game/utils/cards';
 import { getRandomRelics } from '../../../game/utils/relics';
-import { getBattleWinner, isGameOver, shouldPickRelic } from '../../../game/utils/selectors';
+import { getBattleWinner, isGameOver, getNextPickAction } from '../../../game/utils/selectors';
 import { useGameState } from '../../hooks/useGameState';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
-import { CardSelectionScreen } from '../CardSelectionScreen';
+import { CardSelectionScreen } from '../CardSelection/CardSelectionScreen';
 import { RelicSelectionScreen } from '../RelicSelectionScreen';
 import { OverlayBackground } from '../shared/OverlayBackground';
 import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
+import { CardRemovalScreen } from '../CardSelection/CardRemovalScreen';
 
-type ScreenType = 'start' | 'cardSelection' | 'relicSelection' | 'battle';
+type ScreenType = 'start' | 'cardSelection' | 'cardRemovalScreen' | 'relicSelection' | 'battle';
 type OverlayType = 'battleResult' | 'deck' | 'none';
 
 export const Root = styled.div`
@@ -36,7 +37,7 @@ export const ScreenContainer = styled.div`
 
 export function App() {
   const { game, actions, undoManager } = useGameState();
-  const { addCards, addRelic, endBattle, resetGame, startBattle } = actions;
+  const { addCards, removeCards, addRelic, endBattle, resetGame, startBattle } = actions;
   const { clearUndo } = undoManager;
 
   // passed to battle screen so it doesn't update after battle is over
@@ -51,8 +52,10 @@ export function App() {
   // const [screen, setScreen] = useState<ScreenType>('cardSelection');
   // cardSelectionOptionsRef.current = getRandomCards(NUM_CARD_SELECTION_OPTIONS);
 
-  const [screen, setScreen] = useState<ScreenType>('relicSelection');
-  relicSelectionOptionsRef.current = getRandomRelics(NUM_RELIC_SELECTION_OPTIONS, game.user.relics);
+  // const [screen, setScreen] = useState<ScreenType>('relicSelection');
+  // relicSelectionOptionsRef.current = getRandomRelics(NUM_RELIC_SELECTION_OPTIONS, game.user.relics);
+
+  const [screen, setScreen] = useState<ScreenType>('cardRemovalScreen');
 
   // const [screen, setScreen] = useState<ScreenType>('start');
   const [overlay, setOverlay] = useState<OverlayType>('none');
@@ -76,24 +79,34 @@ export function App() {
     goToScreen('cardSelection');
   }, [goToScreen]);
 
-  const handleCardsSelected = useCallback(
+  const handleCardsAdded = useCallback(
     (selectedCardIndexes: number[]) => {
-      const cards = cardSelectionOptionsRef.current.filter((_, i) =>
-        selectedCardIndexes.includes(i),
-      );
+      const cards = selectedCardIndexes.map((i) => cardSelectionOptionsRef.current[i]);
       addCards(cards);
 
-      if (shouldPickRelic(game)) {
+      const nextPickAction = getNextPickAction(game);
+      if (nextPickAction === 'removeCards') {
+        goToScreen('cardRemovalScreen');
+      } else if (nextPickAction === 'addRelic') {
         relicSelectionOptionsRef.current = getRandomRelics(
           NUM_RELIC_SELECTION_OPTIONS,
           game.user.relics,
         );
         goToScreen('relicSelection');
       } else {
+        // pick nothing and go straight to the battle
         goToScreen('battle');
       }
     },
     [addCards, game, goToScreen],
+  );
+
+  const handleCardsRemoved = useCallback(
+    (selectedCardIndexes: number[]) => {
+      removeCards(selectedCardIndexes);
+      goToScreen('battle');
+    },
+    [removeCards, goToScreen],
   );
 
   const handleRelicSelected = useCallback(
@@ -127,9 +140,17 @@ export function App() {
           <CardSelectionScreen
             game={game}
             cards={cardSelectionOptionsRef.current}
-            onCardsSelected={handleCardsSelected}
+            onCardsSelected={handleCardsAdded}
             onViewDeck={() => setOverlay('deck')}
           ></CardSelectionScreen>
+        )}
+
+        {screen === 'cardRemovalScreen' && (
+          <CardRemovalScreen
+            game={game}
+            onCardsSelected={handleCardsRemoved}
+            onViewDeck={() => setOverlay('deck')}
+          ></CardRemovalScreen>
         )}
 
         {screen === 'relicSelection' && (

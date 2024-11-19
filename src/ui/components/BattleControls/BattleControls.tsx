@@ -30,13 +30,9 @@ function backgroundColor({ $highlight }: { $highlight?: boolean }) {
   return $highlight ? '#ffe300' : 'var(--color-primary)';
 }
 
-function size({ $highlight }: { $highlight?: boolean }) {
-  return $highlight ? 2.5 : 2;
-}
-
 const MaskedImage = styled.div<{ src: string; $highlight?: boolean }>`
-  height: ${size}rem;
-  width: ${size}rem;
+  height: 2rem;
+  width: 2rem;
   ${maskImage}
   background-color: ${backgroundColor};
 

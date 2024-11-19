@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { NUM_CARD_SELECTION_PICKS } from '../../../game/constants';
 import { CardState, GameState } from '../../../game/gameState';
 import { Card } from '../Card';
-import { BottomRow, CardGrid, Message, useCardSize } from '../CardGrid';
+import { CardGrid, useCardSize } from '../CardGrid';
 import { HUD } from '../HUD';
 import { Button } from '../shared/Button';
 import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
+import { BottomRow, BottomRowMessage } from '../shared/Row';
 
 interface Props {
   game: GameState;
@@ -32,15 +33,17 @@ export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }
     }
   }
 
-  function handleContinue() {
+  const handleContinue = useCallback(() => {
     onCardsSelected(selectedCardIndexes);
-  }
+  }, [onCardsSelected, selectedCardIndexes]);
 
   function getStyle(index: number) {
     // indicate which cards are selected
     const opacity = selectedCardIndexes.includes(index) ? '0.33' : '1';
     return { opacity };
   }
+
+  const pluralCards = numCardsToPick === 1 ? 'Card' : 'Cards';
 
   return (
     <Container>
@@ -61,8 +64,13 @@ export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }
       </ScrollingCenterContent>
 
       <BottomRow>
-        {numCardsToPick > 0 && <Message>Select {numCardsToPick} Cards</Message>}
-        {numCardsToPick <= 0 && <Button onClick={handleContinue}>Continue</Button>}
+        {numCardsToPick > 0 ? (
+          <BottomRowMessage>
+            Add {numCardsToPick} {pluralCards}
+          </BottomRowMessage>
+        ) : (
+          <Button onClick={handleContinue}>Continue</Button>
+        )}
       </BottomRow>
     </Container>
   );
