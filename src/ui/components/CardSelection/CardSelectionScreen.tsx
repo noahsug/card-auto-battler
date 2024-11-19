@@ -9,6 +9,7 @@ import { Button } from '../shared/Button';
 import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
 import { BottomRow, BottomRowMessage } from '../shared/Row';
+import { plural } from '../../../utils/plural';
 
 interface Props {
   game: GameState;
@@ -43,8 +44,6 @@ export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }
     return { opacity };
   }
 
-  const pluralCards = numCardsToPick === 1 ? 'Card' : 'Cards';
-
   return (
     <Container>
       <HUD game={game} onViewDeck={onViewDeck} />
@@ -66,7 +65,7 @@ export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }
       <BottomRow>
         {numCardsToPick > 0 ? (
           <BottomRowMessage>
-            Add {numCardsToPick} {pluralCards}
+            Add {numCardsToPick} {plural(numCardsToPick, 'Card')}
           </BottomRowMessage>
         ) : (
           <Button onClick={handleContinue}>Continue</Button>

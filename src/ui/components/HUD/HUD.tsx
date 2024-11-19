@@ -1,15 +1,20 @@
 import { styled } from 'styled-components';
 
-import { MAX_LOSSES } from '../../../game/constants';
+import livesImage from '../../images/hourglass.png';
+import battleImage from '../../images/swords.png';
+import skullImage from './skull.png';
+import deckImage from './cards.png';
+
+import { MAX_LOSSES, MAX_WINS } from '../../../game/constants';
 import { GameState } from '../../../game/gameState';
 import { maskImage } from '../../style';
 import { RelicImage } from '../RelicSelectionScreen/Relic';
 import { Row } from '../shared/Row';
-import deckImage from './cards.png';
-import livesImage from './heart.png';
-import battleImage from './swords.png';
+import { isBossBattle } from '../../../game/utils/selectors';
+import { plural } from '../../../utils/plural';
 
 const size = 'max(1.7rem, 4vmin)';
+const padding = 'max(0.6rem, 2vmin)';
 
 const IconRow = styled(Row)`
   justify-content: space-between;
@@ -18,9 +23,8 @@ const IconRow = styled(Row)`
 const Label = styled(Row)`
   font-size: ${size};
   font-family: var(--font-heading);
-  letter-spacing: var(--letter-spacing-heading);
   background-color: var(--color-bg-opaque);
-  padding: max(0.7rem, 1.6vmin);
+  padding: ${padding};
   justify-content: center;
 `;
 
@@ -31,7 +35,7 @@ const ClickableLabel = styled(Label)`
 const Icon = styled.div<{ src: string }>`
   width: ${size};
   height: ${size};
-  margin-right: 0.75rem;
+  margin-right: ${padding};
   ${maskImage}
   background-color: var(--color-primary);
 `;
@@ -54,18 +58,21 @@ interface Props {
 
 export function HUD({ game, onViewDeck }: Props) {
   const { wins, losses, user } = game;
+  const livesLeft = MAX_LOSSES - losses;
 
   return (
     <>
       <IconRow>
         <Label>
           <Icon src={livesImage} />
-          <div>{MAX_LOSSES - losses} lives</div>
+          <div>
+            {livesLeft} {plural(livesLeft, 'rewind')}
+          </div>
         </Label>
 
         <Label>
-          <Icon src={battleImage} />
-          <div>round {wins + 1}</div>
+          {isBossBattle(game) ? <Icon src={skullImage} /> : <Icon src={battleImage} />}
+          <div>{isBossBattle(game) ? 'boss battle' : `battle ${wins + 1}/${MAX_WINS}`}</div>
         </Label>
 
         <ClickableLabel onClick={onViewDeck}>

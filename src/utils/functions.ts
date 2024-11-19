@@ -1,3 +1,3 @@
-export function doNothing() {
+export function noop() {
   return;
 }

@@ -1,6 +1,6 @@
 import { GameState, PlayerState, Target } from '../gameState';
 import { RelicName } from '../../content/relics/relics';
-import { MAX_WINS, MAX_LOSSES } from '../constants';
+import { MAX_LOSSES, MAX_WINS } from '../constants';
 import { Random } from '../../utils/Random';
 
 export function getIsUserTurn({ turn }: { turn: number }) {
@@ -38,13 +38,16 @@ export function getRelic(player: PlayerState, relicName: RelicName) {
   return player.relics.find((relic) => relic.name === relicName);
 }
 
+export function isBossBattle({ wins }: { wins: number }) {
+  return wins === MAX_WINS - 1;
+}
+
 // what pick action to take after adding new cards
-export function getNextPickAction(game: GameState) {
-  const round = game.wins + game.losses;
+export function getNextPickAction({ wins }: { wins: number }) {
   // only pick cards on the first round
-  if (round === 0) return null;
-  if (round % 2 === 0) return 'removeCards';
-  if (round % 2 === 1) return 'addRelic';
+  if (wins === 0) return null;
+  if (wins % 2 === 0) return 'removeCards';
+  if (wins % 2 === 1) return 'addRelic';
   return null;
 }
 

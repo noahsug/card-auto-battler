@@ -14,7 +14,7 @@ import {
   getPlayerTargets,
   isTurnOver,
 } from '../../game/utils/selectors';
-import { doNothing } from '../../utils/functions';
+import { noop } from '../../utils/functions';
 import { useGetBoundingRect } from '../hooks/useBoundingRect';
 import { CanUndo, EndTurn, PlayCard, StartTurn, Undo } from '../hooks/useGameState';
 import { useTimeout } from '../hooks/useTimeout';
@@ -109,8 +109,8 @@ export function BattleScreen({
   }, [activePlayer, endTurn, isBattleOver, playCard]);
 
   // change combat state based only on the active player animations
-  const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : doNothing;
-  const enemyHandleAnimationComplete = getIsUserTurn(game) ? doNothing : handleAnimationComplete;
+  const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : noop;
+  const enemyHandleAnimationComplete = getIsUserTurn(game) ? noop : handleAnimationComplete;
 
   // auto-play cards
   useEffect(() => {
