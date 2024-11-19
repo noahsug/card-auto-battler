@@ -5,7 +5,7 @@ import { NUM_CARD_SELECTION_OPTIONS, NUM_RELIC_SELECTION_OPTIONS } from '../../.
 import { CardState, GameState, RelicState } from '../../../game/gameState';
 import { getRandomCards } from '../../../game/utils/cards';
 import { getRandomRelics } from '../../../game/utils/relics';
-import { getBattleWinner, isGameOver, getNextPickAction } from '../../../game/utils/selectors';
+import { getBattleWinner, getIsGameOver, getNextPickAction } from '../../../game/utils/selectors';
 import { useGameState } from '../../hooks/useGameState';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
@@ -178,7 +178,7 @@ export function App() {
               <BattleResultOverlay
                 game={game}
                 wonLastBattle={wonLastBattleRef.current}
-                onContinue={isGameOver(game) ? restartGame : startCardSelection}
+                onContinue={getIsGameOver(game) ? restartGame : startCardSelection}
               ></BattleResultOverlay>
             )}
 

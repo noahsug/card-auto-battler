@@ -12,7 +12,7 @@ import {
   getBattleWinner,
   getIsUserTurn,
   getPlayerTargets,
-  isTurnOver,
+  getIsTurnOver,
 } from '../../game/utils/selectors';
 import { noop } from '../../utils/functions';
 import { useGetBoundingRect } from '../hooks/useBoundingRect';
@@ -97,7 +97,7 @@ export function BattleScreen({
       setBattleEvents(events);
       nextAnimationState.current = 'endPlayCard';
     } else if (nextAnimationState.current === 'endPlayCard') {
-      if (isTurnOver(activePlayer)) {
+      if (getIsTurnOver(activePlayer)) {
         endTurn();
         setBattleEvents([]);
         nextAnimationState.current = 'startTurn';

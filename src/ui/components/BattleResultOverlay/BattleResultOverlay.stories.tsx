@@ -10,7 +10,6 @@ const meta = {
   component: BattleResultOverlay,
   args: {
     onContinue: fn(),
-    wonLastBattle: true,
     game: createGameState(),
   },
 } satisfies Meta<typeof BattleResultOverlay>;
@@ -18,10 +17,22 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Victory: Story = {};
+export const Victory: Story = {
+  args: {
+    game: {
+      ...createGameState(),
+      wins: 1,
+    },
+    wonLastBattle: true,
+  },
+};
 
 export const Defeat: Story = {
   args: {
+    game: {
+      ...createGameState(),
+      losses: 1,
+    },
     wonLastBattle: false,
   },
 };
@@ -32,6 +43,17 @@ export const GameOver: Story = {
       ...createGameState(),
       losses: MAX_LOSSES,
     },
+    wonLastBattle: false,
+  },
+};
+
+export const BossTime: Story = {
+  args: {
+    game: {
+      ...createGameState(),
+      wins: MAX_WINS - 1,
+    },
+    wonLastBattle: true,
   },
 };
 
@@ -41,5 +63,6 @@ export const YouWin: Story = {
       ...createGameState(),
       wins: MAX_WINS,
     },
+    wonLastBattle: true,
   },
 };

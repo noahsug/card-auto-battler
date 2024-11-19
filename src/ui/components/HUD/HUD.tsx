@@ -2,7 +2,7 @@ import { styled } from 'styled-components';
 
 import livesImage from '../../images/hourglass.png';
 import battleImage from '../../images/swords.png';
-import skullImage from './skull.png';
+import skullImage from '../../images/skull.png';
 import deckImage from './cards.png';
 
 import { MAX_LOSSES, MAX_WINS } from '../../../game/constants';
@@ -10,7 +10,7 @@ import { GameState } from '../../../game/gameState';
 import { maskImage } from '../../style';
 import { RelicImage } from '../RelicSelectionScreen/Relic';
 import { Row } from '../shared/Row';
-import { isBossBattle } from '../../../game/utils/selectors';
+import { getIsBossBattle } from '../../../game/utils/selectors';
 import { plural } from '../../../utils/plural';
 
 const size = 'max(1.7rem, 4vmin)';
@@ -71,8 +71,8 @@ export function HUD({ game, onViewDeck }: Props) {
         </Label>
 
         <Label>
-          {isBossBattle(game) ? <Icon src={skullImage} /> : <Icon src={battleImage} />}
-          <div>{isBossBattle(game) ? 'boss battle' : `battle ${wins + 1}/${MAX_WINS}`}</div>
+          {getIsBossBattle(game) ? <Icon src={skullImage} /> : <Icon src={battleImage} />}
+          <div>{getIsBossBattle(game) ? 'boss battle' : `battle ${wins + 1}`}</div>
         </Label>
 
         <ClickableLabel onClick={onViewDeck}>

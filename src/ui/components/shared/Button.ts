@@ -4,7 +4,7 @@ import { getHandDrawnBorderRadius } from '../../style';
 export const Button = styled.button`
   font-size: 2rem;
   margin: 0 auto;
-  padding: 0.5rem 0 1rem;
+  padding: 0.5rem 0;
   width: 10rem;
   background: none;
   ${getHandDrawnBorderRadius}

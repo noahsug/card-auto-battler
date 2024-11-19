@@ -38,8 +38,8 @@ export function getRelic(player: PlayerState, relicName: RelicName) {
   return player.relics.find((relic) => relic.name === relicName);
 }
 
-export function isBossBattle({ wins }: { wins: number }) {
-  return wins === MAX_WINS - 1;
+export function getIsBossBattle({ wins }: { wins: number }) {
+  return wins >= MAX_WINS - 1;
 }
 
 // what pick action to take after adding new cards
@@ -51,11 +51,11 @@ export function getNextPickAction({ wins }: { wins: number }) {
   return null;
 }
 
-export function isTurnOver(player: PlayerState) {
+export function getIsTurnOver(player: PlayerState) {
   return player.extraCardPlays === 0;
 }
 
-export function isGameOver({ wins, losses }: { wins: number; losses: number }) {
+export function getIsGameOver({ wins, losses }: { wins: number; losses: number }) {
   return losses >= MAX_LOSSES || wins >= MAX_WINS;
 }
 
