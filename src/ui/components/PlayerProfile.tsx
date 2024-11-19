@@ -68,10 +68,10 @@ function summarizeBattleEvents(battleEvents: BattleEvent[]) {
   return summary;
 }
 
-function getDodgeAnimation({ u }: { u: UnitFn }) {
+function getDodgeAnimation({ direction, u }: { direction: Direction; u: UnitFn }) {
   return {
-    x: u(25),
-    y: u(20),
+    x: u(15) * direction,
+    y: u(10),
     hue: 0,
     delay: 0,
     config: { easing: easings.easeOutExpo, duration: 600 },
@@ -116,7 +116,7 @@ function getBattleAnimation({
 }) {
   const { misses, damage } = summarizeBattleEvents(battleEvents);
   if (damage === 0 && misses === 0) return startPosition;
-  if (misses > 0 && damage <= 0) return getDodgeAnimation({ u });
+  if (misses > 0 && damage <= 0) return getDodgeAnimation({ u, direction });
   if (damage < 0) return getHealAnimation({ u });
   return getDamageAnimation({ damage, direction, u });
 }

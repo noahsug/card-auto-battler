@@ -35,11 +35,6 @@ export const ScreenContainer = styled.div`
 `;
 
 export function App() {
-  // DEBUG
-  // const [screen, setScreen] = useState<ScreenType>('battle');
-  const [screen, setScreen] = useState<ScreenType>('start');
-  const [overlay, setOverlay] = useState<OverlayType>('none');
-
   const { game, actions, undoManager } = useGameState();
   const { addCards, addRelic, endBattle, resetGame, startBattle } = actions;
   const { clearUndo } = undoManager;
@@ -49,6 +44,18 @@ export function App() {
   const wonLastBattleRef = useRef(false);
   const cardSelectionOptionsRef = useRef<CardState[]>([]);
   const relicSelectionOptionsRef = useRef<RelicState[]>([]);
+
+  // DEBUG
+  // const [screen, setScreen] = useState<ScreenType>('battle');
+
+  // const [screen, setScreen] = useState<ScreenType>('cardSelection');
+  // cardSelectionOptionsRef.current = getRandomCards(NUM_CARD_SELECTION_OPTIONS);
+
+  const [screen, setScreen] = useState<ScreenType>('relicSelection');
+  relicSelectionOptionsRef.current = getRandomRelics(NUM_RELIC_SELECTION_OPTIONS, game.user.relics);
+
+  // const [screen, setScreen] = useState<ScreenType>('start');
+  const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const goToScreen = useCallback(
     async (screen: ScreenType) => {

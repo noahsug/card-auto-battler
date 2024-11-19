@@ -13,7 +13,7 @@ Game TODO:
 
 Polish TODO:
 
-1. use seeded random to ensure shuffle is always the same
+1. save progress via local storage
 2. queue activations (e.g. relics, effects) one at a time so it's more clear what's happening, and
    highlight the relic/status effect that triggered it
 3. attack animation which triggers on each hit of the card
@@ -21,6 +21,7 @@ Polish TODO:
 5. loading screen
 6. add progress view? (e.g. fight -> card -> fight -> card -> relic -> etc -> boss)
 7. add achievements
+8. add offline app download option (see Slay the Web)
 
 Maybe TODO:
 

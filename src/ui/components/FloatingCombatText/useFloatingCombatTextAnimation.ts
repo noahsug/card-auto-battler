@@ -28,12 +28,12 @@ function createTextAnimation(battleEvent: BattleEvent) {
 
 function getXY(
   { xOffsetRatio, yOffsetRatio }: AnimationData,
-  { targetBoundingRect }: AnimationContext,
+  { targetBoundingRect, u }: AnimationContext,
 ) {
   if (targetBoundingRect == null) return { x: 0, y: 0 };
 
   const { width, height } = targetBoundingRect;
-  return { x: width * xOffsetRatio, y: (height / 2) * yOffsetRatio };
+  return { x: (width - u(20)) * xOffsetRatio, y: (height / 2) * yOffsetRatio };
 }
 
 // start randomly within the top half of the target element

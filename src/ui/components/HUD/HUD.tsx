@@ -9,18 +9,18 @@ import deckImage from './cards.png';
 import livesImage from './heart.png';
 import battleImage from './swords.png';
 
-const size = 2;
+const size = 'max(1.7rem, 4vmin)';
 
 const IconRow = styled(Row)`
   justify-content: space-between;
 `;
 
 const Label = styled(Row)`
-  font-size: ${size}rem;
+  font-size: ${size};
   font-family: var(--font-heading);
   letter-spacing: var(--letter-spacing-heading);
   background-color: var(--color-bg-opaque);
-  padding: 0.5rem;
+  padding: max(0.7rem, 1.6vmin);
   justify-content: center;
 `;
 
@@ -29,8 +29,8 @@ const ClickableLabel = styled(Label)`
 `;
 
 const Icon = styled.div<{ src: string }>`
-  width: ${size}rem;
-  height: ${size}rem;
+  width: ${size};
+  height: ${size};
   margin-right: 0.75rem;
   ${maskImage}
   background-color: var(--color-primary);
@@ -43,8 +43,8 @@ const RelicRow = styled(Row)`
 `;
 
 const HUDRelicImage = styled(RelicImage)`
-  width: ${size}rem;
-  height: ${size}rem;
+  width: ${size};
+  height: ${size};
 `;
 
 interface Props {

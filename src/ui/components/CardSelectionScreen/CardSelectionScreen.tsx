@@ -1,27 +1,13 @@
 import { useState } from 'react';
-import { styled } from 'styled-components';
 
 import { NUM_CARD_SELECTION_PICKS } from '../../../game/constants';
 import { CardState, GameState } from '../../../game/gameState';
 import { Card } from '../Card';
-import { CardGrid, useCardSize } from '../CardGrid';
+import { BottomRow, CardGrid, Message, useCardSize } from '../CardGrid';
 import { HUD } from '../HUD';
 import { Button } from '../shared/Button';
 import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
-
-const bottomRowHeight = 4;
-
-const Message = styled.h2`
-  text-align: center;
-  font-size: 2.5rem;
-  line-height: ${bottomRowHeight}rem;
-`;
-
-const BottomRow = styled.div`
-  margin: 0 auto 0.25rem;
-  height: ${bottomRowHeight}rem;
-`;
 
 interface Props {
   game: GameState;

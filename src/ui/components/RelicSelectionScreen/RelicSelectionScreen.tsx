@@ -8,6 +8,7 @@ import { Button } from '../shared/Button';
 import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
 import { Relic } from './Relic';
+import { Message, BottomRow } from '../CardGrid';
 
 const RelicList = styled.div`
   display: flex;
@@ -16,21 +17,8 @@ const RelicList = styled.div`
   overflow-y: auto;
 
   > * {
-    margin: 0.5rem;
+    margin: 1.5rem 0.5rem;
   }
-`;
-
-const bottomRowHeight = 4;
-
-const Message = styled.h2`
-  text-align: center;
-  font-size: 2.5rem;
-  line-height: ${bottomRowHeight}rem;
-`;
-
-const BottomRow = styled.div`
-  margin: 0 auto 0.25rem;
-  height: ${bottomRowHeight}rem;
 `;
 
 interface Props {
@@ -81,7 +69,7 @@ export function RelicSelectionScreen({ game, relics, onRelicSelected, onViewDeck
 
       <BottomRow>
         {selectedRelicIndex == null ? (
-          <Message>Select a Relic</Message>
+          <Message>Select 1 Relic</Message>
         ) : (
           <Button onClick={handleContinue}>Continue</Button>
         )}
