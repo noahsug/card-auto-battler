@@ -16,18 +16,19 @@ const battleEventsTypesWithFCT = new Set(['damage', 'heal', 'miss']);
 function getTextColor({ $battleEvent }: { $battleEvent: BattleEvent }) {
   switch ($battleEvent.type) {
     case 'damage':
-      return $battleEvent.isCrit ? 'hsl(0, 85%, 40%)' : 'hsl(0, 85%, 20%)';
+      return $battleEvent.isCrit ? 'hsl(50, 85%, 50%)' : 'hsl(0, 85%, 20%)';
     case 'heal':
-      return $battleEvent.isCrit ? 'hsl(120, 85%, 40%)' : 'hsl(120, 85%, 20%)';
+      return $battleEvent.isCrit ? 'hsl(80, 85%, 50%)' : 'hsl(120, 85%, 20%)';
     case 'miss':
       return 'yellow';
   }
 }
 
 function getTextShadow({ $battleEvent }: { $battleEvent: BattleEvent }) {
-  const color = $battleEvent.type === 'miss' ? 'var(--color-bg)' : 'var(--color-primary)';
-  const size = 0.05;
-  const offset = 0.05;
+  const isCrit = ($battleEvent as ValueBattleEvent).isCrit;
+  const color = $battleEvent.type === 'miss' || isCrit ? 'var(--color-bg)' : 'var(--color-primary)';
+  const size = 0.1;
+  const offset = 0.1;
   return `
     ${offset}rem ${offset}rem ${size}rem ${color},
     ${offset}rem -${offset}rem ${size}rem ${color},

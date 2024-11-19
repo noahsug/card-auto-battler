@@ -27,6 +27,8 @@ const Header = styled(animated.h2)`
 
 const ContinueButton = styled(Button)`
   margin: auto;
+  width: auto;
+  padding: 0.5rem 1rem;
 `;
 
 // TODO: Share code with HUD, make scaling units generalizable and easy to use
@@ -107,6 +109,7 @@ export function BattleResultOverlay({ game, onContinue, wonLastBattle }: Props) 
     ref: headerAnimation,
   });
 
+  // TODO: fix the animation playing twice
   const labelAnimation = useSpringRef();
   const labelStyle = useSpring({
     from: { color: '#fcfafb', scale: 1 },

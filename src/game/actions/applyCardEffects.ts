@@ -235,13 +235,7 @@ function dealCardDamage(
 
   // strength
   if (target === 'opponent') {
-    value += self.strength + self.temporaryStrength;
-
-    // strengthWithDodge
-    const strengthWithDodge = getRelic(self, 'strengthWithDodge');
-    if (strengthWithDodge && self.dodge > 0) {
-      value += strengthWithDodge.value;
-    }
+    value += getStrength(context);
   }
 
   const isCrit = getIsCrit(context);
@@ -288,6 +282,20 @@ function dealCardDamage(
     reduceHealth({ value: BLEED_DAMAGE, target }, context);
     opponent.bleed -= 1;
   }
+}
+
+function getStrength(context: PlayCardContext) {
+  const self = getActivePlayer(context.game);
+
+  let strength = self.strength + self.temporaryStrength;
+
+  // strengthWithDodge
+  const strengthWithDodge = getRelic(self, 'strengthWithDodge');
+  if (strengthWithDodge && self.dodge > 0) {
+    strength += strengthWithDodge.value;
+  }
+
+  return strength;
 }
 
 function getIsCrit(context: PlayCardContext) {
@@ -350,14 +358,15 @@ export function reduceHealth(
 
 export function applyHeal(
   { value, multiplier = 1, target }: EffectOptions,
-  { game, events }: PlayCardContext,
+  context: PlayCardContext,
 ) {
+  const { game, events } = context;
   const targetPlayer = getTargetedPlayer(game, target);
 
   // strengthAffectsHealing
   const strengthAffectsHealing = getRelic(targetPlayer, 'strengthAffectsHealing');
   if (strengthAffectsHealing) {
-    value += targetPlayer.strength;
+    value += getStrength(context);
   }
 
   value = Math.floor(value * multiplier);

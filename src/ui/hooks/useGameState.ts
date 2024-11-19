@@ -36,9 +36,8 @@ export function useGameState(initialGameState: GameState = createGameState()) {
     return actionEntries.reduce((acc, [name, action]) => {
       const { promise, resolve } = getResolvablePromise<ReturnType<Action>>();
       acc[name] = (...args: Tail<Parameters<Action>>) => {
-        // only allow undoing to a previous startTurn event
+        // TODO: only a startTurn event can be undone, undo to last card play as well?
         if (name === 'startTurn') {
-          // setUndoHistory((prev) => [...prev, gameState]);
           setUndoHistory((prev) => {
             return [...prev, cloneDeep(gameState)];
           });
@@ -52,7 +51,7 @@ export function useGameState(initialGameState: GameState = createGameState()) {
       };
       return acc;
     }, {} as BoundActions);
-    // TODO: we should ideally remove this dep
+    // TODO: ideally this dep doesn't exist, include undo history as part of UI game state?
   }, [gameState]);
 
   const canUndo = useCallback(() => {

@@ -246,7 +246,7 @@ export const redCards = {
       image: firePowerImage,
     },
   ),
-  hellFire: createCard(
+  fireDamageToAll: createCard(
     [
       {
         name: 'damage',
@@ -268,7 +268,7 @@ export const redCards = {
       },
     ],
     {
-      name: 'Hellfire',
+      name: 'Firestorm',
       description: 'Deal $V damage and $2V burn to the enemy and yourself.',
       image: volcanoImage,
     },

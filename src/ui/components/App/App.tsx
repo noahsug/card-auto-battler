@@ -18,7 +18,7 @@ import backgroundImage from './main-background.png';
 import { CardRemovalScreen } from '../CardSelection/CardRemovalScreen';
 
 type ScreenType = 'start' | 'cardSelection' | 'cardRemovalScreen' | 'relicSelection' | 'battle';
-type OverlayType = 'battleResult' | 'deck' | 'none';
+type OverlayType = 'battleResults' | 'deck' | 'none';
 
 export const Root = styled.div`
   width: 100vw;
@@ -47,6 +47,7 @@ export function App() {
   const relicSelectionOptionsRef = useRef<RelicState[]>([]);
 
   // DEBUG
+  // -----------------
   // const [screen, setScreen] = useState<ScreenType>('battle');
 
   // const [screen, setScreen] = useState<ScreenType>('cardSelection');
@@ -55,10 +56,14 @@ export function App() {
   // const [screen, setScreen] = useState<ScreenType>('relicSelection');
   // relicSelectionOptionsRef.current = getRandomRelics(NUM_RELIC_SELECTION_OPTIONS, game.user.relics);
 
-  const [screen, setScreen] = useState<ScreenType>('cardRemovalScreen');
+  // const [screen, setScreen] = useState<ScreenType>('cardRemovalScreen');
 
-  // const [screen, setScreen] = useState<ScreenType>('start');
-  const [overlay, setOverlay] = useState<OverlayType>('none');
+  const [overlay, setOverlay] = useState<OverlayType>('battleResults');
+
+  // -----------------
+
+  const [screen, setScreen] = useState<ScreenType>('start');
+  // const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const goToScreen = useCallback(
     async (screen: ScreenType) => {
@@ -122,7 +127,7 @@ export function App() {
     endOfBattleGameRef.current = game;
     wonLastBattleRef.current = getBattleWinner(game) === 'user';
     endBattle();
-    setOverlay('battleResult');
+    setOverlay('battleResults');
     clearUndo();
   }, [game, endBattle, clearUndo]);
 
@@ -174,7 +179,7 @@ export function App() {
 
         {overlay !== 'none' && (
           <OverlayBackground>
-            {overlay === 'battleResult' && (
+            {overlay === 'battleResults' && (
               <BattleResultOverlay
                 game={game}
                 wonLastBattle={wonLastBattleRef.current}

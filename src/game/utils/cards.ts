@@ -13,6 +13,7 @@ export function getRandomCards(length: number) {
 }
 
 export function addCardsToPlayer(player: PlayerState, cards: CardState[]) {
-  const clonedCards = cards.map((card, i) => ({ ...card, acquiredId: player.cards.length + i }));
+  const maxAcquiredId = player.cards.reduce((max, card) => Math.max(max, card.acquiredId), 0);
+  const clonedCards = cards.map((card, i) => ({ ...card, acquiredId: maxAcquiredId + 1 + i }));
   player.cards.push(...clonedCards);
 }
