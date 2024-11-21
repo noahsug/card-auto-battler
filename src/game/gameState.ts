@@ -172,7 +172,7 @@ export function createGameState(): GameState {
   // addCardsToPlayer(game.user, [cardsByName.stealth, cardsByName.shockTrap, cardsByName.pumpedUp]);
   addCardsToPlayer(game.user, [attack, heal, cardsByName.dodge]);
   // addCardsToPlayer(game.user, [attack, attack, heal]);
-  addCardsToPlayer(game.enemy, [attack, attack, attack, heal]);
+  addCardsToPlayer(game.enemy, [attack, attack, attack]);
 
   return game;
 }

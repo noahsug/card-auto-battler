@@ -16,6 +16,7 @@ import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './app
 import { BattleEvent, createBattleEvent } from './battleEvent';
 
 export function addCards(game: GameState, cards: CardState[]) {
+  game.rewindGameState = cloneDeep(game);
   addCardsToPlayer(game.user, cards);
 }
 
@@ -215,6 +216,12 @@ export function endBattle(game: GameState) {
 export function undoPlayedCard(game: GameState) {
   assertIsNonNullable(game.undoGameState);
   Object.assign(game, game.undoGameState);
+}
+
+export function rewind(game: GameState) {
+  assertIsNonNullable(game.rewindGameState);
+  Object.assign(game, game.rewindGameState);
+  game.losses += 1;
 }
 
 export function resetGame(game: GameState) {

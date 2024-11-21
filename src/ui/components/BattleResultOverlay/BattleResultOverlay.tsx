@@ -103,7 +103,7 @@ export function BattleResultOverlay({ game, onContinue, wonLastBattle }: Props) 
     to: { y: 0, config: config.wobbly },
   }));
 
-  const progressValueStartingState = { color: '#fcfafb', scale: 1 };
+  const progressValueStartingState = { color: 'var(--color-primary)', scale: 1 };
   const [labelStyle] = useSpring(() => ({
     from: progressValueStartingState,
     to: [
@@ -121,7 +121,7 @@ export function BattleResultOverlay({ game, onContinue, wonLastBattle }: Props) 
     },
   }));
 
-  const iconStartingState = { backgroundColor: '#fcfafb' };
+  const iconStartingState = { backgroundColor: 'var(--color-primary)' };
   const [iconStyle] = useSpring(() => ({
     from: iconStartingState,
     to: [{ backgroundColor: colorToAnimateTo }, ...(isGameOver ? [] : [iconStartingState])],

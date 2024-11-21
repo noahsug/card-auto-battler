@@ -37,7 +37,9 @@ export const ScreenContainer = styled.div`
 
 export function App() {
   const { game, actions } = useGameState();
-  const { addCards, removeCards, addRelic, endBattle, resetGame, startBattle } = actions;
+  const { addCards, removeCards, addRelic, endBattle, resetGame, startBattle, rewind } = actions;
+  const isGameOver = getIsGameOver(game);
+  const battleWinner = getBattleWinner(game);
 
   // passed to battle screen so it doesn't update after battle is over
   const endOfBattleGameRef = useRef<GameState>();
@@ -47,7 +49,7 @@ export function App() {
 
   // DEBUG
   // -----------------
-  const [screen, setScreen] = useState<ScreenType>('battle');
+  // const [screen, setScreen] = useState<ScreenType>('battle');
 
   // const [screen, setScreen] = useState<ScreenType>('cardSelection');
   // cardSelectionOptionsRef.current = getRandomCards(NUM_CARD_SELECTION_OPTIONS);
@@ -61,7 +63,7 @@ export function App() {
 
   // -----------------
 
-  // const [screen, setScreen] = useState<ScreenType>('start');
+  const [screen, setScreen] = useState<ScreenType>('start');
   const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const goToScreen = useCallback(
@@ -122,15 +124,22 @@ export function App() {
 
   const handleBattleOver = useCallback(() => {
     endOfBattleGameRef.current = game;
-    wonLastBattleRef.current = getBattleWinner(game) === 'user';
+    wonLastBattleRef.current = battleWinner === 'user';
     endBattle();
     setOverlay('battleResults');
-  }, [game, endBattle]);
+  }, [game, battleWinner, endBattle]);
 
-  const restartGame = useCallback(() => {
-    resetGame();
-    goToScreen('start');
-  }, [goToScreen, resetGame]);
+  const handleBattleResultsContinue = useCallback(() => {
+    if (isGameOver) {
+      resetGame();
+      goToScreen('start');
+    } else {
+      if (!wonLastBattleRef.current) {
+        rewind();
+      }
+      startCardSelection();
+    }
+  }, [goToScreen, isGameOver, resetGame, rewind, startCardSelection]);
 
   return (
     <Root>
@@ -178,7 +187,7 @@ export function App() {
               <BattleResultOverlay
                 game={game}
                 wonLastBattle={wonLastBattleRef.current}
-                onContinue={getIsGameOver(game) ? restartGame : startCardSelection}
+                onContinue={handleBattleResultsContinue}
               ></BattleResultOverlay>
             )}
 
