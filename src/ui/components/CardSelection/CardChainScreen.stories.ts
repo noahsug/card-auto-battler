@@ -30,7 +30,7 @@ export const HasExistingChain: Story = {
   args: (() => {
     const game = createGameState();
     game.user.cards = getRandomCards(6);
-    const [fromCard, toCard] = game.user.cards.slice(1, 3);
+    const [fromCard, toCard] = [game.user.cards[1], game.user.cards[4]];
     fromCard.chain.toId = toCard.acquiredId;
     toCard.chain.fromId = fromCard.acquiredId;
     return { game };

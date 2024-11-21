@@ -1,6 +1,6 @@
 import { NUM_CARD_REMOVAL_PICKS } from '../../../game/constants';
 import { GameState } from '../../../game/gameState';
-import { CardSelection } from './CardSelection';
+import { CardSelection, sortCards } from './CardSelection';
 
 interface Props {
   game: GameState;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function CardRemoveScreen(props: Props) {
-  const cards = props.game.user.cards;
+  const cards = sortCards(props.game.user.cards);
 
   return (
     <CardSelection

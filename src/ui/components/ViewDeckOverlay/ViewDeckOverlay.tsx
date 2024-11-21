@@ -1,7 +1,6 @@
-import sortBy from 'lodash/sortBy';
-
 import { GameState } from '../../../game/gameState';
 import { CardSelection } from '../CardSelection';
+import { sortCards } from '../CardSelection/CardSelection';
 
 interface Props {
   game: GameState;
@@ -9,7 +8,7 @@ interface Props {
 }
 
 export function ViewDeckOverlay({ game, onClose }: Props) {
-  const cards = sortBy(game.user.cards, (card) => card.acquiredId);
+  const cards = sortCards(game.user.cards);
 
   return <CardSelection game={game} onCardsSelected={onClose} cards={cards} buttonText="Close" />;
 }

@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 
+import sortBy from 'lodash/sortBy';
+import { applyCardOrderingEffects } from '../../../game/actions/applyCardOrderingEffects';
 import { CardState, GameState } from '../../../game/gameState';
 import { plural } from '../../../utils/plural';
+import { useUnits } from '../../hooks/useUnits';
 import { Card } from '../Card';
 import { HUD } from '../HUD';
 import { Button } from '../shared/Button';
 import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
 import { BottomRow, BottomRowMessage } from '../shared/Row';
-import { useUnits } from '../../hooks/useUnits';
 
 const CardGrid = styled.div`
   display: flex;
@@ -70,10 +72,10 @@ export function CardSelection({
 
   // indicate which cards are selected
   function getStyle(index: number) {
-    const opacity = invalidSelections.includes(index) ? '.5' : '1';
     const scale = selectedCardIndexes.includes(index) ? '1' : '.85';
-    const filter = selectedCardIndexes.includes(index) ? 'brightness(1.15)' : '';
-    return { scale, opacity, filter };
+    let filter = selectedCardIndexes.includes(index) ? 'brightness(1.15)' : '';
+    filter = invalidSelections.includes(index) ? 'brightness(.5)' : filter;
+    return { scale, filter };
   }
 
   return (
@@ -105,4 +107,10 @@ export function CardSelection({
       </BottomRow>
     </Container>
   );
+}
+
+export function sortCards(cards: CardState[]) {
+  cards = sortBy(cards, (card) => card.acquiredId);
+  applyCardOrderingEffects(cards);
+  return cards;
 }
