@@ -41,7 +41,7 @@ function getPlayCardBattleEvents(player: PlayerState): BattleEvent[] {
   const card = player.cards[player.currentCardIndex];
   if (card && player.health > 0 && player.stun === 0) {
     // TODO: Rename to startPlayCard
-    return [createBattleEvent('playCard', card.acquiredId)];
+    return [createBattleEvent('startPlayCard', card.acquiredId)];
   }
   return [];
 }

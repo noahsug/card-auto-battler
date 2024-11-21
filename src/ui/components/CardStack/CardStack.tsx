@@ -10,7 +10,7 @@ import { useGetBoundingRect } from '../../hooks/useBoundingRect';
 const ANIMATED_EVENT_TYPES = new Set<BattleEvent['type']>([
   'undo',
   'startBattle',
-  'playCard',
+  'startPlayCard',
   'discardCard',
   'trashCard',
   'shuffle',
@@ -62,7 +62,7 @@ export function CardStack(props: Props) {
   }
   const event = events.current[eventIndex];
 
-  isPaused.current = props.isPaused && event?.type === 'playCard';
+  isPaused.current = props.isPaused && event?.type === 'startPlayCard';
 
   // console.log(
   //   'CS',
@@ -109,13 +109,13 @@ export function CardStack(props: Props) {
       prevEvent?.type !== 'undo' &&
       prevEvent?.type !== 'shuffle' &&
       prevEvent?.type !== 'startBattle' &&
-      prevEvent?.type !== 'playCard'
+      prevEvent?.type !== 'startPlayCard'
     ) {
       // end the animation if there are no events left (unless we hit a special use case like the
       // playCard timeout, or startBattle or shuffle events)
       // console.log('CS done');
       onAnimationComplete();
-    } else if (event?.type === 'playCard' && cardPlayedTimeout.current == null) {
+    } else if (event?.type === 'startPlayCard' && cardPlayedTimeout.current == null) {
       // console.log('CS start playCard');
       cardPlayedTimeout.current = setTimeout(() => {
         // console.log('CS done playCard');

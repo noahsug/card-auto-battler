@@ -56,11 +56,11 @@ export const TakeTurn: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
-      createBattleEvent('playCard', 0),
+      createBattleEvent('startPlayCard', 0),
       createBattleEvent('discardCard', 0),
-      createBattleEvent('playCard', 1),
+      createBattleEvent('startPlayCard', 1),
       createBattleEvent('trashCard', 1),
-      createBattleEvent('playCard', 2),
+      createBattleEvent('startPlayCard', 2),
       createBattleEvent('discardCard', 2),
       createBattleEvent('shuffle'),
     ],
@@ -71,7 +71,7 @@ export const UndoPlayCard: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
-      createBattleEvent('playCard', 0),
+      createBattleEvent('startPlayCard', 0),
       createBattleEvent('discardCard', 0),
       createBattleEvent('undo'),
     ],
@@ -82,7 +82,7 @@ export const UndoTrashCard: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
-      createBattleEvent('playCard', 0),
+      createBattleEvent('startPlayCard', 0),
       createBattleEvent('trashCard', 0),
       createBattleEvent('undo'),
     ],
@@ -91,7 +91,7 @@ export const UndoTrashCard: Story = {
 
 export const UndoMidPlayCard: Story = {
   args: {
-    events: [createBattleEvent('startBattle'), createBattleEvent('playCard', 0)],
+    events: [createBattleEvent('startBattle'), createBattleEvent('startPlayCard', 0)],
     undoAfterMs: 1600,
   },
 };

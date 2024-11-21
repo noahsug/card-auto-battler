@@ -248,7 +248,7 @@ function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
 
   if ((event as CardBattleEvent).cardId === cardAnimation.card.acquiredId) {
     switch (event.type) {
-      case 'playCard':
+      case 'startPlayCard':
         return playCard(cardAnimation, context);
       case 'discardCard':
         return discardCard(cardAnimation, context);

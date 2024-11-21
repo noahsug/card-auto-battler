@@ -17,7 +17,7 @@ export interface ValueBattleEvent {
   isCrit: boolean;
 }
 export interface CardBattleEvent {
-  type: 'playCard' | 'trashCard' | 'discardCard' | 'addTemporaryCard';
+  type: 'startPlayCard' | 'trashCard' | 'discardCard' | 'addTemporaryCard';
   cardId: number;
   target: Target;
 }

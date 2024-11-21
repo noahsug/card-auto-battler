@@ -22,7 +22,7 @@ type Story = StoryObj<typeof meta>;
 
 export const PlayCard: Story = {
   args: {
-    events: [createBattleEvent('playCard', 0)],
+    events: [createBattleEvent('startPlayCard', 0)],
   },
 };
 
@@ -30,11 +30,11 @@ export const TakeTurn: Story = {
   args: {
     events: [
       createBattleEvent('startBattle'),
-      createBattleEvent('playCard', 0),
+      createBattleEvent('startPlayCard', 0),
       createBattleEvent('discardCard', 0),
-      createBattleEvent('playCard', 1),
+      createBattleEvent('startPlayCard', 1),
       createBattleEvent('trashCard', 1),
-      createBattleEvent('playCard', 2),
+      createBattleEvent('startPlayCard', 2),
       createBattleEvent('discardCard', 2),
       createBattleEvent('shuffle'),
     ],
