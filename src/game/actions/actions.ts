@@ -15,7 +15,7 @@ import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRandom, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
-import { breakChain } from './applyCardOrderingEffects';
+import { breakChain, applyCardOrderingEffects } from './applyCardOrderingEffects';
 
 export function addCards(game: GameState, cards: CardState[]) {
   game.rewindGameState = cloneDeep(game);
@@ -33,7 +33,6 @@ export function removeCards(game: GameState, cardIndexes: number[]) {
   game.user.cards = game.user.cards.filter((_, index) => !cardIndexes.includes(index));
 }
 
-// TODO: make sure we can't form a loop
 export function chainCards(game: GameState, cardIndexes: number[]) {
   assert(cardIndexes.length === 2, 'must select exactly 2 cards to chain');
   const { cards } = game.user;
@@ -50,13 +49,17 @@ export function addRelic(game: GameState, relic: RelicState) {
   game.user.relics.push(relic);
 }
 
+function shuffleCards(game: GameState, player: PlayerState) {
+  const { shuffle } = getRandom(game);
+  shuffle(player.cards);
+  applyCardOrderingEffects(player.cards);
+}
+
 function triggerStartOfBattleEffects(
   game: GameState,
   { self }: { self: PlayerState; opponent: PlayerState },
 ) {
-  const { shuffle } = getRandom(game);
-
-  shuffle(self.cards);
+  shuffleCards(game, self);
 
   // strengthAffectsHealing
   const strengthAffectsHealing = getRelic(self, 'strengthAffectsHealing');
@@ -132,7 +135,6 @@ export function startTurn(game: GameState): BattleEvent[] {
 export function playCard(game: GameState): BattleEvent[] {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
   const card = activePlayer.cards[activePlayer.currentCardIndex];
-  const { shuffle } = getRandom(game);
 
   // set undo point after the 2nd+ card is played (we skip the first card because an undo point is
   // set when the turn starts)
@@ -187,7 +189,7 @@ export function playCard(game: GameState): BattleEvent[] {
   if (activePlayer.currentCardIndex >= activePlayer.cards.length) {
     // shuffle deck
     activePlayer.currentCardIndex = 0;
-    shuffle(activePlayer.cards);
+    shuffleCards(game, activePlayer);
     events.push(createBattleEvent('shuffle'));
   }
 
