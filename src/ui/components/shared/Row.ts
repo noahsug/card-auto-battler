@@ -16,6 +16,6 @@ export const BottomRowMessage = styled.h2`
 `;
 
 export const BottomRow = styled.div`
-  margin: 0 auto 0.25rem;
+  margin: 1rem auto 0.25rem;
   height: ${bottomRowHeight}rem;
 `;

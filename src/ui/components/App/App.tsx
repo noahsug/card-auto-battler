@@ -9,19 +9,19 @@ import { getBattleWinner, getIsGameOver, getNextPickAction } from '../../../game
 import { useGameState } from '../../hooks/useGameState';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
-import { CardSelectionScreen } from '../CardSelection/CardSelectionScreen';
+import { CardAddScreen } from '../CardSelection/CardAddScreen';
 import { RelicSelectionScreen } from '../RelicSelectionScreen';
 import { OverlayBackground } from '../shared/OverlayBackground';
 import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
-import { CardRemovalScreen } from '../CardSelection/CardRemovalScreen';
+import { CardRemoveScreen } from '../CardSelection/CardRemoveScreen';
 import { CardChainScreen } from '../CardSelection/CardChainScreen';
 
 type ScreenType =
   | 'start'
   | 'cardSelection'
-  | 'cardRemovalScreen'
+  | 'cardRemoveScreen'
   | 'cardChainScreen'
   | 'relicSelection'
   | 'battle';
@@ -65,7 +65,7 @@ export function App() {
   // const [screen, setScreen] = useState<ScreenType>('relicSelection');
   // relicSelectionOptionsRef.current = getRandomRelics(NUM_RELIC_SELECTION_OPTIONS, game.user.relics);
 
-  // const [screen, setScreen] = useState<ScreenType>('cardRemovalScreen');
+  // const [screen, setScreen] = useState<ScreenType>('cardRemoveScreen');
 
   const [screen, setScreen] = useState<ScreenType>('cardChainScreen');
 
@@ -100,7 +100,7 @@ export function App() {
 
       const nextPickAction = getNextPickAction(game);
       if (nextPickAction === 'removeCards') {
-        goToScreen('cardRemovalScreen');
+        goToScreen('cardRemoveScreen');
       } else if (nextPickAction === 'addRelic') {
         relicSelectionOptionsRef.current = getRandomRelics(
           NUM_RELIC_SELECTION_OPTIONS,
@@ -159,26 +159,30 @@ export function App() {
     }
   }, [goToScreen, isGameOver, resetGame, rewind, startCardSelection]);
 
+  const handleCloseViewDeckOverlay = useCallback(() => {
+    setOverlay('none');
+  }, []);
+
   return (
     <Root>
       <ScreenContainer>
         {screen === 'start' && <StartScreen onContinue={startCardSelection}></StartScreen>}
 
         {screen === 'cardSelection' && (
-          <CardSelectionScreen
+          <CardAddScreen
             game={game}
             cards={cardSelectionOptionsRef.current}
             onCardsSelected={handleCardsAdded}
             onViewDeck={() => setOverlay('deck')}
-          ></CardSelectionScreen>
+          ></CardAddScreen>
         )}
 
-        {screen === 'cardRemovalScreen' && (
-          <CardRemovalScreen
+        {screen === 'cardRemoveScreen' && (
+          <CardRemoveScreen
             game={game}
             onCardsSelected={handleCardsRemoved}
             onViewDeck={() => setOverlay('deck')}
-          ></CardRemovalScreen>
+          ></CardRemoveScreen>
         )}
 
         {screen === 'cardChainScreen' && (
@@ -218,7 +222,7 @@ export function App() {
             )}
 
             {overlay === 'deck' && (
-              <ViewDeckOverlay game={game} onBack={() => setOverlay('none')}></ViewDeckOverlay>
+              <ViewDeckOverlay game={game} onClose={handleCloseViewDeckOverlay}></ViewDeckOverlay>
             )}
           </OverlayBackground>
         )}
