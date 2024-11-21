@@ -77,7 +77,7 @@ const ChainOverlay = styled.div<{ side: 'left' | 'right' }>`
   top: 51%;
   ${({ side }) => side}: -0.5em;
   ${maskImage({ src: chainImage })}
-  background-color: yellow;
+  background-color: #fdfd92;
 `;
 
 interface Props {

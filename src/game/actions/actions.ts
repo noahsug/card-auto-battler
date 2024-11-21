@@ -15,6 +15,7 @@ import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRandom, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
+import { breakChain } from './applyCardOrderingEffects';
 
 export function addCards(game: GameState, cards: CardState[]) {
   game.rewindGameState = cloneDeep(game);
@@ -22,32 +23,27 @@ export function addCards(game: GameState, cards: CardState[]) {
 }
 
 export function removeCards(game: GameState, cardIndexes: number[]) {
-  const cardsToRemove = game.user.cards.filter((_, index) => cardIndexes.includes(index));
+  const { cards } = game.user;
+  const cardsToRemove = cards.filter((_, index) => cardIndexes.includes(index));
   cardsToRemove.forEach((card) => {
-    breakChain(game, card, 'fromId');
-    breakChain(game, card, 'toId');
+    breakChain(card, 'fromId', cards);
+    breakChain(card, 'toId', cards);
   });
 
   game.user.cards = game.user.cards.filter((_, index) => !cardIndexes.includes(index));
 }
 
+// TODO: make sure we can't form a loop
 export function chainCards(game: GameState, cardIndexes: number[]) {
-  const [fromCard, toCard] = cardIndexes.map((index) => game.user.cards[index]);
-  breakChain(game, fromCard, 'toId');
-  breakChain(game, toCard, 'fromId');
+  assert(cardIndexes.length === 2, 'must select exactly 2 cards to chain');
+  const { cards } = game.user;
+  const [fromCard, toCard] = cardIndexes.map((index) => cards[index]);
+
+  breakChain(fromCard, 'toId', cards);
   fromCard.chain.toId = toCard.acquiredId;
+
+  breakChain(toCard, 'fromId', cards);
   toCard.chain.fromId = fromCard.acquiredId;
-}
-
-function breakChain(game: GameState, card: CardState, key: 'fromId' | 'toId') {
-  if (card.chain[key] == null) return;
-
-  const chainedCard = game.user.cards.find((card) => card.acquiredId === card.chain[key]);
-  assertIsNonNullable(chainedCard);
-
-  const opponentKey = key === 'fromId' ? 'toId' : 'fromId';
-  chainedCard.chain[opponentKey] = undefined;
-  card.chain[key] = undefined;
 }
 
 export function addRelic(game: GameState, relic: RelicState) {

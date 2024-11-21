@@ -22,6 +22,7 @@ interface Props {
   game: GameState;
   cards: CardState[];
   buttonText: string;
+  invalidSelections?: number[];
   numCardSelections?: number;
   onViewDeck?: () => void;
   onCardSelectionChange?: (selectedCardIndexes: number[]) => void;
@@ -32,6 +33,7 @@ export function CardSelection({
   game,
   cards,
   buttonText,
+  invalidSelections = [],
   numCardSelections = 0,
   onViewDeck,
   onCardSelectionChange,
@@ -45,6 +47,8 @@ export function CardSelection({
 
   const handleCardSelected = useCallback(
     (index: number) => {
+      if (invalidSelections.includes(index)) return;
+
       if (selectedCardIndexes.includes(index)) {
         // unselect card
         setSelectedCardIndexes((prev) => prev.filter((i) => i !== index));
@@ -53,7 +57,7 @@ export function CardSelection({
         setSelectedCardIndexes((prev) => [...prev, index]);
       }
     },
-    [cardSelectionsRemaining, selectedCardIndexes],
+    [cardSelectionsRemaining, invalidSelections, selectedCardIndexes],
   );
 
   const handleContinue = useCallback(() => {
@@ -66,8 +70,10 @@ export function CardSelection({
 
   // indicate which cards are selected
   function getStyle(index: number) {
+    const opacity = invalidSelections.includes(index) ? '.5' : '1';
     const scale = selectedCardIndexes.includes(index) ? '1' : '.85';
-    return { scale };
+    const filter = selectedCardIndexes.includes(index) ? 'brightness(1.15)' : '';
+    return { scale, opacity, filter };
   }
 
   return (
