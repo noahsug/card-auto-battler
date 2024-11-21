@@ -324,6 +324,12 @@ export function CardStackAnimation({
     });
   }
 
+  if (isFastForwarding) {
+    cardAnimationsRef.current.forEach((c) => {
+      c.cancelWait?.();
+    });
+  }
+
   useEffect(() => {
     animationController.start();
   }, [animationController, event]);
