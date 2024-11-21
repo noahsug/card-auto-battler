@@ -22,7 +22,32 @@ export function addCards(game: GameState, cards: CardState[]) {
 }
 
 export function removeCards(game: GameState, cardIndexes: number[]) {
+  const cardsToRemove = game.user.cards.filter((_, index) => cardIndexes.includes(index));
+  cardsToRemove.forEach((card) => {
+    breakChain(game, card, 'fromId');
+    breakChain(game, card, 'toId');
+  });
+
   game.user.cards = game.user.cards.filter((_, index) => !cardIndexes.includes(index));
+}
+
+export function chainCards(game: GameState, cardIndexes: number[]) {
+  const [fromCard, toCard] = cardIndexes.map((index) => game.user.cards[index]);
+  breakChain(game, fromCard, 'toId');
+  breakChain(game, toCard, 'fromId');
+  fromCard.chain.toId = toCard.acquiredId;
+  toCard.chain.fromId = fromCard.acquiredId;
+}
+
+function breakChain(game: GameState, card: CardState, key: 'fromId' | 'toId') {
+  if (card.chain[key] == null) return;
+
+  const chainedCard = game.user.cards.find((card) => card.acquiredId === card.chain[key]);
+  assertIsNonNullable(chainedCard);
+
+  const opponentKey = key === 'fromId' ? 'toId' : 'fromId';
+  chainedCard.chain[opponentKey] = undefined;
+  card.chain[key] = undefined;
 }
 
 export function addRelic(game: GameState, relic: RelicState) {

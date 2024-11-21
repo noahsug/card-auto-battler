@@ -12,14 +12,14 @@ import { plural } from '../../../utils/plural';
 
 interface Props {
   game: GameState;
-  cards: CardState[];
   onCardsSelected: (selectedCardIndexes: number[]) => void;
   onViewDeck: () => void;
 }
 
-export function CardRemovalScreen({ game, cards, onCardsSelected, onViewDeck }: Props) {
+export function CardChainScreen({ game, onCardsSelected, onViewDeck }: Props) {
   const [selectedCardIndexes, setSelectedCardIndexes] = useState<number[]>([]);
   const cardSize = useCardSize();
+  const cards = game.user.cards;
 
   const numCardsToPick = 2 - selectedCardIndexes.length;
 

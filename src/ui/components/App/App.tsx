@@ -16,8 +16,15 @@ import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
 import { CardRemovalScreen } from '../CardSelection/CardRemovalScreen';
+import { CardChainScreen } from '../CardSelection/CardChainScreen';
 
-type ScreenType = 'start' | 'cardSelection' | 'cardRemovalScreen' | 'relicSelection' | 'battle';
+type ScreenType =
+  | 'start'
+  | 'cardSelection'
+  | 'cardRemovalScreen'
+  | 'cardChainScreen'
+  | 'relicSelection'
+  | 'battle';
 type OverlayType = 'battleResults' | 'deck' | 'none';
 
 export const Root = styled.div`
@@ -37,7 +44,8 @@ export const ScreenContainer = styled.div`
 
 export function App() {
   const { game, actions } = useGameState();
-  const { addCards, removeCards, addRelic, endBattle, resetGame, startBattle, rewind } = actions;
+  const { addCards, removeCards, chainCards, addRelic, endBattle, resetGame, startBattle, rewind } =
+    actions;
   const isGameOver = getIsGameOver(game);
   const battleWinner = getBattleWinner(game);
 
@@ -59,11 +67,13 @@ export function App() {
 
   // const [screen, setScreen] = useState<ScreenType>('cardRemovalScreen');
 
+  const [screen, setScreen] = useState<ScreenType>('cardChainScreen');
+
   // const [overlay, setOverlay] = useState<OverlayType>('battleResults');
 
   // -----------------
 
-  const [screen, setScreen] = useState<ScreenType>('start');
+  // const [screen, setScreen] = useState<ScreenType>('start');
   const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const goToScreen = useCallback(
@@ -111,6 +121,14 @@ export function App() {
       goToScreen('battle');
     },
     [removeCards, goToScreen],
+  );
+
+  const handleCardsChained = useCallback(
+    (selectedCardIndexes: number[]) => {
+      chainCards(selectedCardIndexes);
+      goToScreen('battle');
+    },
+    [chainCards, goToScreen],
   );
 
   const handleRelicSelected = useCallback(
@@ -161,6 +179,14 @@ export function App() {
             onCardsSelected={handleCardsRemoved}
             onViewDeck={() => setOverlay('deck')}
           ></CardRemovalScreen>
+        )}
+
+        {screen === 'cardChainScreen' && (
+          <CardChainScreen
+            game={game}
+            onCardsSelected={handleCardsChained}
+            onViewDeck={() => setOverlay('deck')}
+          ></CardChainScreen>
         )}
 
         {screen === 'relicSelection' && (
