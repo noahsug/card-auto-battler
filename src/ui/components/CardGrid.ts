@@ -7,10 +7,6 @@ export const CardGrid = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   overflow-y: auto;
-
-  > * {
-    margin: 0.25rem;
-  }
 `;
 
 export function useCardSize() {

@@ -46,8 +46,9 @@ export function getIsBossBattle({ wins }: { wins: number }) {
 export function getNextPickAction({ wins }: { wins: number }) {
   // only pick cards on the first round
   if (wins === 0) return null;
-  if (wins % 2 === 0) return 'removeCards';
-  if (wins % 2 === 1) return 'addRelic';
+  if (wins % 4 === 0) return 'removeCards'; // 8, 12, 16, ...
+  if (wins % 4 === 2) return 'chainCards'; // 2, 6, 10, ...
+  if (wins % 2 === 1) return 'addRelic'; // 1, 3, 5, ...
   return null;
 }
 

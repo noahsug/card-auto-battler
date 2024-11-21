@@ -67,7 +67,7 @@ export function CardRemovalScreen({ game, onCardsSelected, onViewDeck }: Props) 
             Remove {numCardsToPick} {plural(numCardsToPick, 'Card')}
           </BottomRowMessage>
         ) : (
-          <Button onClick={handleContinue}>Continue</Button>
+          <Button onClick={handleContinue}>Remove</Button>
         )}
       </BottomRow>
     </Container>

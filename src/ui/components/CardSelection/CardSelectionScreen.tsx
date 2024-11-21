@@ -68,7 +68,7 @@ export function CardSelectionScreen({ game, cards, onCardsSelected, onViewDeck }
             Add {numCardsToPick} {plural(numCardsToPick, 'Card')}
           </BottomRowMessage>
         ) : (
-          <Button onClick={handleContinue}>Continue</Button>
+          <Button onClick={handleContinue}>Add</Button>
         )}
       </BottomRow>
     </Container>

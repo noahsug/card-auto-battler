@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { CardState, GameState } from '../../../game/gameState';
+import { plural } from '../../../utils/plural';
 import { Card } from '../Card';
 import { CardGrid, useCardSize } from '../CardGrid';
 import { HUD } from '../HUD';
@@ -8,7 +10,6 @@ import { Button } from '../shared/Button';
 import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
 import { BottomRow, BottomRowMessage } from '../shared/Row';
-import { plural } from '../../../utils/plural';
 
 interface Props {
   game: GameState;
@@ -19,7 +20,13 @@ interface Props {
 export function CardChainScreen({ game, onCardsSelected, onViewDeck }: Props) {
   const [selectedCardIndexes, setSelectedCardIndexes] = useState<number[]>([]);
   const cardSize = useCardSize();
-  const cards = game.user.cards;
+  const cards = cloneDeep(game.user.cards);
+
+  // mark selected cards as chained
+  const fromCard = cards[selectedCardIndexes[0]];
+  const toCard = cards[selectedCardIndexes[1]];
+  if (fromCard) fromCard.chain.toId = toCard?.acquiredId || -1;
+  if (toCard) toCard.chain.fromId = fromCard?.acquiredId || -1;
 
   const numCardsToPick = 2 - selectedCardIndexes.length;
 
@@ -37,10 +44,10 @@ export function CardChainScreen({ game, onCardsSelected, onViewDeck }: Props) {
     onCardsSelected(selectedCardIndexes);
   }, [onCardsSelected, selectedCardIndexes]);
 
+  // indicate which cards are selected
   function getStyle(index: number) {
-    // indicate which cards are selected
-    const opacity = selectedCardIndexes.includes(index) ? '0.33' : '1';
-    return { opacity };
+    const scale = selectedCardIndexes.includes(index) ? '1' : '.85';
+    return { scale };
   }
 
   return (
@@ -67,7 +74,7 @@ export function CardChainScreen({ game, onCardsSelected, onViewDeck }: Props) {
             Chain {numCardsToPick} {plural(numCardsToPick, 'Card')}
           </BottomRowMessage>
         ) : (
-          <Button onClick={handleContinue}>Continue</Button>
+          <Button onClick={handleContinue}>Chain</Button>
         )}
       </BottomRow>
     </Container>
