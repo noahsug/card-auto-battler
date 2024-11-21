@@ -66,6 +66,7 @@ export function CardStack(props: Props) {
 
   // console.log(
   //   'CS',
+  //   boundingRect?.x,
   //   events.current[eventIndex - 1]?.type,
   //   events.current[eventIndex]?.type,
   //   events.current[eventIndex + 1]?.type,
@@ -92,6 +93,7 @@ export function CardStack(props: Props) {
     ) {
       return;
     }
+    // console.log('CS new event', event?.type);
     visitedEventInfo.current = { eventIndex, event };
 
     const prevEvent = events.current[eventIndex - 1];
@@ -114,6 +116,7 @@ export function CardStack(props: Props) {
       // console.log('CS done');
       onAnimationComplete();
     } else if (event?.type === 'playCard' && cardPlayedTimeout.current == null) {
+      // console.log('CS start playCard');
       cardPlayedTimeout.current = setTimeout(() => {
         // console.log('CS done playCard');
         onAnimationComplete();

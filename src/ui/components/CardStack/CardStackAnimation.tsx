@@ -231,6 +231,14 @@ function returnCardToCorrectPosition(cardAnimation: CardAnimationState, context:
 }
 
 function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
+  // console.log(
+  //   'CSA animate',
+  //   context.deckBoundingRect.x,
+  //   cardAnimation.card.acquiredId,
+  //   context.event?.type,
+  //   cardAnimation.finishedAnimatingEvent === event,
+  // );
+
   const { event } = context;
   // animating the same event a 2nd time after it's been finished causes the 2nd animation to never
   // finish, so we check finishedAnimatingEvent to prevent that

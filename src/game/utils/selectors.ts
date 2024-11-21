@@ -68,3 +68,8 @@ export function getBattleWinner(game: GameState) {
 export function getRandom({ randomnessState }: { randomnessState: GameState['randomnessState'] }) {
   return new Random(randomnessState);
 }
+
+export function getCanUndo(game: GameState) {
+  const isStartOfBattle = game.turn === 0 && game.user.cardsPlayedThisTurn === 0;
+  return game.undoGameState != null && !isStartOfBattle;
+}

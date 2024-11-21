@@ -1,11 +1,10 @@
 import { produce } from 'immer';
-import { useCallback, useMemo, useState } from 'react';
-import cloneDeep from 'lodash/cloneDeep';
+import { useMemo, useState } from 'react';
 
 import * as actions from '../../game/actions';
 import { createGameState, GameState } from '../../game/gameState';
-import { Tail } from '../../utils/types';
 import { getResolvablePromise } from '../../utils/promise';
+import { Tail } from '../../utils/types';
 
 type BoundActions = {
   [K in keyof typeof actions]: (
@@ -13,35 +12,22 @@ type BoundActions = {
   ) => Promise<ReturnType<(typeof actions)[K]>>;
 };
 
-export type AddCards = BoundActions['addCards'];
-export type StartTurn = BoundActions['startTurn'];
-export type PlayCard = BoundActions['playCard'];
-export type EndTurn = BoundActions['endTurn'];
-export type EndBattle = BoundActions['endBattle'];
-export type ResetGame = BoundActions['resetGame'];
-
-export type CanUndo = () => boolean;
-export type ClearUndo = () => void;
-export type Undo = () => void;
+export type UndoPlayedCardAction = BoundActions['undoPlayedCard'];
+export type StartTurnAction = BoundActions['startTurn'];
+export type PlayCardAction = BoundActions['playCard'];
+export type EndTurnAction = BoundActions['endTurn'];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Action = (state: GameState, ...args: any[]) => any;
 
 export function useGameState(initialGameState: GameState = createGameState()) {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
-  const [undoHistory, setUndoHistory] = useState<GameState[]>([]);
 
   const boundActions = useMemo(() => {
     const actionEntries = Object.entries(actions) as [keyof typeof actions, Action][];
     return actionEntries.reduce((acc, [name, action]) => {
       const { promise, resolve } = getResolvablePromise<ReturnType<Action>>();
       acc[name] = (...args: Tail<Parameters<Action>>) => {
-        // TODO: only a startTurn event can be undone, undo to last card play as well?
-        if (name === 'startTurn') {
-          setUndoHistory((prev) => {
-            return [...prev, cloneDeep(gameState)];
-          });
-        }
         setGameState((gameState) => {
           return produce(gameState, (draft) => {
             resolve(action(draft, ...args));
@@ -51,30 +37,11 @@ export function useGameState(initialGameState: GameState = createGameState()) {
       };
       return acc;
     }, {} as BoundActions);
-    // TODO: ideally this dep doesn't exist, include undo history as part of UI game state?
+    // TODO: remove this dep after removing the promise resolve logic above, instead of returning a
+    // value from setState, have gameState hold the battleEvents (and disable battle events
+    // entirely in analysis mode)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState]);
 
-  const canUndo = useCallback(() => {
-    return undoHistory.length > 0;
-  }, [undoHistory.length]);
-
-  const clearUndo = useCallback(() => {
-    setUndoHistory([]);
-  }, []);
-
-  const undo = useCallback(() => {
-    setUndoHistory((prev) => prev.slice(0, -1));
-    setGameState(undoHistory[undoHistory.length - 1]);
-  }, [undoHistory]);
-
-  const undoManager = useMemo(
-    () => ({
-      canUndo,
-      clearUndo,
-      undo,
-    }),
-    [canUndo, clearUndo, undo],
-  );
-
-  return { game: gameState, actions: boundActions, undoManager };
+  return { game: gameState, actions: boundActions };
 }

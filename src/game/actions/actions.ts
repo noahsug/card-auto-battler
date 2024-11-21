@@ -1,4 +1,6 @@
-import { assert } from '../../utils/asserts';
+import cloneDeep from 'lodash/cloneDeep';
+
+import { assert, assertIsNonNullable } from '../../utils/asserts';
 import { MAX_SHOCK } from '../constants';
 import {
   CardState,
@@ -59,6 +61,8 @@ export function startBattle(game: GameState) {
 export function startTurn(game: GameState): BattleEvent[] {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
 
+  game.undoGameState = cloneDeep(game);
+
   activePlayer.damageDealtLastTurn = activePlayer.damageDealtThisTurn;
   activePlayer.damageDealtThisTurn = 0;
   activePlayer.cardsPlayedThisTurn = 0;
@@ -103,6 +107,12 @@ export function playCard(game: GameState): BattleEvent[] {
   const card = activePlayer.cards[activePlayer.currentCardIndex];
   const { shuffle } = getRandom(game);
 
+  // set undo point after the 2nd+ card is played (we skip the first card because an undo point is
+  // set when the turn starts)
+  if (activePlayer.cardsPlayedThisTurn > 0) {
+    game.undoGameState = cloneDeep(game);
+  }
+
   // die if out of cards
   if (!card) {
     const damage = activePlayer.health;
@@ -116,13 +126,13 @@ export function playCard(game: GameState): BattleEvent[] {
     return [];
   }
 
-  const events: BattleEvent[] = [];
-
   if (activePlayer.cardsPlayedThisTurn > 0) {
     assert(activePlayer.extraCardPlays > 0);
     activePlayer.extraCardPlays -= 1;
   }
   activePlayer.cardsPlayedThisTurn += 1;
+
+  const events: BattleEvent[] = [];
 
   // play card
   const playCardEvents = applyCardEffects(game, card);
@@ -193,11 +203,18 @@ export function endBattle(game: GameState) {
   winner === 'user' ? game.wins++ : game.losses++;
 
   game.turn = 0;
+  game.undoGameState = undefined;
+
   resetPlayerAfterBattle(game.user);
   resetPlayerAfterBattle(game.enemy);
 
   game.enemy.startingHealth += 10;
   game.enemy.health = game.enemy.startingHealth;
+}
+
+export function undoPlayedCard(game: GameState) {
+  assertIsNonNullable(game.undoGameState);
+  Object.assign(game, game.undoGameState);
 }
 
 export function resetGame(game: GameState) {

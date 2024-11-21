@@ -36,9 +36,8 @@ export const ScreenContainer = styled.div`
 `;
 
 export function App() {
-  const { game, actions, undoManager } = useGameState();
+  const { game, actions } = useGameState();
   const { addCards, removeCards, addRelic, endBattle, resetGame, startBattle } = actions;
-  const { clearUndo } = undoManager;
 
   // passed to battle screen so it doesn't update after battle is over
   const endOfBattleGameRef = useRef<GameState>();
@@ -48,7 +47,7 @@ export function App() {
 
   // DEBUG
   // -----------------
-  // const [screen, setScreen] = useState<ScreenType>('battle');
+  const [screen, setScreen] = useState<ScreenType>('battle');
 
   // const [screen, setScreen] = useState<ScreenType>('cardSelection');
   // cardSelectionOptionsRef.current = getRandomCards(NUM_CARD_SELECTION_OPTIONS);
@@ -58,24 +57,22 @@ export function App() {
 
   // const [screen, setScreen] = useState<ScreenType>('cardRemovalScreen');
 
-  const [overlay, setOverlay] = useState<OverlayType>('battleResults');
+  // const [overlay, setOverlay] = useState<OverlayType>('battleResults');
 
   // -----------------
 
-  const [screen, setScreen] = useState<ScreenType>('start');
-  // const [overlay, setOverlay] = useState<OverlayType>('none');
+  // const [screen, setScreen] = useState<ScreenType>('start');
+  const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const goToScreen = useCallback(
     async (screen: ScreenType) => {
       setScreen(screen);
       setOverlay('none');
-
       if (screen === 'battle') {
         startBattle();
-        clearUndo();
       }
     },
-    [clearUndo, startBattle],
+    [startBattle],
   );
 
   const startCardSelection = useCallback(() => {
@@ -128,8 +125,7 @@ export function App() {
     wonLastBattleRef.current = getBattleWinner(game) === 'user';
     endBattle();
     setOverlay('battleResults');
-    clearUndo();
-  }, [game, endBattle, clearUndo]);
+  }, [game, endBattle]);
 
   const restartGame = useCallback(() => {
     resetGame();
@@ -171,7 +167,6 @@ export function App() {
           <BattleScreen
             game={endOfBattleGameRef.current || game}
             {...actions}
-            {...undoManager}
             onBattleOver={handleBattleOver}
             onViewDeck={() => setOverlay('deck')}
           ></BattleScreen>
