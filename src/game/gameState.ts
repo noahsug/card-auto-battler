@@ -103,6 +103,7 @@ export interface CardState {
   tribe: Tribe;
   // unique ID used to sort cards from first added to last added
   acquiredId: number;
+  chain: { toId?: number; fromId?: number };
 }
 
 export interface RelicState {

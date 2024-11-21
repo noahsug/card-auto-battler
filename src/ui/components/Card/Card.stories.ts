@@ -35,3 +35,17 @@ export const Channel: Story = {
     card: cardsByName.channel,
   },
 };
+
+export const Chain: Story = {
+  args: {
+    size: 'large',
+    card: { ...cardsByName.channel, chain: { fromId: 0 } },
+  },
+};
+
+export const DoubleChain: Story = {
+  args: {
+    size: 'large',
+    card: { ...cardsByName.attack, chain: { fromId: 0, toId: 1 } },
+  },
+};

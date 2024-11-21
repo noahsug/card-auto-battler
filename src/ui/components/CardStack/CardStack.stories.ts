@@ -14,6 +14,8 @@ const meta = {
     onAnimationComplete() {
       console.log('animation complete');
     },
+    isPaused: false,
+    isFastForwarding: false,
   },
 } satisfies Meta<typeof CardStack>;
 

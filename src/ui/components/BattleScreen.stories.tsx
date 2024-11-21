@@ -1,25 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { cardsByName } from '../../content/cards';
 import { relicsByName } from '../../content/relics';
+import { MAX_LOSSES, MAX_WINS } from '../../game/constants';
 import { createGameState, GameState, statusEffectNames } from '../../game/gameState';
 import { getRandomCards } from '../../game/utils/cards';
 import { useGameState } from '../hooks/useGameState';
 import { BattleScreen } from './BattleScreen';
-import { MAX_LOSSES, MAX_WINS } from '../../game/constants';
 
 function BattleScreenTest({ game: initialGameState }: { game: GameState }) {
-  const { game, actions, undoManager } = useGameState(initialGameState);
+  const { game, actions } = useGameState(initialGameState);
 
   return (
-    <BattleScreen
-      game={game}
-      {...actions}
-      {...undoManager}
-      onBattleOver={fn()}
-      onViewDeck={fn()}
-    ></BattleScreen>
+    <BattleScreen game={game} {...actions} onBattleOver={fn()} onViewDeck={fn()}></BattleScreen>
   );
 }
 

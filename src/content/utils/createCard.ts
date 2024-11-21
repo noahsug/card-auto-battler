@@ -26,7 +26,14 @@ export function createCard(
   effects: Partial<CardEffect>[] = [{}],
   cardState: Partial<Omit<CardState, 'effects'>> = {},
 ): CardState {
-  const { trash = false, name = '', description = '', image = '', tribe = 'basic' } = cardState;
+  const {
+    trash = false,
+    name = '',
+    description = '',
+    image = '',
+    tribe = 'basic',
+    chain = {},
+  } = cardState;
 
   return {
     effects: effects.map(createEffect),
@@ -37,6 +44,7 @@ export function createCard(
     image,
     tribe,
     acquiredId: cardIdCounter++,
+    chain,
   };
 }
 

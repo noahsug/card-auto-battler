@@ -1,4 +1,5 @@
 import cloneDeep from 'lodash/cloneDeep';
+import range from 'lodash/range';
 
 import { assert, assertIsNonNullable } from '../../utils/asserts';
 import { MAX_SHOCK } from '../constants';
@@ -45,6 +46,10 @@ function triggerStartOfBattleEffects(
 
 export function startBattle(game: GameState) {
   assert(game.turn === 0);
+  const { random } = getRandom(game);
+
+  // increment the random state so the battle plays out differently after rewinding
+  range(game.losses).forEach(random);
 
   const userPerspective = { self: game.user, opponent: game.enemy };
   const enemyPerspective = { self: game.enemy, opponent: game.user };

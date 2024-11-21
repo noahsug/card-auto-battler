@@ -8,6 +8,7 @@ import { DescriptionText } from '../DescriptionText';
 import { parseCardDescriptionTemplate } from './parseCardDescriptionTemplate';
 import { getCardColor } from './getCardColor';
 import { Image } from '../shared/Image';
+import chainImage from './chain.png';
 
 export const baseCardSize = { width: 12, height: 20 };
 
@@ -69,6 +70,16 @@ const Text = styled.div`
   }
 `;
 
+const ChainOverlay = styled.div<{ side: 'left' | 'right' }>`
+  width: 2em;
+  height: 2em;
+  position: absolute;
+  top: 51%;
+  ${({ side }) => side}: -0.5em;
+  ${maskImage({ src: chainImage })}
+  background-color: yellow;
+`;
+
 interface Props {
   card: CardState;
   size: 'small' | 'medium' | 'large';
@@ -89,6 +100,8 @@ export function Card({ size, card, onClick, style }: Props) {
           <Text>
             <DescriptionText text={description} />
           </Text>
+          {card.chain.fromId != null && <ChainOverlay side="left" />}
+          {card.chain.toId != null && <ChainOverlay side="right" />}
         </OuterContainer>
       </ThemeProvider>
     </CardRoot>

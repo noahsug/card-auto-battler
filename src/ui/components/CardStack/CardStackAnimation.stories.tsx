@@ -46,6 +46,7 @@ const meta = {
     currentCardIndex: 0,
     deckBoundingRect: new DOMRect(0, 0, 0, 0),
     opponentBoundingRect: new DOMRect(100, -100, 0, 0),
+    isFastForwarding: false,
   },
 } satisfies Meta<typeof CardStackAnimationTest>;
 
