@@ -1,17 +1,17 @@
 import { styled } from 'styled-components';
 
-import livesImage from '../../images/hourglass.png';
-import battleImage from '../../images/swords.png';
-import skullImage from '../../images/skull.png';
 import deckImage from './cards.png';
+import livesImage from './hourglass.png';
+import skullImage from './skull.png';
+import battleImage from './swords.png';
 
-import { MAX_LOSSES, MAX_WINS } from '../../../game/constants';
+import { MAX_LOSSES } from '../../../game/constants';
 import { GameState } from '../../../game/gameState';
+import { getIsBossBattle } from '../../../game/utils/selectors';
+import { plural } from '../../../utils/plural';
 import { maskImage } from '../../style';
 import { RelicImage } from '../RelicSelectionScreen/Relic';
 import { Row } from '../shared/Row';
-import { getIsBossBattle } from '../../../game/utils/selectors';
-import { plural } from '../../../utils/plural';
 
 const size = 'max(1.7rem, 4vmin)';
 const padding = 'max(0.6rem, 2vmin)';
@@ -20,19 +20,22 @@ const IconRow = styled(Row)`
   justify-content: space-between;
 `;
 
-const Label = styled(Row)`
+export const Label = styled(Row)`
   font-size: ${size};
-  font-family: var(--font-heading);
-  background-color: var(--color-bg-opaque);
   padding: ${padding};
+  font-family: var(--font-heading);
   justify-content: center;
 `;
 
-const ClickableLabel = styled(Label)`
+const HUDLabel = styled(Label)`
+  background-color: var(--color-bg-opaque);
+`;
+
+const ClickableLabel = styled(HUDLabel)`
   cursor: pointer;
 `;
 
-const Icon = styled.div<{ src: string }>`
+export const Icon = styled.div<{ src: string }>`
   width: ${size};
   height: ${size};
   margin-right: ${padding};
@@ -63,17 +66,17 @@ export function HUD({ game, onViewDeck }: Props) {
   return (
     <>
       <IconRow>
-        <Label>
+        <HUDLabel>
           <Icon src={livesImage} />
           <div>
             {livesLeft} {plural(livesLeft, 'rewind')}
           </div>
-        </Label>
+        </HUDLabel>
 
-        <Label>
+        <HUDLabel>
           {getIsBossBattle(game) ? <Icon src={skullImage} /> : <Icon src={battleImage} />}
           <div>{getIsBossBattle(game) ? 'boss battle' : `battle ${wins + 1}`}</div>
-        </Label>
+        </HUDLabel>
 
         <ClickableLabel onClick={onViewDeck}>
           <Icon src={deckImage} />

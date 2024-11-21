@@ -1,11 +1,12 @@
 import { animated, config, useSpring } from '@react-spring/web';
 import { styled } from 'styled-components';
 
-import livesImage from '../../images/hourglass.png';
-import skullImage from '../../images/skull.png';
-import battleImage from '../../images/swords.png';
+import livesImage from '../HUD/hourglass.png';
+import skullImage from '../HUD/skull.png';
+import battleImage from '../HUD/swords.png';
 import rewindImage from './backward-time.png';
 import brokenSkullImage from './broken-skull.png';
+import brokenLivesImage from './broken-hourglass.png';
 
 import { useState } from 'react';
 import { MAX_LOSSES, MAX_WINS } from '../../../game/constants';
@@ -13,7 +14,7 @@ import { GameState } from '../../../game/gameState';
 import { getIsBossBattle, getIsGameOver } from '../../../game/utils/selectors';
 import { plural } from '../../../utils/plural';
 import { useUnits } from '../../hooks/useUnits';
-import { maskImage } from '../../style';
+import { Icon, Label } from '../HUD/HUD';
 import { Button } from '../shared/Button';
 import { Container } from '../shared/Container';
 import { Row } from '../shared/Row';
@@ -31,33 +32,29 @@ const ContinueButton = styled(Button)`
   padding: 0.5rem 1rem;
 `;
 
-// TODO: Share code with HUD, make scaling units generalizable and easy to use
-const size = 'max(2.5rem, 8vmin)';
-const padding = 'max(0.6rem, 2vmin)';
-
 const ProgressRow = styled(Row)`
   margin-top: 2rem;
 `;
 
-const Label = styled(animated(Row))`
+const size = 'max(2.5rem, 8vmin)';
+const padding = 'max(0.6rem, 2vmin)';
+
+const ResultsLabel = styled(animated(Label))`
   font-size: ${size};
-  font-family: var(--font-heading);
   padding: ${padding};
-  justify-content: center;
 `;
 
-const Icon = styled(animated.div)<{ src: string }>`
+const ResultsIcon = styled(animated(Icon))`
   width: ${size};
   height: ${size};
   margin-right: ${padding};
-  ${maskImage}
-  background-color: var(--color-primary);
   display: inline-block;
 `;
 
-const ButtonIcon = styled(Icon)`
+const ButtonIcon = styled(ResultsIcon)`
   width: 1.7rem;
   height: 1.7rem;
+  margin-right: 0.5rem;
 `;
 
 interface Props {
@@ -88,44 +85,47 @@ export function BattleResultOverlay({ game, onContinue, wonLastBattle }: Props) 
 
   const colorToAnimateTo = wonLastBattle ? 'hsl(150, 50%, 50%)' : 'hsl(0, 50%, 50%)';
   const [message, continueText] = getBattleResultMessage({ wonLastBattle, wins, losses });
-  const offsetAnimationDelay = 500;
+  const animationDelay = 500;
 
   // used to animate the value changing from its previous value to its current value
   const [offset, setOffset] = useState(1);
   const displayedLivesLeft = MAX_LOSSES - losses + (wonLastBattle ? 0 : offset);
   const displayedWins = wins - (wonLastBattle ? offset : 0);
 
-  const [showBrokenSkull, setShowBrokenSkull] = useState(false);
-  const skullImageToDisplay = showBrokenSkull ? brokenSkullImage : skullImage;
+  const [showBrokenIcon, setShowBrokenIcon] = useState(false);
+  const skullImageToDisplay = showBrokenIcon ? brokenSkullImage : skullImage;
   const winsImage = wins >= MAX_WINS ? skullImageToDisplay : battleImage;
+  const livesImageToDisplay =
+    showBrokenIcon && losses >= MAX_LOSSES ? brokenLivesImage : livesImage;
 
   const [headerStyle] = useSpring(() => ({
     from: { y: u(50) },
     to: { y: 0, config: config.wobbly },
   }));
 
+  const progressValueStartingState = { color: '#fcfafb', scale: 1 };
   const [labelStyle] = useSpring(() => ({
-    from: { color: '#fcfafb', scale: 1 },
+    from: progressValueStartingState,
     to: [
       { color: colorToAnimateTo, scale: 1.3 },
-      ...(isGameOver ? [] : [{ color: '#fcfafb', scale: 1 }]),
+      ...(isGameOver ? [] : [progressValueStartingState]),
     ],
-    delay: offsetAnimationDelay,
+    delay: animationDelay,
     onStart: () => {
       setOffset(0);
     },
     onRest: () => {
-      setShowBrokenSkull(true);
+      if (isGameOver) {
+        setShowBrokenIcon(true);
+      }
     },
   }));
 
+  const iconStartingState = { backgroundColor: '#fcfafb' };
   const [iconStyle] = useSpring(() => ({
-    from: { backgroundColor: '#fcfafb' },
-    to: [
-      { backgroundColor: colorToAnimateTo },
-      ...(isGameOver ? [] : [{ backgroundColor: '#fcfafb' }]),
-    ],
-    delay: offsetAnimationDelay,
+    from: iconStartingState,
+    to: [{ backgroundColor: colorToAnimateTo }, ...(isGameOver ? [] : [iconStartingState])],
+    delay: animationDelay,
   }));
 
   // animate either the number of wins or the number of lives left, depending on if the user won or lost
@@ -136,16 +136,16 @@ export function BattleResultOverlay({ game, onContinue, wonLastBattle }: Props) 
     <Container>
       <Header style={headerStyle}>{message}</Header>
       <ProgressRow>
-        <Label style={winsStyle}>
-          <Icon style={winsIconStyle} src={winsImage} />
+        <ResultsLabel style={winsStyle}>
+          <ResultsIcon style={winsIconStyle} src={winsImage} />
           <span>{`wins ${displayedWins}/${MAX_WINS}`}</span>
-        </Label>
-        <Label style={livesStyle}>
-          <Icon style={livesIconStyle} src={livesImage} />
+        </ResultsLabel>
+        <ResultsLabel style={livesStyle}>
+          <ResultsIcon style={livesIconStyle} src={livesImageToDisplay} />
           <span>
             {displayedLivesLeft} {plural(displayedLivesLeft, 'rewind')}
           </span>
-        </Label>
+        </ResultsLabel>
       </ProgressRow>
       <ContinueButton onClick={onContinue}>
         {continueText === 'Rewind' ? <ButtonIcon src={rewindImage} /> : null}
