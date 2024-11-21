@@ -22,6 +22,8 @@ function getStory(battleEvents: BattleEvent[]): Story {
 
 export const Damage = getStory([createBattleEvent('damage', 10, 'opponent')]);
 
+export const ZeroDamage = getStory([createBattleEvent('damage', 0, 'opponent')]);
+
 export const DamageCrit = getStory([createBattleEvent('damage', 10, 'opponent', 'other', true)]);
 
 export const MultiHitDamage = getStory([

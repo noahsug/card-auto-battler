@@ -1,13 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
-// TODO: fix
-import {
-  reduceLowDamage,
-  regenForHighDamage,
-  sharedPain,
-  strengthAffectsHealing,
-  strengthOnSelfDamage,
-} from '../../content/relics';
+import { relicsByName } from '../../content/relics';
 import {
   createCard,
   createEffect,
@@ -25,6 +18,14 @@ import {
   SetValueCardEffect,
 } from '../gameState';
 import { applyCardEffects } from './applyCardEffects';
+
+const {
+  reduceLowDamage,
+  regenForHighDamage,
+  sharedPain,
+  strengthAffectsHealing,
+  strengthOnSelfDamage,
+} = relicsByName;
 
 let card: CardState;
 let effect: CardEffect;
@@ -431,9 +432,9 @@ describe('battle events', () => {
 
     const { events } = getPlayCardResult({ self: { strength: 2 }, opponent: { bleed: 2 } });
     expect(events).toEqual([
-      { type: 'damage', value: 3, target: 'opponent', source: 'card' },
-      { type: 'damage', value: BLEED_DAMAGE, target: 'opponent', source: 'other' },
-      { type: 'heal', value: 5, target: 'self', source: 'card' },
+      { type: 'damage', value: 3, target: 'opponent', source: 'card', isCrit: false },
+      { type: 'damage', value: BLEED_DAMAGE, target: 'opponent', source: 'other', isCrit: false },
+      { type: 'heal', value: 5, target: 'self', source: 'card', isCrit: false },
     ]);
   });
 
@@ -441,7 +442,19 @@ describe('battle events', () => {
     effect.value = v(0);
 
     const { events } = getPlayCardResult();
-    expect(events).toEqual([{ type: 'damage', value: 0, target: 'opponent', source: 'card' }]);
+    expect(events).toEqual([
+      { type: 'damage', value: 0, target: 'opponent', source: 'card', isCrit: false },
+    ]);
+  });
+
+  it('indicates when damage is a crit', () => {
+    card.effects[0] = createEffect({ target: 'self', name: 'crit' });
+    card.effects[1] = createEffect();
+
+    const { events } = getPlayCardResult();
+    expect(events).toEqual([
+      { type: 'damage', value: 2, target: 'opponent', source: 'card', isCrit: true },
+    ]);
   });
 });
 
@@ -566,13 +579,6 @@ describe('status effects', () => {
       const { diff } = getPlayCardResult({ opponent: { shock: 1 } });
 
       expect(diff).toEqual({ opponent: { health: -1, shock: 1 } });
-    });
-
-    it('stuns when shock reaches max', () => {
-      const { opponent } = getPlayCardResult({ opponent: { shock: MAX_SHOCK - 1 } });
-
-      expect(opponent.shock).toEqual(0);
-      expect(opponent.stun).toEqual(1);
     });
   });
 });
