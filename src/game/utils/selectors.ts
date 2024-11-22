@@ -52,7 +52,8 @@ export function getNextPickAction({ wins }: { wins: number }) {
   return null;
 }
 
-export function getIsTurnOver(player: PlayerState) {
+export function getIsTurnOver(game: GameState) {
+  const player = getActivePlayer(game);
   return player.extraCardPlays === 0;
 }
 

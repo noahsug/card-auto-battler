@@ -159,14 +159,14 @@ function createPlayer({ name, image }: { name: string; image: string }): PlayerS
   };
 }
 
-export function createGameState(): GameState {
+export function createGameState(seed?: number): GameState {
   const game = {
     user: createPlayer(allHeroes.warrior),
     enemy: createPlayer(allEnemies.fireMonster),
     turn: 0,
     wins: 0,
     losses: 0,
-    randomnessState: getRandomState(),
+    randomnessState: getRandomState(seed),
   };
 
   const { attack, heal } = cardsByName;

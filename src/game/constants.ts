@@ -13,6 +13,7 @@ export const NUM_RELIC_SELECTION_OPTIONS = 3;
 
 export const NUM_STARTING_CARDS = 3;
 
+// TODO: Implement
 // the player with the highest health wins after this many turns
 export const MAX_TURNS_IN_BATTLE = 40;
 

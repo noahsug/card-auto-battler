@@ -103,7 +103,7 @@ export function BattleScreen({
       setBattleEvents(events);
       nextAnimationState.current = 'endPlayCard';
     } else if (nextAnimationState.current === 'endPlayCard') {
-      if (getIsTurnOver(activePlayer)) {
+      if (getIsTurnOver(game)) {
         endTurn();
         setBattleEvents([]);
         nextAnimationState.current = 'startTurn';
@@ -112,7 +112,7 @@ export function BattleScreen({
         nextAnimationState.current = 'applyCardEffects';
       }
     }
-  }, [activePlayer, endTurn, isBattleOver, playCard]);
+  }, [activePlayer, endTurn, game, isBattleOver, playCard]);
 
   // change combat state based only on the active player animations
   const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : noop;
