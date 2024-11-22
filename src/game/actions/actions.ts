@@ -216,9 +216,6 @@ export function playCard(game: GameState): BattleEvent[] {
 
   activePlayer.previousCard = card;
 
-  // TODO: clicking view deck does not show trashed cards
-  // TODO: chaining breaks when a card is trashed, as the trashed card's acquiredId can no longer
-  // be found
   if (card.trash) {
     // trash card
     activePlayer.trashedCards.push(card);

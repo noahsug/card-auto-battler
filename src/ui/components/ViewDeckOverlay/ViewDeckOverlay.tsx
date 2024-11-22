@@ -8,7 +8,7 @@ interface Props {
 }
 
 export function ViewDeckOverlay({ game, onClose }: Props) {
-  const cards = sortCards(game.user.cards);
+  const cards = sortCards(game.user.cards.concat(game.user.trashedCards));
 
   return <CardSelection game={game} onCardsSelected={onClose} cards={cards} buttonText="Close" />;
 }
