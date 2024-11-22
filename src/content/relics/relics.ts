@@ -122,3 +122,5 @@ Object.entries(relicsByName).forEach(([name, relic]) => {
 });
 
 export type RelicName = keyof typeof relicsByName;
+
+export const allRelics = Object.values(relicsByName);

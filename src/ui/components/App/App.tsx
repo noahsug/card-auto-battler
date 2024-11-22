@@ -1,29 +1,26 @@
 import { useCallback, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { NUM_CARD_SELECTION_OPTIONS, NUM_RELIC_SELECTION_OPTIONS } from '../../../game/constants';
 import { CardState, GameState, RelicState } from '../../../game/gameState';
-import { getRandomCards } from '../../../game/utils/cards';
-import { getRandomRelics } from '../../../game/utils/relics';
 import { getBattleWinner, getIsGameOver, getNextPickAction } from '../../../game/utils/selectors';
 import { useGameState } from '../../hooks/useGameState';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
 import { CardAddScreen } from '../CardSelection/CardAddScreen';
+import { CardChainScreen } from '../CardSelection/CardChainScreen';
+import { CardRemoveScreen } from '../CardSelection/CardRemoveScreen';
 import { RelicSelectionScreen } from '../RelicSelectionScreen';
 import { OverlayBackground } from '../shared/OverlayBackground';
 import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
-import { CardRemoveScreen } from '../CardSelection/CardRemoveScreen';
-import { CardChainScreen } from '../CardSelection/CardChainScreen';
 
 type ScreenType =
   | 'start'
   | 'cardSelection'
   | 'cardRemoveScreen'
   | 'cardChainScreen'
-  | 'relicSelection'
+  | 'relicSelectionScreen'
   | 'battle';
 type OverlayType = 'battleResults' | 'deck' | 'none';
 
@@ -44,8 +41,18 @@ export const ScreenContainer = styled.div`
 
 export function App() {
   const { game, actions } = useGameState();
-  const { addCards, removeCards, chainCards, addRelic, endBattle, resetGame, startBattle, rewind } =
-    actions;
+  const {
+    getCardAddOptions,
+    getRelicAddOptions,
+    addCards,
+    removeCards,
+    chainCards,
+    addRelic,
+    endBattle,
+    resetGame,
+    startBattle,
+    rewind,
+  } = actions;
   const isGameOver = getIsGameOver(game);
   const battleWinner = getBattleWinner(game);
 
@@ -62,18 +69,18 @@ export function App() {
   // const [screen, setScreen] = useState<ScreenType>('cardSelection');
   // cardSelectionOptionsRef.current = getRandomCards(NUM_CARD_SELECTION_OPTIONS);
 
-  // const [screen, setScreen] = useState<ScreenType>('relicSelection');
+  // const [screen, setScreen] = useState<ScreenType>('relicSelectionScreen');
   // relicSelectionOptionsRef.current = getRandomRelics(NUM_RELIC_SELECTION_OPTIONS, game.user.relics);
 
   // const [screen, setScreen] = useState<ScreenType>('cardRemoveScreen');
 
-  const [screen, setScreen] = useState<ScreenType>('cardChainScreen');
+  // const [screen, setScreen] = useState<ScreenType>('cardChainScreen');
 
   // const [overlay, setOverlay] = useState<OverlayType>('battleResults');
 
   // -----------------
 
-  // const [screen, setScreen] = useState<ScreenType>('start');
+  const [screen, setScreen] = useState<ScreenType>('start');
   const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const goToScreen = useCallback(
@@ -87,14 +94,14 @@ export function App() {
     [startBattle],
   );
 
-  const startCardSelection = useCallback(() => {
+  const startCardSelection = useCallback(async () => {
     endOfBattleGameRef.current = undefined;
-    cardSelectionOptionsRef.current = getRandomCards(NUM_CARD_SELECTION_OPTIONS);
+    cardSelectionOptionsRef.current = await getCardAddOptions();
     goToScreen('cardSelection');
-  }, [goToScreen]);
+  }, [getCardAddOptions, goToScreen]);
 
   const handleCardsAdded = useCallback(
-    (selectedCardIndexes: number[]) => {
+    async (selectedCardIndexes: number[]) => {
       const cards = selectedCardIndexes.map((i) => cardSelectionOptionsRef.current[i]);
       addCards(cards);
 
@@ -102,17 +109,16 @@ export function App() {
       if (nextPickAction === 'removeCards') {
         goToScreen('cardRemoveScreen');
       } else if (nextPickAction === 'addRelic') {
-        relicSelectionOptionsRef.current = getRandomRelics(
-          NUM_RELIC_SELECTION_OPTIONS,
-          game.user.relics,
-        );
-        goToScreen('relicSelection');
+        relicSelectionOptionsRef.current = await getRelicAddOptions();
+        goToScreen('relicSelectionScreen');
+      } else if (nextPickAction === 'chainCards') {
+        goToScreen('cardChainScreen');
       } else {
         // pick nothing and go straight to the battle
         goToScreen('battle');
       }
     },
-    [addCards, game, goToScreen],
+    [addCards, game, getRelicAddOptions, goToScreen],
   );
 
   const handleCardsRemoved = useCallback(
@@ -193,7 +199,7 @@ export function App() {
           ></CardChainScreen>
         )}
 
-        {screen === 'relicSelection' && (
+        {screen === 'relicSelectionScreen' && (
           <RelicSelectionScreen
             game={game}
             relics={relicSelectionOptionsRef.current}

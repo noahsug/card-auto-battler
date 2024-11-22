@@ -332,6 +332,8 @@ export function CardStackAnimation({
     });
   }
 
+  // TODO: fix issue where card auto-play freezes when fast-forwarding at an exact time (try
+  // spamming it on/off)
   if (isFastForwarding) {
     cardAnimationsRef.current.forEach((c) => {
       c.cancelWait?.();

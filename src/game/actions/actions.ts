@@ -1,8 +1,10 @@
 import cloneDeep from 'lodash/cloneDeep';
 import range from 'lodash/range';
 
+import { allCards } from '../../content/cards';
+import { allRelics } from '../../content/relics';
 import { assert, assertIsNonNullable } from '../../utils/asserts';
-import { MAX_SHOCK } from '../constants';
+import { MAX_SHOCK, NUM_CARD_SELECTION_OPTIONS, NUM_RELIC_SELECTION_OPTIONS } from '../constants';
 import {
   CardState,
   GameState,
@@ -14,11 +16,31 @@ import {
 import { addCardsToPlayer } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRandom, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
+import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
-import { breakChain, applyCardOrderingEffects } from './applyCardOrderingEffects';
+
+export function getCardAddOptions(game: GameState): CardState[] {
+  // set rewind point
+  game.rewindGameState = cloneDeep(game);
+
+  const { sampleSize } = getRandom(game);
+
+  const cards = cloneDeep(sampleSize(Object.values(allCards), NUM_CARD_SELECTION_OPTIONS));
+  cards.forEach((card, i) => {
+    card.acquiredId = i;
+  });
+  return cards;
+}
+
+export function getRelicAddOptions(game: GameState): RelicState[] {
+  const { sampleSize } = getRandom(game);
+
+  const existingRelicNames = new Set(game.user.relics.map((relic) => relic.name));
+  const availableRelics = allRelics.filter((relic) => !existingRelicNames.has(relic.name));
+  return cloneDeep(sampleSize(availableRelics, NUM_RELIC_SELECTION_OPTIONS));
+}
 
 export function addCards(game: GameState, cards: CardState[]) {
-  game.rewindGameState = cloneDeep(game);
   addCardsToPlayer(game.user, cards);
 }
 
@@ -149,6 +171,7 @@ export function playCard(game: GameState): BattleEvent[] {
     return [createBattleEvent('damage', damage, 'self')];
   }
 
+  // TODO: the opponent never plays their next card when stunned
   // stun
   if (activePlayer.stun > 0) {
     activePlayer.extraCardPlays = 0;
@@ -175,6 +198,9 @@ export function playCard(game: GameState): BattleEvent[] {
 
   activePlayer.previousCard = card;
 
+  // TODO: clicking view deck does not show trashed cards
+  // TODO: chaining breaks when a card is trashed, as the trashed card's acquiredId can no longer
+  // be found
   if (card.trash) {
     // trash card
     activePlayer.trashedCards.push(card);
@@ -241,6 +267,8 @@ export function endBattle(game: GameState) {
   game.enemy.health = game.enemy.startingHealth;
 }
 
+// TODO: undo-ing a card that gives extra extraCardPlays can result in infinite extraCardPlays.
+// Extra card plays seems to be not be reduced correctly when undoing the card
 export function undoPlayedCard(game: GameState) {
   assertIsNonNullable(game.undoGameState);
   Object.assign(game, game.undoGameState);
@@ -249,6 +277,7 @@ export function undoPlayedCard(game: GameState) {
 export function rewind(game: GameState) {
   assertIsNonNullable(game.rewindGameState);
   Object.assign(game, game.rewindGameState);
+  game.rewindGameState = undefined;
   game.losses += 1;
 }
 

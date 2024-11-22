@@ -4,6 +4,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { cardsByName } from '../../content/cards';
 import { CardState, PlayerState } from '../gameState';
 
+// used for testing
 export function getRandomCards(length: number) {
   const cards = cloneDeep(sampleSize(cardsByName, length));
   for (let i = 0; i < length; i++) {

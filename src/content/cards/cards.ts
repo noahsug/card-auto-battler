@@ -567,3 +567,5 @@ export const cardsByName = {
   ...greenCards,
   ...purpleCards,
 };
+
+export const allCards = Object.values(cardsByName);

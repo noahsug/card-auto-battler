@@ -1,4 +1,5 @@
 import { shuffle } from './shuffle';
+import { sampleSize } from './sampleSize';
 
 // based on https://github.com/mljs/xsadd which is based on the XORSHIFT-ADD (XSadd) algorithm
 
@@ -69,6 +70,11 @@ export function getRandomState(seed: number = getRandomSeed()) {
   return createState(seed);
 }
 
+type RandomIntFn = {
+  (max: number): number;
+  (min: number, max: number): number;
+};
+
 export class Random {
   private state: Uint32Array = new Uint32Array(4);
 
@@ -81,28 +87,21 @@ export class Random {
     } else {
       this.seed(seedOrState ?? getRandomSeed());
     }
-
-    this.random = this.random.bind(this);
-    this.randomUint32 = this.randomUint32.bind(this);
-    this.randomInt = this.randomInt.bind(this);
-    this.shuffle = this.shuffle.bind(this);
   }
 
   // Returns a pseudorandom integer between 0 and 2^32 - 1.
-  public randomUint32() {
+  randomUint32 = () => {
     nextState(this.state);
     return (this.state[3] + this.state[2]) >>> 0;
-  }
+  };
 
   // Returns a pseudorandom number between 0 and 1.
-  public random() {
+  random = () => {
     return (this.randomUint32() >>> 8) * FLOAT_MUL;
-  }
+  };
 
   // Returns a pseudorandom integer between between min (default: 0) and max, inclusive.
-  public randomInt(max: number): number;
-  public randomInt(min: number, max: number): number;
-  public randomInt(...args: unknown[]) {
+  randomInt: RandomIntFn = (...args: unknown[]) => {
     if (args.length === 1) {
       const [max] = args as [number];
       return this.randomInt(0, max);
@@ -113,37 +112,41 @@ export class Random {
       throw new RangeError('min must be less than or equal to max');
     }
     return Math.floor(this.random() * (max - min + 1)) + min;
-  }
+  };
 
   // shuffle array in place
-  public shuffle<T>(array: T[]): T[] {
+  shuffle = <T>(array: T[]): T[] => {
     return shuffle(array, this.random);
-  }
+  };
+
+  sampleSize = <T>(array: T[], size: number): T[] => {
+    return sampleSize(array, size, this.random);
+  };
 
   // Initialize with a new seed (a single Uint32)
-  public seed(seed: number) {
+  seed(seed: number) {
     this.state = createState(seed);
   }
 
   // returns a copy of the current state
-  public getState() {
+  getState() {
     return new Uint32Array(this.state);
   }
 
   // sets the current state to a copy of the passed in state
-  public setState(state: Uint32Array) {
+  setState(state: Uint32Array) {
     this.setStateRef(new Uint32Array(state));
   }
 
   // returns a reference to the current state (changing the returned state will affect the Random
   // instance)
-  public getStateRef() {
+  getStateRef() {
     return this.state;
   }
 
   // sets the current state to the given reference (the passed in state will change with the Random
   // instance's state)
-  public setStateRef(state: Uint32Array) {
+  setStateRef(state: Uint32Array) {
     if (state.length !== 4) {
       throw new TypeError('state must be an Uint32Array of length 4');
     }

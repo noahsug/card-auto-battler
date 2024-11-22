@@ -1,9 +1,9 @@
 import { cardsByName } from '../content/cards';
 import { allEnemies } from '../content/enemies';
 import { allHeroes } from '../content/heroes';
+import { getRandomState } from '../utils/Random';
 import { STARTING_HEALTH } from './constants';
 import { addCardsToPlayer } from './utils/cards';
-import { getRandomState } from '../utils/Random';
 
 export type Target = 'self' | 'opponent';
 
@@ -171,9 +171,11 @@ export function createGameState(): GameState {
 
   const { attack, heal } = cardsByName;
   // addCardsToPlayer(game.user, [cardsByName.stealth, cardsByName.shockTrap, cardsByName.pumpedUp]);
-  addCardsToPlayer(game.user, [attack, heal, cardsByName.dodge]);
+  addCardsToPlayer(game.user, [attack]);
   // addCardsToPlayer(game.user, [attack, attack, heal]);
   addCardsToPlayer(game.enemy, [attack, attack, attack]);
+
+  game.enemy.health = 5;
 
   return game;
 }
