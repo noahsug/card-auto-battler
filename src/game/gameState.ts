@@ -171,7 +171,7 @@ export function createGameState(seed?: number): GameState {
 
   const { attack, heal } = cardsByName;
   // addCardsToPlayer(game.user, [cardsByName.stealth, cardsByName.shockTrap, cardsByName.pumpedUp]);
-  addCardsToPlayer(game.user, [attack]);
+  addCardsToPlayer(game.user, [cardsByName.jabOne, cardsByName.jabOne, attack]);
   // addCardsToPlayer(game.user, [attack, attack, heal]);
   addCardsToPlayer(game.enemy, [attack, attack, attack]);
 

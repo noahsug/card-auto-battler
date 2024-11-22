@@ -35,10 +35,10 @@ import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
 
-type AnimationState = 'startTurn' | 'applyCardEffects' | 'endPlayCard';
+type AnimationState = 'playNextCard' | 'applyCardEffects' | 'endPlayCard';
 
-// TODO: don't start the card animation if dead or stunned (maybe migrate to an sync selector like
-// Jotai before tackling this)
+// TODO: don't start the card animation if dead or stunned (need to return updated player state
+// from action, or use sync selectors like Jotai)
 function getPlayCardBattleEvents(player: PlayerState): BattleEvent[] {
   const card = player.cards[player.currentCardIndex];
   if (card) {
@@ -57,6 +57,7 @@ interface Props {
   onViewDeck: () => void;
 }
 
+// TODO: Move messy battle static logic into separate component and clean up code
 export function BattleScreen({
   game,
   startTurn,
@@ -76,7 +77,7 @@ export function BattleScreen({
 
   const [isPaused, setIsPaused] = useState(true);
   const [isFastForwarding, setIsFastForwarding] = useState(false);
-  const nextAnimationState = useRef<AnimationState>('startTurn');
+  const nextAnimationState = useRef<AnimationState>('playNextCard');
 
   const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([
     createBattleEvent('startBattle'),
@@ -89,8 +90,17 @@ export function BattleScreen({
     ];
   }, [battleEvents, userTarget, enemyTarget]);
 
-  const startNextTurn = useCallback(async () => {
-    const events = await startTurn();
+  const plyNextCard = useCallback(async () => {
+    const events: BattleEvent[] = [];
+
+    if (activePlayer.cardsPlayedThisTurn === 0) {
+      // console.log('-------------------- start turn');
+      const startTurnEvents = await startTurn();
+      events.push(...startTurnEvents);
+    } else {
+      // console.log('-------------------- play next card');
+    }
+
     // start play card animation early
     setBattleEvents([...events, ...getPlayCardBattleEvents(activePlayer)]);
     nextAnimationState.current = 'applyCardEffects';
@@ -106,15 +116,15 @@ export function BattleScreen({
       nextAnimationState.current = 'endPlayCard';
     } else if (nextAnimationState.current === 'endPlayCard') {
       if (getIsTurnOver(game)) {
+        console.log('-------------------- end turn');
         endTurn();
         setBattleEvents([]);
-        nextAnimationState.current = 'startTurn';
+        nextAnimationState.current = 'playNextCard';
       } else {
-        setBattleEvents(getPlayCardBattleEvents(activePlayer));
-        nextAnimationState.current = 'applyCardEffects';
+        plyNextCard();
       }
     }
-  }, [activePlayer, endTurn, game, isBattleOver, playCard]);
+  }, [endTurn, game, isBattleOver, playCard, plyNextCard]);
 
   // change combat state based only on the active player animations
   const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : noop;
@@ -123,12 +133,11 @@ export function BattleScreen({
   // auto-play cards
   useEffect(() => {
     if (isBattleOver) return;
-    // console.log('B auto-play', !isPaused, nextAnimationState.current === 'startTurn');
-    if (!isPaused && nextAnimationState.current === 'startTurn') {
-      // console.log('-------------------- start turn');
-      startNextTurn();
+    // console.log('B auto-play', !isPaused, nextAnimationState.current === 'playNextCard');
+    if (!isPaused && nextAnimationState.current === 'playNextCard') {
+      plyNextCard();
     }
-  }, [isBattleOver, isPaused, startNextTurn]);
+  }, [isBattleOver, isPaused, plyNextCard]);
 
   const handleTogglePlayPause = useCallback(() => {
     setIsPaused((prev) => !prev);
@@ -136,8 +145,8 @@ export function BattleScreen({
 
   const handleUndo = useCallback(() => {
     undoPlayedCard();
+    nextAnimationState.current = 'playNextCard';
     setBattleEvents([createBattleEvent('undo')]);
-    nextAnimationState.current = 'startTurn';
     setIsPaused(true);
   }, [undoPlayedCard]);
 

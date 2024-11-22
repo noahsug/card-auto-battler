@@ -122,13 +122,13 @@ export function startTurn(game: GameState): BattleEvent[] {
 
   activePlayer.damageDealtLastTurn = activePlayer.damageDealtThisTurn;
   activePlayer.damageDealtThisTurn = 0;
-  activePlayer.cardsPlayedThisTurn = 0;
 
   const events: BattleEvent[] = [];
   const card = activePlayer.cards[activePlayer.currentCardIndex];
   const context = { game, events, card };
 
   activePlayer.temporaryDodge = 0;
+  activePlayer.shock = 0;
 
   // delayedShock
   if (activePlayer.delayedShock > 0) {
@@ -249,7 +249,9 @@ export function endTurn(game: GameState) {
   activePlayer.temporaryStrength = 0;
   activePlayer.stun = 0;
 
-  nonActivePlayer.shock = 0;
+  // we set this here instead of startTurn because cardsPlayedThisTurn is used to determine if it's
+  // the start of the turn
+  nonActivePlayer.cardsPlayedThisTurn = 0;
 
   game.turn++;
 }
@@ -282,8 +284,6 @@ export function endBattle(game: GameState) {
   game.enemy.health = game.enemy.startingHealth;
 }
 
-// TODO: undo-ing a card that gives extra extraCardPlays can result in infinite extraCardPlays.
-// Extra card plays seems to be not be reduced correctly when undoing the card
 export function undoPlayedCard(game: GameState) {
   assertIsNonNullable(game.undoGameState);
   Object.assign(game, game.undoGameState);
