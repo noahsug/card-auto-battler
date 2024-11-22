@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import { cardsByName } from '../content/cards';
 import { allEnemies } from '../content/enemies';
 import { allHeroes } from '../content/heroes';
@@ -171,9 +172,9 @@ export function createGameState(seed?: number): GameState {
 
   const { attack, heal } = cardsByName;
   // addCardsToPlayer(game.user, [cardsByName.stealth, cardsByName.shockTrap, cardsByName.pumpedUp]);
-  addCardsToPlayer(game.user, [cardsByName.jabOne, cardsByName.jabOne, attack]);
+  addCardsToPlayer(game.user, cloneDeep([cardsByName.jabOne, attack]));
   // addCardsToPlayer(game.user, [attack, attack, heal]);
-  addCardsToPlayer(game.enemy, [attack, attack, attack]);
+  addCardsToPlayer(game.enemy, cloneDeep([attack, attack, attack]));
 
   // game.enemy.health = 5;
 

@@ -2,9 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
 import { createGameState } from '../../../game/gameState';
-import { getRandomRelics } from '../../../game/utils/relics';
-import { CardChainScreen } from './CardChainScreen';
 import { getRandomCards } from '../../../game/utils/cards';
+import { CardChainScreen } from './CardChainScreen';
 
 const meta = {
   title: 'CardChainScreen',

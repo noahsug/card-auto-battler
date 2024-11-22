@@ -44,7 +44,7 @@ function playOrLogSeed(pickActions: PickActions, seed: number) {
     play(pickActions, seed);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.log('failed on seed:', seed);
+    // console.log('failed on seed:', seed);
     throw error;
   }
 }

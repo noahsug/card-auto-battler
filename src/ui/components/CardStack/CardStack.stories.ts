@@ -12,7 +12,7 @@ const meta = {
     currentCardIndex: 0,
     opponentBoundingRect: new DOMRect(400, 200, 0, 0),
     onAnimationComplete() {
-      console.log('animation complete');
+      // console.log('animation complete');
     },
     isPaused: false,
     isFastForwarding: false,

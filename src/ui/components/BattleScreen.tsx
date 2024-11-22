@@ -116,7 +116,7 @@ export function BattleScreen({
       nextAnimationState.current = 'endPlayCard';
     } else if (nextAnimationState.current === 'endPlayCard') {
       if (getIsTurnOver(game)) {
-        console.log('-------------------- end turn');
+        // console.log('-------------------- end turn');
         endTurn();
         setBattleEvents([]);
         nextAnimationState.current = 'playNextCard';
@@ -141,6 +141,11 @@ export function BattleScreen({
 
   const handleTogglePlayPause = useCallback(() => {
     setIsPaused((prev) => !prev);
+  }, []);
+
+  const handleToggleFastForwarding = useCallback(() => {
+    setIsFastForwarding((prev) => !prev);
+    setIsPaused(false);
   }, []);
 
   const handleUndo = useCallback(() => {
@@ -216,7 +221,7 @@ export function BattleScreen({
         onBack={canUndo ? handleUndo : undefined}
         onTogglePlay={!isBattleOver ? handleTogglePlayPause : undefined}
         isPaused={isPaused}
-        onToggleFastForward={() => setIsFastForwarding((prev) => !prev)}
+        onToggleFastForward={!isBattleOver ? handleToggleFastForwarding : undefined}
         isFastForwarding={isFastForwarding}
       />
     </Container>

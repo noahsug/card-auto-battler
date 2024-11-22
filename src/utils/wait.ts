@@ -4,22 +4,16 @@ export function wait(ms: number): Promise<void> {
   });
 }
 
-export function cancelableWait(ms: number) {
-  let resolve: () => void;
-  const promise = new Promise<void>((resolveArg) => {
+export function cancelableWait<T = string>(ms: number) {
+  let resolve: (reason: T | undefined) => void;
+  const promise = new Promise<T | undefined>((resolveArg) => {
     resolve = resolveArg;
     setTimeout(resolve, ms);
   });
 
-  let isCanceled = false;
-  const cancel = () => {
-    resolve();
-    isCanceled = true;
+  const cancel = (reason?: T) => {
+    resolve(reason);
   };
 
-  function getIsCanceled() {
-    return isCanceled;
-  }
-
-  return [promise, cancel, getIsCanceled] as const;
+  return [promise, cancel] as const;
 }

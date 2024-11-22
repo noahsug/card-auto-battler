@@ -1,6 +1,6 @@
 import { animated, config, easings, useTransition } from '@react-spring/web';
 import random from 'lodash/random';
-import { useEffect, useRef } from 'react';
+import { MutableRefObject, RefObject, useEffect, useRef } from 'react';
 import { styled } from 'styled-components';
 
 import { BattleEvent, CardBattleEvent } from '../../../game/actions/battleEvent';
@@ -26,6 +26,8 @@ const AnimatedContainer = styled(animated.div)`
   inset: 0;
 `;
 
+type CancelWaitReasons = 'undo' | 'fast-forward';
+
 interface CardAnimationState {
   card: CardState;
   rotation: number;
@@ -33,7 +35,7 @@ interface CardAnimationState {
   inDiscard: boolean;
   isAnimating: boolean;
   finishedAnimatingEvent?: BattleEvent;
-  cancelWait?: () => void;
+  cancelWait?: (reason?: CancelWaitReasons) => void;
 }
 
 function createCardAnimationState(
@@ -59,7 +61,7 @@ interface AnimationContext {
   opponentBoundingRect: DOMRect;
   u: UnitFn;
   windowDimensions: WindowDimensions;
-  isFastForwarding: boolean;
+  isFastForwardingRef: MutableRefObject<boolean>;
 }
 
 function syncDeckIndex(cardAnimation: CardAnimationState, context: AnimationContext) {
@@ -137,7 +139,7 @@ function getDeckPosition(cardAnimation: CardAnimationState, context: AnimationCo
 
 function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) {
   // console.log('CSA dealCard', cardAnimation.card.acquiredId);
-  const { cards, onCardAnimationComplete } = context;
+  const { cards, onCardAnimationComplete, isFastForwardingRef } = context;
   const reverseIndex = cards.length - 1 - cardAnimation.deckIndex;
   cardAnimation.isAnimating = true;
 
@@ -148,10 +150,12 @@ function dealCard(cardAnimation: CardAnimationState, context: AnimationContext) 
       immediate: true,
     });
 
+    const delay = isFastForwardingRef.current ? 100 : 300;
+
     const deckPosition = getDeckPosition(cardAnimation, context);
     await next({
       ...deckPosition,
-      delay: (reverseIndex * 300) / Math.sqrt(cards.length),
+      delay: (reverseIndex * delay) / Math.sqrt(cards.length),
       config: config.default,
     });
 
@@ -169,11 +173,12 @@ function playCard(cardAnimation: CardAnimationState, context: AnimationContext) 
   return async (next: (options: object) => Promise<void>) => {
     await next({ x, y, scale: 1.25, rotate: 0, config: { ...config.stiff, clamp: false } });
 
-    const wait = context.isFastForwarding ? 0 : 700;
-    const [promise, cancel, getIsCanceled] = cancelableWait(wait);
+    const wait = context.isFastForwardingRef.current ? 0 : 700;
+    const [promise, cancel] = cancelableWait<CancelWaitReasons>(wait);
     cardAnimation.cancelWait = cancel;
-    await promise;
-    if (!getIsCanceled()) {
+    const cancelReason = await promise;
+
+    if (cancelReason !== 'undo') {
       onCardAnimationComplete(cardAnimation);
     }
   };
@@ -185,7 +190,7 @@ function discardCard(cardAnimation: CardAnimationState, context: AnimationContex
   cardAnimation.isAnimating = true;
 
   return async (next: (options: object) => Promise<void>) => {
-    const duration = context.isFastForwarding ? 100 : 300;
+    const duration = context.isFastForwardingRef.current ? 100 : 300;
     await next({ y: u(-1000), rotate: 0, config: { duration, easing: easings.easeInExpo } });
 
     cardAnimation.inDiscard = true;
@@ -231,14 +236,6 @@ function returnCardToCorrectPosition(cardAnimation: CardAnimationState, context:
 }
 
 function animate(cardAnimation: CardAnimationState, context: AnimationContext) {
-  // console.log(
-  //   'CSA animate',
-  //   context.deckBoundingRect.x,
-  //   cardAnimation.card.acquiredId,
-  //   context.event?.type,
-  //   cardAnimation.finishedAnimatingEvent === event,
-  // );
-
   const { event } = context;
   // animating the same event a 2nd time after it's been finished causes the 2nd animation to never
   // finish, so we check finishedAnimatingEvent to prevent that
@@ -284,6 +281,10 @@ export function CardStackAnimation({
 }: Props) {
   const [u, windowDimensions] = useUnits();
 
+  // move to ref so we can access the most up-to-date version in the animation functions
+  const isFastForwardingRef = useRef(isFastForwarding);
+  isFastForwardingRef.current = isFastForwarding;
+
   const cardAnimationsRef = useRef<CardAnimationState[]>(
     cards.map((card, i) => createCardAnimationState(card, i, currentCardIndex)),
   );
@@ -307,7 +308,7 @@ export function CardStackAnimation({
     opponentBoundingRect,
     u,
     windowDimensions,
-    isFastForwarding,
+    isFastForwardingRef,
   };
 
   const [render, animationController] = useTransition(
@@ -328,15 +329,13 @@ export function CardStackAnimation({
     handledEventRef.current = event;
     animationController.stop();
     cardAnimationsRef.current.forEach((c) => {
-      c.cancelWait?.();
+      c.cancelWait?.('undo');
     });
   }
 
-  // TODO: fix issue where card auto-play freezes when fast-forwarding at an exact time (try
-  // spamming it on/off)
   if (isFastForwarding) {
     cardAnimationsRef.current.forEach((c) => {
-      c.cancelWait?.();
+      c.cancelWait?.('fast-forward');
     });
   }
 
