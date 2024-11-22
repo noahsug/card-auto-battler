@@ -177,6 +177,7 @@ export function createGameState(seed?: number): GameState {
   addCardsToPlayer(game.enemy, cloneDeep([attack, attack, attack]));
 
   // game.enemy.health = 5;
+  game.user.health = 1;
 
   return game;
 }
