@@ -37,7 +37,8 @@ export function applyCardOrderingEffects(cards: CardState[]) {
     let currentCard = chainStart;
     while (currentCard.chain.toId != null) {
       const nextCardIndex = cards.findIndex((card) => card.acquiredId === currentCard.chain.toId);
-      assert(nextCardIndex >= 0, `invalid chain: ${currentCard.chain.toId}`);
+      // card is trashed
+      if (nextCardIndex === -1) return;
 
       // move the next card to the right of the current card
       const [nextCard] = cards.splice(nextCardIndex, 1);

@@ -4,7 +4,12 @@ import range from 'lodash/range';
 import { allCards } from '../../content/cards';
 import { allRelics } from '../../content/relics';
 import { assert, assertIsNonNullable } from '../../utils/asserts';
-import { MAX_SHOCK, NUM_CARD_SELECTION_OPTIONS, NUM_RELIC_SELECTION_OPTIONS } from '../constants';
+import {
+  MAX_SHOCK,
+  MAX_TURNS_IN_BATTLE,
+  NUM_CARD_SELECTION_OPTIONS,
+  NUM_RELIC_SELECTION_OPTIONS,
+} from '../constants';
 import {
   CardState,
   GameState,
@@ -151,6 +156,27 @@ export function startTurn(game: GameState): BattleEvent[] {
     }
   }
 
+  // die if out of cards
+  if (!card) {
+    const damage = activePlayer.health;
+    activePlayer.health = 0;
+    return [createBattleEvent('damage', damage, 'self')];
+  }
+
+  // the player with the highest health wins after X turns
+  if (game.turn >= MAX_TURNS_IN_BATTLE) {
+    if (activePlayer.health >= nonActivePlayer.health) {
+      // user wins
+      const damage = nonActivePlayer.health;
+      nonActivePlayer.health = 0;
+      return [createBattleEvent('damage', damage, 'opponent')];
+    }
+    // enemy wins
+    const damage = activePlayer.health;
+    activePlayer.health = 0;
+    return [createBattleEvent('damage', damage, 'self')];
+  }
+
   return events;
 }
 
@@ -162,13 +188,6 @@ export function playCard(game: GameState): BattleEvent[] {
   // set when the turn starts)
   if (activePlayer.cardsPlayedThisTurn > 0) {
     game.undoGameState = cloneDeep(game);
-  }
-
-  // die if out of cards
-  if (!card) {
-    const damage = activePlayer.health;
-    activePlayer.health = 0;
-    return [createBattleEvent('damage', damage, 'self')];
   }
 
   // TODO: the opponent never plays their next card when stunned
