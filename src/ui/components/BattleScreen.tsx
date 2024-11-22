@@ -37,9 +37,11 @@ import { StatusEffects } from './StatusEffects';
 
 type AnimationState = 'startTurn' | 'applyCardEffects' | 'endPlayCard';
 
+// TODO: don't start the card animation if dead or stunned (maybe migrate to an sync selector like
+// Jotai before tackling this)
 function getPlayCardBattleEvents(player: PlayerState): BattleEvent[] {
   const card = player.cards[player.currentCardIndex];
-  if (card && player.health > 0 && player.stun === 0) {
+  if (card) {
     return [createBattleEvent('startPlayCard', card.acquiredId)];
   }
   return [];

@@ -2,6 +2,7 @@
 
 Game TODO:
 
+1. use Jotai for sync selectors, making everything simpler
 1. add charms that help sort cards (e.g. feather = card is near top, anchor = card near bottom?,
    chain = two cards are always played after each other), 1 charm per card? but chains can grow in
    size

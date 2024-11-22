@@ -175,7 +175,7 @@ export function createGameState(seed?: number): GameState {
   // addCardsToPlayer(game.user, [attack, attack, heal]);
   addCardsToPlayer(game.enemy, [attack, attack, attack]);
 
-  game.enemy.health = 5;
+  // game.enemy.health = 5;
 
   return game;
 }

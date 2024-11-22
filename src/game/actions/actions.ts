@@ -190,7 +190,6 @@ export function playCard(game: GameState): BattleEvent[] {
     game.undoGameState = cloneDeep(game);
   }
 
-  // TODO: the opponent never plays their next card when stunned
   // stun
   if (activePlayer.stun > 0) {
     activePlayer.extraCardPlays = 0;
