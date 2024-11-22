@@ -24,6 +24,8 @@ import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './app
 import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
 
+// TODO: ReactStrictMode breaks rewindGameState randomness seed, as it changes for some reason the
+// 2nd time this function is called, maybe due to our sins of returning a promise from the action?
 export function getCardAddOptions(game: GameState): CardState[] {
   // set rewind point
   game.rewindGameState = cloneDeep(game);

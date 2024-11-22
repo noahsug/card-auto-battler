@@ -204,10 +204,15 @@ it('shows the same pick options after rewinding', () => {
   battle(game);
   rewind(game);
   makeSelections(game, pickActions);
+  battle(game);
+  rewind(game);
+  makeSelections(game, pickActions);
 
   const options = pickResults.map(({ options }) => (options || []).map((pick) => pick.name));
   const beforeRewind = options.slice(0, 2);
-  const afterRewind = options.slice(2);
+  const afterRewind1 = options.slice(2, 4);
+  const afterRewind2 = options.slice(4);
 
-  expect(beforeRewind).toEqual(afterRewind);
+  expect(beforeRewind).toEqual(afterRewind1);
+  expect(beforeRewind).toEqual(afterRewind2);
 });

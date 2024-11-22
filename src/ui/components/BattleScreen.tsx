@@ -39,6 +39,7 @@ type AnimationState = 'playNextCard' | 'applyCardEffects' | 'endPlayCard';
 
 // TODO: don't start the card animation if dead or stunned (need to return updated player state
 // from action, or use sync selectors like Jotai)
+// TODO: the game hangs forever after the play card animation when the opponent is stunned
 function getPlayCardBattleEvents(player: PlayerState): BattleEvent[] {
   const card = player.cards[player.currentCardIndex];
   if (card) {

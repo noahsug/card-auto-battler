@@ -64,7 +64,7 @@ export function App() {
 
   // DEBUG
   // -----------------
-  const [screen, setScreen] = useState<ScreenType>('battle');
+  // const [screen, setScreen] = useState<ScreenType>('battle');
 
   // const [screen, setScreen] = useState<ScreenType>('cardSelection');
   // cardSelectionOptionsRef.current = getRandomCards(NUM_CARD_SELECTION_OPTIONS);
@@ -80,7 +80,7 @@ export function App() {
 
   // -----------------
 
-  // const [screen, setScreen] = useState<ScreenType>('start');
+  const [screen, setScreen] = useState<ScreenType>('start');
   const [overlay, setOverlay] = useState<OverlayType>('none');
 
   const goToScreen = useCallback(
