@@ -14,6 +14,8 @@ import { OverlayBackground } from '../shared/OverlayBackground';
 import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
+import cloneDeep from 'lodash/cloneDeep';
+import { assertIsNonNullable } from '../../../utils/asserts';
 
 type ScreenType =
   | 'start'
@@ -40,7 +42,7 @@ export const ScreenContainer = styled.div`
 `;
 
 export function App() {
-  const { game, actions } = useGameState();
+  const { game, actions, select } = useGameState();
   const {
     getCardAddOptions,
     getRelicAddOptions,
@@ -61,6 +63,7 @@ export function App() {
   const wonLastBattleRef = useRef(false);
   const cardSelectionOptionsRef = useRef<CardState[]>([]);
   const relicSelectionOptionsRef = useRef<RelicState[]>([]);
+  const rewindGameStateRef = useRef<GameState>();
 
   // DEBUG
   // -----------------
@@ -95,10 +98,11 @@ export function App() {
   );
 
   const startCardSelection = useCallback(async () => {
+    rewindGameStateRef.current = await select((game) => cloneDeep(game));
     endOfBattleGameRef.current = undefined;
     cardSelectionOptionsRef.current = await getCardAddOptions();
     goToScreen('cardSelection');
-  }, [getCardAddOptions, goToScreen]);
+  }, [getCardAddOptions, goToScreen, select]);
 
   const handleCardsAdded = useCallback(
     async (selectedCardIndexes: number[]) => {
@@ -159,7 +163,8 @@ export function App() {
       goToScreen('start');
     } else {
       if (!wonLastBattleRef.current) {
-        rewind();
+        assertIsNonNullable(rewindGameStateRef.current);
+        rewind(rewindGameStateRef.current);
       }
       startCardSelection();
     }

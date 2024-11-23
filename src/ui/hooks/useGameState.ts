@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import * as actions from '../../game/actions';
 import { createGameState, GameState } from '../../game/gameState';
@@ -37,11 +37,24 @@ export function useGameState(initialGameState: GameState = createGameState()) {
       };
       return acc;
     }, {} as BoundActions);
-    // TODO: remove this dep after removing the promise resolve logic above, instead of returning a
-    // value from setState, have gameState hold the battleEvents (and disable battle events
-    // entirely in analysis mode)
+    // TODO: maybe use Jotai instead so not all our actions change when game state changes
+    // this dep is needed for the promise resolve logic to work correctly
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState]);
 
-  return { game: gameState, actions: boundActions };
+  const select = useCallback(
+    (fn: (gameState: GameState) => T) => {
+      const { promise, resolve } = getResolvablePromise<T>();
+      setGameState((gameState) => {
+        resolve(fn(gameState));
+        return gameState;
+      });
+      return promise;
+    },
+    // this dep is needed for the promise resolve logic to work correctly
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [gameState],
+  );
+
+  return { game: gameState, setGameState, select, actions: boundActions };
 }

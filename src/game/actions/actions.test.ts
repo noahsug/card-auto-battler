@@ -29,6 +29,7 @@ import {
   NUM_CARD_REMOVAL_PICKS,
   NUM_CARD_SELECTION_PICKS,
 } from '../constants';
+import cloneDeep from 'lodash/cloneDeep';
 
 type SelectCardsToAdd = (game: GameState, cardOptions: CardState[]) => CardState[];
 type SelectCardsToRemove = (game: GameState) => number[];
@@ -51,11 +52,12 @@ function play(game: GameState, pickActions: PickActions) {
 }
 
 function playRound(game: GameState, pickActions: PickActions) {
+  const rewindGameState = cloneDeep(game);
   makeSelections(game, pickActions);
   const winner = battle(game);
 
   if (winner === 'enemy') {
-    rewind(game);
+    rewind(game, rewindGameState);
   }
 
   return winner;
@@ -200,12 +202,15 @@ it('shows the same pick options after rewinding', () => {
   // force a win so we immediately select relics
   game.wins = 1;
 
+  let rewindGameState = cloneDeep(game);
   makeSelections(game, pickActions);
   battle(game);
-  rewind(game);
+  rewind(game, rewindGameState);
+
+  rewindGameState = cloneDeep(game);
   makeSelections(game, pickActions);
   battle(game);
-  rewind(game);
+  rewind(game, rewindGameState);
   makeSelections(game, pickActions);
 
   const options = pickResults.map(({ options }) => (options || []).map((pick) => pick.name));
