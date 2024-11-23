@@ -481,15 +481,17 @@ export const purpleCards = {
   shockTrap: createCard(
     [
       {
-        name: 'shock',
+        name: 'delayedShock',
+        value: v(1),
       },
       {
-        name: 'delayedShock',
+        target: 'self',
+        name: 'extraCardPlays',
       },
     ],
     {
       name: 'Shock Trap',
-      description: `Apply $V shock. Apply $2V shock again at the start of the enemy's turn.`,
+      description: `Apply $V shock at the start of the enemy's turn. Play another card.`,
       image: electricTrapImage,
     },
   ),

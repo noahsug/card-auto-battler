@@ -15,8 +15,7 @@ const ANIMATED_EVENT_TYPES = new Set<BattleEvent['type']>([
   'trashCard',
   'shuffle',
   'addTemporaryCard',
-  'applyCardEffects',
-  'endPlayCard',
+  'animationComplete',
 ]);
 
 interface Props {
@@ -86,7 +85,7 @@ export function CardStack(props: Props) {
     }
   }, [eventIndex, props.events]);
 
-  // handle calling onAnimationComplete when certain animations are finished
+  // calls onAnimationComplete when we see the animationComplete event
   useEffect(() => {
     // ensure we don't handle the same event twice
     if (
@@ -95,45 +94,29 @@ export function CardStack(props: Props) {
     ) {
       return;
     }
-    // console.log('CS new event', event?.type);
     visitedEventInfo.current = { eventIndex, event };
+    // console.log('CS new event', event?.type);
 
-    const prevEvent = events.current[eventIndex - 1];
     const nextEvent = events.current[eventIndex + 1];
 
-    if (event?.type === 'shuffle' && nextEvent?.type === 'endPlayCard') {
-      // mark the animation as complete early if all we have left to do is shuffle the cards
-      onAnimationComplete();
-      // console.log('M done shuffle');
-    } else if (event?.type === 'endPlayCard') {
-      // endPlayCard doesn't have an animation, so we manually move to the next event
-      setEventIndex((prev) => prev + 1);
-      // check that we haven't already marked the animation as complete due to the shuffle case
-      // above
-      if (prevEvent?.type !== 'shuffle') {
-        // TODO: just splice endPlayCard/applyCardEffects from events.current, rather than do the
-        // above check
+    if (
+      (event?.type === 'shuffle' || event?.type === 'startPlayCard') &&
+      nextEvent?.type === 'animationComplete'
+    ) {
+      // mark the animation as done early and remove the upcoming animationComplete event
+      events.current.splice(eventIndex + 1, 1);
+
+      if (event?.type === 'shuffle') {
         onAnimationComplete();
-      }
-      // console.log('CS endPlayCard');
-    } else if (event?.type === 'startPlayCard' && nextEvent?.type === 'applyCardEffects') {
-      // mark the animation as complete if all we have left to do is start the play card animation
-      // console.log('CS start applyCardEffects');
-      if (cardPlayedTimeout.current == null) {
+      } else if (event?.type === 'startPlayCard' && cardPlayedTimeout.current == null) {
         cardPlayedTimeout.current = setTimeout(() => {
           onAnimationComplete();
-          // console.log('CS done applyCardEffects');
           cardPlayedTimeout.current = undefined;
         }, 200);
       }
-    } else if (event?.type === 'applyCardEffects') {
-      // applyCardEffects doesn't have an animation, so we manually move to the next event
+    } else if (event?.type === 'animationComplete') {
+      onAnimationComplete();
       setEventIndex((prev) => prev + 1);
-      // check that we haven't already marked the animation as complete due to the startPlayCard
-      // case above
-      if (prevEvent?.type !== 'startPlayCard') {
-        onAnimationComplete();
-      }
     }
   }, [event, eventIndex, isPaused, onAnimationComplete]);
 

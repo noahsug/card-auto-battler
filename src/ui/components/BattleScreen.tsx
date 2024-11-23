@@ -107,7 +107,7 @@ export function BattleScreen({
     setBattleEvents([
       ...events,
       ...getPlayCardBattleEvents(activePlayer),
-      createBattleEvent('applyCardEffects'),
+      createBattleEvent('animationComplete'),
     ]);
     nextAnimationState.current = 'applyCardEffects';
   }, [activePlayer, game, startTurn]);
@@ -117,7 +117,7 @@ export function BattleScreen({
     if (isBattleOver) return;
     if (nextAnimationState.current === 'applyCardEffects') {
       const events = await playCard();
-      setBattleEvents([...events, createBattleEvent('endPlayCard')]);
+      setBattleEvents([...events, createBattleEvent('animationComplete')]);
       nextAnimationState.current = 'endPlayCard';
     } else if (nextAnimationState.current === 'endPlayCard') {
       if (getIsTurnOver(game)) {

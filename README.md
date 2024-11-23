@@ -2,17 +2,18 @@
 
 Game TODO:
 
-1. re-work shock? playing a card to skip the enemies turn isn't even that strong, so shock seems
-   very weak
 1. use storybook visual testing
-1. add charms that help sort cards (e.g. feather = card is near top, anchor = card near bottom?,
-   chain = two cards are always played after each other), 1 charm per card? but chains can grow in
-   size
-1. add choice of which charm options you want to do?
-1. more enemies
-1. more heros?
-1. add more effects that allow you to play multiple cards or remove cards, since this gets you
-   through a big deck faster and makes picking cards feel more impactful later in the game
+2. add post card selection "charm shops": feather = card on top, anchor = card on bottom, potion =
+   powerful 1 time use
+3. add choice of which charm shop you want to enter?
+4. change charms at anytime outside of battle?
+5. more enemies
+6. more heros?
+7. rerolls, currency?
+8. card rarity? so we don't spam folks with mythics that are OP but situational
+9. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
+   cards/turn?), since this gets you through a big deck faster and makes picking cards feel more
+   impactful later in the game
 
 Polish TODO:
 

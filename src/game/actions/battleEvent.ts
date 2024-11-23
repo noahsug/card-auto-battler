@@ -6,7 +6,7 @@ interface UntargetedBattleEvent {
   type: 'startBattle' | 'undo';
 }
 export interface BattleEventWithTarget {
-  type: 'miss' | 'shuffle' | 'applyCardEffects' | 'endPlayCard';
+  type: 'miss' | 'shuffle' | 'animationComplete';
   target: Target;
 }
 export interface ValueBattleEvent {
@@ -48,12 +48,7 @@ export function createBattleEvent(type: BattleEvent['type'], ...args: unknown[])
   if (type === 'startBattle' || type === 'undo') {
     return { type };
   }
-  if (
-    type === 'miss' ||
-    type === 'shuffle' ||
-    type === 'endPlayCard' ||
-    type === 'applyCardEffects'
-  ) {
+  if (type === 'miss' || type === 'shuffle' || type === 'animationComplete') {
     const [target] = args as [Target?];
     return { type, target: target || 'self' };
   }
