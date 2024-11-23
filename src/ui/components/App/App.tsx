@@ -91,10 +91,11 @@ export function App() {
       setScreen(screen);
       setOverlay('none');
       if (screen === 'battle') {
+        console.log('startBattle()', await select((game) => game.turn));
         startBattle();
       }
     },
-    [startBattle],
+    [select, startBattle],
   );
 
   const startCardSelection = useCallback(async () => {
@@ -164,6 +165,7 @@ export function App() {
     } else {
       if (!wonLastBattleRef.current) {
         assertIsNonNullable(rewindGameStateRef.current);
+        console.log('rewind to', rewindGameStateRef.current.turn);
         rewind(rewindGameStateRef.current);
       }
       startCardSelection();
@@ -172,6 +174,10 @@ export function App() {
 
   const handleCloseViewDeckOverlay = useCallback(() => {
     setOverlay('none');
+  }, []);
+
+  const handleOnViewDeck = useCallback(() => {
+    setOverlay('deck');
   }, []);
 
   return (
@@ -184,7 +190,7 @@ export function App() {
             game={game}
             cards={cardSelectionOptionsRef.current}
             onCardsSelected={handleCardsAdded}
-            onViewDeck={() => setOverlay('deck')}
+            onViewDeck={handleOnViewDeck}
           ></CardAddScreen>
         )}
 
@@ -192,7 +198,7 @@ export function App() {
           <CardRemoveScreen
             game={game}
             onCardsSelected={handleCardsRemoved}
-            onViewDeck={() => setOverlay('deck')}
+            onViewDeck={handleOnViewDeck}
           ></CardRemoveScreen>
         )}
 
@@ -200,7 +206,7 @@ export function App() {
           <CardChainScreen
             game={game}
             onCardsSelected={handleCardsChained}
-            onViewDeck={() => setOverlay('deck')}
+            onViewDeck={handleOnViewDeck}
           ></CardChainScreen>
         )}
 
@@ -209,7 +215,7 @@ export function App() {
             game={game}
             relics={relicSelectionOptionsRef.current}
             onRelicSelected={handleRelicSelected}
-            onViewDeck={() => setOverlay('deck')}
+            onViewDeck={handleOnViewDeck}
           ></RelicSelectionScreen>
         )}
 
@@ -219,7 +225,8 @@ export function App() {
             {...actions}
             setGameState={setGameState}
             onBattleOver={handleBattleOver}
-            onViewDeck={() => setOverlay('deck')}
+            onViewDeck={handleOnViewDeck}
+            hasOverlay={overlay !== 'none'}
           ></BattleScreen>
         )}
 

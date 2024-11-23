@@ -2,11 +2,13 @@
 
 Game TODO:
 
+1. re-work shock? playing a card to skip the enemies turn isn't even that strong, so shock seems
+   very weak
 1. use storybook visual testing
 1. add charms that help sort cards (e.g. feather = card is near top, anchor = card near bottom?,
    chain = two cards are always played after each other), 1 charm per card? but chains can grow in
    size
-1. add way to remove cards (maybe also via charms?)
+1. add choice of which charm options you want to do?
 1. more enemies
 1. more heros?
 1. add more effects that allow you to play multiple cards or remove cards, since this gets you
