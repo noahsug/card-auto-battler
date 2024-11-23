@@ -4,7 +4,7 @@ import { fn } from '@storybook/test';
 import { relicsByName } from '../../content/relics';
 import { MAX_LOSSES, MAX_WINS } from '../../game/constants';
 import { createGameState, GameState, statusEffectNames } from '../../game/gameState';
-import { getRandomCards } from '../../game/utils/cards';
+import { getRandomCards } from '../../testing/utils';
 import { useGameState } from '../hooks/useGameState';
 import { BattleScreen } from './BattleScreen';
 

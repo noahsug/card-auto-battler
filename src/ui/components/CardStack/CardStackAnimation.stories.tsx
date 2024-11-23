@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { BattleEvent, createBattleEvent } from '../../../game/actions/battleEvent';
-import { getRandomCards } from '../../../game/utils/cards';
+import { getRandomCards } from '../../../testing/utils';
 import { CardStackAnimation, Props } from './CardStackAnimation';
 
 const Container = styled.div`

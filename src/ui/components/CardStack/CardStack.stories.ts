@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { createBattleEvent } from '../../../game/actions/battleEvent';
-import { getRandomCards } from '../../../game/utils/cards';
+import { getRandomCards } from '../../../testing/utils';
 import { CardStack } from './CardStack';
 
 const meta = {
