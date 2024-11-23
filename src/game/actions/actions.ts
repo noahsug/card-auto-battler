@@ -115,8 +115,6 @@ export function startBattle(game: GameState) {
 export function startTurn(game: GameState): BattleEvent[] {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
 
-  game.undoGameState = cloneDeep(game);
-
   activePlayer.damageDealtLastTurn = activePlayer.damageDealtThisTurn;
   activePlayer.damageDealtThisTurn = 0;
 
@@ -180,12 +178,6 @@ export function startTurn(game: GameState): BattleEvent[] {
 export function playCard(game: GameState): BattleEvent[] {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
   const card = activePlayer.cards[activePlayer.currentCardIndex];
-
-  // set undo point after the 2nd+ card is played (we skip the first card because an undo point is
-  // set when the turn starts)
-  if (activePlayer.cardsPlayedThisTurn > 0) {
-    game.undoGameState = cloneDeep(game);
-  }
 
   // stun
   if (activePlayer.stun > 0) {
@@ -272,18 +264,12 @@ export function endBattle(game: GameState) {
   winner === 'user' ? game.wins++ : game.losses++;
 
   game.turn = 0;
-  game.undoGameState = undefined;
 
   resetPlayerAfterBattle(game.user);
   resetPlayerAfterBattle(game.enemy);
 
   game.enemy.startingHealth += 10;
   game.enemy.health = game.enemy.startingHealth;
-}
-
-export function undoPlayedCard(game: GameState) {
-  assertIsNonNullable(game.undoGameState);
-  Object.assign(game, game.undoGameState);
 }
 
 export function rewind(game: GameState, previousGameState: GameState) {

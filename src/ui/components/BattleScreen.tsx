@@ -13,16 +13,11 @@ import {
   getIsUserTurn,
   getPlayerTargets,
   getIsTurnOver,
-  getCanUndo,
+  getIsStartOfBattle,
 } from '../../game/utils/selectors';
 import { noop } from '../../utils/functions';
 import { useGetBoundingRect } from '../hooks/useBoundingRect';
-import {
-  EndTurnAction,
-  PlayCardAction,
-  StartTurnAction,
-  UndoPlayedCardAction,
-} from '../hooks/useGameState';
+import { EndTurnAction, PlayCardAction, StartTurnAction } from '../hooks/useGameState';
 import { useTimeout } from '../hooks/useTimeout';
 import { BattleControls } from './BattleControls';
 import { CardStack } from './CardStack';
@@ -34,6 +29,7 @@ import { CenterContent } from './shared/CenterContent';
 import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
+import cloneDeep from 'lodash/cloneDeep';
 
 type AnimationState = 'playNextCard' | 'applyCardEffects' | 'endPlayCard';
 
@@ -53,7 +49,7 @@ interface Props {
   startTurn: StartTurnAction;
   playCard: PlayCardAction;
   endTurn: EndTurnAction;
-  undoPlayedCard: UndoPlayedCardAction;
+  setGameState: (game: GameState) => void;
   onBattleOver: () => void;
   onViewDeck: () => void;
 }
@@ -63,7 +59,7 @@ export function BattleScreen({
   game,
   startTurn,
   playCard,
-  undoPlayedCard,
+  setGameState,
   endTurn,
   onBattleOver,
   onViewDeck,
@@ -71,7 +67,7 @@ export function BattleScreen({
   const { user, enemy } = game;
   const isBattleOver = getBattleWinner(game) != null;
   const activePlayer = getActivePlayer(game);
-  const canUndo = getCanUndo(game);
+  const isStartOfBattle = getIsStartOfBattle(game);
 
   const [userProfileHandleRef, getUserProfileBoundingRect] = useGetBoundingRect();
   const [enemyProfileHandleRef, getEnemyProfileBoundingRect] = useGetBoundingRect();
@@ -79,6 +75,7 @@ export function BattleScreen({
   const [isPaused, setIsPaused] = useState(true);
   const [isFastForwarding, setIsFastForwarding] = useState(false);
   const nextAnimationState = useRef<AnimationState>('playNextCard');
+  const undoHistory = useRef<GameState[]>([]);
 
   const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([
     createBattleEvent('startBattle'),
@@ -91,8 +88,9 @@ export function BattleScreen({
     ];
   }, [battleEvents, userTarget, enemyTarget]);
 
-  const plyNextCard = useCallback(async () => {
+  const playNextCard = useCallback(async () => {
     const events: BattleEvent[] = [];
+    undoHistory.current.push(cloneDeep(game));
 
     if (activePlayer.cardsPlayedThisTurn === 0) {
       // console.log('-------------------- start turn');
@@ -105,7 +103,7 @@ export function BattleScreen({
     // start play card animation early
     setBattleEvents([...events, ...getPlayCardBattleEvents(activePlayer)]);
     nextAnimationState.current = 'applyCardEffects';
-  }, [activePlayer, startTurn]);
+  }, [activePlayer, game, startTurn]);
 
   const handleAnimationComplete = useCallback(async () => {
     // console.log('B start', nextAnimationState.current);
@@ -122,10 +120,10 @@ export function BattleScreen({
         setBattleEvents([]);
         nextAnimationState.current = 'playNextCard';
       } else {
-        plyNextCard();
+        playNextCard();
       }
     }
-  }, [endTurn, game, isBattleOver, playCard, plyNextCard]);
+  }, [endTurn, game, isBattleOver, playCard, playNextCard]);
 
   // change combat state based only on the active player animations
   const userHandleAnimationComplete = getIsUserTurn(game) ? handleAnimationComplete : noop;
@@ -136,9 +134,9 @@ export function BattleScreen({
     if (isBattleOver) return;
     // console.log('B auto-play', !isPaused, nextAnimationState.current === 'playNextCard');
     if (!isPaused && nextAnimationState.current === 'playNextCard') {
-      plyNextCard();
+      playNextCard();
     }
-  }, [isBattleOver, isPaused, plyNextCard]);
+  }, [isBattleOver, isPaused, playNextCard]);
 
   const handleTogglePlayPause = useCallback(() => {
     setIsPaused((prev) => !prev);
@@ -150,11 +148,11 @@ export function BattleScreen({
   }, []);
 
   const handleUndo = useCallback(() => {
-    undoPlayedCard();
+    setGameState(undoHistory.current.pop()!);
     nextAnimationState.current = 'playNextCard';
     setBattleEvents([createBattleEvent('undo')]);
     setIsPaused(true);
-  }, [undoPlayedCard]);
+  }, [setGameState]);
 
   useTimeout(onBattleOver, 1500, { enabled: isBattleOver });
 
@@ -219,7 +217,7 @@ export function BattleScreen({
       </CenterContent>
 
       <BattleControls
-        onBack={canUndo ? handleUndo : undefined}
+        onBack={undoHistory.current.length > 0 && !isStartOfBattle ? handleUndo : undefined}
         onTogglePlay={!isBattleOver ? handleTogglePlayPause : undefined}
         isPaused={isPaused}
         onToggleFastForward={!isBattleOver ? handleToggleFastForwarding : undefined}

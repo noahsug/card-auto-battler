@@ -3,6 +3,10 @@ import { RelicName } from '../../content/relics/relics';
 import { MAX_LOSSES, MAX_WINS } from '../constants';
 import { Random } from '../../utils/Random';
 
+export function getIsStartOfBattle(game: GameState) {
+  return game.turn === 0 && game.user.cardsPlayedThisTurn === 0;
+}
+
 export function getIsUserTurn({ turn }: { turn: number }) {
   return turn % 2 === 0;
 }
@@ -69,9 +73,4 @@ export function getBattleWinner(game: GameState) {
 
 export function getRandom({ randomnessState }: { randomnessState: GameState['randomnessState'] }) {
   return new Random(randomnessState);
-}
-
-export function getCanUndo(game: GameState) {
-  const isStartOfBattle = game.turn === 0 && game.user.cardsPlayedThisTurn === 0;
-  return game.undoGameState != null && !isStartOfBattle;
 }

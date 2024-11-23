@@ -139,8 +139,6 @@ export interface GameState {
   wins: number;
   losses: number;
   randomnessState: Uint32Array;
-  rewindGameState?: GameState;
-  undoGameState?: GameState;
 }
 
 function createPlayer({ name, image }: { name: string; image: string }): PlayerState {

@@ -42,7 +42,7 @@ export const ScreenContainer = styled.div`
 `;
 
 export function App() {
-  const { game, actions, select } = useGameState();
+  const { game, actions, select, setGameState } = useGameState();
   const {
     getCardAddOptions,
     getRelicAddOptions,
@@ -217,6 +217,7 @@ export function App() {
           <BattleScreen
             game={endOfBattleGameRef.current || game}
             {...actions}
+            setGameState={setGameState}
             onBattleOver={handleBattleOver}
             onViewDeck={() => setOverlay('deck')}
           ></BattleScreen>

@@ -12,7 +12,6 @@ type BoundActions = {
   ) => Promise<ReturnType<(typeof actions)[K]>>;
 };
 
-export type UndoPlayedCardAction = BoundActions['undoPlayedCard'];
 export type StartTurnAction = BoundActions['startTurn'];
 export type PlayCardAction = BoundActions['playCard'];
 export type EndTurnAction = BoundActions['endTurn'];
@@ -43,7 +42,7 @@ export function useGameState(initialGameState: GameState = createGameState()) {
   }, [gameState]);
 
   const select = useCallback(
-    (fn: (gameState: GameState) => T) => {
+    <T>(fn: (gameState: GameState) => T) => {
       const { promise, resolve } = getResolvablePromise<T>();
       setGameState((gameState) => {
         resolve(fn(gameState));
