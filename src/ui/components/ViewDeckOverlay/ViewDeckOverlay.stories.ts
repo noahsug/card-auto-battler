@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
+import { allCards } from '../../../content/cards';
 import { createGameState } from '../../../game/gameState';
-import { getRandomCards } from '../../../testing/utils';
 import { ViewDeckOverlay } from './ViewDeckOverlay';
 
 const meta = {
   title: 'ViewDeckOverlay',
   component: ViewDeckOverlay,
   args: {
-    onBack: fn,
+    onClose: fn(),
   },
 } satisfies Meta<typeof ViewDeckOverlay>;
 
@@ -23,8 +23,8 @@ export const FewCards: Story = {
 };
 
 const manyCards = createGameState();
-manyCards.user.cards = getRandomCards(20);
-export const ManyCards: Story = {
+manyCards.user.cards = allCards;
+export const AllCards: Story = {
   args: {
     game: manyCards,
   },

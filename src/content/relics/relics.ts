@@ -2,10 +2,10 @@ import lifestealImage from '../../ui/components/StatusEffects/images/heart-plus.
 import openWoundImage from './images/bleeding-wound.png';
 import cowledImage from './images/cowled.png';
 import fireSilhouetteImage from './images/fire-silhouette.png';
-import fistImage from './images/fist.png';
 import sproutImage from './images/ground-sprout.png';
 import planksImage from './images/packed-planks.png';
 import necklaceImage from './images/primitive-necklace.png';
+import fistImage from './images/punch.png';
 import pyromaniacImage from './images/pyromaniac.png';
 import targetingImage from './images/targeting.png';
 import thunderBladeImage from './images/thunder-blade.png';
@@ -26,7 +26,7 @@ export const basicRelics = {
   }),
   monk: createRelic({
     displayName: 'Way of the Monk',
-    description: `Basic ${attack.name} cards deal 4 damage 2 times.`,
+    description: `Basic ${attack.name} cards are played twice.`,
     image: fistImage,
   }),
 };

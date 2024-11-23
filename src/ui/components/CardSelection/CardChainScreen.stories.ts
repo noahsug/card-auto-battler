@@ -9,8 +9,8 @@ const meta = {
   title: 'CardChainScreen',
   component: CardChainScreen,
   args: {
-    onViewDeck: fn,
-    onCardsSelected: fn,
+    onViewDeck: fn(),
+    onCardsSelected: fn(),
   },
 } satisfies Meta<typeof CardChainScreen>;
 

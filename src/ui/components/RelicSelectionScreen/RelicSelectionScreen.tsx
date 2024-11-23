@@ -13,7 +13,6 @@ import { BottomRowMessage, BottomRow } from '../shared/Row';
 const RelicList = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
   overflow-y: auto;
 
   > * {

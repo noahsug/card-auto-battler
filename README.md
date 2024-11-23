@@ -2,8 +2,8 @@
 
 Game TODO:
 
-1. storybook visual testing
-2. more enemies
+1. more enemies
+2. storybook visual testing
 3. choice of which charm shop to enter and more charm shops: feather = card on top, anchor = card
    on bottom, potion = powerful 1 time use
 4. more heros?

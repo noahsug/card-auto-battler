@@ -7,7 +7,7 @@ const Value = styled.span`
   font-weight: bold;
 `;
 
-const numericWords = ['double', 'triple', 'quadruple', 'quintuple', 'crit'];
+const numericWords = ['twice', 'double', 'triple', 'quadruple', 'quintuple', 'crit'];
 
 const tribeTextToHighlight: string[] = tribes.filter((tribe) => tribe !== 'basic');
 

@@ -1,5 +1,5 @@
 import { cardsByName } from '../../content/cards';
-import { createCard, value as v } from '../../content/utils/createCard';
+import { value as v } from '../../content/utils/createCard';
 import { CardEffectName, CardState, PlayerState } from '../gameState';
 
 const { attack } = cardsByName;
@@ -12,19 +12,12 @@ export function addCardsToPlayer(player: PlayerState, cards: CardState[]) {
   player.cards.push(...cards);
 }
 
-const monkPunch = createCard([{ name: 'damage', value: v(4), multiHit: v(2) }], {
-  name: `${attack.name} (Monk)`,
-  description: 'Deal 4 damage 2 times.',
-});
-
 export function convertBasicAttacksToMonkAttack(cards: CardState[]) {
   cards.forEach((card) => {
     if (card.name !== attack.name) return;
-    Object.assign(card, {
-      name: monkPunch.name,
-      description: monkPunch.description,
-      effects: monkPunch.effects,
-    });
+    card.repeat = { value: v(1) };
+    card.description += ' Repeat.';
+    card.name = `${attack.name} (Monk)`;
   });
 }
 

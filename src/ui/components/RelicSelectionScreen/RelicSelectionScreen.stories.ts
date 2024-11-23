@@ -10,7 +10,8 @@ const meta = {
   title: 'RelicSelectionScreen',
   component: RelicSelectionScreen,
   args: {
-    onViewDeck: fn,
+    onViewDeck: fn(),
+    onRelicSelected: fn(),
   },
 } satisfies Meta<typeof RelicSelectionScreen>;
 
@@ -21,7 +22,6 @@ export const Primary: Story = {
   args: {
     game: createGameState(),
     relics: getRandomRelics(3),
-    onRelicSelected: fn,
   },
 };
 
@@ -29,6 +29,5 @@ export const AllRelics: Story = {
   args: {
     game: createGameState(),
     relics: Object.values(relicsByName),
-    onRelicSelected: fn,
   },
 };
