@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { createGameState } from '../../../game/gameState';
-import { getRandomCards } from '../../../testing/utils';
-import { CardAddScreen } from './CardAddScreen';
 import { cardsByName } from '../../../content/cards';
-import { getRandomRelics } from '../../../testing/utils';
+import { createGameState } from '../../../game/gameState';
+import { getRandomCards, getRandomRelics } from '../../../testing/utils';
+import { CardAddScreen } from './CardAddScreen';
 
 const meta = {
   title: 'CardAddScreen',

@@ -2,8 +2,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import range from 'lodash/range';
 
 import { allCards } from '../../content/cards';
-import { allRelics } from '../../content/relics';
-import { assert, assertIsNonNullable } from '../../utils/asserts';
+import { allRelics, RelicName } from '../../content/relics';
+import { assert } from '../../utils/asserts';
 import {
   MAX_SHOCK,
   MAX_TURNS_IN_BATTLE,
@@ -18,7 +18,7 @@ import {
   createGameState,
   statusEffectNames,
 } from '../gameState';
-import { addCardsToPlayer } from '../utils/cards';
+import { addCardsToPlayer, convertBasicAttacksToMonkAttack } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRandom, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects';
@@ -31,6 +31,12 @@ export function getCardAddOptions(game: GameState): CardState[] {
   cards.forEach((card, i) => {
     card.acquiredId = i;
   });
+
+  // monk relic
+  if (getRelic(game.user, 'monk')) {
+    convertBasicAttacksToMonkAttack(cards);
+  }
+
   return cards;
 }
 
@@ -71,6 +77,10 @@ export function chainCards(game: GameState, cardIndexes: number[]) {
 
 export function addRelic(game: GameState, relic: RelicState) {
   game.user.relics.push(relic);
+
+  if (relic.name === ('monk' satisfies RelicName)) {
+    convertBasicAttacksToMonkAttack(game.user.cards);
+  }
 }
 
 function shuffleCards(game: GameState, player: PlayerState) {
@@ -272,6 +282,9 @@ export function endBattle(game: GameState) {
   game.enemy.health = game.enemy.startingHealth;
 }
 
+// TODO: rewind should change the random state so the user has more options and is never in a spot
+// where they want to intentionally lose to pick that one OP card/relic combo due to now knowing
+// the future - it also breaks re-rolling if we add that later
 export function rewind(game: GameState, previousGameState: GameState) {
   Object.assign(game, previousGameState);
   game.losses += 1;

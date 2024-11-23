@@ -5,6 +5,7 @@ import { allHeroes } from '../content/heroes';
 import { getRandomState } from '../utils/Random';
 import { STARTING_HEALTH } from './constants';
 import { addCardsToPlayer } from './utils/cards';
+import { relicsByName } from '../content/relics';
 
 export type Target = 'self' | 'opponent';
 

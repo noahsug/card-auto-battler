@@ -1,16 +1,20 @@
-import pyromaniacImage from './images/pyromaniac.png';
+import lifestealImage from '../../ui/components/StatusEffects/images/heart-plus.png';
 import openWoundImage from './images/bleeding-wound.png';
+import cowledImage from './images/cowled.png';
+import fireSilhouetteImage from './images/fire-silhouette.png';
+import fistImage from './images/fist.png';
 import sproutImage from './images/ground-sprout.png';
 import planksImage from './images/packed-planks.png';
 import necklaceImage from './images/primitive-necklace.png';
-import fireSilhouetteImage from './images/fire-silhouette.png';
-import transfuseImage from './images/transfuse.png';
-import thunderBladeImage from './images/thunder-blade.png';
+import pyromaniacImage from './images/pyromaniac.png';
 import targetingImage from './images/targeting.png';
-import cowledImage from './images/cowled.png';
-import lifestealImage from '../../ui/components/StatusEffects/images/heart-plus.png';
+import thunderBladeImage from './images/thunder-blade.png';
+import transfuseImage from './images/transfuse.png';
 
+import { cardsByName } from '../cards/cards';
 import { createRelic } from '../utils/createRelic';
+
+const { attack } = cardsByName;
 
 // basic
 export const basicRelics = {
@@ -19,6 +23,11 @@ export const basicRelics = {
     description: 'Gain $V% lifesteal.',
     value: 0.25,
     image: lifestealImage,
+  }),
+  monk: createRelic({
+    displayName: 'Way of the Monk',
+    description: `Basic ${attack.name} cards deal 4 damage 2 times.`,
+    image: fistImage,
   }),
 };
 Object.values(basicRelics).forEach((relic) => {

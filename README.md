@@ -2,16 +2,14 @@
 
 Game TODO:
 
-1. use storybook visual testing
-2. add post card selection "charm shops": feather = card on top, anchor = card on bottom, potion =
-   powerful 1 time use
-3. add choice of which charm shop you want to enter?
-4. change charms at anytime outside of battle?
-5. more enemies
-6. more heros?
-7. rerolls, currency?
-8. card rarity? so we don't spam folks with mythics that are OP but situational
-9. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
+1. storybook visual testing
+2. more enemies
+3. choice of which charm shop to enter and more charm shops: feather = card on top, anchor = card
+   on bottom, potion = powerful 1 time use
+4. more heros?
+5. rerolls, currency?
+6. card rarity? so we don't spam folks with mythics that are OP but situational
+7. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
    cards/turn?), since this gets you through a big deck faster and makes picking cards feel more
    impactful later in the game
 
