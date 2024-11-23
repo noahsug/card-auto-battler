@@ -15,6 +15,7 @@ const ANIMATED_EVENT_TYPES = new Set<BattleEvent['type']>([
   'trashCard',
   'shuffle',
   'addTemporaryCard',
+  'endPlayCard',
 ]);
 
 interface Props {
@@ -60,17 +61,17 @@ export function CardStack(props: Props) {
     const newEvents = props.events.filter((e) => ANIMATED_EVENT_TYPES.has(e.type));
     events.current.push(...newEvents);
   }
-  const event = events.current[eventIndex];
+  const event: BattleEvent = events.current[eventIndex];
 
   isPaused.current = props.isPaused && event?.type === 'startPlayCard';
 
-  // console.log(
-  //   'CS',
-  //   boundingRect?.x,
-  //   events.current[eventIndex - 1]?.type,
-  //   events.current[eventIndex]?.type,
-  //   events.current[eventIndex + 1]?.type,
-  // );
+  console.log(
+    'CS',
+    boundingRect?.x,
+    events.current[eventIndex - 1]?.type,
+    events.current[eventIndex]?.type,
+    events.current[eventIndex + 1]?.type,
+  );
 
   // undo
   useEffect(() => {
@@ -93,33 +94,30 @@ export function CardStack(props: Props) {
     ) {
       return;
     }
-    // console.log('CS new event', event?.type);
+    console.log('CS new event', event?.type);
     visitedEventInfo.current = { eventIndex, event };
 
     const prevEvent = events.current[eventIndex - 1];
     const nextEvent = events.current[eventIndex + 1];
 
-    if (event?.type === 'shuffle' && !nextEvent) {
+    if (event?.type === 'shuffle' && nextEvent?.type === 'endPlayCard') {
       // end the animation early if all we have left to do is shuffle the cards
-      // console.log('M done shuffle');
       onAnimationComplete();
-    } else if (
-      !event &&
-      prevEvent &&
-      prevEvent?.type !== 'undo' &&
-      prevEvent?.type !== 'shuffle' &&
-      prevEvent?.type !== 'startBattle' &&
-      prevEvent?.type !== 'startPlayCard'
-    ) {
-      // end the animation if there are no events left (unless we hit a special use case like the
-      // playCard timeout, or startBattle or shuffle events)
-      // console.log('CS done');
-      onAnimationComplete();
-    } else if (event?.type === 'startPlayCard' && cardPlayedTimeout.current == null) {
-      // console.log('CS start playCard');
-      cardPlayedTimeout.current = setTimeout(() => {
-        // console.log('CS done playCard');
+      console.log('M done shuffle');
+    } else if (event?.type === 'endPlayCard') {
+      // endPlayCard doesn't have an animation, so we manually move to the next event
+      setEventIndex((prev) => prev + 1);
+      // end the animation if there are no events left (unless we already ended the animation due
+      // to the shuffle case above)
+      if (prevEvent?.type !== 'shuffle') {
         onAnimationComplete();
+      }
+      console.log('CS endPlayCard');
+    } else if (event?.type === 'startPlayCard' && cardPlayedTimeout.current == null) {
+      // console.log('CS start startPlayCard');
+      cardPlayedTimeout.current = setTimeout(() => {
+        onAnimationComplete();
+        // console.log('CS done startPlayCard');
         cardPlayedTimeout.current = undefined;
       }, 200);
     }
