@@ -1,11 +1,10 @@
 import { animated, useSpring } from '@react-spring/web';
 import clamp from 'lodash/clamp';
-import { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 
+import { Image } from '../shared/Image';
 import healthBarBorderImage from './health-bar-border.png';
 import healthBarInnerImage from './health-bar-inner.png';
-import { Image } from '../shared/Image';
 
 const WIDTH = 10;
 

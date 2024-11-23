@@ -1,5 +1,6 @@
 import range from 'lodash/range';
 import sampleSize from 'lodash/sampleSize';
+import cloneDeep from 'lodash/cloneDeep';
 import sample from 'lodash/sample';
 
 import { getRandomSeed } from '../../utils/Random';
@@ -29,7 +30,6 @@ import {
   NUM_CARD_REMOVAL_PICKS,
   NUM_CARD_SELECTION_PICKS,
 } from '../constants';
-import cloneDeep from 'lodash/cloneDeep';
 
 type SelectCardsToAdd = (game: GameState, cardOptions: CardState[]) => CardState[];
 type SelectCardsToRemove = (game: GameState) => number[];

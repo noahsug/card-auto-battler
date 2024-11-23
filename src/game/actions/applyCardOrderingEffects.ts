@@ -1,4 +1,4 @@
-import { assertIsNonNullable, assert } from '../../utils/asserts';
+import { assertIsNonNullable } from '../../utils/asserts';
 import { CardState } from '../gameState';
 
 // checks whether the new chain creates a loop

@@ -18,7 +18,7 @@ import {
   getRelic,
   getTargetedPlayer,
 } from '../utils/selectors';
-import { BattleEvent, createBattleEvent, BattleEventSource, ValueBattleEvent } from './battleEvent';
+import { BattleEvent, BattleEventSource, createBattleEvent, ValueBattleEvent } from './battleEvent';
 
 interface PlayCardContext {
   game: GameState;

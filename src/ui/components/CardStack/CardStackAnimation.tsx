@@ -1,6 +1,6 @@
 import { animated, config, easings, useTransition } from '@react-spring/web';
 import random from 'lodash/random';
-import { MutableRefObject, RefObject, useEffect, useRef } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
 import { styled } from 'styled-components';
 
 import { BattleEvent, CardBattleEvent } from '../../../game/actions/battleEvent';

@@ -1,6 +1,5 @@
 import { createCard, value as v } from '../../../content/utils/createCard';
 import { parseCardDescriptionTemplate } from './parseCardDescriptionTemplate';
-import lifesteal from '../../../content/cards/images/lifesteal.jpeg';
 
 it('parses basic values', () => {
   const description = parseCardDescriptionTemplate(

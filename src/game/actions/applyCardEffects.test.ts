@@ -9,7 +9,7 @@ import {
   value as v,
 } from '../../content/utils/createCard';
 import { diffValues } from '../../utils/objects';
-import { BLEED_DAMAGE, MAX_SHOCK } from '../constants';
+import { BLEED_DAMAGE } from '../constants';
 import {
   CardEffect,
   CardState,
