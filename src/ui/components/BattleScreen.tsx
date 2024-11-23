@@ -46,6 +46,7 @@ function getPlayCardBattleEvents(player: PlayerState): BattleEvent[] {
 
 interface Props {
   game: GameState;
+  hasOverlay: boolean;
   startTurn: StartTurnAction;
   playCard: PlayCardAction;
   endTurn: EndTurnAction;
@@ -55,8 +56,10 @@ interface Props {
 }
 
 // TODO: Move messy battle static logic into separate component and clean up code
+// TODO: initial card order is incorrect
 export function BattleScreen({
   game,
+  hasOverlay,
   startTurn,
   playCard,
   setGameState,
@@ -101,7 +104,11 @@ export function BattleScreen({
     }
 
     // start play card animation early
-    setBattleEvents([...events, ...getPlayCardBattleEvents(activePlayer)]);
+    setBattleEvents([
+      ...events,
+      ...getPlayCardBattleEvents(activePlayer),
+      createBattleEvent('applyCardEffects'),
+    ]);
     nextAnimationState.current = 'applyCardEffects';
   }, [activePlayer, game, startTurn]);
 
@@ -137,6 +144,11 @@ export function BattleScreen({
     }
   }, [isBattleOver, isPaused, playNextCard]);
 
+  const handleViewDeck = useCallback(() => {
+    onViewDeck();
+    setIsPaused(true);
+  }, [onViewDeck]);
+
   const handleTogglePlayPause = useCallback(() => {
     setIsPaused((prev) => !prev);
   }, []);
@@ -153,11 +165,23 @@ export function BattleScreen({
     setIsPaused(true);
   }, [setGameState]);
 
+  const canUndo = !hasOverlay && undoHistory.current.length > 0 && !isStartOfBattle;
+  const canPauseOrFastForward = !hasOverlay && !isBattleOver;
+  const undoCallback = useMemo(() => (canUndo ? handleUndo : undefined), [canUndo, handleUndo]);
+  const togglePlayCallback = useMemo(
+    () => (canPauseOrFastForward ? handleTogglePlayPause : undefined),
+    [canPauseOrFastForward, handleTogglePlayPause],
+  );
+  const toggleFastForwardCallback = useMemo(
+    () => (canPauseOrFastForward ? handleToggleFastForwarding : undefined),
+    [canPauseOrFastForward, handleToggleFastForwarding],
+  );
+
   useTimeout(onBattleOver, 1500, { enabled: isBattleOver });
 
   return (
     <Container>
-      <HUD game={game} onViewDeck={onViewDeck} />
+      <HUD game={game} onViewDeck={handleViewDeck} />
 
       <CenterContent>
         <PlayersRow>
@@ -216,10 +240,10 @@ export function BattleScreen({
       </CenterContent>
 
       <BattleControls
-        onBack={undoHistory.current.length > 0 && !isStartOfBattle ? handleUndo : undefined}
-        onTogglePlay={!isBattleOver ? handleTogglePlayPause : undefined}
+        onBack={undoCallback}
+        onTogglePlay={togglePlayCallback}
         isPaused={isPaused}
-        onToggleFastForward={!isBattleOver ? handleToggleFastForwarding : undefined}
+        onToggleFastForward={toggleFastForwardCallback}
         isFastForwarding={isFastForwarding}
       />
     </Container>

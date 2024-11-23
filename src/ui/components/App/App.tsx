@@ -88,11 +88,11 @@ export function App() {
 
   const goToScreen = useCallback(
     async (screen: ScreenType) => {
-      setScreen(screen);
-      setOverlay('none');
       if (screen === 'battle') {
         startBattle();
       }
+      setScreen(screen);
+      setOverlay('none');
     },
     [startBattle],
   );
@@ -174,6 +174,10 @@ export function App() {
     setOverlay('none');
   }, []);
 
+  const handleOnViewDeck = useCallback(() => {
+    setOverlay('deck');
+  }, []);
+
   return (
     <Root>
       <ScreenContainer>
@@ -184,7 +188,7 @@ export function App() {
             game={game}
             cards={cardSelectionOptionsRef.current}
             onCardsSelected={handleCardsAdded}
-            onViewDeck={() => setOverlay('deck')}
+            onViewDeck={handleOnViewDeck}
           ></CardAddScreen>
         )}
 
@@ -192,7 +196,7 @@ export function App() {
           <CardRemoveScreen
             game={game}
             onCardsSelected={handleCardsRemoved}
-            onViewDeck={() => setOverlay('deck')}
+            onViewDeck={handleOnViewDeck}
           ></CardRemoveScreen>
         )}
 
@@ -200,7 +204,7 @@ export function App() {
           <CardChainScreen
             game={game}
             onCardsSelected={handleCardsChained}
-            onViewDeck={() => setOverlay('deck')}
+            onViewDeck={handleOnViewDeck}
           ></CardChainScreen>
         )}
 
@@ -209,7 +213,7 @@ export function App() {
             game={game}
             relics={relicSelectionOptionsRef.current}
             onRelicSelected={handleRelicSelected}
-            onViewDeck={() => setOverlay('deck')}
+            onViewDeck={handleOnViewDeck}
           ></RelicSelectionScreen>
         )}
 
@@ -219,7 +223,8 @@ export function App() {
             {...actions}
             setGameState={setGameState}
             onBattleOver={handleBattleOver}
-            onViewDeck={() => setOverlay('deck')}
+            onViewDeck={handleOnViewDeck}
+            hasOverlay={overlay !== 'none'}
           ></BattleScreen>
         )}
 
