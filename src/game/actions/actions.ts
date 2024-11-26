@@ -27,7 +27,7 @@ import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects
 import { BattleEvent, createBattleEvent } from './battleEvent';
 import { potionByName } from '../../content/cards/cards';
 
-export function getCardAddOptions(game: GameState): CardState[] {
+export function getAddCardsOptions(game: GameState): CardState[] {
   const { sampleSize } = getRandom(game);
 
   const numOptions =

@@ -4,16 +4,16 @@ import { fn } from '@storybook/test';
 import { potionByName } from '../../../content/cards';
 import { getPotionAddOptions } from '../../../game/actions';
 import { createGameState } from '../../../game/gameState';
-import { PotionAddScreen } from './PotionAddScreen';
+import { AddPotionsScreen } from './AddPotionsScreen';
 
 const meta = {
   title: 'PotionAddScreen',
-  component: PotionAddScreen,
+  component: AddPotionsScreen,
   args: {
     onViewDeck: fn(),
     onCardsSelected: fn(),
   },
-} satisfies Meta<typeof PotionAddScreen>;
+} satisfies Meta<typeof AddPotionsScreen>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

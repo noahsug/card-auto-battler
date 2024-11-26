@@ -11,7 +11,7 @@ import {
   chainCards,
   endBattle,
   endTurn,
-  getCardAddOptions,
+  getAddCardsOptions,
   getRelicAddOptions,
   playCard,
   removeCards,
@@ -19,7 +19,7 @@ import {
   startBattle,
   startTurn,
 } from './actions';
-import { getBattleWinner, getIsGameOver, getIsTurnOver, getNextShop } from '../utils/selectors';
+import { getBattleWinner, getIsGameOver, getIsTurnOver, getNextShops } from '../utils/selectors';
 import {
   MAX_TURNS_IN_BATTLE,
   NUM_CARD_REMOVAL_PICKS,
@@ -62,19 +62,19 @@ function makeSelections(
   game: GameState,
   { selectCardsToAdd, selectCardsToRemove, selectCardsToChain, selectRelicToAdd }: PickActions,
 ) {
-  const cardOptions = getCardAddOptions(game);
+  const cardOptions = getAddCardsOptions(game);
   const cardsToAdd = selectCardsToAdd(game, cardOptions);
   addCards(game, cardsToAdd);
 
-  const nextPickAction = getNextShop(game);
-  if (nextPickAction === 'removeCards') {
+  const [shop] = getNextShops(game);
+  if (shop === 'removeCards') {
     const cardIndexes = selectCardsToRemove(game);
     removeCards(game, cardIndexes);
-  } else if (nextPickAction === 'addRelics') {
+  } else if (shop === 'addRelics') {
     const relicOptions = getRelicAddOptions(game);
     const relic = selectRelicToAdd(game, relicOptions);
     addRelic(game, relic);
-  } else if (nextPickAction === 'chainCards') {
+  } else if (shop === 'chainCards') {
     const cardIndexes = selectCardsToChain(game);
     chainCards(game, cardIndexes);
   }

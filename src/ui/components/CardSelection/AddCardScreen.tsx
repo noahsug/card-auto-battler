@@ -9,7 +9,7 @@ interface Props {
   onViewDeck: () => void;
 }
 
-export function CardAddScreen(props: Props) {
+export function AddCardScreen(props: Props) {
   const numPicks =
     props.game.wins === 0 ? NUM_FIRST_CARD_SELECTION_PICKS : NUM_CARD_SELECTION_PICKS;
   return <CardSelection {...props} numCardSelections={numPicks} buttonText="Add" />;

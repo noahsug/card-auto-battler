@@ -10,7 +10,7 @@ import { GameState } from '../../../game/gameState';
 import { getIsBossBattle } from '../../../game/utils/selectors';
 import { plural } from '../../../utils/plural';
 import { maskImage } from '../../style';
-import { RelicImage } from '../RelicSelectionScreen/Relic';
+import { RelicImage } from '../AddRelicsScreen/Relic';
 import { Row } from '../shared/Row';
 
 const size = 'max(1.7rem, 4vmin)';

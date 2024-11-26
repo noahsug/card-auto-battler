@@ -174,7 +174,7 @@ export function createGameState(seed?: number): GameState {
   // addCardsToPlayer(game.user, [cardsByName.stealth, cardsByName.shockTrap, cardsByName.pumpedUp]);
   addCardsToPlayer(game.user, cloneDeep([attack]));
   // addCardsToPlayer(game.user, [attack, attack, heal]);
-  addCardsToPlayer(game.enemy, cloneDeep([attack, attack, attack]));
+  addCardsToPlayer(game.enemy, cloneDeep([attack]));
 
   // game.enemy.health = 5;
   // game.user.health = 1;

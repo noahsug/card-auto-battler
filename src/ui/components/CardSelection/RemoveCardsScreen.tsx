@@ -8,7 +8,7 @@ interface Props {
   onViewDeck: () => void;
 }
 
-export function CardRemoveScreen(props: Props) {
+export function RemoveCardsScreen(props: Props) {
   const cards = sortCards(props.game.user.cards);
 
   return (

@@ -3,16 +3,16 @@ import { fn } from '@storybook/test';
 
 import { createGameState } from '../../../game/gameState';
 import { getRandomCards } from '../../../testing/utils';
-import { CardChainScreen } from './CardChainScreen';
+import { ChainCardsScreen } from './ChainCardsScreen';
 
 const meta = {
-  title: 'CardChainScreen',
-  component: CardChainScreen,
+  title: 'ChainCardsScreen',
+  component: ChainCardsScreen,
   args: {
     onViewDeck: fn(),
     onCardsSelected: fn(),
   },
-} satisfies Meta<typeof CardChainScreen>;
+} satisfies Meta<typeof ChainCardsScreen>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

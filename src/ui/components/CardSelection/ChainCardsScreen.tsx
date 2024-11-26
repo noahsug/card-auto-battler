@@ -26,7 +26,7 @@ function getInvalidSelectionsIndexes(cards: CardState[], selectedCardIndexes: nu
   return invalidSelections;
 }
 
-export function CardChainScreen(props: Props) {
+export function ChainCardsScreen(props: Props) {
   const [selectedCardIndexes, setSelectedCardIndexes] = useState<number[]>([]);
 
   const cards = sortCards(cloneDeep(props.game.user.cards));

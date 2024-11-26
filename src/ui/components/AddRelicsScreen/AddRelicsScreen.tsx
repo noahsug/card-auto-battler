@@ -27,7 +27,7 @@ interface Props {
   onViewDeck: () => void;
 }
 
-export function RelicSelectionScreen({ game, relics, onRelicSelected, onViewDeck }: Props) {
+export function AddRelicsScreen({ game, relics, onRelicSelected, onViewDeck }: Props) {
   const [selectedRelicIndex, setSelectedRelicIndex] = useState<number>();
 
   function handleContinue() {

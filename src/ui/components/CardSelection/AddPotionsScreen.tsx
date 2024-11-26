@@ -9,7 +9,7 @@ interface Props {
   onViewDeck: () => void;
 }
 
-export function PotionAddScreen(props: Props) {
+export function AddPotionsScreen(props: Props) {
   return (
     <CardSelection {...props} numCardSelections={NUM_POTION_SELECTION_PICKS} buttonText="Add" />
   );

@@ -3,16 +3,16 @@ import { fn } from '@storybook/test';
 
 import { createGameState } from '../../../game/gameState';
 import { getRandomRelics } from '../../../testing/utils';
-import { CardRemoveScreen } from './CardRemoveScreen';
+import { RemoveCardsScreen } from './RemoveCardsScreen';
 
 const meta = {
-  title: 'CardRemoveScreen',
-  component: CardRemoveScreen,
+  title: 'RemoveCardsScreen',
+  component: RemoveCardsScreen,
   args: {
     onViewDeck: fn(),
     onCardsSelected: fn(),
   },
-} satisfies Meta<typeof CardRemoveScreen>;
+} satisfies Meta<typeof RemoveCardsScreen>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
