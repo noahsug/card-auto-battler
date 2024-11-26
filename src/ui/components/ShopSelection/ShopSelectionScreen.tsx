@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
 import { GameState } from '../../../game/gameState';
-import { ShopName } from '../../../game/utils/selectors';
+import { ShopName } from '../../../game/actions/actions';
 import { HUD } from '../HUD';
 import { ScrollingCenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
@@ -8,8 +8,7 @@ import { ShopOption } from './ShopOption';
 
 interface Props {
   game: GameState;
-  shopA: ShopName;
-  shopB: ShopName;
+  shopOptions: ShopName[];
   onViewDeck: () => void;
   onShopSelected: (shop: ShopName) => void;
 }
@@ -24,14 +23,15 @@ const ShopList = styled.div`
   }
 `;
 
-export function ShopSelectionScreen({ game, shopA, shopB, onViewDeck, onShopSelected }: Props) {
+export function ShopSelectionScreen({ game, shopOptions, onViewDeck, onShopSelected }: Props) {
   return (
     <Container>
       <HUD game={game} onViewDeck={onViewDeck} />
       <ScrollingCenterContent>
         <ShopList>
-          <ShopOption name={shopA} onShopSelected={() => onShopSelected(shopA)} />
-          <ShopOption name={shopB} onShopSelected={() => onShopSelected(shopB)} />
+          {shopOptions.map((shop) => (
+            <ShopOption key={shop} name={shop} onShopSelected={() => onShopSelected(shop)} />
+          ))}
         </ShopList>
       </ScrollingCenterContent>
     </Container>

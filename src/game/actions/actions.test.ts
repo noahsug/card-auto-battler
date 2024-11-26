@@ -2,6 +2,7 @@ import range from 'lodash/range';
 import sampleSize from 'lodash/sampleSize';
 import cloneDeep from 'lodash/cloneDeep';
 import sample from 'lodash/sample';
+import shuffle from 'lodash/shuffle';
 
 import { getRandomSeed } from '../../utils/Random';
 import { CardState, createGameState, GameState, RelicState } from '../gameState';
@@ -13,42 +14,41 @@ import {
   endTurn,
   getAddCardsOptions,
   getRelicAddOptions,
+  getShopOptions,
   playCard,
   removeCards,
   rewind,
+  ShopName,
   startBattle,
   startTurn,
 } from './actions';
-import { getBattleWinner, getIsGameOver, getIsTurnOver, getNextShops } from '../utils/selectors';
+import { getBattleWinner, getIsGameOver, getIsTurnOver } from '../utils/selectors';
 import {
   MAX_TURNS_IN_BATTLE,
   NUM_CARD_REMOVAL_PICKS,
   NUM_CARD_SELECTION_PICKS,
 } from '../constants';
+import { getChainCreatesLoop } from './applyCardOrderingEffects';
 
-type SelectCardsToAdd = (game: GameState, cardOptions: CardState[]) => CardState[];
-type SelectCardsToRemove = (game: GameState) => number[];
-type SelectCardsToChain = (game: GameState) => number[];
-type SelectRelicToAdd = (game: GameState, relicOptions: RelicState[]) => RelicState;
-
-type PickActions = {
-  selectCardsToAdd: SelectCardsToAdd;
-  selectCardsToRemove: SelectCardsToRemove;
-  selectCardsToChain: SelectCardsToChain;
-  selectRelicToAdd: SelectRelicToAdd;
+type ChoiceFunctions = {
+  chooseShop: (game: GameState, shopOptions: ShopName[]) => ShopName;
+  chooseCardsToAdd: (game: GameState, cardOptions: CardState[]) => CardState[];
+  chooseCardsToRemove: (game: GameState) => number[];
+  chooseCardsToChain: (game: GameState) => number[];
+  chooseRelicToAdd: (game: GameState, relicOptions: RelicState[]) => RelicState;
 };
 
-function play(game: GameState, pickActions: PickActions) {
+function play(game: GameState, choices: ChoiceFunctions) {
   let gameWinner = null;
   while (!gameWinner) {
-    gameWinner = playRound(game, pickActions);
+    gameWinner = playRound(game, choices);
   }
   return gameWinner;
 }
 
-function playRound(game: GameState, pickActions: PickActions) {
+function playRound(game: GameState, choices: ChoiceFunctions) {
   const rewindGameState = cloneDeep(game);
-  makeSelections(game, pickActions);
+  makeSelections(game, choices);
   const winner = battle(game);
 
   if (winner === 'enemy') {
@@ -60,22 +60,30 @@ function playRound(game: GameState, pickActions: PickActions) {
 
 function makeSelections(
   game: GameState,
-  { selectCardsToAdd, selectCardsToRemove, selectCardsToChain, selectRelicToAdd }: PickActions,
+  {
+    chooseShop,
+    chooseCardsToAdd,
+    chooseCardsToRemove,
+    chooseCardsToChain,
+    chooseRelicToAdd,
+  }: ChoiceFunctions,
 ) {
   const cardOptions = getAddCardsOptions(game);
-  const cardsToAdd = selectCardsToAdd(game, cardOptions);
+  const cardsToAdd = chooseCardsToAdd(game, cardOptions);
   addCards(game, cardsToAdd);
 
-  const [shop] = getNextShops(game);
+  const shopOptions = getShopOptions(game);
+  const shop = shopOptions.length === 2 ? chooseShop(game, shopOptions) : shopOptions[0];
+
   if (shop === 'removeCards') {
-    const cardIndexes = selectCardsToRemove(game);
+    const cardIndexes = chooseCardsToRemove(game);
     removeCards(game, cardIndexes);
   } else if (shop === 'addRelics') {
     const relicOptions = getRelicAddOptions(game);
-    const relic = selectRelicToAdd(game, relicOptions);
+    const relic = chooseRelicToAdd(game, relicOptions);
     addRelic(game, relic);
   } else if (shop === 'chainCards') {
-    const cardIndexes = selectCardsToChain(game);
+    const cardIndexes = chooseCardsToChain(game);
     chainCards(game, cardIndexes);
   }
 }
@@ -108,63 +116,104 @@ function playCards(game: GameState) {
   return playCards(game);
 }
 
-const simplePickActions: PickActions = {
-  selectCardsToAdd: (_, cards) => cards.slice(0, NUM_CARD_SELECTION_PICKS),
-  selectCardsToRemove: () => range(NUM_CARD_REMOVAL_PICKS),
-  selectCardsToChain: (game) => [game.user.cards.length - 2, game.user.cards.length - 1],
-  selectRelicToAdd: (_, relics) => relics[0],
+const simplePickActions: ChoiceFunctions = {
+  chooseShop: (_, shops) => shops[0],
+  chooseCardsToAdd: (_, cards) => cards.slice(0, NUM_CARD_SELECTION_PICKS),
+  chooseCardsToRemove: () => range(NUM_CARD_REMOVAL_PICKS),
+  chooseCardsToChain: (game) => [game.user.cards.length - 2, game.user.cards.length - 1],
+  chooseRelicToAdd: (_, relics) => relics[0],
 };
 
-const randomPickActions: PickActions = {
-  selectCardsToAdd: (_, cards) => sampleSize(cards, NUM_CARD_SELECTION_PICKS),
-  selectCardsToRemove: (game) => sampleSize(range(game.user.cards.length)),
-  // TODO: make random but smart about which cards to chain
-  selectCardsToChain: simplePickActions.selectCardsToChain,
-  selectRelicToAdd: (_, relics) => sample(relics)!,
+const chooseRandomCardsToChain: ChoiceFunctions['chooseCardsToChain'] = (game: GameState) => {
+  const indexes = range(game.user.cards.length);
+  const firstCardIndexes = shuffle(indexes);
+  const secondCardIndexes = shuffle(indexes);
+
+  let result: number[] = [];
+
+  firstCardIndexes.forEach((firstIndex) => {
+    if (result.length > 0) return;
+    secondCardIndexes.forEach((secondIndex) => {
+      if (result.length > 0) return;
+      if (!getChainCreatesLoop(game.user.cards, firstIndex, secondIndex)) {
+        result = [firstIndex, secondIndex];
+      }
+    });
+  });
+
+  if (result.length === 0) {
+    console.log(
+      'failed to chain:',
+      game.user.cards.map((card) => card.chain),
+    );
+    throw new Error('unable to chain 2 cards');
+  }
+  return result;
 };
 
-type PickResults = {
+const randomPickActions: ChoiceFunctions = {
+  chooseShop: (_, shops) => sample(shops)!,
+  chooseCardsToAdd: (_, cards) => sampleSize(cards, NUM_CARD_SELECTION_PICKS),
+  chooseCardsToRemove: (game) => sampleSize(range(game.user.cards.length)),
+  chooseCardsToChain: chooseRandomCardsToChain,
+  chooseRelicToAdd: (_, relics) => sample(relics)!,
+};
+
+type ChoiceResults = {
   type: string;
-  options?: CardState[] | RelicState[];
-  picks: CardState[] | RelicState[];
+  options: string[];
+  picks: string[];
 };
 
-function trackPickActions(pickActions: PickActions): {
-  pickActions: PickActions;
-  pickResults: PickResults[];
+function trackPickActions(choices: ChoiceFunctions): {
+  choices: ChoiceFunctions;
+  results: ChoiceResults[];
 } {
-  const pickResults: PickResults[] = [];
-  const selectCardsToAdd = (game: GameState, cardOptions: CardState[]) => {
-    const picks = pickActions.selectCardsToAdd(game, cardOptions);
-    pickResults.push({ type: 'selectCardsToAdd', options: cardOptions, picks });
-    return picks;
-  };
-  const selectCardsToRemove = (game: GameState) => {
-    const pickIndexes = pickActions.selectCardsToRemove(game);
-    const picks = pickIndexes.map((index) => game.user.cards[index]);
-    pickResults.push({ type: 'selectCardsToRemove', picks });
-    return pickIndexes;
-  };
-  const selectCardsToChain = (game: GameState) => {
-    const pickIndexes = pickActions.selectCardsToChain(game);
-    const picks = pickIndexes.map((index) => game.user.cards[index]);
-    pickResults.push({ type: 'selectCardsToChain', picks });
-    return pickIndexes;
-  };
-  const selectRelicToAdd = (game: GameState, relicOptions: RelicState[]) => {
-    const pick = pickActions.selectRelicToAdd(game, relicOptions);
-    pickResults.push({ type: 'selectRelicToAdd', options: relicOptions, picks: [pick] });
+  const pickResults: ChoiceResults[] = [];
+  const chooseShop = (game: GameState, shopOptions: ShopName[]) => {
+    const pick = choices.chooseShop(game, shopOptions);
+    pickResults.push({ type: 'chooseShop', options: shopOptions, picks: [pick] });
     return pick;
+  };
+  const chooseCardsToAdd = (game: GameState, cardOptions: CardState[]) => {
+    const options = cardOptions.map((card) => card.name);
+    const cardPicks = choices.chooseCardsToAdd(game, cardOptions);
+    const picks = cardPicks.map((card) => card.name);
+    pickResults.push({ type: 'chooseCardsToAdd', options, picks });
+    return cardPicks;
+  };
+  const chooseCardsToRemove = (game: GameState) => {
+    const options = game.user.cards.map((card) => card.name);
+    const pickIndexes = choices.chooseCardsToRemove(game);
+    const cardPicks = pickIndexes.map((index) => game.user.cards[index]);
+    const picks = cardPicks.map((card) => card.name);
+    pickResults.push({ type: 'chooseCardsToRemove', options, picks });
+    return pickIndexes;
+  };
+  const chooseCardsToChain = (game: GameState) => {
+    const options = game.user.cards.map((card) => card.name);
+    const pickIndexes = choices.chooseCardsToChain(game);
+    const cardPicks = pickIndexes.map((index) => game.user.cards[index]);
+    const picks = cardPicks.map((card) => card.name);
+    pickResults.push({ type: 'chooseCardsToChain', options, picks });
+    return pickIndexes;
+  };
+  const chooseRelicToAdd = (game: GameState, relicOptions: RelicState[]) => {
+    const options = relicOptions.map((relic) => relic.name);
+    const relicPick = choices.chooseRelicToAdd(game, relicOptions);
+    pickResults.push({ type: 'chooseRelicToAdd', options, picks: [relicPick.name] });
+    return relicPick;
   };
 
   return {
-    pickActions: {
-      selectCardsToAdd,
-      selectCardsToRemove,
-      selectCardsToChain,
-      selectRelicToAdd,
-    },
-    pickResults,
+    choices: {
+      chooseShop,
+      chooseCardsToAdd,
+      chooseCardsToRemove,
+      chooseCardsToChain,
+      chooseRelicToAdd,
+    } as ChoiceFunctions,
+    results: pickResults,
   };
 }
 
@@ -182,30 +231,28 @@ it('plays a full game without error', () => {
   }
 });
 
-it('shows the same pick options after rewinding', () => {
-  const { pickActions, pickResults } = trackPickActions(randomPickActions);
+it('shows the same card and relic selections after rewinding', () => {
+  const { choices, results } = trackPickActions(randomPickActions);
 
   const game = createGameState();
 
-  // force a win so we immediately select relics
+  // force a win so we immediately choose relics
   game.wins = 1;
 
   let rewindGameState = cloneDeep(game);
-  makeSelections(game, pickActions);
+  makeSelections(game, choices);
+  const beforeRewind = results.splice(0, results.length).map(({ options }) => options);
+
   battle(game);
   rewind(game, rewindGameState);
-
   rewindGameState = cloneDeep(game);
-  makeSelections(game, pickActions);
+  makeSelections(game, choices);
+  const afterRewind1 = results.splice(0, results.length).map(({ options }) => options);
+
   battle(game);
   rewind(game, rewindGameState);
-
-  makeSelections(game, pickActions);
-
-  const options = pickResults.map(({ options }) => (options || []).map((pick) => pick.name));
-  const beforeRewind = options.slice(0, 2);
-  const afterRewind1 = options.slice(2, 4);
-  const afterRewind2 = options.slice(4);
+  makeSelections(game, choices);
+  const afterRewind2 = results.splice(0, results.length).map(({ options }) => options);
 
   expect(beforeRewind).toEqual(afterRewind1);
   expect(beforeRewind).toEqual(afterRewind2);

@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
 import { createGameState } from '../../../game/gameState';
-import { getNextShops } from '../../../game/utils/selectors';
 import { ShopSelectionScreen } from './ShopSelectionScreen';
+import { getShopOptions, ShopName } from '../../../game/actions/actions';
 
 const meta = {
   title: 'ShopSelectionScreen',
@@ -20,8 +20,8 @@ type Story = StoryObj<typeof meta>;
 export const Primary: Story = {
   args: (() => {
     const game = createGameState();
-    game.wins = 1; // Ensure we have a shop
-    const [shopA, shopB] = getNextShops(game);
-    return { game, shopA, shopB };
+    game.wins = 2;
+    const shopOptions = getShopOptions(game);
+    return { game, shopOptions };
   })(),
 };

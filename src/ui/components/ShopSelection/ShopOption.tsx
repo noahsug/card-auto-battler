@@ -1,4 +1,4 @@
-import { ShopName } from '../../../game/utils/selectors';
+import { ShopName } from '../../../game/actions/actions';
 import { Button } from '../shared/Button';
 
 interface Props {

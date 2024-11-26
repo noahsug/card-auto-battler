@@ -27,6 +27,30 @@ import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects
 import { BattleEvent, createBattleEvent } from './battleEvent';
 import { potionByName } from '../../content/cards/cards';
 
+export type ShopName = 'removeCards' | 'chainCards' | 'addRelics' | 'addPotions';
+
+// which shops to choose from after adding new cards
+export function getShopOptions(game: GameState): ShopName[] {
+  const { wins } = game;
+
+  // just add cards on the first round
+  if (wins === 0) return [];
+
+  const relicRounds = [1, 4, 6, 8];
+  if (relicRounds.includes(wins)) return ['addRelics'];
+
+  const { sampleSize } = getRandom(game);
+
+  const potionRounds = [3, 5, 7]; // no potions for final boss (aka no rounds 8 or 9)
+  const otherShopOptions: ShopName[] = sampleSize(['removeCards', 'chainCards'], 2);
+
+  if (potionRounds.includes(wins)) {
+    return [otherShopOptions[0], 'addPotions'];
+  }
+
+  return otherShopOptions;
+}
+
 export function getAddCardsOptions(game: GameState): CardState[] {
   const { sampleSize } = getRandom(game);
 
@@ -303,7 +327,7 @@ export function endBattle(game: GameState) {
   game.enemy.health = game.enemy.startingHealth;
 }
 
-// TODO: rewind should change the random state so the user has more options and is never in a spot
+// TODO: rewind should change the random state? Reason: user has more options and is never in a spot
 // where they want to intentionally lose to pick that one OP card/relic combo due to now knowing
 // the future - it also breaks re-rolling if we add that later
 export function rewind(game: GameState, previousGameState: GameState) {

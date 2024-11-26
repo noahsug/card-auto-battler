@@ -2,6 +2,7 @@ import { GameState, PlayerState, Target } from '../gameState';
 import { RelicName } from '../../content/relics/relics';
 import { MAX_LOSSES, MAX_WINS } from '../constants';
 import { Random } from '../../utils/Random';
+import { ShopName } from '../actions/actions';
 
 export function getIsStartOfBattle(game: GameState) {
   return game.turn === 0 && game.user.cardsPlayedThisTurn === 0;
@@ -44,18 +45,6 @@ export function getRelic(player: PlayerState, relicName: RelicName) {
 
 export function getIsBossBattle({ wins }: { wins: number }) {
   return wins >= MAX_WINS - 1;
-}
-
-export type ShopName = 'removeCards' | 'chainCards' | 'addRelics' | 'addPotions';
-
-// which shops to choose from after adding new cards
-export function getNextShops({ wins }: { wins: number }): ShopName[] {
-  // only pick cards on the first round
-  if (wins === 0) return [];
-  if (wins % 4 === 0) return ['removeCards']; // 8, 12, 16, ...
-  if (wins % 4 === 2) return ['chainCards']; // 2, 6, 10, ...
-  if (wins % 2 === 1) return ['addRelics']; // 1, 3, 5, ...
-  return [];
 }
 
 export function getIsTurnOver(game: GameState) {

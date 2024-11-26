@@ -123,6 +123,10 @@ export class Random {
     return sampleSize(array, size, this.random);
   };
 
+  sample = <T>(array: T[]): T => {
+    return sampleSize(array, 1, this.random)[0];
+  };
+
   // Initialize with a new seed (a single Uint32)
   seed(seed: number) {
     this.state = createState(seed);

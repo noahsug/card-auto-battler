@@ -2,12 +2,8 @@ import { useCallback, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { CardState, GameState, RelicState } from '../../../game/gameState';
-import {
-  getBattleWinner,
-  getIsGameOver,
-  getNextShops,
-  ShopName,
-} from '../../../game/utils/selectors';
+import { getBattleWinner, getIsGameOver } from '../../../game/utils/selectors';
+import { ShopName, getShopOptions } from '../../../game/actions/actions';
 import { useGameState } from '../../hooks/useGameState';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
@@ -21,8 +17,9 @@ import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
 import cloneDeep from 'lodash/cloneDeep';
 import { assertIsNonNullable } from '../../../utils/asserts';
+import { ShopSelectionScreen } from '../ShopSelection';
 
-type ScreenType = ShopName | 'start' | 'addCards' | 'battle';
+type ScreenType = ShopName | 'selectShop' | 'start' | 'addCards' | 'battle';
 type OverlayType = 'battleResults' | 'deck' | 'none';
 
 export const Root = styled.div`
@@ -62,6 +59,7 @@ export function App() {
   const wonLastBattleRef = useRef(false);
   const cardSelectionOptionsRef = useRef<CardState[]>([]);
   const relicSelectionOptionsRef = useRef<RelicState[]>([]);
+  const shopSelectionOptionsRef = useRef<ShopName[]>([]);
   const rewindGameStateRef = useRef<GameState>();
 
   // DEBUG
@@ -103,23 +101,33 @@ export function App() {
     goToScreen('addCards');
   }, [getAddCardsOptions, goToScreen, select]);
 
+  const handleGoToShop = useCallback(
+    async (shop: ShopName) => {
+      if (shop === 'addRelics') {
+        relicSelectionOptionsRef.current = await getRelicAddOptions();
+      }
+      goToScreen(shop);
+    },
+    [getRelicAddOptions, goToScreen],
+  );
+
   const handleCardsAdded = useCallback(
     async (selectedCardIndexes: number[]) => {
       const cards = selectedCardIndexes.map((i) => cardSelectionOptionsRef.current[i]);
       addCards(cards);
 
-      const [nextShop] = getNextShops(game);
-      if (nextShop) {
-        if (nextShop === 'addRelics') {
-          relicSelectionOptionsRef.current = await getRelicAddOptions();
-        }
-        goToScreen(nextShop);
+      const shopOptions = getShopOptions(game);
+      if (shopOptions.length === 2) {
+        shopSelectionOptionsRef.current = shopOptions;
+        goToScreen('selectShop');
+      } else if (shopOptions.length === 1) {
+        handleGoToShop(shopOptions[0]);
       } else {
         // pick nothing and go straight to the battle
         goToScreen('battle');
       }
     },
-    [addCards, game, getRelicAddOptions, goToScreen],
+    [addCards, game, goToScreen, handleGoToShop],
   );
 
   const handleCardsRemoved = useCallback(
@@ -187,6 +195,15 @@ export function App() {
             onCardsSelected={handleCardsAdded}
             onViewDeck={handleOnViewDeck}
           ></AddCardScreen>
+        )}
+
+        {screen === 'selectShop' && (
+          <ShopSelectionScreen
+            game={game}
+            shopOptions={shopSelectionOptionsRef.current!}
+            onShopSelected={handleGoToShop}
+            onViewDeck={handleOnViewDeck}
+          ></ShopSelectionScreen>
         )}
 
         {screen === 'removeCards' && (

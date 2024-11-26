@@ -3,6 +3,8 @@ import { CardState } from '../gameState';
 
 // checks whether the new chain creates a loop
 export function getChainCreatesLoop(cards: CardState[], fromIndex: number, toIndex: number) {
+  if (fromIndex === toIndex) return true;
+
   const [fromCard, toCard] = [cards[fromIndex], cards[toIndex]];
 
   let currentCard = toCard;
