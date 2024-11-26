@@ -582,6 +582,7 @@ export const potionCardsByName = {
     ],
     {
       trash: true,
+      uses: 2,
       name: 'Regen Potion',
       description: 'Gain $V regen.',
       image: regenPotionImage,
@@ -596,6 +597,7 @@ export const potionCardsByName = {
     ],
     {
       trash: true,
+      uses: 2,
       name: 'Damage Potion',
       description: 'Deal $V damage.',
       image: damagePotionImage,
@@ -611,6 +613,7 @@ export const potionCardsByName = {
     ],
     {
       trash: true,
+      uses: 2,
       name: 'Strength Potion',
       description: 'Gain $V strength.',
       image: strengthPotionImage,
@@ -626,6 +629,7 @@ export const potionCardsByName = {
     ],
     {
       trash: true,
+      uses: 2,
       name: 'Adrenaline Potion',
       description: 'Play $V cards.',
       image: adrenalinePotionImage,
@@ -641,6 +645,7 @@ export const potionCardsByName = {
     ],
     {
       trash: true,
+      uses: 2,
       name: 'Crit Potion',
       description: 'Your next $V attacks will crit.',
       image: critPotionImage,
@@ -656,6 +661,7 @@ export const potionCardsByName = {
     ],
     {
       trash: true,
+      uses: 2,
       name: 'Dodge Potion',
       description: 'Gain $V dodge.',
       image: dodgePotionImage,

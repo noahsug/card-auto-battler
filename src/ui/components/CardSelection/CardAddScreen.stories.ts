@@ -20,9 +20,18 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {
+export const FirstTurn: Story = {
   args: (() => {
     const game = createGameState();
+    const cards = getCardAddOptions(game);
+    return { game, cards };
+  })(),
+};
+
+export const LaterTurns: Story = {
+  args: (() => {
+    const game = createGameState();
+    game.wins = 1;
     game.user.relics = getRandomRelics(3);
     const cards = getCardAddOptions(game);
     return { game, cards };

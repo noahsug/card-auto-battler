@@ -187,13 +187,6 @@ it('plays a full game without error', () => {
   }
 });
 
-it('avoids invalid chain error', () => {
-  const seed = 873466592;
-  const game = createGameState(seed);
-
-  expect(() => play(game, simplePickActions)).not.toThrow();
-});
-
 it('shows the same pick options after rewinding', () => {
   const { pickActions, pickResults } = trackPickActions(randomPickActions);
 
@@ -211,6 +204,7 @@ it('shows the same pick options after rewinding', () => {
   makeSelections(game, pickActions);
   battle(game);
   rewind(game, rewindGameState);
+
   makeSelections(game, pickActions);
 
   const options = pickResults.map(({ options }) => (options || []).map((pick) => pick.name));

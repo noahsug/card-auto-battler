@@ -5,6 +5,7 @@ import { createGameState } from '../../../game/gameState';
 import { getRandomRelics } from '../../../testing/utils';
 import { RelicSelectionScreen } from './RelicSelectionScreen';
 import { relicsByName } from '../../../content/relics';
+import { getCardAddOptions, getRelicAddOptions } from '../../../game/actions';
 
 const meta = {
   title: 'RelicSelectionScreen',
@@ -19,10 +20,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
-  args: {
-    game: createGameState(),
-    relics: getRandomRelics(3),
-  },
+  args: (() => {
+    const game = createGameState();
+    const relics = getRelicAddOptions(game);
+    return { game, relics };
+  })(),
 };
 
 export const AllRelics: Story = {

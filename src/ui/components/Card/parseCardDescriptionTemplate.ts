@@ -1,4 +1,5 @@
 import { CardState, If, MaybeValue, ValueDescriptor } from '../../../game/gameState';
+import { plural } from '../../../utils/plural';
 import { parseDescriptionTemplate } from '../../utils/parseDescriptionTemplate';
 
 type TemplateMap = Record<string, number>;
@@ -84,6 +85,11 @@ export function parseCardDescriptionTemplate(card: CardState) {
 
   if (card.trash) {
     text += ' Trash.';
+  }
+
+  if (card.uses) {
+    const uses = plural(card.uses.current, 'use');
+    text += ` Permanently removed after ${card.uses.current} ${uses}.`;
   }
 
   return text;

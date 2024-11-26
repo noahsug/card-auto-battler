@@ -10,6 +10,7 @@ import {
   NUM_CARD_SELECTION_OPTIONS,
   NUM_POTION_SELECTION_OPTIONS,
   NUM_RELIC_SELECTION_OPTIONS,
+  NUM_FIRST_CARD_SELECTION_OPTIONS,
 } from '../constants';
 import {
   CardState,
@@ -29,7 +30,10 @@ import { potionCardsByName } from '../../content/cards/cards';
 export function getCardAddOptions(game: GameState): CardState[] {
   const { sampleSize } = getRandom(game);
 
-  const cards = cloneDeep(sampleSize(Object.values(allCards), NUM_CARD_SELECTION_OPTIONS));
+  const numOptions =
+    game.wins === 0 ? NUM_FIRST_CARD_SELECTION_OPTIONS : NUM_CARD_SELECTION_OPTIONS;
+
+  const cards = cloneDeep(sampleSize(Object.values(allCards), numOptions));
   cards.forEach((card, i) => {
     card.acquiredId = i;
   });
@@ -224,7 +228,15 @@ export function playCard(game: GameState): BattleEvent[] {
 
   activePlayer.previousCard = card;
 
-  if (card.trash) {
+  if (card.uses) {
+    card.uses.current -= 1;
+  }
+
+  if (card.uses?.current === 0) {
+    // permanently remove card
+    activePlayer.cards.splice(activePlayer.currentCardIndex, 1);
+    events.push(createBattleEvent('trashCard', card.acquiredId));
+  } else if (card.trash) {
     // trash card
     activePlayer.trashedCards.push(card);
     activePlayer.cards.splice(activePlayer.currentCardIndex, 1);

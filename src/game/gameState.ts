@@ -99,6 +99,7 @@ export interface CardState {
   repeat?: MaybeValue;
   lifesteal?: MaybeValue;
   trash: boolean;
+  uses?: { current: number; max: number };
   name: string;
   description: string;
   image: string;

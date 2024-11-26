@@ -24,10 +24,11 @@ export function createEffect(partialEffect: Partial<CardEffect> = {}): CardEffec
 // returns a CardState with defaults
 export function createCard(
   effects: Partial<CardEffect>[] = [{}],
-  cardState: Partial<Omit<CardState, 'effects'>> = {},
+  cardState: Partial<Omit<CardState, 'effects' | 'uses'>> & { uses?: number } = {},
 ): CardState {
   const {
     trash = false,
+    uses,
     name = '',
     description = '',
     image = '',
@@ -39,6 +40,7 @@ export function createCard(
     effects: effects.map(createEffect),
     ...cardState,
     trash,
+    uses: uses ? { current: uses, max: uses } : undefined,
     name,
     description,
     image,
