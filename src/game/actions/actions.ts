@@ -40,6 +40,8 @@ export function getCardAddOptions(game: GameState): CardState[] {
   return cards;
 }
 
+export function getPotionAddOptions(game: GameState): CardState[] {}
+
 export function getRelicAddOptions(game: GameState): RelicState[] {
   const { sampleSize } = getRandom(game);
 

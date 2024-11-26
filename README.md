@@ -4,9 +4,17 @@ Game TODO:
 
 1. more enemies
 2. storybook visual testing
-3. choice of which charm shop to enter and more charm shops: feather = card on top, anchor = card
-   on bottom, potion = powerful 1 time use
-4. more heros?
+3. choice of which charm shop to enter and more charm shops:
+   1. ✅ chain = play after other chained card
+   2. ✅ remove = remove card
+   3. feather = card on top
+   4. anchor = card on bottom
+   5. potion = powerful 1 time use
+   6. dup card
+   7. remove "trash" keyword
+   8. add "play another card" keyword
+   9. +1 damage?
+4. more heroes?
 5. rerolls, currency?
 6. card rarity? so we don't spam folks with mythics that are OP but situational
 7. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
@@ -16,14 +24,16 @@ Game TODO:
 Polish TODO:
 
 1. save progress via local storage
-2. queue activations (e.g. relics, effects) one at a time so it's more clear what's happening, and
+2. rewind animation (show character coming back to life, health going to full, then jump to card
+   select)
+3. queue activations (e.g. relics, effects) one at a time so it's more clear what's happening, and
    highlight the relic/status effect that triggered it
-3. attack animation which triggers on each hit of the card
-4. clicking a card zooms in on it and displays what each keyword does
-5. loading screen
-6. add progress view? (e.g. fight -> card -> fight -> card -> relic -> etc -> boss)
-7. add achievements
-8. add offline app download option (see Slay the Web)
+4. attack animation which triggers on each hit of the card
+5. clicking a card zooms in on it and displays what each keyword does
+6. loading screen
+7. add progress view? (e.g. fight -> card -> fight -> card -> relic -> etc -> boss)
+8. add achievements
+9. add offline app download option (see Slay the Web)
 
 Maybe TODO:
 
@@ -239,6 +249,34 @@ The problem is this is super slow (36^6 nodes for each min-max search) and there
 possible decks for caching to have impact.
 
 ## gameplay
+
+### Balance
+
+3 first fights = flexible deck building, at least one piece of early game
+3 middle fights = some synergy is in place or all early game
+3 end fights = all early game won't cut it, need synergy
+1 boss = synergy needs to be dialed in and even then still might fail
+
+early game = upfront damage, carry you through mid game
+late game = scaling or needs synergy to work, risky to pick up
+cooperation = how many cards are part of other synergies
+size = how many pieces are needed for the synergy to come online
+
+4 main easy to find synergies. The cards that make up these synergies are:
+
+- I freeze = decent early, weak late, win = 1 mid (+dmg) or 2 late (dmg all on freeze)
+- W = powerful early, weak mid, 1 powerful card late, high cooperation, small size
+- N = powerful early, powerful mid, weak late, high cooperation, small size
+- D = powerful early,
+
+NWID
+
+wants
+
+- be able to pivot strategy before half way
+- have truly OP combos that are very rare (e.g. steal opponent card)
+- if a synergy uses early game cards it should be hard to assemble (e.g. lot of parts)
+- a synergy can be easy to assemble if it relies on mostly late game cards
 
 ### Cards (10/23/24)
 

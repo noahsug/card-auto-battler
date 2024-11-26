@@ -206,7 +206,7 @@ export const redCards = {
     {
       trash: true,
       name: 'Fireball',
-      description: 'Deal $V damage. Trash.',
+      description: 'Deal $V damage.',
       image: fireballImage,
     },
   ),
@@ -376,7 +376,7 @@ export const redCards = {
     {
       trash: true,
       name: 'Power Through Flame',
-      description: `Gain lifesteal when burning. Gain $2V burn. Trash.`,
+      description: `Gain lifesteal when burning. Gain $2V burn.`,
       image: personOnFireImage,
     },
   ),
@@ -564,6 +564,70 @@ export const purpleCards = {
 Object.values(purpleCards).forEach((card) => {
   card.tribe = 'purple';
 });
+
+export const potionCards = {
+  regenPotion: createCard(
+    [
+      {
+        target: 'self',
+        name: 'regen',
+        value: v(15),
+      },
+    ],
+    // TODO: Generate uses text for cards
+    {
+      trash: true,
+      name: 'Regen Potion',
+      description: 'Gain $V regen.',
+      image: '',
+    },
+  ),
+  damagePotion: createCard(
+    [
+      {
+        name: 'damage',
+        value: v(15),
+      },
+    ],
+    // TODO: Generate uses text for cards
+    {
+      trash: true,
+      name: 'Damage Potion',
+      description: 'Deal $V damage.',
+      image: '',
+    },
+  ),
+  strengthPotion: createCard(
+    [
+      {
+        target: 'self',
+        name: 'strength',
+        value: v(6),
+      },
+    ],
+    {
+      trash: true,
+      name: 'Strength Potion',
+      description: 'Gain $V strength.',
+      image: heavyRockImage,
+    },
+  ),
+  cardPlaysPotion: createCard(
+    [
+      {
+        target: 'self',
+        name: 'extraCardPlays',
+        value: v(3),
+      },
+    ],
+    {
+      trash: true,
+      name: 'Card Plays Potion',
+      description: 'Gain $V extra card plays.',
+      image: '',
+    },
+  ),
+};
 
 export const cardsByName = {
   ...basicCards,

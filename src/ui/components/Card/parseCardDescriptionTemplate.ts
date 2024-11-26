@@ -80,5 +80,11 @@ export function parseCardDescriptionTemplate(card: CardState) {
   };
 
   const getValue = (templateStr: string) => templateMap[templateStr];
-  return parseDescriptionTemplate(card.description, getValue);
+  let text = parseDescriptionTemplate(card.description, getValue);
+
+  if (card.trash) {
+    text += ' Trash.';
+  }
+
+  return text;
 }
