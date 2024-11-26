@@ -15,8 +15,12 @@ export function addCardsToPlayer(player: PlayerState, cards: CardState[]) {
 export function convertBasicAttacksToMonkAttack(cards: CardState[]) {
   cards.forEach((card) => {
     if (card.name !== attack.name) return;
-    card.repeat = { value: v(1) };
-    card.description += ' Repeat.';
+    card.effects.push({
+      target: 'self',
+      name: 'extraCardPlays',
+      value: v(1),
+    });
+    card.description += ' Play another card.';
     card.name = `${attack.name} (Monk)`;
   });
 }

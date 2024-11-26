@@ -1,5 +1,8 @@
 import { assertIsNonNullable } from '../../utils/asserts';
 
+// TODO: remove this and instead have card/relic descriptions use `${v1}` where v1 is the function
+// (card, game) => string, this will allow for more dynamic descriptions (e.g. # of punch cards for
+// punk relic)
 export function parseDescriptionTemplate(
   description: string,
   getValueFn: (templateStr: string) => number | undefined,

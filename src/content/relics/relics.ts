@@ -26,7 +26,7 @@ export const basicRelics = {
   }),
   monk: createRelic({
     displayName: 'Way of the Monk',
-    description: `Basic ${attack.name} cards are played twice.`,
+    description: `Basic "${attack.name}" cards gain "play another card".`,
     image: fistImage,
   }),
 };
