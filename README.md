@@ -8,12 +8,12 @@ Game TODO:
    1. ✅ chain = play after other chained card
    2. ✅ remove = remove card
    3. feather = card on top
-   4. anchor = card on bottom
-   5. potion = powerful 1 time use
-   6. dup card
-   7. remove "trash" keyword
-   8. add "play another card" keyword
-   9. +1 damage?
+   4. ✅ potion = powerful 1 time use
+   5. dup card (does not dup chain)?
+   6. remove "trash" keyword?
+   7. add "play another card" keyword?
+   8. add "crit" keyword?
+   9. add "repeat" keyword?
 4. more heroes?
 5. rerolls, currency?
 6. card rarity? so we don't spam folks with mythics that are OP but situational

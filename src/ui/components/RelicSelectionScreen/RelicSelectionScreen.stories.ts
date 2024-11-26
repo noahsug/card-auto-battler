@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { createGameState } from '../../../game/gameState';
-import { getRandomRelics } from '../../../testing/utils';
-import { RelicSelectionScreen } from './RelicSelectionScreen';
 import { relicsByName } from '../../../content/relics';
-import { getCardAddOptions, getRelicAddOptions } from '../../../game/actions';
+import { getRelicAddOptions } from '../../../game/actions';
+import { createGameState } from '../../../game/gameState';
+import { RelicSelectionScreen } from './RelicSelectionScreen';
 
 const meta = {
   title: 'RelicSelectionScreen',

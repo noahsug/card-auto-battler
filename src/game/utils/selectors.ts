@@ -46,14 +46,16 @@ export function getIsBossBattle({ wins }: { wins: number }) {
   return wins >= MAX_WINS - 1;
 }
 
-// what pick action to take after adding new cards
-export function getNextPickAction({ wins }: { wins: number }) {
+export type ShopName = 'removeCards' | 'chainCards' | 'addRelics' | 'addPotions';
+
+// which shops to choose from after adding new cards
+export function getNextShops({ wins }: { wins: number }): ShopName[] {
   // only pick cards on the first round
-  if (wins === 0) return null;
-  if (wins % 4 === 0) return 'removeCards'; // 8, 12, 16, ...
-  if (wins % 4 === 2) return 'chainCards'; // 2, 6, 10, ...
-  if (wins % 2 === 1) return 'addRelic'; // 1, 3, 5, ...
-  return null;
+  if (wins === 0) return [];
+  if (wins % 4 === 0) return ['removeCards']; // 8, 12, 16, ...
+  if (wins % 4 === 2) return ['chainCards']; // 2, 6, 10, ...
+  if (wins % 2 === 1) return ['addRelics']; // 1, 3, 5, ...
+  return [];
 }
 
 export function getIsTurnOver(game: GameState) {

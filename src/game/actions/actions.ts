@@ -25,7 +25,7 @@ import { getBattleWinner, getPlayers, getRandom, getRelic } from '../utils/selec
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
-import { potionCardsByName } from '../../content/cards/cards';
+import { potionByName } from '../../content/cards/cards';
 
 export function getCardAddOptions(game: GameState): CardState[] {
   const { sampleSize } = getRandom(game);
@@ -49,7 +49,7 @@ export function getCardAddOptions(game: GameState): CardState[] {
 export function getPotionAddOptions(game: GameState): CardState[] {
   const { sampleSize } = getRandom(game);
 
-  const cards = Object.values(potionCardsByName);
+  const cards = Object.values(potionByName);
   return cloneDeep(sampleSize(cards, NUM_POTION_SELECTION_OPTIONS));
 }
 

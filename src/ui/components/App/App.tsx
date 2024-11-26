@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 import { CardState, GameState, RelicState } from '../../../game/gameState';
-import { getBattleWinner, getIsGameOver, getNextPickAction } from '../../../game/utils/selectors';
+import { getBattleWinner, getIsGameOver, getNextShops } from '../../../game/utils/selectors';
 import { useGameState } from '../../hooks/useGameState';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
@@ -109,13 +109,13 @@ export function App() {
       const cards = selectedCardIndexes.map((i) => cardSelectionOptionsRef.current[i]);
       addCards(cards);
 
-      const nextPickAction = getNextPickAction(game);
-      if (nextPickAction === 'removeCards') {
+      const [nextShop] = getNextShops(game);
+      if (nextShop === 'removeCards') {
         goToScreen('cardRemoveScreen');
-      } else if (nextPickAction === 'addRelic') {
+      } else if (nextShop === 'addRelics') {
         relicSelectionOptionsRef.current = await getRelicAddOptions();
         goToScreen('relicSelectionScreen');
-      } else if (nextPickAction === 'chainCards') {
+      } else if (nextShop === 'chainCards') {
         goToScreen('cardChainScreen');
       } else {
         // pick nothing and go straight to the battle

@@ -571,7 +571,7 @@ Object.values(purpleCardsByName).forEach((card) => {
   card.tribe = 'purple';
 });
 
-export const potionCardsByName = {
+export const potionByName = {
   regenPotion: createCard(
     [
       {
