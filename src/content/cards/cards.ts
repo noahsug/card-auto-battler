@@ -28,13 +28,19 @@ import electricTrapImage from './images/electric-trap.png';
 import tripleStrikeImage from './images/triple-strike.png';
 import stealthImage from './images/stealth.jpeg';
 import pumpUpImage from './images/pump-up.png';
+import dodgePotionImage from './images/dodge-potion.jpeg';
+import critPotionImage from './images/crit-potion.jpeg';
+import regenPotionImage from './images/regen-potion.jpeg';
+import damagePotionImage from './images/damage-potion.jpeg';
+import adrenalinePotionImage from './images/adrenaline-potion.jpeg';
+import strengthPotionImage from './images/strength-potion.jpeg';
 
 import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
 
 /**
  * Basic cards
  */
-export const basicCards = {
+export const basicCardsByName = {
   attack: createCard(
     [
       {
@@ -79,7 +85,7 @@ export const basicCards = {
 /**
  * Green cards
  */
-export const greenCards = {
+export const greenCardsByName = {
   damagePerTurn: createCard(
     [
       {
@@ -189,14 +195,14 @@ export const greenCards = {
     },
   ),
 };
-Object.values(greenCards).forEach((card) => {
+Object.values(greenCardsByName).forEach((card) => {
   card.tribe = 'green';
 });
 
 /**
  * Red cards
  */
-export const redCards = {
+export const redCardsByName = {
   fireball: createCard(
     [
       {
@@ -402,14 +408,14 @@ export const redCards = {
     },
   ),
 };
-Object.values(redCards).forEach((card) => {
+Object.values(redCardsByName).forEach((card) => {
   card.tribe = 'red';
 });
 
 /**
  * Purple cards
  */
-export const purpleCards = {
+export const purpleCardsByName = {
   jabOne: createCard(
     [
       {
@@ -561,25 +567,24 @@ export const purpleCards = {
     },
   ),
 };
-Object.values(purpleCards).forEach((card) => {
+Object.values(purpleCardsByName).forEach((card) => {
   card.tribe = 'purple';
 });
 
-export const potionCards = {
+export const potionCardsByName = {
   regenPotion: createCard(
     [
       {
         target: 'self',
         name: 'regen',
-        value: v(15),
+        value: v(6),
       },
     ],
-    // TODO: Generate uses text for cards
     {
       trash: true,
       name: 'Regen Potion',
       description: 'Gain $V regen.',
-      image: '',
+      image: regenPotionImage,
     },
   ),
   damagePotion: createCard(
@@ -589,12 +594,11 @@ export const potionCards = {
         value: v(15),
       },
     ],
-    // TODO: Generate uses text for cards
     {
       trash: true,
       name: 'Damage Potion',
       description: 'Deal $V damage.',
-      image: '',
+      image: damagePotionImage,
     },
   ),
   strengthPotion: createCard(
@@ -609,7 +613,7 @@ export const potionCards = {
       trash: true,
       name: 'Strength Potion',
       description: 'Gain $V strength.',
-      image: heavyRockImage,
+      image: strengthPotionImage,
     },
   ),
   cardPlaysPotion: createCard(
@@ -622,18 +626,48 @@ export const potionCards = {
     ],
     {
       trash: true,
-      name: 'Card Plays Potion',
-      description: 'Gain $V extra card plays.',
-      image: '',
+      name: 'Adrenaline Potion',
+      description: 'Play $V cards.',
+      image: adrenalinePotionImage,
+    },
+  ),
+  critPotion: createCard(
+    [
+      {
+        target: 'self',
+        name: 'crit',
+        value: v(3),
+      },
+    ],
+    {
+      trash: true,
+      name: 'Crit Potion',
+      description: 'Your next $V attacks will crit.',
+      image: critPotionImage,
+    },
+  ),
+  dodgePotion: createCard(
+    [
+      {
+        target: 'self',
+        name: 'dodge',
+        value: v(3),
+      },
+    ],
+    {
+      trash: true,
+      name: 'Dodge Potion',
+      description: 'Gain $V dodge.',
+      image: dodgePotionImage,
     },
   ),
 };
 
 export const cardsByName = {
-  ...basicCards,
-  ...redCards,
-  ...greenCards,
-  ...purpleCards,
+  ...basicCardsByName,
+  ...redCardsByName,
+  ...greenCardsByName,
+  ...purpleCardsByName,
 };
 
 export const allCards = Object.values(cardsByName);

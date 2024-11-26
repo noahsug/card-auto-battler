@@ -8,6 +8,7 @@ import {
   MAX_SHOCK,
   MAX_TURNS_IN_BATTLE,
   NUM_CARD_SELECTION_OPTIONS,
+  NUM_POTION_SELECTION_OPTIONS,
   NUM_RELIC_SELECTION_OPTIONS,
 } from '../constants';
 import {
@@ -23,6 +24,7 @@ import { getBattleWinner, getPlayers, getRandom, getRelic } from '../utils/selec
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
+import { potionCardsByName } from '../../content/cards/cards';
 
 export function getCardAddOptions(game: GameState): CardState[] {
   const { sampleSize } = getRandom(game);
@@ -40,7 +42,12 @@ export function getCardAddOptions(game: GameState): CardState[] {
   return cards;
 }
 
-export function getPotionAddOptions(game: GameState): CardState[] {}
+export function getPotionAddOptions(game: GameState): CardState[] {
+  const { sampleSize } = getRandom(game);
+
+  const cards = Object.values(potionCardsByName);
+  return cloneDeep(sampleSize(cards, NUM_POTION_SELECTION_OPTIONS));
+}
 
 export function getRelicAddOptions(game: GameState): RelicState[] {
   const { sampleSize } = getRandom(game);
