@@ -1,5 +1,5 @@
 import { shuffle } from './shuffle';
-import { sampleSize } from './sampleSize';
+import { sample } from './sample';
 import { isNumber } from 'lodash';
 
 // based on https://github.com/mljs/xsadd which is based on the XORSHIFT-ADD (XSadd) algorithm
@@ -123,11 +123,11 @@ export class Random {
   };
 
   sample = <T>(array: T[], size: number): T[] => {
-    return sampleSize(array, size, this.random);
+    return sample(array, size, this.random);
   };
 
   pick = <T>(array: T[]): T => {
-    return sampleSize(array, 1, this.random)[0];
+    return sample(array, 1, this.random)[0];
   };
 
   // Initialize with a new seed (a single Uint32)

@@ -1,8 +1,9 @@
+import range from 'lodash/range';
+
 import { PlayerInfo } from '../gameState';
 import { Random } from '../../utils/Random';
 import { EnemyName, enemiesByName } from '../../content/enemies/enemies';
 import { MAX_WINS } from '../constants';
-import range from 'lodash/range';
 
 export function getEnemyInfo(enemyOrder: EnemyName[], battleNumber: number): PlayerInfo {
   const enemyName = enemyOrder[battleNumber];
@@ -15,50 +16,51 @@ export function getEnemyInfo(enemyOrder: EnemyName[], battleNumber: number): Pla
   };
 }
 
-export function getEnemyOrder({ pick }: Random) {
-  const enemyNamesBySlots = range(MAX_WINS).map(() => new Set<EnemyName>());
-  for (const [name, { battleRange }] of Object.entries(enemiesByName)) {
-    const [min, max] = battleRange;
-    for (let i = min; i <= max; i++) {
-      enemyNamesBySlots[i].add(name as EnemyName);
-    }
+export function getEnemyOrder(random: Random) {
+  // enemy order can fail since we're doing a very simple greedy algorithm, we could make the
+  // greedy algorithm smarter but we want to ensure enemies are placed as randomly as possible
+  for (let i = 0; i < 20; i++) {
+    const { enemyOrder, success } = getEnemyOrderAndSuccess(random);
+    if (success) return enemyOrder;
   }
 
+  // our greedy algorithm failed, so we'll force the enemy order to be valid,
+  // this should be extremely rare (~0.0001% chance)
+  const { enemyOrder } = getEnemyOrderAndSuccess(random, { force: true });
+  return enemyOrder;
+}
+
+function getEnemyOrderAndSuccess(
+  { shuffle, pick }: Random,
+  { force = false }: { force?: boolean } = {},
+) {
+  // sort from narrowest enemy battle range to widest
+  const entries = shuffle(Object.entries(enemiesByName)).sort(([, enemyA], [, enemyB]) => {
+    const [minA, maxA] = enemyA.battleRange;
+    const [minB, maxB] = enemyB.battleRange;
+    return maxA - minA - (maxB - minB);
+  });
+
+  let success = true;
   const enemyOrder = new Array<EnemyName>(MAX_WINS);
-  for (let iterations = 0; iterations < MAX_WINS; iterations++) {
-    const { slot, enemies } = getLeastUsedSlot(enemyNamesBySlots);
-    const enemy = getMost;
-  }
-}
+  assert(entries.length >= MAX_WINS, 'Expected number of enemies to be >= MAX_WINS');
 
-function getLeastUsedSlot(enemyNamesBySlots: Set<EnemyName>[]) {
-  return enemyNamesBySlots.reduce(
-    (min, enemies, slot) => {
-      if (enemies.size < min.enemies.size) {
-        return { slot, enemies: enemies };
+  for (const [name, { battleRange }] of entries) {
+    let index = pick(getAvailableIndexes(battleRange, enemyOrder));
+    if (index === undefined) {
+      if (force) {
+        // force the enemy into any available index
+        index = pick(getAvailableIndexes([0, enemyOrder.length - 1], enemyOrder));
+      } else {
+        success = false;
       }
-      return min;
-    },
-    { slot: -1, enemies: new Set<EnemyName>() },
-  );
+    }
+    enemyOrder[index] = name as EnemyName;
+  }
+  return { enemyOrder, success };
 }
 
-function getUnusedIndexes(battleRange: [number, number], enemyOrder: EnemyName[]) {
+function getAvailableIndexes(battleRange: [number, number], enemyOrder: EnemyName[]) {
   const [min, max] = battleRange;
   return range(min, max + 1).filter((i) => !enemyOrder[i]);
 }
-
-// // sort from narrowest battle range to widest
-// const entries = Object.entries(enemiesByName).sort(([, enemyA], [, enemyB]) => {
-//   const [minA, maxA] = enemyA.battleRange;
-//   const [minB, maxB] = enemyB.battleRange;
-//   return maxA - minA - (maxB - minB);
-// });
-// const availableSlotsByEnemyName
-// const enemyOrder = new Array<EnemyName>(MAX_WINS);
-// entries.forEach(([name, { battleRange }]) => {
-//   const index = pick(getUnusedIndexes(battleRange, enemyOrder));
-//   console.log('pick', index, name);
-//   enemyOrder[index] = name as EnemyName;
-// });
-// return enemyOrder;
