@@ -1,22 +1,23 @@
 import { useCallback, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
+import { ShopName } from '../../../game/actions';
 import { CardState, GameState, RelicState } from '../../../game/gameState';
 import { getBattleWinner, getIsGameOver } from '../../../game/utils/selectors';
-import { ShopName, getShopOptions } from '../../../game/actions/actions';
+import { assertIsNonNullable } from '../../../utils/asserts';
 import { useGameState } from '../../hooks/useGameState';
+import { AddRelicsScreen } from '../AddRelicsScreen';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
 import { AddCardScreen } from '../CardSelection/AddCardScreen';
 import { ChainCardsScreen } from '../CardSelection/ChainCardsScreen';
 import { RemoveCardsScreen } from '../CardSelection/RemoveCardsScreen';
-import { AddRelicsScreen } from '../AddRelicsScreen';
 import { OverlayBackground } from '../shared/OverlayBackground';
+import { ShopSelectionScreen } from '../ShopSelection';
 import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
-import { assertIsNonNullable } from '../../../utils/asserts';
-import { ShopSelectionScreen } from '../ShopSelection';
+import { AddPotionsScreen } from '../CardSelection/AddPotionsScreen';
 
 type ScreenType = ShopName | 'selectShop' | 'start' | 'addCards' | 'battle';
 type OverlayType = 'battleResults' | 'deck' | 'none';
@@ -39,8 +40,11 @@ export const ScreenContainer = styled.div`
 export function App() {
   const { game, actions, select, setGameState } = useGameState();
   const {
+    initializeEnemy,
     getAddCardsOptions,
     getRelicAddOptions,
+    getAddPotionOptions,
+    getShopOptions,
     addCards,
     removeCards,
     chainCards,
@@ -56,9 +60,10 @@ export function App() {
   // passed to battle screen so it doesn't update after battle is over
   const endOfBattleGameRef = useRef<GameState>();
   const wonLastBattleRef = useRef(false);
-  const cardSelectionOptionsRef = useRef<CardState[]>([]);
-  const relicSelectionOptionsRef = useRef<RelicState[]>([]);
-  const shopSelectionOptionsRef = useRef<ShopName[]>([]);
+  const cardOptionsRef = useRef<CardState[]>([]);
+  const potionOptionsRef = useRef<CardState[]>([]);
+  const relicOptionsRef = useRef<RelicState[]>([]);
+  const shopOptionsRef = useRef<ShopName[]>([]);
   const rewindGameStateRef = useRef<GameState>();
 
   // DEBUG
@@ -95,29 +100,32 @@ export function App() {
 
   const startCardSelection = useCallback(async () => {
     rewindGameStateRef.current = await select((game) => structuredClone(game));
+    initializeEnemy();
     endOfBattleGameRef.current = undefined;
-    cardSelectionOptionsRef.current = await getAddCardsOptions();
+    cardOptionsRef.current = await getAddCardsOptions();
     goToScreen('addCards');
-  }, [getAddCardsOptions, goToScreen, select]);
+  }, [getAddCardsOptions, goToScreen, initializeEnemy, select]);
 
   const handleGoToShop = useCallback(
     async (shop: ShopName) => {
       if (shop === 'addRelics') {
-        relicSelectionOptionsRef.current = await getRelicAddOptions();
+        relicOptionsRef.current = await getRelicAddOptions();
+      } else if (shop === 'addPotions') {
+        potionOptionsRef.current = await getAddPotionOptions();
       }
       goToScreen(shop);
     },
-    [getRelicAddOptions, goToScreen],
+    [getAddPotionOptions, getRelicAddOptions, goToScreen],
   );
 
   const handleCardsAdded = useCallback(
     async (selectedCardIndexes: number[]) => {
-      const cards = selectedCardIndexes.map((i) => cardSelectionOptionsRef.current[i]);
+      const cards = selectedCardIndexes.map((i) => cardOptionsRef.current[i]);
       addCards(cards);
 
-      const shopOptions = getShopOptions(game);
+      const shopOptions = await getShopOptions();
       if (shopOptions.length === 2) {
-        shopSelectionOptionsRef.current = shopOptions;
+        shopOptionsRef.current = shopOptions;
         goToScreen('selectShop');
       } else if (shopOptions.length === 1) {
         handleGoToShop(shopOptions[0]);
@@ -126,7 +134,7 @@ export function App() {
         goToScreen('battle');
       }
     },
-    [addCards, game, goToScreen, handleGoToShop],
+    [addCards, getShopOptions, goToScreen, handleGoToShop],
   );
 
   const handleCardsRemoved = useCallback(
@@ -147,7 +155,7 @@ export function App() {
 
   const handleRelicSelected = useCallback(
     (selectedRelicIndex: number) => {
-      const relic = relicSelectionOptionsRef.current[selectedRelicIndex];
+      const relic = relicOptionsRef.current[selectedRelicIndex];
       addRelic(relic);
       goToScreen('battle');
     },
@@ -194,16 +202,25 @@ export function App() {
         {screen === 'addCards' && (
           <AddCardScreen
             game={game}
-            cards={cardSelectionOptionsRef.current}
+            cards={cardOptionsRef.current}
             onCardsSelected={handleCardsAdded}
             onViewDeck={handleOnViewDeck}
           ></AddCardScreen>
         )}
 
+        {screen === 'addPotions' && (
+          <AddPotionsScreen
+            game={game}
+            cards={potionOptionsRef.current}
+            onCardsSelected={handleCardsAdded}
+            onViewDeck={handleOnViewDeck}
+          ></AddPotionsScreen>
+        )}
+
         {screen === 'selectShop' && (
           <ShopSelectionScreen
             game={game}
-            shopOptions={shopSelectionOptionsRef.current!}
+            shopOptions={shopOptionsRef.current!}
             onShopSelected={handleGoToShop}
             onViewDeck={handleOnViewDeck}
           ></ShopSelectionScreen>
@@ -228,7 +245,7 @@ export function App() {
         {screen === 'addRelics' && (
           <AddRelicsScreen
             game={game}
-            relics={relicSelectionOptionsRef.current}
+            relics={relicOptionsRef.current}
             onRelicSelected={handleRelicSelected}
             onViewDeck={handleOnViewDeck}
           ></AddRelicsScreen>

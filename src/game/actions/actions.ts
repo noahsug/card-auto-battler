@@ -18,6 +18,7 @@ import {
   RelicState,
   createGameState,
   statusEffectNames,
+  createPlayer,
 } from '../gameState';
 import { addCardsToPlayer, convertBasicAttacksToMonkAttack } from '../utils/cards';
 import { getBattleWinner, getPlayers, getRandom, getRelic } from '../utils/selectors';
@@ -25,8 +26,18 @@ import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './app
 import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
 import { potionByName } from '../../content/cards/cards';
+import { allEnemies } from '../../content/enemies';
 
 export type ShopName = 'removeCards' | 'chainCards' | 'addRelics' | 'addPotions';
+
+export function initializeEnemy(game: GameState) {
+  const enemyInfo = allEnemies.fireMonster;
+  const enemy = createPlayer(enemyInfo);
+  enemy.startingHealth += game.wins * 10;
+  enemy.health = enemy.startingHealth;
+
+  game.enemy = enemy;
+}
 
 // which shops to choose from after adding new cards
 export function getShopOptions(game: GameState): ShopName[] {
@@ -69,7 +80,7 @@ export function getAddCardsOptions(game: GameState): CardState[] {
   return cards;
 }
 
-export function getPotionAddOptions(game: GameState): CardState[] {
+export function getAddPotionOptions(game: GameState): CardState[] {
   const { sampleSize } = getRandom(game);
 
   const cards = Object.values(potionByName);
@@ -99,6 +110,7 @@ export function removeCards(game: GameState, cardIndexes: number[]) {
   game.user.cards = game.user.cards.filter((_, index) => !cardIndexes.includes(index));
 }
 
+// TODO: all card selections are off by 1 index
 export function chainCards(game: GameState, cardIndexes: number[]) {
   assert(cardIndexes.length === 2, 'must select exactly 2 cards to chain');
   const { cards } = game.user;
@@ -320,10 +332,6 @@ export function endBattle(game: GameState) {
   game.turn = 0;
 
   resetPlayerAfterBattle(game.user);
-  resetPlayerAfterBattle(game.enemy);
-
-  game.enemy.startingHealth += 10;
-  game.enemy.health = game.enemy.startingHealth;
 }
 
 // TODO: rewind should change the random state? Reason: user has more options and is never in a spot

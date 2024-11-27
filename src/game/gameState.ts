@@ -146,7 +146,7 @@ export interface PlayerInfo {
   cards: CardState[];
 }
 
-function createPlayer({ name, image, cards }: PlayerInfo): PlayerState {
+export function createPlayer({ name, image, cards }: PlayerInfo): PlayerState {
   const player = {
     health: STARTING_HEALTH,
     startingHealth: STARTING_HEALTH,
@@ -172,7 +172,8 @@ function createPlayer({ name, image, cards }: PlayerInfo): PlayerState {
 export function createGameState(seed?: number): GameState {
   const game = {
     user: createPlayer(allHeroes.warrior),
-    enemy: createPlayer(allEnemies.fireMonster),
+    // enemy is initialized later via initializeEnemy()
+    enemy: createPlayer({ name: '', image: '', cards: [] }),
     turn: 0,
     wins: 0,
     losses: 0,

@@ -15,7 +15,7 @@ export const baseCardSize = { width: 12, height: 20 };
 export const cardSizeScaling = {
   small: 0.7,
   medium: 0.8,
-  large: 1.2,
+  large: 1.1,
 };
 
 const CardRoot = styled.div<{ $size: Props['size'] }>`
@@ -70,12 +70,12 @@ const Text = styled.div`
   }
 `;
 
-const ChainOverlay = styled.div<{ side: 'left' | 'right' }>`
+const ChainOverlay = styled.div<{ $side: 'left' | 'right' }>`
   width: 2em;
   height: 2em;
   position: absolute;
   top: 51%;
-  ${({ side }) => side}: -0.5em;
+  ${({ $side }) => $side}: -0.5em;
   ${maskImage({ src: chainImage })}
   background-color: #fdfd92;
 `;
@@ -100,8 +100,8 @@ export function Card({ size, card, onClick, style }: Props) {
           <Text>
             <DescriptionText text={description} />
           </Text>
-          {card.chain.fromId != null && <ChainOverlay side="left" />}
-          {card.chain.toId != null && <ChainOverlay side="right" />}
+          {card.chain.fromId != null && <ChainOverlay $side="left" />}
+          {card.chain.toId != null && <ChainOverlay $side="right" />}
         </OuterContainer>
       </ThemeProvider>
     </CardRoot>
