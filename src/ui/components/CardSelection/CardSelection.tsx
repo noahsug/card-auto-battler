@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { styled } from 'styled-components';
-
 import sortBy from 'lodash/sortBy';
+
 import { applyCardOrderingEffects } from '../../../game/actions/applyCardOrderingEffects';
 import { CardState, GameState } from '../../../game/gameState';
 import { plural } from '../../../utils/plural';
@@ -28,7 +28,7 @@ interface Props {
   numCardSelections?: number;
   onViewDeck?: () => void;
   onCardSelectionChange?: (selectedCardIndexes: number[]) => void;
-  onCardsSelected?: (selectedCardIndexes: number[]) => void;
+  onCardsSelected?: (cards: CardState[]) => void;
 }
 
 export function CardSelection({
@@ -57,14 +57,21 @@ export function CardSelection({
       } else if (cardSelectionsRemaining > 0) {
         // select card
         setSelectedCardIndexes((prev) => [...prev, index]);
+      } else {
+        // replace the last selected card
+        setSelectedCardIndexes((prev) => {
+          const copy = [...prev];
+          copy.pop();
+          return [...copy, index];
+        });
       }
     },
     [cardSelectionsRemaining, invalidSelections, selectedCardIndexes],
   );
 
   const handleContinue = useCallback(() => {
-    onCardsSelected?.(selectedCardIndexes);
-  }, [onCardsSelected, selectedCardIndexes]);
+    onCardsSelected?.(selectedCardIndexes.map((i) => cards[i]));
+  }, [cards, onCardsSelected, selectedCardIndexes]);
 
   useEffect(() => {
     onCardSelectionChange?.(selectedCardIndexes);
@@ -72,10 +79,16 @@ export function CardSelection({
 
   // indicate which cards are selected
   function getStyle(index: number) {
-    const scale = selectedCardIndexes.includes(index) ? '1' : '.85';
-    let filter = selectedCardIndexes.includes(index) ? 'brightness(1.15)' : '';
-    filter = invalidSelections.includes(index) ? 'brightness(.5)' : filter;
-    return { scale, filter };
+    if (selectedCardIndexes.includes(index)) {
+      return { scale: '1', filter: 'brightness(1.15)' };
+    } else if (
+      invalidSelections.includes(index) ||
+      (cardSelectionsRemaining === 0 && numCardSelections > 0)
+    ) {
+      return { scale: '.85', filter: 'brightness(.5)' };
+    } else {
+      return { scale: '.85', filter: '' };
+    }
   }
 
   return (

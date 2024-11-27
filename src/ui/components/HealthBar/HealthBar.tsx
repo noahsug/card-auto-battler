@@ -1,5 +1,4 @@
 import { animated, useSpring } from '@react-spring/web';
-import clamp from 'lodash/clamp';
 import { styled } from 'styled-components';
 
 import { Image } from '../shared/Image';
@@ -50,11 +49,13 @@ interface Props {
 }
 
 export function HealthBar({ health, maxHealth }: Props) {
+  health = Math.max(0, health);
+
   const [animationProps] = useSpring(
     {
       from: { width: '100%' },
       // ensure percent health remaining stays within 0% - 100%
-      to: { width: `${clamp((health / maxHealth) * 100, 0, 100)}%` },
+      to: { width: `${Math.min((health / maxHealth) * 100, 100)}%` },
     },
     [health, maxHealth],
   );

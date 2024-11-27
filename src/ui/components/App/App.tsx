@@ -9,7 +9,7 @@ import { useGameState } from '../../hooks/useGameState';
 import { AddRelicsScreen } from '../AddRelicsScreen';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
-import { AddCardScreen } from '../CardSelection/AddCardScreen';
+import { AddCardsScreen } from '../CardSelection/AddCardsScreen';
 import { ChainCardsScreen } from '../CardSelection/ChainCardsScreen';
 import { RemoveCardsScreen } from '../CardSelection/RemoveCardsScreen';
 import { OverlayBackground } from '../shared/OverlayBackground';
@@ -41,8 +41,8 @@ export function App() {
   const { game, actions, select, setGameState } = useGameState();
   const {
     initializeEnemy,
-    getAddCardsOptions,
-    getRelicAddOptions,
+    getAddCardOptions,
+    getAddRelicOptions,
     getAddPotionOptions,
     getShopOptions,
     addCards,
@@ -102,25 +102,24 @@ export function App() {
     rewindGameStateRef.current = await select((game) => structuredClone(game));
     initializeEnemy();
     endOfBattleGameRef.current = undefined;
-    cardOptionsRef.current = await getAddCardsOptions();
+    cardOptionsRef.current = await getAddCardOptions();
     goToScreen('addCards');
-  }, [getAddCardsOptions, goToScreen, initializeEnemy, select]);
+  }, [getAddCardOptions, goToScreen, initializeEnemy, select]);
 
   const handleGoToShop = useCallback(
     async (shop: ShopName) => {
       if (shop === 'addRelics') {
-        relicOptionsRef.current = await getRelicAddOptions();
+        relicOptionsRef.current = await getAddRelicOptions();
       } else if (shop === 'addPotions') {
         potionOptionsRef.current = await getAddPotionOptions();
       }
       goToScreen(shop);
     },
-    [getAddPotionOptions, getRelicAddOptions, goToScreen],
+    [getAddPotionOptions, getAddRelicOptions, goToScreen],
   );
 
-  const handleCardsAdded = useCallback(
-    async (selectedCardIndexes: number[]) => {
-      const cards = selectedCardIndexes.map((i) => cardOptionsRef.current[i]);
+  const handleAddCards = useCallback(
+    async (cards: CardState[]) => {
       addCards(cards);
 
       const shopOptions = await getShopOptions();
@@ -137,25 +136,32 @@ export function App() {
     [addCards, getShopOptions, goToScreen, handleGoToShop],
   );
 
-  const handleCardsRemoved = useCallback(
-    (selectedCardIndexes: number[]) => {
-      removeCards(selectedCardIndexes);
+  const handleAddPotions = useCallback(
+    (cards: CardState[]) => {
+      addCards(cards);
+      goToScreen('battle');
+    },
+    [addCards, goToScreen],
+  );
+
+  const handleRemoveCards = useCallback(
+    (cards: CardState[]) => {
+      removeCards(cards);
       goToScreen('battle');
     },
     [removeCards, goToScreen],
   );
 
-  const handleCardsChained = useCallback(
-    (selectedCardIndexes: number[]) => {
-      chainCards(selectedCardIndexes);
+  const handleChainCards = useCallback(
+    (cards: CardState[]) => {
+      chainCards(cards);
       goToScreen('battle');
     },
     [chainCards, goToScreen],
   );
 
-  const handleRelicSelected = useCallback(
-    (selectedRelicIndex: number) => {
-      const relic = relicOptionsRef.current[selectedRelicIndex];
+  const handleAddRelics = useCallback(
+    (relic: RelicState) => {
       addRelic(relic);
       goToScreen('battle');
     },
@@ -200,19 +206,19 @@ export function App() {
         {screen === 'start' && <StartScreen onContinue={startCardSelection}></StartScreen>}
 
         {screen === 'addCards' && (
-          <AddCardScreen
+          <AddCardsScreen
             game={game}
             cards={cardOptionsRef.current}
-            onCardsSelected={handleCardsAdded}
+            onCardsSelected={handleAddCards}
             onViewDeck={handleOnViewDeck}
-          ></AddCardScreen>
+          ></AddCardsScreen>
         )}
 
         {screen === 'addPotions' && (
           <AddPotionsScreen
             game={game}
             cards={potionOptionsRef.current}
-            onCardsSelected={handleCardsAdded}
+            onCardsSelected={handleAddPotions}
             onViewDeck={handleOnViewDeck}
           ></AddPotionsScreen>
         )}
@@ -229,7 +235,7 @@ export function App() {
         {screen === 'removeCards' && (
           <RemoveCardsScreen
             game={game}
-            onCardsSelected={handleCardsRemoved}
+            onCardsSelected={handleRemoveCards}
             onViewDeck={handleOnViewDeck}
           ></RemoveCardsScreen>
         )}
@@ -237,7 +243,7 @@ export function App() {
         {screen === 'chainCards' && (
           <ChainCardsScreen
             game={game}
-            onCardsSelected={handleCardsChained}
+            onCardsSelected={handleChainCards}
             onViewDeck={handleOnViewDeck}
           ></ChainCardsScreen>
         )}
@@ -246,7 +252,7 @@ export function App() {
           <AddRelicsScreen
             game={game}
             relics={relicOptionsRef.current}
-            onRelicSelected={handleRelicSelected}
+            onRelicSelected={handleAddRelics}
             onViewDeck={handleOnViewDeck}
           ></AddRelicsScreen>
         )}

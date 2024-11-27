@@ -5,7 +5,7 @@ import { CardSelection } from './CardSelection';
 interface Props {
   game: GameState;
   cards: CardState[];
-  onCardsSelected: (selectedCardIndexes: number[]) => void;
+  onCardsSelected: (cards: CardState[]) => void;
   onViewDeck: () => void;
 }
 

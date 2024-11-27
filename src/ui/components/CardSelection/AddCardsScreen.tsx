@@ -5,11 +5,11 @@ import { CardSelection } from './CardSelection';
 interface Props {
   game: GameState;
   cards: CardState[];
-  onCardsSelected: (selectedCardIndexes: number[]) => void;
+  onCardsSelected: (cards: CardState[]) => void;
   onViewDeck: () => void;
 }
 
-export function AddCardScreen(props: Props) {
+export function AddCardsScreen(props: Props) {
   const numPicks =
     props.game.wins === 0 ? NUM_FIRST_CARD_SELECTION_PICKS : NUM_CARD_SELECTION_PICKS;
   return <CardSelection {...props} numCardSelections={numPicks} buttonText="Add" />;

@@ -6,15 +6,12 @@ import { CardSelection, sortCards } from './CardSelection';
 
 interface Props {
   game: GameState;
-  onCardsSelected: (selectedCardIndexes: number[]) => void;
+  onCardsSelected: (cards: CardState[]) => void;
   onViewDeck: () => void;
 }
 
 // returns card indexes that would create a loop if chained
-function getInvalidSelectionsIndexes(cards: CardState[], selectedCardIndexes: number[]): number[] {
-  if (selectedCardIndexes.length !== 1) return [];
-  const [fromIndex] = selectedCardIndexes;
-
+function getInvalidSelectionsIndexes(cards: CardState[], fromIndex: number): number[] {
   const invalidSelections: number[] = [];
   for (let toIndex = 0; toIndex < cards.length; toIndex++) {
     if (toIndex !== fromIndex && getChainCreatesLoop(cards, fromIndex, toIndex)) {
@@ -36,7 +33,12 @@ export function ChainCardsScreen(props: Props) {
   if (fromCard) breakChain(fromCard, 'toId', cards);
   if (toCard) breakChain(toCard, 'fromId', cards);
 
-  const invalidSelections = getInvalidSelectionsIndexes(cards, selectedCardIndexes);
+  // when the user has selected one card, mark the cards that they can't select because it
+  // would create a chain loop
+  const invalidSelections =
+    selectedCardIndexes.length === 1
+      ? getInvalidSelectionsIndexes(cards, selectedCardIndexes[0])
+      : [];
 
   // set the chain IDs, or add a mock acquiredId so half the chain shows up in the UI
   if (fromCard) fromCard.chain.toId = toCard?.acquiredId || -1;

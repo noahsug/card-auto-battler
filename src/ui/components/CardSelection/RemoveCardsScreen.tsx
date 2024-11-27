@@ -1,10 +1,10 @@
 import { NUM_CARD_REMOVAL_PICKS } from '../../../game/constants';
-import { GameState } from '../../../game/gameState';
+import { CardState, GameState } from '../../../game/gameState';
 import { CardSelection, sortCards } from './CardSelection';
 
 interface Props {
   game: GameState;
-  onCardsSelected: (selectedCardIndexes: number[]) => void;
+  onCardsSelected: (cards: CardState[]) => void;
   onViewDeck: () => void;
 }
 

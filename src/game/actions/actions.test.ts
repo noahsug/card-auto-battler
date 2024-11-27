@@ -11,8 +11,9 @@ import {
   chainCards,
   endBattle,
   endTurn,
-  getAddCardsOptions,
-  getRelicAddOptions,
+  getAddCardOptions,
+  getAddPotionOptions,
+  getAddRelicOptions,
   getShopOptions,
   playCard,
   removeCards,
@@ -26,14 +27,15 @@ import {
   MAX_TURNS_IN_BATTLE,
   NUM_CARD_REMOVAL_PICKS,
   NUM_CARD_SELECTION_PICKS,
+  NUM_FIRST_CARD_SELECTION_PICKS,
 } from '../constants';
 import { getChainCreatesLoop } from './applyCardOrderingEffects';
 
 type ChoiceFunctions = {
   chooseShop: (game: GameState, shopOptions: ShopName[]) => ShopName;
   chooseCardsToAdd: (game: GameState, cardOptions: CardState[]) => CardState[];
-  chooseCardsToRemove: (game: GameState) => number[];
-  chooseCardsToChain: (game: GameState) => number[];
+  chooseCardsToRemove: (game: GameState) => CardState[];
+  chooseCardsToChain: (game: GameState) => CardState[];
   chooseRelicToAdd: (game: GameState, relicOptions: RelicState[]) => RelicState;
 };
 
@@ -67,23 +69,29 @@ function makeSelections(
     chooseRelicToAdd,
   }: ChoiceFunctions,
 ) {
-  const cardOptions = getAddCardsOptions(game);
+  // add cards
+  const cardOptions = getAddCardOptions(game);
   const cardsToAdd = chooseCardsToAdd(game, cardOptions);
   addCards(game, cardsToAdd);
 
+  // choose shop
   const shopOptions = getShopOptions(game);
   const shop = shopOptions.length === 2 ? chooseShop(game, shopOptions) : shopOptions[0];
 
   if (shop === 'removeCards') {
-    const cardIndexes = chooseCardsToRemove(game);
-    removeCards(game, cardIndexes);
+    const cards = chooseCardsToRemove(game);
+    removeCards(game, cards);
   } else if (shop === 'addRelics') {
-    const relicOptions = getRelicAddOptions(game);
+    const relicOptions = getAddRelicOptions(game);
     const relic = chooseRelicToAdd(game, relicOptions);
     addRelic(game, relic);
   } else if (shop === 'chainCards') {
-    const cardIndexes = chooseCardsToChain(game);
-    chainCards(game, cardIndexes);
+    const cards = chooseCardsToChain(game);
+    chainCards(game, cards);
+  } else if (shop === 'addPotions') {
+    const potionOptions = getAddPotionOptions(game);
+    const potions = chooseCardsToAdd(game, potionOptions);
+    addCards(game, potions);
   }
 }
 
@@ -115,14 +123,6 @@ function playCards(game: GameState) {
   return playCards(game);
 }
 
-const simplePickActions: ChoiceFunctions = {
-  chooseShop: (_, shops) => shops[0],
-  chooseCardsToAdd: (_, cards) => cards.slice(0, NUM_CARD_SELECTION_PICKS),
-  chooseCardsToRemove: () => range(NUM_CARD_REMOVAL_PICKS),
-  chooseCardsToChain: (game) => [game.user.cards.length - 2, game.user.cards.length - 1],
-  chooseRelicToAdd: (_, relics) => relics[0],
-};
-
 const chooseRandomCardsToChain: ChoiceFunctions['chooseCardsToChain'] = (game: GameState) => {
   const indexes = range(game.user.cards.length);
   const firstCardIndexes = shuffle(indexes);
@@ -147,13 +147,18 @@ const chooseRandomCardsToChain: ChoiceFunctions['chooseCardsToChain'] = (game: G
     );
     throw new Error('unable to chain 2 cards');
   }
-  return result;
+  return result.map((index) => game.user.cards[index]);
+};
+
+const chooseRandomCardsToAdd: ChoiceFunctions['chooseCardsToAdd'] = (game, cards) => {
+  const size = game.wins === 0 ? NUM_FIRST_CARD_SELECTION_PICKS : NUM_CARD_SELECTION_PICKS;
+  return sampleSize(cards, size);
 };
 
 const randomPickActions: ChoiceFunctions = {
   chooseShop: (_, shops) => sample(shops)!,
-  chooseCardsToAdd: (_, cards) => sampleSize(cards, NUM_CARD_SELECTION_PICKS),
-  chooseCardsToRemove: (game) => sampleSize(range(game.user.cards.length)),
+  chooseCardsToAdd: chooseRandomCardsToAdd,
+  chooseCardsToRemove: (game) => sampleSize(game.user.cards, NUM_CARD_REMOVAL_PICKS),
   chooseCardsToChain: chooseRandomCardsToChain,
   chooseRelicToAdd: (_, relics) => sample(relics)!,
 };
@@ -183,19 +188,17 @@ function trackPickActions(choices: ChoiceFunctions): {
   };
   const chooseCardsToRemove = (game: GameState) => {
     const options = game.user.cards.map((card) => card.name);
-    const pickIndexes = choices.chooseCardsToRemove(game);
-    const cardPicks = pickIndexes.map((index) => game.user.cards[index]);
+    const cardPicks = choices.chooseCardsToRemove(game);
     const picks = cardPicks.map((card) => card.name);
     pickResults.push({ type: 'chooseCardsToRemove', options, picks });
-    return pickIndexes;
+    return cardPicks;
   };
   const chooseCardsToChain = (game: GameState) => {
     const options = game.user.cards.map((card) => card.name);
-    const pickIndexes = choices.chooseCardsToChain(game);
-    const cardPicks = pickIndexes.map((index) => game.user.cards[index]);
+    const cardPicks = choices.chooseCardsToChain(game);
     const picks = cardPicks.map((card) => card.name);
     pickResults.push({ type: 'chooseCardsToChain', options, picks });
-    return pickIndexes;
+    return cardPicks;
   };
   const chooseRelicToAdd = (game: GameState, relicOptions: RelicState[]) => {
     const options = relicOptions.map((relic) => relic.name);

@@ -23,7 +23,7 @@ const RelicList = styled.div`
 interface Props {
   game: GameState;
   relics: RelicState[];
-  onRelicSelected: (selectedRelicIndex: number) => void;
+  onRelicSelected: (relic: RelicState) => void;
   onViewDeck: () => void;
 }
 
@@ -32,7 +32,7 @@ export function AddRelicsScreen({ game, relics, onRelicSelected, onViewDeck }: P
 
   function handleContinue() {
     assertIsNonNullable(selectedRelicIndex);
-    onRelicSelected(selectedRelicIndex);
+    onRelicSelected(relics[selectedRelicIndex]);
   }
 
   function handleRelicSelected(index: number) {

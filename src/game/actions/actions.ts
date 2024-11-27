@@ -3,7 +3,7 @@ import range from 'lodash/range';
 import { allCards } from '../../content/cards';
 import { potionByName } from '../../content/cards/cards';
 import { allRelics, RelicName } from '../../content/relics';
-import { assert } from '../../utils/asserts';
+import { assert, assertIsNonNullable } from '../../utils/asserts';
 import {
   MAX_SHOCK,
   MAX_TURNS_IN_BATTLE,
@@ -54,7 +54,7 @@ export function getShopOptions(game: GameState): ShopName[] {
   return otherShopOptions;
 }
 
-export function getAddCardsOptions(game: GameState): CardState[] {
+export function getAddCardOptions(game: GameState): CardState[] {
   const { sample: sampleSize } = getRandom(game);
 
   const numOptions =
@@ -80,7 +80,7 @@ export function getAddPotionOptions(game: GameState): CardState[] {
   return structuredClone(sampleSize(cards, NUM_POTION_SELECTION_OPTIONS));
 }
 
-export function getRelicAddOptions(game: GameState): RelicState[] {
+export function getAddRelicOptions(game: GameState): RelicState[] {
   const { sample: sampleSize } = getRandom(game);
 
   const existingRelicNames = new Set(game.user.relics.map((relic) => relic.name));
@@ -92,22 +92,28 @@ export function addCards(game: GameState, cards: CardState[]) {
   addCardsToPlayer(game.user, cards);
 }
 
-export function removeCards(game: GameState, cardIndexes: number[]) {
+export function removeCards(game: GameState, cardsToRemove: CardState[]) {
   const { cards } = game.user;
-  const cardsToRemove = cards.filter((_, index) => cardIndexes.includes(index));
+  // remap cardsToRemove to the actual cards since game is a proxy object when using immer
+  cardsToRemove = cardsToRemove.map(
+    (cardToRemove) => cards.find((card) => card.acquiredId === cardToRemove.acquiredId)!,
+  );
+
   cardsToRemove.forEach((card) => {
     breakChain(card, 'fromId', cards);
     breakChain(card, 'toId', cards);
   });
 
-  game.user.cards = game.user.cards.filter((_, index) => !cardIndexes.includes(index));
+  game.user.cards = cards.filter((c) => !cardsToRemove.includes(c));
 }
 
-// TODO: all card selections are off by 1 index
-export function chainCards(game: GameState, cardIndexes: number[]) {
-  assert(cardIndexes.length === 2, 'must select exactly 2 cards to chain');
+export function chainCards(game: GameState, cardsToChain: CardState[]) {
+  assert(cardsToChain.length === 2, 'must select exactly 2 cards to chain');
   const { cards } = game.user;
-  const [fromCard, toCard] = cardIndexes.map((index) => cards[index]);
+
+  const [fromCard, toCard] = cardsToChain.map(
+    (cardToChain) => game.user.cards.find((card) => card.acquiredId === cardToChain.acquiredId)!,
+  );
 
   breakChain(fromCard, 'toId', cards);
   fromCard.chain.toId = toCard.acquiredId;
