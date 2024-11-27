@@ -42,7 +42,7 @@ export function getShopOptions(game: GameState): ShopName[] {
   const relicRounds = [1, 4, 6, 8];
   if (relicRounds.includes(wins)) return ['addRelics'];
 
-  const { sampleSize } = getRandom(game);
+  const { sample: sampleSize } = getRandom(game);
 
   const potionRounds = [3, 5, 7]; // no potions for final boss (aka no rounds 8 or 9)
   const otherShopOptions: ShopName[] = sampleSize(['removeCards', 'chainCards'], 2);
@@ -55,7 +55,7 @@ export function getShopOptions(game: GameState): ShopName[] {
 }
 
 export function getAddCardsOptions(game: GameState): CardState[] {
-  const { sampleSize } = getRandom(game);
+  const { sample: sampleSize } = getRandom(game);
 
   const numOptions =
     game.wins === 0 ? NUM_FIRST_CARD_SELECTION_OPTIONS : NUM_CARD_SELECTION_OPTIONS;
@@ -74,14 +74,14 @@ export function getAddCardsOptions(game: GameState): CardState[] {
 }
 
 export function getAddPotionOptions(game: GameState): CardState[] {
-  const { sampleSize } = getRandom(game);
+  const { sample: sampleSize } = getRandom(game);
 
   const cards = Object.values(potionByName);
   return structuredClone(sampleSize(cards, NUM_POTION_SELECTION_OPTIONS));
 }
 
 export function getRelicAddOptions(game: GameState): RelicState[] {
-  const { sampleSize } = getRandom(game);
+  const { sample: sampleSize } = getRandom(game);
 
   const existingRelicNames = new Set(game.user.relics.map((relic) => relic.name));
   const availableRelics = allRelics.filter((relic) => !existingRelicNames.has(relic.name));

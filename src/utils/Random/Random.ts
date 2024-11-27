@@ -122,11 +122,11 @@ export class Random {
     return shuffle(array, this.random);
   };
 
-  sampleSize = <T>(array: T[], size: number): T[] => {
+  sample = <T>(array: T[], size: number): T[] => {
     return sampleSize(array, size, this.random);
   };
 
-  sample = <T>(array: T[]): T => {
+  pick = <T>(array: T[]): T => {
     return sampleSize(array, 1, this.random)[0];
   };
 
