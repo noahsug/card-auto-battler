@@ -2,9 +2,16 @@
 
 Game TODO:
 
-1. more enemies
-2. storybook visual testing
-3. choice of which charm shop to enter and more charm shops:
+1. fix card select off by one(?) error
+2. add potions screen goes to shop select, so we can't ever move on
+3. trim all profile images, instead add "scale" property to enemies, make boss massive
+4. remove white outline on characters, and increase size for desktop instead (thin gray line instead?)
+5. display enemy names
+6. implement easy to use scaling size between desktop/mobile
+7. remove hue-shift when enemy takes damage - it looks super weird. They can flash opacity or red
+   maybe?
+8. storybook visual testing
+9. choice of which charm shop to enter and more charm shops:
    1. ✅ chain = play after other chained card
    2. ✅ remove = remove card
    3. feather = card on top
@@ -14,12 +21,12 @@ Game TODO:
    7. add "play another card" keyword?
    8. add "crit" keyword?
    9. add "repeat" keyword?
-4. more heroes?
-5. rerolls, currency?
-6. card rarity? so we don't spam folks with mythics that are OP but situational
-7. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
-   cards/turn?), since this gets you through a big deck faster and makes picking cards feel more
-   impactful later in the game
+10. more heroes?
+11. rerolls, currency?
+12. card rarity? so we don't spam folks with mythics that are OP but situational
+13. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
+    cards/turn?), since this gets you through a big deck faster and makes picking cards feel more
+    impactful later in the game
 
 Polish TODO:
 

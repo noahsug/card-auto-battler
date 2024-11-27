@@ -183,7 +183,7 @@ export function createGameState(seed?: number): GameState {
     turn: 0,
     wins: 0,
     losses: 0,
-    randomnessState: random.getState(),
+    randomnessState: getRandomState(seed),
   };
 
   // game.enemy.health = 5;

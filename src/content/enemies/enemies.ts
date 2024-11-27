@@ -24,17 +24,18 @@ interface EnemyInfo {
 }
 
 function basicAttacks(battleNumber: number) {
-  return range(0, battleNumber).map(() => cardsByName.attack);
+  return range(0, battleNumber + 1).map(() => cardsByName.attack);
 }
 
 function scalingHealth(battleNumber: number) {
-  return 20 + battleNumber * 10;
+  // return 20 + battleNumber * 10;
+  return 2 + battleNumber;
 }
 
-const firstThird = Math.floor(MAX_WINS / 3) - 1;
+const third = Math.floor(MAX_WINS / 3) - 1;
 const middle = Math.floor(MAX_WINS / 2) - 1;
-const secondThird = Math.floor((2 * MAX_WINS) / 3) - 1;
-const end = MAX_WINS - 1;
+const twoThirds = Math.floor((2 * MAX_WINS) / 3) - 1;
+const end = MAX_WINS - 2;
 
 export const enemiesByName: Record<string, EnemyInfo> = {
   greenMonster: {
@@ -54,14 +55,14 @@ export const enemiesByName: Record<string, EnemyInfo> = {
   armoredLizard: {
     name: 'Armored Lizard',
     image: armoredLizardImage,
-    battleRange: [1, secondThird],
+    battleRange: [1, twoThirds],
     getCards: basicAttacks,
     getHealth: scalingHealth,
   },
   coolBird: {
     name: 'Cool Bird',
     image: coolBirdImage,
-    battleRange: [1, secondThird],
+    battleRange: [1, twoThirds],
     getCards: basicAttacks,
     getHealth: scalingHealth,
   },
@@ -75,14 +76,14 @@ export const enemiesByName: Record<string, EnemyInfo> = {
   frostLizard: {
     name: 'Frost Lizard',
     image: frostLizardImage,
-    battleRange: [firstThird, end],
+    battleRange: [third, end],
     getCards: basicAttacks,
     getHealth: scalingHealth,
   },
   grumpyRock: {
     name: 'Grumpy Rock',
     image: grumpyRockImage,
-    battleRange: [firstThird, end],
+    battleRange: [third, end],
     getCards: basicAttacks,
     getHealth: scalingHealth,
   },
@@ -96,14 +97,14 @@ export const enemiesByName: Record<string, EnemyInfo> = {
   blueRedMonster: {
     name: 'Blue Red Monster',
     image: blueRedMonsterImage,
-    battleRange: [secondThird, end],
+    battleRange: [twoThirds, end],
     getCards: basicAttacks,
     getHealth: scalingHealth,
   },
   giantLizard: {
     name: 'Giant Lizard',
     image: giantLizardImage,
-    battleRange: [end, end],
+    battleRange: [MAX_WINS - 1, MAX_WINS - 1],
     getCards: basicAttacks,
     getHealth: scalingHealth,
   },
