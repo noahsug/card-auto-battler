@@ -1,5 +1,6 @@
 import { shuffle } from './shuffle';
 import { sampleSize } from './sampleSize';
+import { isNumber } from 'lodash';
 
 // based on https://github.com/mljs/xsadd which is based on the XORSHIFT-ADD (XSadd) algorithm
 
@@ -82,10 +83,12 @@ export class Random {
   constructor(seed?: number);
   constructor(state: Uint32Array);
   constructor(seedOrState?: number | Uint32Array) {
-    if (seedOrState instanceof Uint32Array) {
+    if (isNumber(seedOrState)) {
+      this.seed(seedOrState);
+    } else if (seedOrState) {
       this.setStateRef(seedOrState);
     } else {
-      this.seed(seedOrState ?? getRandomSeed());
+      this.seed(getRandomSeed());
     }
   }
 

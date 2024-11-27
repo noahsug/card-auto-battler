@@ -1,11 +1,8 @@
-import { cloneDeep } from 'lodash';
-import { cardsByName } from '../content/cards';
 import { allEnemies } from '../content/enemies';
 import { allHeroes } from '../content/heroes';
 import { getRandomState } from '../utils/Random';
 import { STARTING_HEALTH } from './constants';
 import { addCardsToPlayer } from './utils/cards';
-import { relicsByName } from '../content/relics';
 
 export type Target = 'self' | 'opponent';
 
@@ -143,8 +140,14 @@ export interface GameState {
   randomnessState: Uint32Array;
 }
 
-function createPlayer({ name, image }: { name: string; image: string }): PlayerState {
-  return {
+export interface PlayerInfo {
+  name: string;
+  image: string;
+  cards: CardState[];
+}
+
+function createPlayer({ name, image, cards }: PlayerInfo): PlayerState {
+  const player = {
     health: STARTING_HEALTH,
     startingHealth: STARTING_HEALTH,
     ...EMPTY_STATUS_EFFECTS,
@@ -158,6 +161,12 @@ function createPlayer({ name, image }: { name: string; image: string }): PlayerS
     name,
     image,
   };
+
+  addCardsToPlayer(
+    player,
+    cards.map((c) => structuredClone(c)),
+  );
+  return player;
 }
 
 export function createGameState(seed?: number): GameState {
@@ -170,14 +179,8 @@ export function createGameState(seed?: number): GameState {
     randomnessState: getRandomState(seed),
   };
 
-  const { attack, heal } = cardsByName;
-  // addCardsToPlayer(game.user, [cardsByName.stealth, cardsByName.shockTrap, cardsByName.pumpedUp]);
-  addCardsToPlayer(game.user, cloneDeep([attack]));
-  // addCardsToPlayer(game.user, [attack, attack, heal]);
-  addCardsToPlayer(game.enemy, cloneDeep([attack]));
-
   // game.enemy.health = 5;
-  game.user.health = 1;
+  // game.user.health = 1;
 
   return game;
 }

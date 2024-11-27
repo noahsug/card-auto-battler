@@ -1,5 +1,3 @@
-import cloneDeep from 'lodash/cloneDeep';
-
 import { relicsByName } from '../../content/relics';
 import {
   createCard,
@@ -31,7 +29,7 @@ let card: CardState;
 let effect: CardEffect;
 
 beforeEach(() => {
-  card = cloneDeep(createCard());
+  card = structuredClone(createCard());
   effect = card.effects[0];
 });
 
@@ -53,7 +51,7 @@ function getPlayCardResult({
 
   const self = Object.assign(user, selfOverrides);
   const opponent = Object.assign(enemy, opponentOverrides);
-  const init = cloneDeep({ self, opponent });
+  const init = structuredClone({ self, opponent });
 
   const events = applyCardEffects(game, card);
 

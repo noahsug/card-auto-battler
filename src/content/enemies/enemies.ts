@@ -5,11 +5,14 @@ import greenMonster from './images/green-monster.png';
 
 import warrior from '../heroes/images/warrior.png';
 
+import { PlayerInfo } from '../../game/gameState';
+import { cardsByName } from '../cards';
+
 export const allEnemies = {
   fireMonster: {
     name: 'Fire Monster',
     image: fireMonster,
-    cards: [],
+    cards: [cardsByName.attack],
   },
   // birthdayMonster: {
   //   name: 'Birthday Monster',
@@ -18,6 +21,6 @@ export const allEnemies = {
   // green
   // blueRed
   // shadow warrior
-};
+} satisfies Record<string, PlayerInfo>;
 
 export type EnemyName = keyof typeof allEnemies;

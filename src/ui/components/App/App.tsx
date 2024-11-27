@@ -15,7 +15,6 @@ import { OverlayBackground } from '../shared/OverlayBackground';
 import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
-import cloneDeep from 'lodash/cloneDeep';
 import { assertIsNonNullable } from '../../../utils/asserts';
 import { ShopSelectionScreen } from '../ShopSelection';
 
@@ -95,7 +94,7 @@ export function App() {
   );
 
   const startCardSelection = useCallback(async () => {
-    rewindGameStateRef.current = await select((game) => cloneDeep(game));
+    rewindGameStateRef.current = await select((game) => structuredClone(game));
     endOfBattleGameRef.current = undefined;
     cardSelectionOptionsRef.current = await getAddCardsOptions();
     goToScreen('addCards');

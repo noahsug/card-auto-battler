@@ -5,7 +5,7 @@ import { CardEffectName, CardState, PlayerState } from '../gameState';
 const { attack } = cardsByName;
 
 export function addCardsToPlayer(player: PlayerState, cards: CardState[]) {
-  const maxAcquiredId = player.cards.reduce((max, card) => Math.max(max, card.acquiredId), 0);
+  const maxAcquiredId = player.cards.reduce((max, card) => Math.max(max, card.acquiredId), -1);
   cards.forEach((card, i) => {
     card.acquiredId = maxAcquiredId + 1 + i;
   });

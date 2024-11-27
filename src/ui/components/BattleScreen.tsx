@@ -29,7 +29,6 @@ import { CenterContent } from './shared/CenterContent';
 import { Container } from './shared/Container';
 import { Row } from './shared/Row';
 import { StatusEffects } from './StatusEffects';
-import cloneDeep from 'lodash/cloneDeep';
 
 type AnimationState = 'playNextCard' | 'applyCardEffects' | 'endPlayCard';
 
@@ -93,7 +92,7 @@ export function BattleScreen({
 
   const playNextCard = useCallback(async () => {
     const events: BattleEvent[] = [];
-    undoHistory.current.push(cloneDeep(game));
+    undoHistory.current.push(structuredClone(game));
 
     if (activePlayer.cardsPlayedThisTurn === 0) {
       // console.log('-------------------- start turn');

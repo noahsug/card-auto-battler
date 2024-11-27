@@ -1,4 +1,3 @@
-import cloneDeep from 'lodash/cloneDeep';
 import range from 'lodash/range';
 
 import { allCards } from '../../content/cards';
@@ -57,7 +56,7 @@ export function getAddCardsOptions(game: GameState): CardState[] {
   const numOptions =
     game.wins === 0 ? NUM_FIRST_CARD_SELECTION_OPTIONS : NUM_CARD_SELECTION_OPTIONS;
 
-  const cards = cloneDeep(sampleSize(Object.values(allCards), numOptions));
+  const cards = structuredClone(sampleSize(Object.values(allCards), numOptions));
   cards.forEach((card, i) => {
     card.acquiredId = i;
   });
@@ -74,7 +73,7 @@ export function getPotionAddOptions(game: GameState): CardState[] {
   const { sampleSize } = getRandom(game);
 
   const cards = Object.values(potionByName);
-  return cloneDeep(sampleSize(cards, NUM_POTION_SELECTION_OPTIONS));
+  return structuredClone(sampleSize(cards, NUM_POTION_SELECTION_OPTIONS));
 }
 
 export function getRelicAddOptions(game: GameState): RelicState[] {
@@ -82,7 +81,7 @@ export function getRelicAddOptions(game: GameState): RelicState[] {
 
   const existingRelicNames = new Set(game.user.relics.map((relic) => relic.name));
   const availableRelics = allRelics.filter((relic) => !existingRelicNames.has(relic.name));
-  return cloneDeep(sampleSize(availableRelics, NUM_RELIC_SELECTION_OPTIONS));
+  return structuredClone(sampleSize(availableRelics, NUM_RELIC_SELECTION_OPTIONS));
 }
 
 export function addCards(game: GameState, cards: CardState[]) {

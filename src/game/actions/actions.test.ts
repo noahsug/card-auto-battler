@@ -1,6 +1,5 @@
 import range from 'lodash/range';
 import sampleSize from 'lodash/sampleSize';
-import cloneDeep from 'lodash/cloneDeep';
 import sample from 'lodash/sample';
 import shuffle from 'lodash/shuffle';
 
@@ -47,7 +46,7 @@ function play(game: GameState, choices: ChoiceFunctions) {
 }
 
 function playRound(game: GameState, choices: ChoiceFunctions) {
-  const rewindGameState = cloneDeep(game);
+  const rewindGameState = structuredClone(game);
   makeSelections(game, choices);
   const winner = battle(game);
 
@@ -233,19 +232,18 @@ it('plays a full game without error', () => {
 
 it('shows the same card and relic selections after rewinding', () => {
   const { choices, results } = trackPickActions(randomPickActions);
-
   const game = createGameState();
 
   // force a win so we immediately choose relics
   game.wins = 1;
 
-  let rewindGameState = cloneDeep(game);
+  let rewindGameState = structuredClone(game);
   makeSelections(game, choices);
   const beforeRewind = results.splice(0, results.length).map(({ options }) => options);
 
   battle(game);
   rewind(game, rewindGameState);
-  rewindGameState = cloneDeep(game);
+  rewindGameState = structuredClone(game);
   makeSelections(game, choices);
   const afterRewind1 = results.splice(0, results.length).map(({ options }) => options);
 

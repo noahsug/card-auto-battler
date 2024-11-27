@@ -1,4 +1,3 @@
-import cloneDeep from 'lodash/cloneDeep';
 import { useState } from 'react';
 
 import { breakChain, getChainCreatesLoop } from '../../../game/actions/applyCardOrderingEffects';
@@ -29,7 +28,8 @@ function getInvalidSelectionsIndexes(cards: CardState[], selectedCardIndexes: nu
 export function ChainCardsScreen(props: Props) {
   const [selectedCardIndexes, setSelectedCardIndexes] = useState<number[]>([]);
 
-  const cards = sortCards(cloneDeep(props.game.user.cards));
+  // copy cards because we're changing their chain IDs as the user selects/de-selects cards
+  const cards = sortCards(structuredClone(props.game.user.cards));
 
   // mark selected cards as chained
   const [fromCard, toCard] = selectedCardIndexes.map((index) => cards[index]);
