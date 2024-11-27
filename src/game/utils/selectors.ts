@@ -1,8 +1,9 @@
-import { GameState, PlayerState, Target } from '../gameState';
+import { EnemyName } from '../../content/enemies/enemies';
+import { getEnemyInfo } from './enemies';
 import { RelicName } from '../../content/relics/relics';
-import { MAX_LOSSES, MAX_WINS } from '../constants';
 import { Random } from '../../utils/Random';
-import { ShopName } from '../actions/actions';
+import { MAX_LOSSES, MAX_WINS } from '../constants';
+import { GameState, PlayerState, Target, createPlayer } from '../gameState';
 
 export function getIsStartOfBattle(game: GameState) {
   return game.turn === 0 && game.user.cardsPlayedThisTurn === 0;
@@ -64,4 +65,8 @@ export function getBattleWinner(game: GameState) {
 
 export function getRandom({ randomnessState }: { randomnessState: GameState['randomnessState'] }) {
   return new Random(randomnessState);
+}
+
+export function getNextEnemy({ enemyOrder, wins }: { enemyOrder: EnemyName[]; wins: number }) {
+  return createPlayer(getEnemyInfo(enemyOrder, wins));
 }

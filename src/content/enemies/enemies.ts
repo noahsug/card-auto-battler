@@ -1,26 +1,19 @@
-import birthdayMonster from './images/birthday-monster.png';
-import blueRedMonster from './images/blue-red-monster.png';
 import fireMonster from './images/fire-monster.png';
-import greenMonster from './images/green-monster.png';
 
-import warrior from '../heroes/images/warrior.png';
-
-import { PlayerInfo } from '../../game/gameState';
 import { cardsByName } from '../cards';
 
-export const allEnemies = {
+export const enemiesByName = {
   fireMonster: {
     name: 'Fire Monster',
     image: fireMonster,
-    cards: [cardsByName.attack],
+    battleRange: [0, 8],
+    getCards: (battleNumber: number) => [
+      cardsByName.attack,
+      cardsByName.attack,
+      cardsByName.attack,
+    ],
+    getHealth: (battleNumber: number) => 10 + battleNumber * 2,
   },
-  // birthdayMonster: {
-  //   name: 'Birthday Monster',
-  //   image: birthdayMonster,
-  // },
-  // green
-  // blueRed
-  // shadow warrior
-} satisfies Record<string, PlayerInfo>;
+};
 
-export type EnemyName = keyof typeof allEnemies;
+export type EnemyName = keyof typeof enemiesByName;

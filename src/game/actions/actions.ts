@@ -1,42 +1,35 @@
 import range from 'lodash/range';
 
 import { allCards } from '../../content/cards';
+import { potionByName } from '../../content/cards/cards';
 import { allRelics, RelicName } from '../../content/relics';
 import { assert } from '../../utils/asserts';
 import {
   MAX_SHOCK,
   MAX_TURNS_IN_BATTLE,
   NUM_CARD_SELECTION_OPTIONS,
+  NUM_FIRST_CARD_SELECTION_OPTIONS,
   NUM_POTION_SELECTION_OPTIONS,
   NUM_RELIC_SELECTION_OPTIONS,
-  NUM_FIRST_CARD_SELECTION_OPTIONS,
 } from '../constants';
 import {
   CardState,
+  createGameState,
   GameState,
   PlayerState,
   RelicState,
-  createGameState,
   statusEffectNames,
-  createPlayer,
 } from '../gameState';
 import { addCardsToPlayer, convertBasicAttacksToMonkAttack } from '../utils/cards';
-import { getBattleWinner, getPlayers, getRandom, getRelic } from '../utils/selectors';
+import { getBattleWinner, getNextEnemy, getPlayers, getRandom, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
-import { potionByName } from '../../content/cards/cards';
-import { allEnemies } from '../../content/enemies';
 
 export type ShopName = 'removeCards' | 'chainCards' | 'addRelics' | 'addPotions';
 
 export function initializeEnemy(game: GameState) {
-  const enemyInfo = allEnemies.fireMonster;
-  const enemy = createPlayer(enemyInfo);
-  enemy.startingHealth += game.wins * 10;
-  enemy.health = enemy.startingHealth;
-
-  game.enemy = enemy;
+  game.enemy = getNextEnemy(game);
 }
 
 // which shops to choose from after adding new cards

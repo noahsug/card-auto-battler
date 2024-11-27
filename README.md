@@ -60,7 +60,12 @@ Performance TODO:
 
 ## Art
 
-Create card art via Gemini prompt: "Create an image that would match the text "Sucker Punch" in the style of a hand drawn illustration."
+"create an image of a powerful, happy creature. It should look like it was drawn well. The
+background should be plain white. The image should be zoomed out so the creature's entire body is
+shown, including its feet"
+
+"Create an image of a accuracy potion, rendered in a well drawn style, with a target inscribed, in
+an ornate silver vial, closeup macro drawing with shallow depth of field."
 
 Remove background via <https://www.remove.bg/upload>
 

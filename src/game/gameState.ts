@@ -1,8 +1,9 @@
-import { allEnemies } from '../content/enemies';
-import { allHeroes } from '../content/heroes';
-import { getRandomState } from '../utils/Random';
-import { STARTING_HEALTH } from './constants';
+import { heroesByName } from '../content/heroes';
+import { getRandomState, Random } from '../utils/Random';
 import { addCardsToPlayer } from './utils/cards';
+import { getEnemyInfo, getEnemyOrder } from './utils/enemies';
+import { getRandom, getNextEnemy } from './utils/selectors';
+import { EnemyName } from '../content/enemies';
 
 export type Target = 'self' | 'opponent';
 
@@ -134,6 +135,7 @@ export interface PlayerState extends StatusEffects {
 export interface GameState {
   user: PlayerState;
   enemy: PlayerState;
+  enemyOrder: EnemyName[];
   turn: number;
   wins: number;
   losses: number;
@@ -144,12 +146,13 @@ export interface PlayerInfo {
   name: string;
   image: string;
   cards: CardState[];
+  health: number;
 }
 
-export function createPlayer({ name, image, cards }: PlayerInfo): PlayerState {
+export function createPlayer({ name, image, cards, health }: PlayerInfo): PlayerState {
   const player = {
-    health: STARTING_HEALTH,
-    startingHealth: STARTING_HEALTH,
+    health,
+    startingHealth: health,
     ...EMPTY_STATUS_EFFECTS,
     cards: [],
     trashedCards: [],
@@ -170,14 +173,17 @@ export function createPlayer({ name, image, cards }: PlayerInfo): PlayerState {
 }
 
 export function createGameState(seed?: number): GameState {
+  const random = new Random(seed);
+  const enemyOrder = getEnemyOrder(random);
+
   const game = {
-    user: createPlayer(allHeroes.warrior),
-    // enemy is initialized later via initializeEnemy()
-    enemy: createPlayer({ name: '', image: '', cards: [] }),
+    user: createPlayer(heroesByName.warrior),
+    enemy: getNextEnemy({ enemyOrder, wins: 0 }),
+    enemyOrder,
     turn: 0,
     wins: 0,
     losses: 0,
-    randomnessState: getRandomState(seed),
+    randomnessState: random.getState(),
   };
 
   // game.enemy.health = 5;
