@@ -162,10 +162,14 @@ export function App() {
     setOverlay('battleResults');
   }, [game, battleWinner, endBattle]);
 
+  const handleRestartGame = useCallback(() => {
+    resetGame();
+    goToScreen('start');
+  }, [goToScreen, resetGame]);
+
   const handleBattleResultsContinue = useCallback(() => {
     if (isGameOver) {
-      resetGame();
-      goToScreen('start');
+      handleRestartGame();
     } else {
       if (!wonLastBattleRef.current) {
         assertIsNonNullable(rewindGameStateRef.current);
@@ -173,7 +177,7 @@ export function App() {
       }
       startCardSelection();
     }
-  }, [goToScreen, isGameOver, resetGame, rewind, startCardSelection]);
+  }, [handleRestartGame, isGameOver, rewind, startCardSelection]);
 
   const handleCloseViewDeckOverlay = useCallback(() => {
     setOverlay('none');
@@ -249,6 +253,7 @@ export function App() {
                 game={game}
                 wonLastBattle={wonLastBattleRef.current}
                 onContinue={handleBattleResultsContinue}
+                onGiveUp={handleRestartGame}
               ></BattleResultOverlay>
             )}
 

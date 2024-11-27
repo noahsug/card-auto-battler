@@ -17,19 +17,13 @@ import { useUnits } from '../../hooks/useUnits';
 import { Icon, Label } from '../HUD/HUD';
 import { Button } from '../shared/Button';
 import { Container } from '../shared/Container';
-import { Row } from '../shared/Row';
+import { BottomRow, Row } from '../shared/Row';
 
 const Header = styled(animated.h2)`
   text-align: center;
   font-size: max(8rem, 30vmin);
   margin-bottom: max(2rem, 10vmin);
   margin-top: auto;
-`;
-
-const ContinueButton = styled(Button)`
-  margin: auto;
-  width: auto;
-  padding: 0.5rem 1rem;
 `;
 
 const ProgressRow = styled(Row)`
@@ -51,6 +45,17 @@ const ResultsIcon = styled(animated(Icon))`
   display: inline-block;
 `;
 
+const ButtonsContainer = styled.div`
+  margin: auto;
+`;
+
+const BattleResultsButton = styled(Button)`
+  margin: 2rem auto 0rem;
+  width: auto;
+  padding: 0.5rem 1rem;
+  display: block;
+`;
+
 const ButtonIcon = styled(ResultsIcon)`
   width: 1.7rem;
   height: 1.7rem;
@@ -60,6 +65,7 @@ const ButtonIcon = styled(ResultsIcon)`
 interface Props {
   game: GameState;
   onContinue: () => void;
+  onGiveUp: () => void;
   wonLastBattle: boolean;
 }
 
@@ -77,7 +83,7 @@ function getBattleResultMessage({
   return wonLastBattle ? ['Victory!', 'Continue'] : ['Defeat', 'Rewind'];
 }
 
-export function BattleResultOverlay({ game, onContinue, wonLastBattle }: Props) {
+export function BattleResultOverlay({ game, onContinue, onGiveUp, wonLastBattle }: Props) {
   const [u] = useUnits();
   const { wins, losses } = game;
   const isGameOver = getIsGameOver(game);
@@ -147,11 +153,18 @@ export function BattleResultOverlay({ game, onContinue, wonLastBattle }: Props) 
           </span>
         </ResultsLabel>
       </ProgressRow>
-      <ContinueButton onClick={onContinue}>
-        {continueText === 'Rewind' ? <ButtonIcon src={rewindImage} /> : null}
-        {continueText === 'Continue' && isBossBattle ? <ButtonIcon src={skullImage} /> : null}
-        <span>{continueText}</span>
-      </ContinueButton>
+      <ButtonsContainer>
+        <BattleResultsButton onClick={onContinue}>
+          {continueText === 'Rewind' ? <ButtonIcon src={rewindImage} /> : null}
+          {continueText === 'Continue' && isBossBattle ? <ButtonIcon src={skullImage} /> : null}
+          <span>{continueText}</span>
+        </BattleResultsButton>
+        {continueText === 'Rewind' && (
+          <BattleResultsButton onClick={onGiveUp}>
+            <span>Give Up</span>
+          </BattleResultsButton>
+        )}
+      </ButtonsContainer>
     </Container>
   );
 }
