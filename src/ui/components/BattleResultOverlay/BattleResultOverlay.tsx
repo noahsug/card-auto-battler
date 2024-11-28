@@ -5,8 +5,8 @@ import livesImage from '../HUD/hourglass.png';
 import skullImage from '../HUD/skull.png';
 import battleImage from '../HUD/swords.png';
 import rewindImage from './backward-time.png';
-import brokenSkullImage from './broken-skull.png';
 import brokenLivesImage from './broken-hourglass.png';
+import brokenSkullImage from './broken-skull.png';
 
 import { useState } from 'react';
 import { MAX_LOSSES, MAX_WINS } from '../../../game/constants';
@@ -17,7 +17,7 @@ import { useUnits } from '../../hooks/useUnits';
 import { Icon, Label } from '../HUD/HUD';
 import { Button } from '../shared/Button';
 import { Container } from '../shared/Container';
-import { BottomRow, Row } from '../shared/Row';
+import { Row } from '../shared/Row';
 
 const Header = styled(animated.h2)`
   text-align: center;

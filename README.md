@@ -2,11 +2,7 @@
 
 Game TODO:
 
-4. remove white outline on characters, and increase size for desktop instead (thin gray line instead?)
-5. display enemy names
-6. implement easy to use scaling size between desktop/mobile
-7. storybook visual testing
-8. choice of which charm shop to enter and more charm shops:
+1. choice of which charm shop to enter and more charm shops:
    1. ✅ chain = play after other chained card
    2. ✅ remove = remove card
    3. feather = card on top
@@ -16,26 +12,29 @@ Game TODO:
    7. add "play another card" keyword?
    8. add "crit" keyword?
    9. add "repeat" keyword?
-9. more heroes?
-10. rerolls, currency?
-11. card rarity? so we don't spam folks with mythics that are OP but situational
-12. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
-    cards/turn?), since this gets you through a big deck faster and makes picking cards feel more
-    impactful later in the game
+2. storybook visual testing
+3. more heroes?
+4. card rarity? so we don't spam folks with mythics that are OP but situational
+5. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
+   cards/turn?), since this gets you through a big deck faster and makes picking cards feel more
+   impactful later in the game
 
 Polish TODO:
 
+1. implement easy to use scaling size between desktop/mobile
+1. Button should have an icon prop and be used everywhere (no custom buttons)
 1. save progress via local storage
-2. rewind animation (show character coming back to life, health going to full, then jump to card
+1. rewind animation (show character coming back to life, health going to full, then jump to card
    select)
-3. queue activations (e.g. relics, effects) one at a time so it's more clear what's happening, and
+1. display enemy names?
+1. queue activations (e.g. relics, effects) one at a time so it's more clear what's happening, and
    highlight the relic/status effect that triggered it
-4. attack animation which triggers on each hit of the card
-5. clicking a card zooms in on it and displays what each keyword does
-6. loading screen
-7. add progress view? (e.g. fight -> card -> fight -> card -> relic -> etc -> boss)
-8. add achievements
-9. add offline app download option (see Slay the Web)
+1. attack animation which triggers on each hit of the card
+1. clicking a card zooms in on it and displays what each keyword does
+1. loading screen
+1. add progress view? (e.g. fight -> card -> fight -> card -> relic -> etc -> boss)
+1. add achievements
+1. add offline app download option (see Slay the Web)
 
 Maybe TODO:
 

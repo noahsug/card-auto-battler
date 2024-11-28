@@ -2,7 +2,7 @@ import { styled } from 'styled-components';
 import { GameState } from '../../../game/gameState';
 import { ShopName } from '../../../game/actions/actions';
 import { HUD } from '../HUD';
-import { ScrollingCenterContent } from '../shared/CenterContent';
+import { ScrollingCenterContent, CenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
 import { ShopOption } from './ShopOption';
 
@@ -13,13 +13,21 @@ interface Props {
   onShopSelected: (shop: ShopName) => void;
 }
 
-const ShopList = styled.div`
-  display: flex;
-  flex-direction: row;
-  overflow-y: auto;
+const CenterContentWithMargin = styled(CenterContent)`
+  margin: auto;
+`;
 
+const size = 'max(2.5rem, 8vmin)';
+
+const Message = styled.h2`
+  margin-bottom: ${size};
+  font-size: ${size};
+`;
+
+const ShopOptions = styled.div`
   > * {
-    margin: 1.5rem 0.5rem;
+    display: block;
+    margin: 2rem 0;
   }
 `;
 
@@ -27,13 +35,14 @@ export function ShopSelectionScreen({ game, shopOptions, onViewDeck, onShopSelec
   return (
     <Container>
       <HUD game={game} onViewDeck={onViewDeck} />
-      <ScrollingCenterContent>
-        <ShopList>
+      <CenterContentWithMargin>
+        <Message>select a boon</Message>
+        <ShopOptions>
           {shopOptions.map((shop) => (
             <ShopOption key={shop} name={shop} onShopSelected={() => onShopSelected(shop)} />
           ))}
-        </ShopList>
-      </ScrollingCenterContent>
+        </ShopOptions>
+      </CenterContentWithMargin>
     </Container>
   );
 }
