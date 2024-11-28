@@ -188,6 +188,7 @@ export function BattleScreen({
             <StatusEffects player={user} />
             <PlayerProfile
               src={user.image}
+              scale={user.scale}
               handleRef={userProfileHandleRef}
               battleEvents={userBattleEvents}
               isDead={user.health <= 0}
@@ -204,6 +205,7 @@ export function BattleScreen({
             <PlayerProfile
               src={enemy.image}
               flip={true}
+              scale={enemy.scale}
               handleRef={enemyProfileHandleRef}
               battleEvents={enemyBattleEvents}
               isDead={enemy.health <= 0}

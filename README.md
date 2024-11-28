@@ -2,9 +2,6 @@
 
 Game TODO:
 
-1. fix card select off by one(?) error
-2. add potions screen goes to shop select, so we can't ever move on
-3. trim all profile images, instead add "scale" property to enemies, make boss massive
 4. remove white outline on characters, and increase size for desktop instead (thin gray line instead?)
 5. display enemy names
 6. implement easy to use scaling size between desktop/mobile

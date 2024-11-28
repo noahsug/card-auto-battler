@@ -130,6 +130,7 @@ export interface PlayerState extends StatusEffects {
   damageDealtLastTurn: number;
   name: string;
   image: string;
+  scale: number;
 }
 
 export interface GameState {
@@ -147,9 +148,10 @@ export interface PlayerInfo {
   image: string;
   cards: CardState[];
   health: number;
+  scale: number;
 }
 
-export function createPlayer({ name, image, cards, health }: PlayerInfo): PlayerState {
+export function createPlayer({ name, image, cards, health, scale }: PlayerInfo): PlayerState {
   const player = {
     health,
     startingHealth: health,
@@ -163,6 +165,7 @@ export function createPlayer({ name, image, cards, health }: PlayerInfo): Player
     damageDealtLastTurn: 0,
     name,
     image,
+    scale,
   };
 
   addCardsToPlayer(

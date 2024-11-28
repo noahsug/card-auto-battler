@@ -8,5 +8,6 @@ export const heroesByName = {
     image: warrior,
     cards: [cardsByName.attack, cardsByName.attack, cardsByName.heal],
     health: 30,
+    scale: 0.85,
   },
 } satisfies Record<string, PlayerInfo>;

@@ -21,6 +21,7 @@ interface EnemyInfo {
   battleRange: [number, number];
   getCards: (battleNumber: number) => CardState[];
   getHealth: (battleNumber: number) => number;
+  scale?: number;
 }
 
 function basicAttacks(battleNumber: number) {
@@ -51,6 +52,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     battleRange: [0, 2],
     getCards: basicAttacks,
     getHealth: scalingHealth,
+    scale: 0.5,
   },
   armoredLizard: {
     name: 'Armored Lizard',
@@ -65,6 +67,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     battleRange: [1, twoThirds],
     getCards: basicAttacks,
     getHealth: scalingHealth,
+    scale: 0.5,
   },
   fireMonster: {
     name: 'Fire Monster',
@@ -72,6 +75,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     battleRange: [1, end],
     getCards: basicAttacks,
     getHealth: scalingHealth,
+    scale: 0.5,
   },
   frostLizard: {
     name: 'Frost Lizard',
@@ -86,6 +90,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     battleRange: [third, end],
     getCards: basicAttacks,
     getHealth: scalingHealth,
+    scale: 1.1,
   },
   treeMonster: {
     name: 'Tree Monster',
@@ -93,6 +98,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     battleRange: [middle, end],
     getCards: basicAttacks,
     getHealth: scalingHealth,
+    scale: 1.4,
   },
   blueRedMonster: {
     name: 'Blue Red Monster',
@@ -100,6 +106,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     battleRange: [twoThirds, end],
     getCards: basicAttacks,
     getHealth: scalingHealth,
+    scale: 1.2,
   },
   giantLizard: {
     name: 'Giant Lizard',
@@ -107,6 +114,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     battleRange: [MAX_WINS - 1, MAX_WINS - 1],
     getCards: basicAttacks,
     getHealth: scalingHealth,
+    scale: 2,
   },
 };
 

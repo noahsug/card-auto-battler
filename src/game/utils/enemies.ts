@@ -15,6 +15,7 @@ export function getEnemyInfo(enemyOrder: EnemyName[], battleNumber: number): Pla
     image: enemyInfo.image,
     cards: enemyInfo.getCards(battleNumber),
     health: enemyInfo.getHealth(battleNumber),
+    scale: enemyInfo.scale || 1,
   };
 }
 

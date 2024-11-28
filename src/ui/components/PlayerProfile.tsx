@@ -18,15 +18,18 @@ const AnimatedContainer = styled(animated.div)`
 
 const size = 12;
 
-const ProfileImage = styled(animated(Image))<{ $flip?: boolean }>`
+const ProfileImage = styled(animated(Image))<{ $flip?: boolean; $scale?: number }>`
   width: ${size}rem;
   height: ${size}rem;
   margin-bottom: 0.5rem;
   transform: ${(props) => (props.$flip ? 'scaleX(-1)' : 'none')};
+  scale: ${(props) => props.$scale};
+  transform-origin: bottom;
 `;
 
 interface Props {
   flip?: boolean;
+  scale?: number;
   battleEvents: BattleEvent[];
   src: string;
   handleRef: (element: Element | null) => void;
@@ -139,7 +142,7 @@ function getDeathAnimation({
   };
 }
 
-export function PlayerProfile({ flip, battleEvents, src, handleRef, isDead }: Props) {
+export function PlayerProfile({ flip, scale = 1, battleEvents, src, handleRef, isDead }: Props) {
   const [u, windowDimensions] = useUnits();
 
   // recoil in the opposite direction the image is facing
@@ -172,7 +175,7 @@ export function PlayerProfile({ flip, battleEvents, src, handleRef, isDead }: Pr
   return (
     <div ref={handleRef}>
       <AnimatedContainer style={animationProps}>
-        <ProfileImage $flip={flip} src={src} style={{ filter }} />
+        <ProfileImage $flip={flip} $scale={scale} src={src} style={{ filter }} />
       </AnimatedContainer>
     </div>
   );
