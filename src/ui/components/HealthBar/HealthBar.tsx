@@ -4,6 +4,7 @@ import { styled } from 'styled-components';
 import { Image } from '../shared/Image';
 import healthBarBorderImage from './health-bar-border.png';
 import healthBarInnerImage from './health-bar-inner.png';
+import { maskImage } from '../../style';
 
 const WIDTH = 10;
 
@@ -19,15 +20,27 @@ const Root = styled.div`
   }
 `;
 
-const Bar = styled(animated.div)`
+const healthBarColor = '#bbb';
+
+const Border = styled.div<{ src: string }>`
+  width: 100%;
+  height: 100%;
+  background-color: ${healthBarColor};
+  ${maskImage}
+  mask-size: 100% 100%;
+`;
+
+const Bar = styled(animated.div)<{ src: string }>`
   height: 100%;
   position: absolute;
   top: 0;
   left: 0;
-  background-image: url(${healthBarInnerImage});
-  background-position: left;
-  background-size: cover;
+  background-color: ${healthBarColor};
+  ${maskImage}
+  mask-size: cover;
 `;
+
+const size = 0.03;
 
 const Label = styled.h2`
   position: absolute;
@@ -37,10 +50,10 @@ const Label = styled.h2`
   text-align: center;
   font-weight: bold;
   text-shadow:
-    0.03em 0.03em 0 black,
-    0.03em -0.03em 0 black,
-    -0.03em 0.03em 0 black,
-    -0.03em -0.03em 0 black;
+    ${size}em ${size}em 0 black,
+    ${size}em -${size}em 0 black,
+    -${size}em ${size}em 0 black,
+    -${size}em -${size}em 0 black;
 `;
 
 interface Props {
@@ -62,8 +75,8 @@ export function HealthBar({ health, maxHealth }: Props) {
 
   return (
     <Root>
-      <Image src={healthBarBorderImage} alt="health-bar" />
-      <Bar style={animationProps} />
+      <Border src={healthBarBorderImage} />
+      <Bar src={healthBarInnerImage} style={animationProps} />
       <Label>
         {health} / {maxHealth}
       </Label>
