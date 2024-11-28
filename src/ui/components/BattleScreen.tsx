@@ -115,6 +115,7 @@ export function BattleScreen({
     // console.log('B start', nextAnimationState.current);
     if (isBattleOver) return;
     if (nextAnimationState.current === 'applyCardEffects') {
+      console.log('B playCard', game.turn, 'user cards played', game.user.cardsPlayedThisTurn);
       const events = await playCard();
       setBattleEvents([...events, createBattleEvent('animationComplete')]);
       nextAnimationState.current = 'endPlayCard';

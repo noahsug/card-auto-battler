@@ -18,6 +18,7 @@ import {
   GameState,
   PlayerState,
   RelicState,
+  ShopName,
   statusEffectNames,
 } from '../gameState';
 import { addCardsToPlayer, convertBasicAttacksToMonkAttack } from '../utils/cards';
@@ -25,8 +26,6 @@ import { getBattleWinner, getNextEnemy, getPlayers, getRandom, getRelic } from '
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
-
-export type ShopName = 'removeCards' | 'chainCards' | 'addRelics' | 'addPotions';
 
 export function initializeEnemy(game: GameState) {
   game.enemy = getNextEnemy(game);
@@ -242,7 +241,15 @@ export function playCard(game: GameState): BattleEvent[] {
     return [];
   }
 
+  console.log(
+    activePlayer === game.user ? 'user' : 'enemy',
+    'cardsPlayedThisTurn',
+    activePlayer.cardsPlayedThisTurn,
+    'extraCardPlays',
+    activePlayer.extraCardPlays,
+  );
   if (activePlayer.cardsPlayedThisTurn > 0) {
+    // TODO: this assert failed once
     assert(activePlayer.extraCardPlays > 0);
     activePlayer.extraCardPlays -= 1;
   }
@@ -333,7 +340,7 @@ export function endBattle(game: GameState) {
   resetPlayerAfterBattle(game.user);
 }
 
-// TODO: rewind should change the random state? Reason: user has more options and is never in a spot
+// TODO?: rewind should change the random state? Reason: user has more options and is never in a spot
 // where they want to intentionally lose to pick that one OP card/relic combo due to now knowing
 // the future - it also breaks re-rolling if we add that later
 export function rewind(game: GameState, previousGameState: GameState) {

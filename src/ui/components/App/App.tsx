@@ -1,25 +1,21 @@
 import { useCallback, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { ShopName } from '../../../game/actions';
-import { CardState, GameState, RelicState } from '../../../game/gameState';
+import { CardState, GameState, RelicState, ShopName } from '../../../game/gameState';
 import { getBattleWinner, getIsGameOver } from '../../../game/utils/selectors';
 import { assertIsNonNullable } from '../../../utils/asserts';
 import { useGameState } from '../../hooks/useGameState';
 import { AddRelicsScreen } from '../AddRelicsScreen';
 import { BattleResultOverlay } from '../BattleResultOverlay';
 import { BattleScreen } from '../BattleScreen';
-import { AddCardsScreen } from '../CardSelection/AddCardsScreen';
-import { ChainCardsScreen } from '../CardSelection/ChainCardsScreen';
-import { RemoveCardsScreen } from '../CardSelection/RemoveCardsScreen';
+import { CardSelectionScreen, isCardSelectionScreen } from '../CardSelection/CardSelectionScreen';
 import { OverlayBackground } from '../shared/OverlayBackground';
 import { ShopSelectionScreen } from '../ShopSelection';
 import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
-import { AddPotionsScreen } from '../CardSelection/AddPotionsScreen';
 
-type ScreenType = ShopName | 'selectShop' | 'start' | 'addCards' | 'battle';
+export type ScreenType = ShopName | 'selectShop' | 'start' | 'addCards' | 'battle';
 type OverlayType = 'battleResults' | 'deck' | 'none';
 
 export const Root = styled.div`
@@ -61,7 +57,6 @@ export function App() {
   const endOfBattleGameRef = useRef<GameState>();
   const wonLastBattleRef = useRef(false);
   const cardOptionsRef = useRef<CardState[]>([]);
-  const potionOptionsRef = useRef<CardState[]>([]);
   const relicOptionsRef = useRef<RelicState[]>([]);
   const shopOptionsRef = useRef<ShopName[]>([]);
   const rewindGameStateRef = useRef<GameState>();
@@ -111,11 +106,13 @@ export function App() {
       if (shop === 'addRelics') {
         relicOptionsRef.current = await getAddRelicOptions();
       } else if (shop === 'addPotions') {
-        potionOptionsRef.current = await getAddPotionOptions();
+        cardOptionsRef.current = await getAddPotionOptions();
+      } else {
+        cardOptionsRef.current = game.user.cards;
       }
       goToScreen(shop);
     },
-    [getAddPotionOptions, getAddRelicOptions, goToScreen],
+    [game.user.cards, getAddPotionOptions, getAddRelicOptions, goToScreen],
   );
 
   const handleAddCards = useCallback(
@@ -136,36 +133,32 @@ export function App() {
     [addCards, getShopOptions, goToScreen, handleGoToShop],
   );
 
-  const handleAddPotions = useCallback(
-    (cards: CardState[]) => {
-      addCards(cards);
-      goToScreen('battle');
-    },
-    [addCards, goToScreen],
-  );
-
-  const handleRemoveCards = useCallback(
-    (cards: CardState[]) => {
-      removeCards(cards);
-      goToScreen('battle');
-    },
-    [removeCards, goToScreen],
-  );
-
-  const handleChainCards = useCallback(
-    (cards: CardState[]) => {
-      chainCards(cards);
-      goToScreen('battle');
-    },
-    [chainCards, goToScreen],
-  );
-
   const handleAddRelics = useCallback(
     (relic: RelicState) => {
       addRelic(relic);
       goToScreen('battle');
     },
     [addRelic, goToScreen],
+  );
+
+  const handleCardsSelected = useCallback(
+    async (cards: CardState[]) => {
+      if (screen === 'addCards') {
+        handleAddCards(cards);
+        return;
+      }
+
+      if (screen === 'addPotions') {
+        addCards(cards);
+      } else if (screen === 'removeCards') {
+        removeCards(cards);
+      } else if (screen === 'chainCards') {
+        chainCards(cards);
+      }
+
+      goToScreen('battle');
+    },
+    [addCards, chainCards, goToScreen, handleAddCards, removeCards, screen],
   );
 
   const handleBattleOver = useCallback(() => {
@@ -205,47 +198,14 @@ export function App() {
       <ScreenContainer>
         {screen === 'start' && <StartScreen onContinue={startCardSelection}></StartScreen>}
 
-        {screen === 'addCards' && (
-          <AddCardsScreen
+        {isCardSelectionScreen(screen) && (
+          <CardSelectionScreen
+            type={screen}
             game={game}
             cards={cardOptionsRef.current}
-            onCardsSelected={handleAddCards}
+            onCardsSelected={handleCardsSelected}
             onViewDeck={handleOnViewDeck}
-          ></AddCardsScreen>
-        )}
-
-        {screen === 'addPotions' && (
-          <AddPotionsScreen
-            game={game}
-            cards={potionOptionsRef.current}
-            onCardsSelected={handleAddPotions}
-            onViewDeck={handleOnViewDeck}
-          ></AddPotionsScreen>
-        )}
-
-        {screen === 'selectShop' && (
-          <ShopSelectionScreen
-            game={game}
-            shopOptions={shopOptionsRef.current!}
-            onShopSelected={handleGoToShop}
-            onViewDeck={handleOnViewDeck}
-          ></ShopSelectionScreen>
-        )}
-
-        {screen === 'removeCards' && (
-          <RemoveCardsScreen
-            game={game}
-            onCardsSelected={handleRemoveCards}
-            onViewDeck={handleOnViewDeck}
-          ></RemoveCardsScreen>
-        )}
-
-        {screen === 'chainCards' && (
-          <ChainCardsScreen
-            game={game}
-            onCardsSelected={handleChainCards}
-            onViewDeck={handleOnViewDeck}
-          ></ChainCardsScreen>
+          ></CardSelectionScreen>
         )}
 
         {screen === 'addRelics' && (
@@ -255,6 +215,15 @@ export function App() {
             onRelicSelected={handleAddRelics}
             onViewDeck={handleOnViewDeck}
           ></AddRelicsScreen>
+        )}
+
+        {screen === 'selectShop' && (
+          <ShopSelectionScreen
+            game={game}
+            shopOptions={shopOptionsRef.current!}
+            onShopSelected={handleGoToShop}
+            onViewDeck={handleOnViewDeck}
+          ></ShopSelectionScreen>
         )}
 
         {screen === 'battle' && (

@@ -5,6 +5,9 @@ import { getEnemyInfo, getEnemyOrder } from './utils/enemies';
 import { getRandom, getNextEnemy } from './utils/selectors';
 import { EnemyName } from '../content/enemies';
 
+export type CardShopName = 'removeCards' | 'chainCards' | 'addPotions';
+export type ShopName = CardShopName | 'addRelics';
+
 export type Target = 'self' | 'opponent';
 
 export const statusEffectNames = [

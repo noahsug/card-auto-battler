@@ -3,7 +3,8 @@ import { fn } from '@storybook/test';
 
 import { createGameState } from '../../../game/gameState';
 import { ShopSelectionScreen } from './ShopSelectionScreen';
-import { getShopOptions, ShopName } from '../../../game/actions/actions';
+import { getShopOptions } from '../../../game/actions/actions';
+import { ShopName } from '../../../game/gameState';
 
 const meta = {
   title: 'ShopSelectionScreen',

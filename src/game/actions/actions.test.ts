@@ -18,10 +18,10 @@ import {
   playCard,
   removeCards,
   rewind,
-  ShopName,
   startBattle,
   startTurn,
 } from './actions';
+import { ShopName } from '../gameState';
 import { getBattleWinner, getIsGameOver, getIsTurnOver } from '../utils/selectors';
 import {
   MAX_TURNS_IN_BATTLE,

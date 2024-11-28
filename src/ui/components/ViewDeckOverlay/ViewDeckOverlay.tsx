@@ -1,6 +1,5 @@
 import { GameState } from '../../../game/gameState';
-import { CardSelection } from '../CardSelection';
-import { sortCards } from '../CardSelection/CardSelection';
+import { CardSelection, sortCards } from '../CardSelection/CardSelection';
 
 interface Props {
   game: GameState;
