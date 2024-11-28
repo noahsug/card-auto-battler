@@ -10,7 +10,7 @@ import { ControllerUpdate } from '../utils/reactSpring';
 import { Image } from './shared/Image';
 
 const oneDropShadowGlow = 'drop-shadow(0 0 0.04rem var(--color-primary))';
-const dropShadowGlow = new Array(4).fill(oneDropShadowGlow).join(' ');
+const dropShadowGlow = new Array(1).fill(oneDropShadowGlow).join(' ');
 
 const AnimatedContainer = styled(animated.div)`
   filter: ${dropShadowGlow};
@@ -39,7 +39,6 @@ interface Props {
 const startPosition = {
   x: 0,
   y: 0,
-  hue: 0,
   brightness: 1,
   rotate: 0,
   config: { duration: 600 },
@@ -75,7 +74,6 @@ function getDodgeAnimation({ direction, u }: { direction: Direction; u: UnitFn }
   return {
     x: u(15) * direction,
     y: u(10),
-    hue: 0,
     delay: 0,
     config: { easing: easings.easeOutExpo, duration: 600 },
   } satisfies AnimationOptions;
@@ -103,7 +101,7 @@ function getDamageAnimation({
 
   return {
     x: u(4 + 20 * magnitude) * direction,
-    hue: 20 + 160 * magnitude,
+    brightness: 1 - 0.7 * magnitude,
     config: { easing: easings.easeOutExpo, duration: 100 + 100 * magnitude },
   } satisfies AnimationOptions;
 }
@@ -136,7 +134,7 @@ function getDeathAnimation({
   return {
     x: (windowWidth / 2) * direction,
     y: u(-100),
-    hue: 180,
+    brightness: 0,
     rotate: 360 * direction,
     config: { easing: easings.easeOutCubic, duration: 5000 },
   };
@@ -167,10 +165,7 @@ export function PlayerProfile({ flip, scale = 1, battleEvents, src, handleRef, i
     animationController.start(animation);
   }, [animationController, battleEvents, direction, isDead, u, windowDimensions.width]);
 
-  const filter = to(
-    [animationProps.hue, animationProps.brightness],
-    (hue, brightness) => `hue-rotate(${hue}deg) brightness(${brightness})`,
-  );
+  const filter = to([animationProps.brightness], (brightness) => `brightness(${brightness})`);
 
   return (
     <div ref={handleRef}>
