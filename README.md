@@ -2,20 +2,22 @@
 
 Game TODO:
 
+1. Instance of dealing damage from a card = use of crit
 1. choice of which charm shop to enter and more charm shops:
    1. ✅ chain = play after other chained card
    2. ✅ remove = remove card
-   3. feather = card on top
-   4. ✅ potion = powerful 1 time use
-   5. dup card (does not dup chain)?
-   6. remove "trash" keyword?
-   7. add "play another card" keyword?
-   8. add "crit" keyword?
-   9. add "repeat" keyword?
-2. storybook visual testing
-3. more heroes?
-4. card rarity? so we don't spam folks with mythics that are OP but situational
-5. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
+   3. feather = card on top + exhaust
+   4. anchor = card on bottom + crit
+   5. ✅ potion = powerful 1 time use
+   6. dup card (does not dup chain)?
+   7. remove "trash" keyword?
+   8. add "play another card" keyword?
+   9. add "crit" keyword?
+   10. add "repeat" keyword?
+1. storybook visual testing
+1. more heroes?
+1. card rarity? so we don't spam folks with mythics that are OP but situational
+1. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
    cards/turn?), since this gets you through a big deck faster and makes picking cards feel more
    impactful later in the game
 

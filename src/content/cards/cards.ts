@@ -35,7 +35,7 @@ import damagePotionImage from './images/damage-potion.jpeg';
 import adrenalinePotionImage from './images/adrenaline-potion.jpeg';
 import strengthPotionImage from './images/strength-potion.jpeg';
 
-import { createCard, ifCompare, ifHas, value as v } from '../utils/createCard';
+import { createCard, ifCompare, ifHas, value as v, playAnotherCard } from '../utils/createCard';
 
 /**
  * Basic cards
@@ -222,10 +222,7 @@ export const redCardsByName = {
         target: 'self',
         name: 'temporaryFireCrit',
       },
-      {
-        target: 'self',
-        name: 'extraCardPlays',
-      },
+      playAnotherCard(),
     ],
     {
       name: 'Channel',
@@ -421,10 +418,7 @@ export const purpleCardsByName = {
       {
         value: v(1),
       },
-      {
-        target: 'self',
-        name: 'extraCardPlays',
-      },
+      playAnotherCard(),
     ],
     {
       name: 'Left Jab',
@@ -443,8 +437,7 @@ export const purpleCardsByName = {
         value: v(4),
       },
       {
-        target: 'self',
-        name: 'extraCardPlays',
+        ...playAnotherCard(),
         if: ifCompare('self', 'cardsPlayedThisTurn', '>=', 2),
       },
     ],
@@ -490,10 +483,7 @@ export const purpleCardsByName = {
         name: 'delayedShock',
         value: v(1),
       },
-      {
-        target: 'self',
-        name: 'extraCardPlays',
-      },
+      playAnotherCard(),
     ],
     {
       name: 'Shock Trap',
@@ -506,10 +496,7 @@ export const purpleCardsByName = {
       {
         name: 'shock',
       },
-      {
-        target: 'self',
-        name: 'extraCardPlays',
-      },
+      playAnotherCard(),
     ],
     {
       name: 'Electric Jab',
@@ -555,10 +542,7 @@ export const purpleCardsByName = {
         name: 'temporaryStrength',
         value: v(2),
       },
-      {
-        target: 'self',
-        name: 'extraCardPlays',
-      },
+      playAnotherCard(),
     ],
     {
       name: 'Pumped Up',
@@ -577,14 +561,15 @@ export const potionByName = {
       {
         target: 'self',
         name: 'regen',
-        value: v(6),
+        value: v(5),
       },
+      playAnotherCard(),
     ],
     {
       trash: true,
       uses: 2,
       name: 'Regen Potion',
-      description: 'Gain $V regen.',
+      description: 'Gain $V regen and play another card.',
       image: regenPotionImage,
     },
   ),
@@ -592,14 +577,15 @@ export const potionByName = {
     [
       {
         name: 'damage',
-        value: v(15),
+        value: v(12),
       },
+      playAnotherCard(),
     ],
     {
       trash: true,
       uses: 2,
       name: 'Damage Potion',
-      description: 'Deal $V damage.',
+      description: 'Deal $V damage. Play another card.',
       image: damagePotionImage,
     },
   ),
@@ -608,33 +594,25 @@ export const potionByName = {
       {
         target: 'self',
         name: 'strength',
-        value: v(6),
+        value: v(4),
       },
+      playAnotherCard(),
     ],
     {
       trash: true,
       uses: 2,
       name: 'Strength Potion',
-      description: 'Gain $V strength.',
+      description: 'Gain $V strength. Play another card.',
       image: strengthPotionImage,
     },
   ),
-  cardPlaysPotion: createCard(
-    [
-      {
-        target: 'self',
-        name: 'extraCardPlays',
-        value: v(3),
-      },
-    ],
-    {
-      trash: true,
-      uses: 2,
-      name: 'Adrenaline Potion',
-      description: 'Play $V cards.',
-      image: adrenalinePotionImage,
-    },
-  ),
+  cardPlaysPotion: createCard([playAnotherCard(v(3))], {
+    trash: true,
+    uses: 2,
+    name: 'Adrenaline Potion',
+    description: 'Play $V cards.',
+    image: adrenalinePotionImage,
+  }),
   critPotion: createCard(
     [
       {
@@ -642,12 +620,13 @@ export const potionByName = {
         name: 'crit',
         value: v(3),
       },
+      playAnotherCard(),
     ],
     {
       trash: true,
       uses: 2,
       name: 'Crit Potion',
-      description: 'Your next $V attacks will crit.',
+      description: 'Your next $V attacks will crit. Play another card.',
       image: critPotionImage,
     },
   ),
@@ -656,14 +635,15 @@ export const potionByName = {
       {
         target: 'self',
         name: 'dodge',
-        value: v(3),
+        value: v(2),
       },
+      playAnotherCard(),
     ],
     {
       trash: true,
       uses: 2,
       name: 'Dodge Potion',
-      description: 'Gain $V dodge.',
+      description: 'Gain $V dodge. Play another card.',
       image: dodgePotionImage,
     },
   ),

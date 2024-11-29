@@ -84,12 +84,12 @@ export function parseCardDescriptionTemplate(card: CardState) {
   let text = parseDescriptionTemplate(card.description, getValue);
 
   if (card.trash) {
-    text += ' Trash.';
+    text += ' Exhaust.';
   }
 
   if (card.uses) {
     const uses = plural(card.uses.current, 'use');
-    text += ` Permanently removed after ${card.uses.current} ${uses}.`;
+    text += ` ${card.uses.current} ${uses}.`;
   }
 
   return text;

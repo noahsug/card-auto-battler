@@ -1,9 +1,9 @@
+import { EnemyName } from '../content/enemies';
 import { heroesByName } from '../content/heroes';
 import { getRandomState, Random } from '../utils/Random';
 import { addCardsToPlayer } from './utils/cards';
-import { getEnemyInfo, getEnemyOrder } from './utils/enemies';
-import { getRandom, getNextEnemy } from './utils/selectors';
-import { EnemyName } from '../content/enemies';
+import { getEnemyOrder } from './utils/enemies';
+import { getNextEnemy } from './utils/selectors';
 
 export type CardShopName = 'removeCards' | 'chainCards' | 'addPotions';
 export type ShopName = CardShopName | 'addRelics';
@@ -108,6 +108,7 @@ export interface CardState {
   // unique ID used to sort cards from first added to last added
   acquiredId: number;
   chain: { toId?: number; fromId?: number };
+  feather: boolean;
 }
 
 export interface RelicState {

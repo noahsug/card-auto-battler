@@ -10,8 +10,13 @@ import {
 } from '../../game/gameState';
 import { assertIsNonNullable } from '../../utils/asserts';
 
-// used for storybook and tests
-let cardIdCounter = 0;
+export function playAnotherCard(value?: ValueDescriptor): CardEffect {
+  return createEffect({
+    target: 'self',
+    name: 'extraCardPlays',
+    value,
+  });
+}
 
 // returns a CardEffect with defaults
 export function createEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {
@@ -20,6 +25,9 @@ export function createEffect(partialEffect: Partial<CardEffect> = {}): CardEffec
   partialEffect.value = partialEffect.value || value(1);
   return partialEffect as CardEffect;
 }
+
+// used for storybook and tests
+let cardIdCounter = 0;
 
 // returns a CardState with defaults
 export function createCard(
@@ -34,6 +42,7 @@ export function createCard(
     image = '',
     tribe = 'basic',
     chain = {},
+    feather = false,
   } = cardState;
 
   return {
@@ -47,6 +56,7 @@ export function createCard(
     tribe,
     acquiredId: cardIdCounter++,
     chain,
+    feather,
   };
 }
 
