@@ -71,27 +71,54 @@ const Text = styled.div`
   }
 `;
 
-const ChainOverlay = styled.div<{ $side: 'left' | 'right' }>`
-  width: 2em;
-  height: 2em;
+const ImageBorder = styled.div`
+  filter: drop-shadow(0 0 0.1em black) drop-shadow(0 0 0.1em black);
+`;
+
+const charmColor = '#e4e4bf';
+
+const ChainOverlayContainer = styled(ImageBorder)<{ $side: 'left' | 'right' }>`
   position: absolute;
   top: 51%;
   ${({ $side }) => $side}: -0.5em;
-  ${maskImage({ src: chainImage })}
-  background-color: #fdfd92;
 `;
 
-FeatherOverlayShadow = styled.div``;
-
-const FeatherOverlay = styled.div`
+const ChainOverlayImage = styled.div`
   width: 2em;
   height: 2em;
-  position: absolute;
-  top: -0.5em;
-  right: -0.5em;
-  ${maskImage({ src: featherImage })}
-  background-color: #fdfd92;
+  ${maskImage({ src: chainImage })}
+  background-color: ${charmColor}
 `;
+
+function ChainOverlay({ side }: { side: 'left' | 'right' }) {
+  return (
+    <ChainOverlayContainer $side={side}>
+      <ChainOverlayImage />
+    </ChainOverlayContainer>
+  );
+}
+
+const FeatherOverlayContainer = styled(ImageBorder)`
+  position: absolute;
+  top: 1em;
+  right: -0.5em;
+  rotate: -45deg;
+`;
+
+const FeatherOverlayImage = styled.div`
+  width: 3em;
+  height: 3em;
+  ${maskImage({ src: featherImage })};
+  background-color: ${charmColor};
+`;
+
+function FeatherOverlay() {
+  return (
+    <FeatherOverlayContainer>
+      <FeatherOverlayImage />
+    </FeatherOverlayContainer>
+  );
+}
 
 interface Props {
   card: CardState;
@@ -113,8 +140,8 @@ export function Card({ size, card, onClick, style }: Props) {
           <Text>
             <DescriptionText text={description} />
           </Text>
-          {card.chain.fromId != null && <ChainOverlay $side="left" />}
-          {card.chain.toId != null && <ChainOverlay $side="right" />}
+          {card.chain.fromId != null && <ChainOverlay side="left" />}
+          {card.chain.toId != null && <ChainOverlay side="right" />}
           {card.feather && <FeatherOverlay />}
         </OuterContainer>
       </ThemeProvider>

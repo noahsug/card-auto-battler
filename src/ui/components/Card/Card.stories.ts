@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import sample from 'lodash/sample';
 
 import { Card } from './Card';
-import { cardsByName } from '../../../content/cards';
+import { allCards, cardsByName } from '../../../content/cards';
 
 const meta = {
   title: 'Card',
@@ -17,18 +18,6 @@ export const Punch: Story = {
     card: cardsByName.attack,
   },
 };
-export const Fireball: Story = {
-  args: {
-    size: 'large',
-    card: cardsByName.fireball,
-  },
-};
-export const Eviscerate: Story = {
-  args: {
-    size: 'large',
-    card: cardsByName.eviscerate,
-  },
-};
 export const Channel: Story = {
   args: {
     size: 'large',
@@ -39,27 +28,27 @@ export const Channel: Story = {
 export const Chain: Story = {
   args: {
     size: 'large',
-    card: { ...cardsByName.channel, chain: { fromId: 0 } },
+    card: { ...sample(allCards)!, chain: { fromId: 0 } },
   },
 };
 
 export const DoubleChain: Story = {
   args: {
     size: 'large',
-    card: { ...cardsByName.attack, chain: { fromId: 0, toId: 1 } },
+    card: { ...sample(allCards)!, chain: { fromId: 0, toId: 1 } },
   },
 };
 
 export const Feather: Story = {
   args: {
     size: 'large',
-    card: { ...cardsByName.attack, feather: true },
+    card: { ...sample(allCards)!, feather: true },
   },
 };
 
 export const FeatherChain: Story = {
   args: {
     size: 'large',
-    card: { ...cardsByName.attack, chain: { toId: 0 }, feather: true },
+    card: { ...sample(allCards)!, chain: { toId: 0 }, feather: true },
   },
 };
