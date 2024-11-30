@@ -49,3 +49,17 @@ export const DoubleChain: Story = {
     card: { ...cardsByName.attack, chain: { fromId: 0, toId: 1 } },
   },
 };
+
+export const Feather: Story = {
+  args: {
+    size: 'large',
+    card: { ...cardsByName.attack, feather: true },
+  },
+};
+
+export const FeatherChain: Story = {
+  args: {
+    size: 'large',
+    card: { ...cardsByName.attack, chain: { toId: 0 }, feather: true },
+  },
+};

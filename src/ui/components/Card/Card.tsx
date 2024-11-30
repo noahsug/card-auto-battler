@@ -9,6 +9,7 @@ import { parseCardDescriptionTemplate } from './parseCardDescriptionTemplate';
 import { getCardColor } from './getCardColor';
 import { Image } from '../shared/Image';
 import chainImage from './chain.png';
+import featherImage from './feather.png';
 
 export const baseCardSize = { width: 12, height: 20 };
 
@@ -80,6 +81,18 @@ const ChainOverlay = styled.div<{ $side: 'left' | 'right' }>`
   background-color: #fdfd92;
 `;
 
+FeatherOverlayShadow = styled.div``;
+
+const FeatherOverlay = styled.div`
+  width: 2em;
+  height: 2em;
+  position: absolute;
+  top: -0.5em;
+  right: -0.5em;
+  ${maskImage({ src: featherImage })}
+  background-color: #fdfd92;
+`;
+
 interface Props {
   card: CardState;
   size: 'small' | 'medium' | 'large';
@@ -102,6 +115,7 @@ export function Card({ size, card, onClick, style }: Props) {
           </Text>
           {card.chain.fromId != null && <ChainOverlay $side="left" />}
           {card.chain.toId != null && <ChainOverlay $side="right" />}
+          {card.feather && <FeatherOverlay />}
         </OuterContainer>
       </ThemeProvider>
     </CardRoot>
