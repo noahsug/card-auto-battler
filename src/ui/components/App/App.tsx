@@ -44,6 +44,7 @@ export function App() {
     addCards,
     removeCards,
     chainCards,
+    featherCards,
     addRelic,
     endBattle,
     resetGame,
@@ -154,11 +155,13 @@ export function App() {
         removeCards(cards);
       } else if (screen === 'chainCards') {
         chainCards(cards);
+      } else if (screen === 'featherCards') {
+        featherCards(cards);
       }
 
       goToScreen('battle');
     },
-    [addCards, chainCards, goToScreen, handleAddCards, removeCards, screen],
+    [addCards, chainCards, featherCards, goToScreen, handleAddCards, removeCards, screen],
   );
 
   const handleBattleOver = useCallback(() => {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 import sortBy from 'lodash/sortBy';
 
-import { applyCardOrderingEffects } from '../../../game/actions/applyCardOrderingEffects';
+import { applyCardOrderingEffects } from '../../../game/utils/cards';
 import { CardState, GameState } from '../../../game/gameState';
 import { plural } from '../../../utils/plural';
 import { useUnits } from '../../hooks/useUnits';
@@ -123,7 +123,6 @@ export function CardSelection({
 }
 
 export function sortCards(cards: CardState[]) {
-  cards = sortBy(cards, (card) => card.acquiredId);
-  applyCardOrderingEffects(cards);
-  return cards;
+  const sortedCards = sortBy(cards, (card) => card.acquiredId);
+  return applyCardOrderingEffects(sortedCards);
 }

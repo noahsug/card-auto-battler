@@ -1,15 +1,9 @@
 import { NUM_CARD_REMOVAL_PICKS } from '../../../game/constants';
-import { CardState, GameState } from '../../../game/gameState';
 import { CardSelection, sortCards } from './CardSelection';
+import { GenericCardSelectionProps } from './CardSelectionScreen';
 
-interface Props {
-  game: GameState;
-  onCardsSelected: (cards: CardState[]) => void;
-  onViewDeck: () => void;
-}
-
-export function RemoveCardsScreen(props: Props) {
-  const cards = sortCards(props.game.user.cards);
+export function RemoveCardsScreen(props: GenericCardSelectionProps) {
+  const cards = sortCards(props.cards);
 
   return (
     <CardSelection

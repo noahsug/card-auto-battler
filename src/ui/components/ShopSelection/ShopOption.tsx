@@ -11,6 +11,7 @@ const displayNames: Record<ShopName, string> = {
   addRelics: 'Add Relics',
   chainCards: 'Chain Cards',
   removeCards: 'Remove Cards',
+  featherCards: 'Lighten Cards',
 };
 
 export function ShopOption({ name, onShopSelected }: Props) {

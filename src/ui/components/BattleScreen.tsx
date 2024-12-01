@@ -154,9 +154,12 @@ export function BattleScreen({
   }, []);
 
   const handleToggleFastForwarding = useCallback(() => {
+    if (!isFastForwarding) {
+      // unpause when turning on fast forwarding
+      setIsPaused(false);
+    }
     setIsFastForwarding((prev) => !prev);
-    setIsPaused(false);
-  }, []);
+  }, [isFastForwarding]);
 
   const handleUndo = useCallback(() => {
     setGameState(undoHistory.current.pop()!);

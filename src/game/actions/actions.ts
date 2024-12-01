@@ -3,7 +3,7 @@ import range from 'lodash/range';
 import { allCards } from '../../content/cards';
 import { potionByName } from '../../content/cards/cards';
 import { allRelics, RelicName } from '../../content/relics';
-import { assert, assertIsNonNullable } from '../../utils/asserts';
+import { assert } from '../../utils/asserts';
 import {
   MAX_SHOCK,
   MAX_TURNS_IN_BATTLE,
@@ -21,10 +21,15 @@ import {
   ShopName,
   statusEffectNames,
 } from '../gameState';
-import { addCardsToPlayer, convertBasicAttacksToMonkAttack } from '../utils/cards';
+import {
+  addCardsToPlayer,
+  applyCardOrderingEffects,
+  breakChain,
+  convertBasicAttacksToMonkAttack,
+  getMatchingCards,
+} from '../utils/cards';
 import { getBattleWinner, getNextEnemy, getPlayers, getRandom, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
-import { applyCardOrderingEffects, breakChain } from './applyCardOrderingEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
 
 export function initializeEnemy(game: GameState) {
@@ -44,7 +49,7 @@ export function getShopOptions(game: GameState): ShopName[] {
   const { sample: sampleSize } = getRandom(game);
 
   const potionRounds = [3, 5, 7]; // no potions for final boss (aka no rounds 8 or 9)
-  const otherShopOptions: ShopName[] = sampleSize(['removeCards', 'chainCards'], 2);
+  const otherShopOptions: ShopName[] = sampleSize(['removeCards', 'chainCards', 'featherCards'], 2);
 
   if (potionRounds.includes(wins)) {
     return [otherShopOptions[0], 'addPotions'];
@@ -94,10 +99,7 @@ export function addCards(game: GameState, cards: CardState[]) {
 export function removeCards(game: GameState, cardsToRemove: CardState[]) {
   const { cards } = game.user;
   // remap cardsToRemove to the actual cards since game is a proxy object when using immer
-  cardsToRemove = cardsToRemove.map(
-    (cardToRemove) => cards.find((card) => card.acquiredId === cardToRemove.acquiredId)!,
-  );
-
+  cardsToRemove = getMatchingCards(game.user.cards, cardsToRemove);
   cardsToRemove.forEach((card) => {
     breakChain(card, 'fromId', cards);
     breakChain(card, 'toId', cards);
@@ -110,15 +112,20 @@ export function chainCards(game: GameState, cardsToChain: CardState[]) {
   assert(cardsToChain.length === 2, 'must select exactly 2 cards to chain');
   const { cards } = game.user;
 
-  const [fromCard, toCard] = cardsToChain.map(
-    (cardToChain) => game.user.cards.find((card) => card.acquiredId === cardToChain.acquiredId)!,
-  );
+  const [fromCard, toCard] = getMatchingCards(game.user.cards, cardsToChain);
 
   breakChain(fromCard, 'toId', cards);
   fromCard.chain.toId = toCard.acquiredId;
 
   breakChain(toCard, 'fromId', cards);
   toCard.chain.fromId = fromCard.acquiredId;
+}
+
+export function featherCards(game: GameState, cardsToFeather: CardState[]) {
+  cardsToFeather = getMatchingCards(game.user.cards, cardsToFeather);
+  cardsToFeather.forEach((card) => {
+    card.charm = 'feather';
+  });
 }
 
 export function addRelic(game: GameState, relic: RelicState) {
@@ -132,7 +139,7 @@ export function addRelic(game: GameState, relic: RelicState) {
 function shuffleCards(game: GameState, player: PlayerState) {
   const { shuffle } = getRandom(game);
   shuffle(player.cards);
-  applyCardOrderingEffects(player.cards);
+  player.cards = applyCardOrderingEffects(player.cards);
 }
 
 function triggerStartOfBattleEffects(

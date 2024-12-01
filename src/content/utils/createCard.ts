@@ -42,7 +42,6 @@ export function createCard(
     image = '',
     tribe = 'basic',
     chain = {},
-    feather = false,
   } = cardState;
 
   return {
@@ -56,7 +55,6 @@ export function createCard(
     tribe,
     acquiredId: cardIdCounter++,
     chain,
-    feather,
   };
 }
 

@@ -5,7 +5,7 @@ import { addCardsToPlayer } from './utils/cards';
 import { getEnemyOrder } from './utils/enemies';
 import { getNextEnemy } from './utils/selectors';
 
-export type CardShopName = 'removeCards' | 'chainCards' | 'addPotions';
+export type CardShopName = 'removeCards' | 'chainCards' | 'addPotions' | 'featherCards';
 export type ShopName = CardShopName | 'addRelics';
 
 export type Target = 'self' | 'opponent';
@@ -108,7 +108,7 @@ export interface CardState {
   // unique ID used to sort cards from first added to last added
   acquiredId: number;
   chain: { toId?: number; fromId?: number };
-  feather: boolean;
+  charm?: 'feather';
 }
 
 export interface RelicState {

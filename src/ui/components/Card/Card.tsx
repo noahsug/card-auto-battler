@@ -75,7 +75,7 @@ const ImageBorder = styled.div`
   filter: drop-shadow(0 0 0.1em black) drop-shadow(0 0 0.1em black);
 `;
 
-const charmColor = '#e4e4bf';
+const charmColor = '#f3f382';
 
 const ChainOverlayContainer = styled(ImageBorder)<{ $side: 'left' | 'right' }>`
   position: absolute;
@@ -90,13 +90,11 @@ const ChainOverlayImage = styled.div`
   background-color: ${charmColor}
 `;
 
-function ChainOverlay({ side }: { side: 'left' | 'right' }) {
-  return (
-    <ChainOverlayContainer $side={side}>
-      <ChainOverlayImage />
-    </ChainOverlayContainer>
-  );
-}
+const ChainOverlay = ({ side }: { side: 'left' | 'right' }) => (
+  <ChainOverlayContainer $side={side}>
+    <ChainOverlayImage />
+  </ChainOverlayContainer>
+);
 
 const FeatherOverlayContainer = styled(ImageBorder)`
   position: absolute;
@@ -112,13 +110,11 @@ const FeatherOverlayImage = styled.div`
   background-color: ${charmColor};
 `;
 
-function FeatherOverlay() {
-  return (
-    <FeatherOverlayContainer>
-      <FeatherOverlayImage />
-    </FeatherOverlayContainer>
-  );
-}
+const FeatherOverlay = () => (
+  <FeatherOverlayContainer>
+    <FeatherOverlayImage />
+  </FeatherOverlayContainer>
+);
 
 interface Props {
   card: CardState;
@@ -142,7 +138,7 @@ export function Card({ size, card, onClick, style }: Props) {
           </Text>
           {card.chain.fromId != null && <ChainOverlay side="left" />}
           {card.chain.toId != null && <ChainOverlay side="right" />}
-          {card.feather && <FeatherOverlay />}
+          {card.charm === 'feather' && <FeatherOverlay />}
         </OuterContainer>
       </ThemeProvider>
     </CardRoot>

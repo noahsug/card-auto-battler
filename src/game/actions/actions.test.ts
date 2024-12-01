@@ -29,7 +29,7 @@ import {
   NUM_CARD_SELECTION_PICKS,
   NUM_FIRST_CARD_SELECTION_PICKS,
 } from '../constants';
-import { getChainCreatesLoop } from './applyCardOrderingEffects';
+import { getChainCreatesLoop } from '../utils/cards';
 
 type ChoiceFunctions = {
   chooseShop: (game: GameState, shopOptions: ShopName[]) => ShopName;

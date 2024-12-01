@@ -16,6 +16,8 @@ export const NUM_POTION_SELECTION_PICKS = 1;
 
 export const NUM_CARD_REMOVAL_PICKS = 1;
 
+export const NUM_CARD_FEATHER_PICKS = 1;
+
 export const NUM_RELIC_SELECTION_OPTIONS = 4;
 
 export const NUM_STARTING_CARDS = 3;

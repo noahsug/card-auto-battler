@@ -1,8 +1,7 @@
 import { styled } from 'styled-components';
-import { GameState } from '../../../game/gameState';
-import { ShopName } from '../../../game/gameState';
+import { GameState, ShopName } from '../../../game/gameState';
 import { HUD } from '../HUD';
-import { ScrollingCenterContent, CenterContent } from '../shared/CenterContent';
+import { CenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
 import { ShopOption } from './ShopOption';
 

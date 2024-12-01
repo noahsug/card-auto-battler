@@ -22,6 +22,7 @@ const game = createGameState();
 export const Primary: Story = {
   args: {
     game,
+    cards: game.user.cards,
   },
 };
 
@@ -32,6 +33,6 @@ export const HasExistingChain: Story = {
     const [fromCard, toCard] = [game.user.cards[1], game.user.cards[4]];
     fromCard.chain.toId = toCard.acquiredId;
     toCard.chain.fromId = fromCard.acquiredId;
-    return { game };
+    return { game, cards: game.user.cards };
   })(),
 };

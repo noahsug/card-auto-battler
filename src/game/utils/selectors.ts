@@ -3,7 +3,7 @@ import { getEnemyInfo } from './enemies';
 import { RelicName } from '../../content/relics/relics';
 import { Random } from '../../utils/Random';
 import { MAX_LOSSES, MAX_WINS } from '../constants';
-import { GameState, PlayerState, Target, createPlayer } from '../gameState';
+import { CardState, GameState, PlayerState, Target, createPlayer } from '../gameState';
 
 export function getIsStartOfBattle(game: GameState) {
   return game.turn === 0 && game.user.cardsPlayedThisTurn === 0;

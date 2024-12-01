@@ -1,14 +1,9 @@
 import { useState } from 'react';
 
-import { breakChain, getChainCreatesLoop } from '../../../game/actions/applyCardOrderingEffects';
-import { CardState, GameState } from '../../../game/gameState';
+import { breakChain, getChainCreatesLoop } from '../../../game/utils/cards';
+import { CardState } from '../../../game/gameState';
 import { CardSelection, sortCards } from './CardSelection';
-
-interface Props {
-  game: GameState;
-  onCardsSelected: (cards: CardState[]) => void;
-  onViewDeck: () => void;
-}
+import { GenericCardSelectionProps } from './CardSelectionScreen';
 
 // returns card indexes that would create a loop if chained
 function getInvalidSelectionsIndexes(cards: CardState[], fromIndex: number): number[] {
@@ -22,11 +17,11 @@ function getInvalidSelectionsIndexes(cards: CardState[], fromIndex: number): num
   return invalidSelections;
 }
 
-export function ChainCardsScreen(props: Props) {
+export function ChainCardsScreen(props: GenericCardSelectionProps) {
   const [selectedCardIndexes, setSelectedCardIndexes] = useState<number[]>([]);
 
   // copy cards because we're changing their chain IDs as the user selects/de-selects cards
-  const cards = sortCards(structuredClone(props.game.user.cards));
+  const cards = sortCards(structuredClone(props.cards));
 
   // mark selected cards as chained
   const [fromCard, toCard] = selectedCardIndexes.map((index) => cards[index]);
