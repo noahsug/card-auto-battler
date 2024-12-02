@@ -1,16 +1,26 @@
 import range from 'lodash/range';
-import sampleSize from 'lodash/sampleSize';
 import sample from 'lodash/sample';
+import sampleSize from 'lodash/sampleSize';
 import shuffle from 'lodash/shuffle';
 
 import { getRandomSeed } from '../../utils/Random';
-import { CardState, createGameState, GameState, RelicState } from '../gameState';
+import {
+  MAX_TURNS_IN_BATTLE,
+  NUM_CARD_FEATHER_PICKS,
+  NUM_CARD_REMOVAL_PICKS,
+  NUM_CARD_SELECTION_PICKS,
+  NUM_FIRST_CARD_SELECTION_PICKS,
+} from '../constants';
+import { CardState, createGameState, GameState, RelicState, ShopName } from '../gameState';
+import { getChainCreatesLoop } from '../utils/cards';
+import { getBattleWinner, getIsGameOver, getIsTurnOver } from '../utils/selectors';
 import {
   addCards,
   addRelic,
   chainCards,
   endBattle,
   endTurn,
+  featherCards,
   getAddCardOptions,
   getAddPotionOptions,
   getAddRelicOptions,
@@ -21,15 +31,6 @@ import {
   startBattle,
   startTurn,
 } from './actions';
-import { ShopName } from '../gameState';
-import { getBattleWinner, getIsGameOver, getIsTurnOver } from '../utils/selectors';
-import {
-  MAX_TURNS_IN_BATTLE,
-  NUM_CARD_REMOVAL_PICKS,
-  NUM_CARD_SELECTION_PICKS,
-  NUM_FIRST_CARD_SELECTION_PICKS,
-} from '../constants';
-import { getChainCreatesLoop } from '../utils/cards';
 
 type ChoiceFunctions = {
   chooseShop: (game: GameState, shopOptions: ShopName[]) => ShopName;
@@ -37,6 +38,7 @@ type ChoiceFunctions = {
   chooseCardsToRemove: (game: GameState) => CardState[];
   chooseCardsToChain: (game: GameState) => CardState[];
   chooseRelicToAdd: (game: GameState, relicOptions: RelicState[]) => RelicState;
+  chooseCardsToFeather: (game: GameState) => CardState[];
 };
 
 function play(game: GameState, choices: ChoiceFunctions) {
@@ -67,6 +69,7 @@ function makeSelections(
     chooseCardsToRemove,
     chooseCardsToChain,
     chooseRelicToAdd,
+    chooseCardsToFeather,
   }: ChoiceFunctions,
 ) {
   // add cards
@@ -92,6 +95,11 @@ function makeSelections(
     const potionOptions = getAddPotionOptions(game);
     const potions = chooseCardsToAdd(game, potionOptions);
     addCards(game, potions);
+  } else if (shop === 'featherCards') {
+    const cards = chooseCardsToFeather(game);
+    featherCards(game, cards);
+  } else {
+    shop satisfies never;
   }
 }
 
@@ -145,7 +153,7 @@ const chooseRandomCardsToChain: ChoiceFunctions['chooseCardsToChain'] = (game: G
       'failed to chain:',
       game.user.cards.map((card) => card.chain),
     );
-    throw new Error('unable to chain 2 cards');
+    throw new Error('unable to chain cards');
   }
   return result.map((index) => game.user.cards[index]);
 };
@@ -161,6 +169,7 @@ const randomPickActions: ChoiceFunctions = {
   chooseCardsToRemove: (game) => sampleSize(game.user.cards, NUM_CARD_REMOVAL_PICKS),
   chooseCardsToChain: chooseRandomCardsToChain,
   chooseRelicToAdd: (_, relics) => sample(relics)!,
+  chooseCardsToFeather: (game) => sampleSize(game.user.cards, NUM_CARD_FEATHER_PICKS),
 };
 
 type ChoiceResults = {
@@ -200,6 +209,13 @@ function trackPickActions(choices: ChoiceFunctions): {
     pickResults.push({ type: 'chooseCardsToChain', options, picks });
     return cardPicks;
   };
+  const chooseCardsToFeather = (game: GameState) => {
+    const options = game.user.cards.map((card) => card.name);
+    const cardPicks = choices.chooseCardsToFeather(game);
+    const picks = cardPicks.map((card) => card.name);
+    pickResults.push({ type: 'chooseCardsToFeather', options, picks });
+    return cardPicks;
+  };
   const chooseRelicToAdd = (game: GameState, relicOptions: RelicState[]) => {
     const options = relicOptions.map((relic) => relic.name);
     const relicPick = choices.chooseRelicToAdd(game, relicOptions);
@@ -214,7 +230,8 @@ function trackPickActions(choices: ChoiceFunctions): {
       chooseCardsToRemove,
       chooseCardsToChain,
       chooseRelicToAdd,
-    } as ChoiceFunctions,
+      chooseCardsToFeather,
+    },
     results: pickResults,
   };
 }

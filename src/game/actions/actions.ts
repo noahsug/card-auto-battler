@@ -11,6 +11,7 @@ import {
   NUM_FIRST_CARD_SELECTION_OPTIONS,
   NUM_POTION_SELECTION_OPTIONS,
   NUM_RELIC_SELECTION_OPTIONS,
+  NUM_CARD_CHAIN_PICKS,
 } from '../constants';
 import {
   CardState,
@@ -38,6 +39,7 @@ export function initializeEnemy(game: GameState) {
 
 // which shops to choose from after adding new cards
 export function getShopOptions(game: GameState): ShopName[] {
+  const { sample } = getRandom(game);
   const { wins } = game;
 
   // just add cards on the first round
@@ -46,16 +48,13 @@ export function getShopOptions(game: GameState): ShopName[] {
   const relicRounds = [1, 4, 6, 8];
   if (relicRounds.includes(wins)) return ['addRelics'];
 
-  const { sample: sampleSize } = getRandom(game);
-
-  const potionRounds = [3, 5, 7]; // no potions for final boss (aka no rounds 8 or 9)
-  const otherShopOptions: ShopName[] = sampleSize(['removeCards', 'chainCards', 'featherCards'], 2);
-
-  if (potionRounds.includes(wins)) {
-    return [otherShopOptions[0], 'addPotions'];
+  const shopOptions: ShopName[] = ['removeCards', 'chainCards', 'featherCards'];
+  if (game.wins <= 7) {
+    // no potions before the last boss
+    shopOptions.push('addPotions');
   }
 
-  return otherShopOptions;
+  return sample(shopOptions, 2);
 }
 
 export function getAddCardOptions(game: GameState): CardState[] {
@@ -109,7 +108,7 @@ export function removeCards(game: GameState, cardsToRemove: CardState[]) {
 }
 
 export function chainCards(game: GameState, cardsToChain: CardState[]) {
-  assert(cardsToChain.length === 2, 'must select exactly 2 cards to chain');
+  assert(cardsToChain.length === 2, 'chaining more than 2 cards is not implemented');
   const { cards } = game.user;
 
   const [fromCard, toCard] = getMatchingCards(game.user.cards, cardsToChain);
@@ -125,6 +124,7 @@ export function featherCards(game: GameState, cardsToFeather: CardState[]) {
   cardsToFeather = getMatchingCards(game.user.cards, cardsToFeather);
   cardsToFeather.forEach((card) => {
     card.charm = 'feather';
+    card.trash = true;
   });
 }
 

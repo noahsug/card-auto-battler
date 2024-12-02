@@ -4,6 +4,7 @@ import { breakChain, getChainCreatesLoop } from '../../../game/utils/cards';
 import { CardState } from '../../../game/gameState';
 import { CardSelection, sortCards } from './CardSelection';
 import { GenericCardSelectionProps } from './CardSelectionScreen';
+import { NUM_CARD_CHAIN_PICKS } from '../../../game/constants';
 
 // returns card indexes that would create a loop if chained
 function getInvalidSelectionsIndexes(cards: CardState[], fromIndex: number): number[] {
@@ -44,7 +45,7 @@ export function ChainCardsScreen(props: GenericCardSelectionProps) {
       {...props}
       cards={cards}
       invalidSelections={invalidSelections}
-      numCardSelections={2}
+      numCardSelections={NUM_CARD_CHAIN_PICKS}
       buttonText="Chain"
       onCardSelectionChange={setSelectedCardIndexes}
     />

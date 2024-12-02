@@ -6,7 +6,7 @@ Game TODO:
 1. choice of which charm shop to enter and more charm shops:
    1. ✅ chain = play after other chained card
    2. ✅ remove = remove card
-   3. feather = card on top + exhaust
+   3. ✅ feather = card on top + exhaust
    4. anchor = card on bottom + crit
    5. ✅ potion = powerful 1 time use
    6. dup card (does not dup chain)?
