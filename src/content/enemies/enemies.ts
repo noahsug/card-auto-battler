@@ -12,15 +12,18 @@ import punchyImage from './images/punchy.png';
 import treeMonsterImage from './images/tree-monster.png';
 
 import { cardsByName } from '../cards';
-import { CardState } from '../../game/gameState';
+import { CardState, PlayerState } from '../../game/gameState';
 import { MAX_WINS } from '../../game/constants';
+import { enemyCardsByName } from '../cards/cards';
 
 interface EnemyInfo {
   name: string;
   image: string;
+  // battles that this enemy appears in, inclusive
   battleRange: [number, number];
   getCards: (battleNumber: number) => CardState[];
   getHealth: (battleNumber: number) => number;
+  initialize?: (player: PlayerState) => void;
   scale?: number;
 }
 
@@ -28,9 +31,18 @@ function basicAttacks(battleNumber: number) {
   return range(0, battleNumber + 1).map(() => cardsByName.attack);
 }
 
-function scalingHealth(battleNumber: number) {
-  // return 20 + battleNumber * 10;
-  return 2 + battleNumber;
+function getScalingHealthFn(ratio: number) {
+  return (battleNumber: number) => {
+    return (25 + battleNumber * 5) * ratio;
+    // return 2 + battleNumber;
+  };
+}
+
+function chainCards(cards: CardState[], fromCardName: string, toCardName: string) {
+  const fromCard = cards.find((card) => card.name === fromCardName)!;
+  const toCard = cards.find((card) => card.name === toCardName)!;
+  fromCard.chain.toId = toCard.acquiredId;
+  toCard.chain.fromId = fromCard.acquiredId;
 }
 
 const third = Math.floor(MAX_WINS / 3) - 1;
@@ -44,14 +56,21 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     image: greenMonsterImage,
     battleRange: [0, 2],
     getCards: basicAttacks,
-    getHealth: scalingHealth,
+    getHealth: getScalingHealthFn(1),
   },
   punchy: {
     name: 'Punchy',
     image: punchyImage,
     battleRange: [0, 2],
-    getCards: basicAttacks,
-    getHealth: scalingHealth,
+    getCards: (n) => {
+      const cards = range(0, 3).map(() => cardsByName.attack);
+      cards.push(enemyCardsByName.windUp, enemyCardsByName.bigPunch);
+      return cards;
+    },
+    initialize: (player) => {
+      chainCards(player.cards, enemyCardsByName.windUp.name, enemyCardsByName.bigPunch.name);
+    },
+    getHealth: getScalingHealthFn(1),
     scale: 0.5,
   },
   armoredLizard: {
@@ -59,14 +78,14 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     image: armoredLizardImage,
     battleRange: [1, twoThirds],
     getCards: basicAttacks,
-    getHealth: scalingHealth,
+    getHealth: getScalingHealthFn(1),
   },
   coolBird: {
     name: 'Cool Bird',
     image: coolBirdImage,
     battleRange: [1, twoThirds],
     getCards: basicAttacks,
-    getHealth: scalingHealth,
+    getHealth: getScalingHealthFn(1),
     scale: 0.5,
   },
   fireMonster: {
@@ -74,7 +93,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     image: fireMonsterImage,
     battleRange: [1, end],
     getCards: basicAttacks,
-    getHealth: scalingHealth,
+    getHealth: getScalingHealthFn(1),
     scale: 0.5,
   },
   frostLizard: {
@@ -82,14 +101,14 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     image: frostLizardImage,
     battleRange: [third, end],
     getCards: basicAttacks,
-    getHealth: scalingHealth,
+    getHealth: getScalingHealthFn(1),
   },
   grumpyRock: {
     name: 'Grumpy Rock',
     image: grumpyRockImage,
     battleRange: [third, end],
     getCards: basicAttacks,
-    getHealth: scalingHealth,
+    getHealth: getScalingHealthFn(1),
     scale: 1.1,
   },
   treeMonster: {
@@ -97,7 +116,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     image: treeMonsterImage,
     battleRange: [middle, end],
     getCards: basicAttacks,
-    getHealth: scalingHealth,
+    getHealth: getScalingHealthFn(1),
     scale: 1.4,
   },
   blueRedMonster: {
@@ -105,7 +124,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     image: blueRedMonsterImage,
     battleRange: [twoThirds, end],
     getCards: basicAttacks,
-    getHealth: scalingHealth,
+    getHealth: getScalingHealthFn(1),
     scale: 1.2,
   },
   giantLizard: {
@@ -113,7 +132,7 @@ export const enemiesByName: Record<string, EnemyInfo> = {
     image: giantLizardImage,
     battleRange: [MAX_WINS - 1, MAX_WINS - 1],
     getCards: basicAttacks,
-    getHealth: scalingHealth,
+    getHealth: getScalingHealthFn(1),
     scale: 2,
   },
 };

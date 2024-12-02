@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { cardsByName } from '../../../content/cards';
+import { cardsByName, enemyCardsByName } from '../../../content/cards';
 import { relicsByName } from '../../../content/relics';
 import { getAddCardOptions } from '../../../game/actions';
 import { CardState, createGameState } from '../../../game/gameState';
@@ -55,5 +55,12 @@ export const AllCards: Story = {
   args: {
     game: createGameState(),
     cards: Object.values(cardsByName),
+  },
+};
+
+export const EnemyCards: Story = {
+  args: {
+    game: createGameState(),
+    cards: Object.values(enemyCardsByName),
   },
 };

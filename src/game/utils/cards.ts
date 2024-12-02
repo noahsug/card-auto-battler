@@ -72,6 +72,11 @@ export function breakChain(card: CardState, key: 'fromId' | 'toId', cards: CardS
   card.chain[key] = undefined;
 }
 
+export function addFeatherCharm(card: CardState) {
+  card.charm = 'feather';
+  card.trash = true;
+}
+
 // order cards so that ordering effects like chain and feather are followed
 export function applyCardOrderingEffects(cards: CardState[]) {
   // put feathered cards first

@@ -153,9 +153,17 @@ export interface PlayerInfo {
   cards: CardState[];
   health: number;
   scale: number;
+  initialize?: (player: PlayerState) => void;
 }
 
-export function createPlayer({ name, image, cards, health, scale }: PlayerInfo): PlayerState {
+export function createPlayer({
+  name,
+  image,
+  cards,
+  health,
+  scale,
+  initialize,
+}: PlayerInfo): PlayerState {
   const player = {
     health,
     startingHealth: health,
@@ -176,6 +184,8 @@ export function createPlayer({ name, image, cards, health, scale }: PlayerInfo):
     player,
     cards.map((c) => structuredClone(c)),
   );
+
+  initialize?.(player);
   return player;
 }
 

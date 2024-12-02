@@ -42,13 +42,13 @@ export const DoubleChain: Story = {
 export const Feather: Story = {
   args: {
     size: 'large',
-    card: { ...sample(allCards)!, feather: true },
+    card: { ...sample(allCards)!, charm: 'feather' },
   },
 };
 
 export const FeatherChain: Story = {
   args: {
     size: 'large',
-    card: { ...sample(allCards)!, chain: { toId: 0 }, feather: true },
+    card: { ...sample(allCards)!, chain: { toId: 0 }, charm: 'feather' },
   },
 };

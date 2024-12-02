@@ -7,7 +7,7 @@ import { createGameState, GameState, statusEffectNames } from '../../game/gameSt
 import { getRandomCards } from '../../testing/utils';
 import { useGameState } from '../hooks/useGameState';
 import { BattleScreen } from './BattleScreen';
-import { initializeEnemy } from '../../game/actions';
+import { startBattle } from '../../game/actions';
 
 function BattleScreenTest({ game: initialGameState }: { game: GameState }) {
   const { game, actions, setGameState } = useGameState(initialGameState);
@@ -66,11 +66,20 @@ export const StatusEffectsAndRelics: Story = {
   })(),
 };
 
+export const Punchy: Story = {
+  args: (() => {
+    const game = createGameState();
+    game.enemyOrder[0] = 'punchy';
+    startBattle(game);
+    return { game };
+  })(),
+};
+
 export const MidGame: Story = {
   args: (() => {
     const game = createGameState();
     game.wins = Math.round(MAX_WINS / 2) - 1;
-    initializeEnemy(game);
+    startBattle(game);
     return { game };
   })(),
 };
@@ -79,7 +88,7 @@ export const LateGame: Story = {
   args: (() => {
     const game = createGameState();
     game.wins = MAX_WINS - 2;
-    initializeEnemy(game);
+    startBattle(game);
     return { game };
   })(),
 };
@@ -88,7 +97,7 @@ export const Boss: Story = {
   args: (() => {
     const game = createGameState();
     game.wins = MAX_WINS - 1;
-    initializeEnemy(game);
+    startBattle(game);
     return { game };
   })(),
 };

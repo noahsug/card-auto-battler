@@ -1,7 +1,6 @@
 import range from 'lodash/range';
 
-import { allCards } from '../../content/cards';
-import { potionByName } from '../../content/cards/cards';
+import { nonBasicCards, potionByName } from '../../content/cards/cards';
 import { allRelics, RelicName } from '../../content/relics';
 import { assert } from '../../utils/asserts';
 import {
@@ -11,7 +10,6 @@ import {
   NUM_FIRST_CARD_SELECTION_OPTIONS,
   NUM_POTION_SELECTION_OPTIONS,
   NUM_RELIC_SELECTION_OPTIONS,
-  NUM_CARD_CHAIN_PICKS,
 } from '../constants';
 import {
   CardState,
@@ -24,6 +22,7 @@ import {
 } from '../gameState';
 import {
   addCardsToPlayer,
+  addFeatherCharm,
   applyCardOrderingEffects,
   breakChain,
   convertBasicAttacksToMonkAttack,
@@ -32,10 +31,6 @@ import {
 import { getBattleWinner, getNextEnemy, getPlayers, getRandom, getRelic } from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
-
-export function initializeEnemy(game: GameState) {
-  game.enemy = getNextEnemy(game);
-}
 
 // which shops to choose from after adding new cards
 export function getShopOptions(game: GameState): ShopName[] {
@@ -63,7 +58,7 @@ export function getAddCardOptions(game: GameState): CardState[] {
   const numOptions =
     game.wins === 0 ? NUM_FIRST_CARD_SELECTION_OPTIONS : NUM_CARD_SELECTION_OPTIONS;
 
-  const cards = structuredClone(sampleSize(Object.values(allCards), numOptions));
+  const cards = structuredClone(sampleSize(Object.values(nonBasicCards), numOptions));
   cards.forEach((card, i) => {
     card.acquiredId = i;
   });
@@ -114,18 +109,15 @@ export function chainCards(game: GameState, cardsToChain: CardState[]) {
   const [fromCard, toCard] = getMatchingCards(game.user.cards, cardsToChain);
 
   breakChain(fromCard, 'toId', cards);
-  fromCard.chain.toId = toCard.acquiredId;
-
   breakChain(toCard, 'fromId', cards);
+
+  fromCard.chain.toId = toCard.acquiredId;
   toCard.chain.fromId = fromCard.acquiredId;
 }
 
 export function featherCards(game: GameState, cardsToFeather: CardState[]) {
   cardsToFeather = getMatchingCards(game.user.cards, cardsToFeather);
-  cardsToFeather.forEach((card) => {
-    card.charm = 'feather';
-    card.trash = true;
-  });
+  cardsToFeather.forEach(addFeatherCharm);
 }
 
 export function addRelic(game: GameState, relic: RelicState) {
@@ -158,6 +150,8 @@ function triggerStartOfBattleEffects(
 export function startBattle(game: GameState) {
   assert(game.turn === 0);
   const { random } = getRandom(game);
+
+  game.enemy = getNextEnemy(game);
 
   // increment the random state so the battle plays out differently after rewinding
   range(game.losses).forEach(random);

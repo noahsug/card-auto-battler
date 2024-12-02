@@ -68,5 +68,6 @@ export function getRandom({ randomnessState }: { randomnessState: GameState['ran
 }
 
 export function getNextEnemy({ enemyOrder, wins }: { enemyOrder: EnemyName[]; wins: number }) {
-  return createPlayer(getEnemyInfo(enemyOrder, wins));
+  const enemyInfo = getEnemyInfo(enemyOrder[wins], wins);
+  return createPlayer(enemyInfo);
 }

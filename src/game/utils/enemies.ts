@@ -7,12 +7,10 @@ import { Random } from '../../utils/Random';
 import { MAX_WINS } from '../constants';
 import { PlayerInfo } from '../gameState';
 
-export function getEnemyInfo(enemyOrder: EnemyName[], battleNumber: number): PlayerInfo {
-  const enemyName = enemyOrder[battleNumber];
+export function getEnemyInfo(enemyName: EnemyName, battleNumber: number): PlayerInfo {
   const enemyInfo = enemiesByName[enemyName];
   return {
-    name: enemyInfo.name,
-    image: enemyInfo.image,
+    ...enemyInfo,
     cards: enemyInfo.getCards(battleNumber),
     health: enemyInfo.getHealth(battleNumber),
     scale: enemyInfo.scale || 1,

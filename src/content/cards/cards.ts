@@ -5,6 +5,8 @@ import fireballImage from './images/fireball.png';
 import parryImage from './images/parry.png';
 import phoenixImage from './images/phoenix.jpeg';
 import punchImage from './images/punch.png';
+import bigPunchImage from './images/big-punch.png';
+import windUpImage from './images/wind-up.png';
 import volcanoImage from './images/volcano.jpeg';
 import crossImage from './images/cross.png';
 import growingClubImage from './images/growing-club.png';
@@ -44,7 +46,7 @@ export const basicCardsByName = {
   attack: createCard(
     [
       {
-        value: v(5),
+        value: v(4),
       },
     ],
     {
@@ -58,7 +60,7 @@ export const basicCardsByName = {
       {
         target: 'self',
         name: 'heal',
-        value: v(5),
+        value: v(4),
       },
     ],
     {
@@ -649,11 +651,37 @@ export const potionByName = {
   ),
 };
 
+export const enemyCardsByName = {
+  bigPunch: createCard(
+    [
+      {
+        value: v(8),
+      },
+    ],
+    {
+      name: 'Big Punch',
+      description: `Deal $V damage.`,
+      image: bigPunchImage,
+    },
+  ),
+  windUp: createCard([], {
+    name: 'Wind Up',
+    description: 'Prepare for a big attack.',
+    image: windUpImage,
+  }),
+};
+
+export const nonBasicCardsByName = {
+  ...greenCardsByName,
+  ...redCardsByName,
+  ...purpleCardsByName,
+};
+
+export const nonBasicCards = Object.values(nonBasicCardsByName);
+
 export const cardsByName = {
   ...basicCardsByName,
-  ...redCardsByName,
-  ...greenCardsByName,
-  ...purpleCardsByName,
+  ...nonBasicCardsByName,
 };
 
 export const allCards = Object.values(cardsByName);

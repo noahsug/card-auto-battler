@@ -36,7 +36,6 @@ export const ScreenContainer = styled.div`
 export function App() {
   const { game, actions, select, setGameState } = useGameState();
   const {
-    initializeEnemy,
     getAddCardOptions,
     getAddRelicOptions,
     getAddPotionOptions,
@@ -96,11 +95,10 @@ export function App() {
 
   const startCardSelection = useCallback(async () => {
     rewindGameStateRef.current = await select((game) => structuredClone(game));
-    initializeEnemy();
     endOfBattleGameRef.current = undefined;
     cardOptionsRef.current = await getAddCardOptions();
     goToScreen('addCards');
-  }, [getAddCardOptions, goToScreen, initializeEnemy, select]);
+  }, [getAddCardOptions, goToScreen, select]);
 
   const handleGoToShop = useCallback(
     async (shop: ShopName) => {
