@@ -7,9 +7,12 @@ export function assertIsNonNullable<T>(
   }
 }
 
-export function assertIsNullable(value: unknown): asserts value is null | undefined {
+export function assertIsNullable(
+  value: unknown,
+  message?: string,
+): asserts value is null | undefined {
   if (value != null) {
-    throw new Error(`expected null or undefined, but got ${value}`);
+    throw new Error(message || `expected null or undefined, but got ${value}`);
   }
 }
 
@@ -19,15 +22,15 @@ export function assert(condition: boolean, message?: string): asserts condition 
   }
 }
 
-export function assertEqual<T>(a: T, b: T): asserts a is T {
+export function assertEqual<T>(a: T, b: T, message?: string): asserts a is T {
   if (a !== b) {
-    throw new Error(`expected ${a} to equal ${b}`);
+    throw new Error(`expected ${a} to equal ${b}` + getMessageSuffix(message));
   }
 }
 
-export function assertNotEqual(a: unknown, b: unknown) {
+export function assertNotEqual<T>(a: T, b: T, message?: string) {
   if (a === b) {
-    throw new Error(`expected ${a} NOT to equal ${b}`);
+    throw new Error(`expected ${a} NOT to equal ${b}` + getMessageSuffix(message));
   }
 }
 
@@ -38,8 +41,14 @@ export function assertNotEqual(a: unknown, b: unknown) {
 export function assertType<T, const R extends T>(
   object: { type: T } | undefined,
   type: R,
+  message?: string,
 ): asserts object is { type: R } {
   if (object?.type !== type) {
-    throw new Error(`expected type ${type}, got ${object?.type}`);
+    throw new Error(`expected type ${type}, got ${object?.type}` + getMessageSuffix(message));
   }
+}
+
+function getMessageSuffix(message?: string) {
+  if (message) return `, ${message}`;
+  return '';
 }

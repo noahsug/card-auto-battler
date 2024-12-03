@@ -2,8 +2,8 @@ import groupBy from 'lodash/groupBy';
 
 import { cardsByName } from '../../content/cards';
 import { value as v } from '../../content/utils/createCard';
-import { assertIsNonNullable } from '../../utils/asserts';
-import { CardEffectName, CardState, PlayerState } from '../gameState';
+import { assertIsNonNullable, assertType } from '../../utils/asserts';
+import { CardState, PlayerState } from '../gameState';
 
 const { attack } = cardsByName;
 
@@ -28,13 +28,11 @@ export function convertBasicAttacksToMonkAttack(cards: CardState[]) {
   });
 }
 
-export function getBasicValue(card: CardState, name: CardEffectName) {
-  const effect = card.effects.find((effect) => effect.name === name);
+export function addDamage(card: CardState, damage: number) {
+  const effect = card.effects.find((effect) => effect.name === 'damage');
   const value = effect?.value;
-  if (value?.type === 'basicValue') {
-    return value.value;
-  }
-  throw new Error(`card does not have basic effect: ${name}`);
+  assertType(value, 'basicValue', card.name);
+  value.value += damage;
 }
 
 export function getCardByIdOrError(cards: CardState[], acquiredId: number): CardState {

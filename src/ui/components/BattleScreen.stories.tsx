@@ -1,13 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
+import { enemiesByName } from '../../content/enemies';
+import { EnemyName } from '../../content/enemies/enemies';
 import { relicsByName } from '../../content/relics';
+import { startBattle } from '../../game/actions';
 import { MAX_WINS } from '../../game/constants';
 import { createGameState, GameState, statusEffectNames } from '../../game/gameState';
 import { getRandomCards } from '../../testing/utils';
 import { useGameState } from '../hooks/useGameState';
 import { BattleScreen } from './BattleScreen';
-import { startBattle } from '../../game/actions';
 
 function BattleScreenTest({ game: initialGameState }: { game: GameState }) {
   const { game, actions, setGameState } = useGameState(initialGameState);
@@ -66,15 +68,6 @@ export const StatusEffectsAndRelics: Story = {
   })(),
 };
 
-export const Punchy: Story = {
-  args: (() => {
-    const game = createGameState();
-    game.enemyOrder[0] = 'punchy';
-    startBattle(game);
-    return { game };
-  })(),
-};
-
 export const MidGame: Story = {
   args: (() => {
     const game = createGameState();
@@ -101,3 +94,22 @@ export const Boss: Story = {
     return { game };
   })(),
 };
+
+function fightEnemy(enemyName: EnemyName, isEarlyBattleRound: boolean): Story {
+  return {
+    args: (() => {
+      const game = createGameState();
+      const enemyInfo = Object.entries(enemiesByName).find(([name]) => name === enemyName)![1];
+      game.wins = isEarlyBattleRound ? enemyInfo.battleRange[0] : enemyInfo.battleRange[1];
+      game.enemyOrder[game.wins] = enemyName;
+      startBattle(game);
+      return { game };
+    })(),
+  };
+}
+
+export const Punchy: Story = fightEnemy('punchy', true);
+export const Punchy2: Story = fightEnemy('punchy', false);
+
+export const GreenMonster: Story = fightEnemy('greenMonster', true);
+export const GreenMonster2: Story = fightEnemy('greenMonster', false);

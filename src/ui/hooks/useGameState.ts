@@ -27,13 +27,14 @@ export function useGameState(initialGameState: GameState = createGameState()) {
     return actionEntries.reduce((acc, [name, action]) => {
       const { promise, resolve } = getResolvablePromise<ReturnType<Action>>();
       acc[name] = (...args: Tail<Parameters<Action>>) => {
-        setGameState((gameState) => {
-          return produce(gameState, (draft) => {
-            resolve(action(draft, ...args));
-          });
-        });
+        setGameState(
+          produce((gameState) => {
+            resolve(action(gameState, ...args));
+          }),
+        );
         return promise;
       };
+
       return acc;
     }, {} as BoundActions);
     // TODO: maybe use Jotai instead so not all our actions change when game state changes

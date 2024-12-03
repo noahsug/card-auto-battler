@@ -2,7 +2,8 @@
 
 Game TODO:
 
-1. Instance of dealing damage from a card = use of crit
+1. Charms act like equipment and can be moved around any time via "view deck" screen, entering a
+   shop adds a charm and then brings you into the view deck screen
 1. choice of which charm shop to enter and more charm shops:
    1. ✅ chain = play after other chained card
    2. ✅ remove = remove card

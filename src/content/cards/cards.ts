@@ -6,7 +6,6 @@ import parryImage from './images/parry.png';
 import phoenixImage from './images/phoenix.jpeg';
 import punchImage from './images/punch.png';
 import bigPunchImage from './images/big-punch.png';
-import windUpImage from './images/wind-up.png';
 import volcanoImage from './images/volcano.jpeg';
 import crossImage from './images/cross.png';
 import growingClubImage from './images/growing-club.png';
@@ -36,6 +35,10 @@ import regenPotionImage from './images/regen-potion.jpeg';
 import damagePotionImage from './images/damage-potion.jpeg';
 import adrenalinePotionImage from './images/adrenaline-potion.jpeg';
 import strengthPotionImage from './images/strength-potion.jpeg';
+
+import windUpImage from './images/enemy/wind-up.png';
+import greenMonsterAttackImage from './images/enemy/green-monster-attack.png';
+import hideImage from './images/enemy/hide.png';
 
 import { createCard, ifCompare, ifHas, value as v, playAnotherCard } from '../utils/createCard';
 
@@ -652,6 +655,7 @@ export const potionByName = {
 };
 
 export const enemyCardsByName = {
+  // punchy
   bigPunch: createCard(
     [
       {
@@ -669,6 +673,45 @@ export const enemyCardsByName = {
     description: 'Prepare for a big attack.',
     image: windUpImage,
   }),
+
+  // green monster
+  surpriseAttack: createCard(
+    [
+      {
+        name: 'crit',
+        target: 'self',
+        if: ifCompare('self', 'dodge', '>=', 1),
+      },
+      {
+        value: v(4),
+      },
+      {
+        name: 'set',
+        target: 'self',
+        valueName: 'dodge',
+        value: v(0),
+      },
+    ],
+    {
+      name: 'Surprise Attack',
+      description: `Deal $2V damage. Crit if you have dodge. Lose all dodge.`,
+      image: greenMonsterAttackImage,
+    },
+  ),
+  hide: createCard(
+    [
+      {
+        target: 'self',
+        name: 'dodge',
+        value: v(1),
+      },
+    ],
+    {
+      name: 'Hide',
+      description: 'Gain $V dodge.',
+      image: hideImage,
+    },
+  ),
 };
 
 export const nonBasicCardsByName = {

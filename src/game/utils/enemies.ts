@@ -1,19 +1,19 @@
 import min from 'lodash/min';
 import range from 'lodash/range';
 
-import { EnemyName, enemiesByName } from '../../content/enemies/enemies';
+import { EnemyName, enemiesByName, EnemyInfo } from '../../content/enemies/enemies';
 import { assert } from '../../utils/asserts';
 import { Random } from '../../utils/Random';
 import { MAX_WINS } from '../constants';
 import { PlayerInfo } from '../gameState';
 
 export function getEnemyInfo(enemyName: EnemyName, battleNumber: number): PlayerInfo {
-  const enemyInfo = enemiesByName[enemyName];
+  const enemyInfo = enemiesByName[enemyName] as EnemyInfo;
   return {
     ...enemyInfo,
     cards: enemyInfo.getCards(battleNumber),
     health: enemyInfo.getHealth(battleNumber),
-    scale: enemyInfo.scale || 1,
+    scale: enemyInfo.scale ?? 1,
   };
 }
 

@@ -154,9 +154,6 @@ export class Random {
   // sets the current state to the given reference (the passed in state will change with the Random
   // instance's state)
   setStateRef(state: Uint32Array) {
-    if (state.length !== 4) {
-      throw new TypeError('state must be an Uint32Array of length 4');
-    }
     this.state = state;
   }
 }
