@@ -24,8 +24,6 @@ interface PlayCardContext {
   game: GameState;
   events: BattleEvent[];
   card: CardState;
-  // rue when a card would deal damage, even if it was dodged
-  cardDealsDamage?: boolean;
 }
 
 interface EffectOptions {
@@ -35,8 +33,6 @@ interface EffectOptions {
 }
 
 export function applyCardEffects(game: GameState, card: CardState): BattleEvent[] {
-  const activePlayer = getActivePlayer(game);
-
   const events: BattleEvent[] = [];
   const context: PlayCardContext = { game, events, card };
 
@@ -47,18 +43,6 @@ export function applyCardEffects(game: GameState, card: CardState): BattleEvent[
     card.effects.forEach((effect) => {
       applyEffect(effect, context);
     });
-  }
-
-  // TODO: replace with booleans when certain effects are applied, e.g. if a card applies this
-  // affect after it deals damage, we should not remove the effect
-  if (context.cardDealsDamage) {
-    if (activePlayer.crit > 0) {
-      activePlayer.crit -= 1;
-    }
-
-    if (activePlayer.temporaryFireCrit > 0 && card.name.toLocaleLowerCase().includes('fire')) {
-      activePlayer.temporaryFireCrit -= 1;
-    }
   }
 
   return events;
@@ -86,7 +70,6 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
 
   switch (effect.name) {
     case 'damage': {
-      context.cardDealsDamage = true;
       const dodged = dodgeDamage(effect, context);
       if (!dodged) {
         dealCardDamage(effectOptions, context);
@@ -238,7 +221,7 @@ function dealCardDamage(
     value += getStrength(context);
   }
 
-  const isCrit = getIsCrit(context);
+  const isCrit = consumeCrit(context);
   if (isCrit) {
     multiplier *= 2;
 
@@ -298,24 +281,26 @@ function getStrength(context: PlayCardContext) {
   return strength;
 }
 
-function getIsCrit(context: PlayCardContext) {
+function consumeCrit(context: PlayCardContext) {
   const self = getActivePlayer(context.game);
   const { card, game } = context;
   const { random } = getRandom(game);
 
+  // critChance
+  const critChance = getRelic(self, 'critChance');
+  if (critChance && random() < critChance.value) {
+    return true;
+  }
+
   // temporaryFireCrit
   if (self.temporaryFireCrit > 0 && card.name.toLocaleLowerCase().includes('fire')) {
+    self.temporaryFireCrit -= 1;
     return true;
   }
 
   // crit
   if (self.crit > 0) {
-    return true;
-  }
-
-  // critChance
-  const critChance = getRelic(self, 'critChance');
-  if (critChance && random() < critChance.value) {
+    self.crit -= 1;
     return true;
   }
 

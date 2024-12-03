@@ -228,7 +228,7 @@ export const redCardsByName = {
     ],
     {
       name: 'Channel',
-      description: 'The next "fire" attack played this turn will crit. Play another card.',
+      description: 'The next "fire" attack this turn will crit. Play another card.',
       image: channelImage,
     },
   ),

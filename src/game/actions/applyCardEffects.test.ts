@@ -495,16 +495,19 @@ describe('status effects', () => {
       expect(diff).toEqual({ self: { temporaryFireCrit: -1 }, opponent: { health: -2 } });
     });
 
-    it('applies to each effect on a fire card', () => {
+    it('each stack applies to one instance of damage from a fire card', () => {
       card.effects = [
         createEffect({ name: 'damage', value: v(1) }),
         createEffect({ name: 'damage', value: v(2) }),
         createEffect({ name: 'damage', value: v(3) }),
       ];
       const { diff } = getPlayCardResult({
-        self: { temporaryFireCrit: 1 },
+        self: { temporaryFireCrit: 2 },
       });
-      expect(diff).toEqual({ self: { temporaryFireCrit: -1 }, opponent: { health: -12 } });
+      expect(diff).toEqual({
+        self: { temporaryFireCrit: -2 },
+        opponent: { health: -(1 + 2) * 2 - 3 },
+      });
     });
 
     it('does nothing for non-fire cards', () => {

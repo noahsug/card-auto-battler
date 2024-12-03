@@ -19,7 +19,7 @@ import { enemyCardsByName } from '../cards/cards';
 interface EnemyInfo {
   name: string;
   image: string;
-  // battles that this enemy appears in, inclusive
+  // battle # range that the enemy can appear in, inclusive
   battleRange: [number, number];
   getCards: (battleNumber: number) => CardState[];
   getHealth: (battleNumber: number) => number;
