@@ -348,9 +348,9 @@ export function reduceHealth(
   }
 
   targetPlayer.health -= value;
-  const damageEvent = createBattleEvent('damage', value, target);
+  const damageEvent = createBattleEvent('damage', value, target) as ValueBattleEvent;
   events.push(damageEvent);
-  return damageEvent as ValueBattleEvent;
+  return damageEvent;
 }
 
 export function applyHeal(

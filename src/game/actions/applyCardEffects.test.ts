@@ -18,7 +18,7 @@ import {
 import { applyCardEffects } from './applyCardEffects';
 
 const {
-  permaThickSkin: reduceLowDamage,
+  permaThickSkin,
   regenForHighDamage,
   sharedPain,
   strengthAffectsHealing,
@@ -614,8 +614,8 @@ describe('status effects', () => {
 });
 
 describe('relics', () => {
-  describe('reduceLowDamage', () => {
-    const relics = [reduceLowDamage];
+  describe('permaThickSkin', () => {
+    const relics = [permaThickSkin];
 
     it('reduces damage to 1 when 4 or less', () => {
       effect.value = v(4);
@@ -627,6 +627,12 @@ describe('relics', () => {
       effect.value = v(5);
       const { diff } = getPlayCardResult({ opponent: { relics } });
       expect(diff).toEqual({ opponent: { health: -5 } });
+    });
+
+    it('stacks with normal thick skin', () => {
+      effect.value = v(5);
+      const { diff } = getPlayCardResult({ opponent: { relics, thickSkin: 1 } });
+      expect(diff).toEqual({ opponent: { health: -1, thickSkin: -1 } });
     });
   });
 
