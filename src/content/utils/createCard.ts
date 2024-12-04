@@ -61,20 +61,20 @@ export function createCard(
 // returns a CardEffect.If with defaults
 export function ifCompare(
   target: Target,
-  name: PlayerValueType,
+  type: PlayerValueType,
   multiplier: number,
   comparison: If['comparison'],
   basicValue: number,
 ): If;
 export function ifCompare(
   target: Target,
-  name: PlayerValueType,
+  type: PlayerValueType,
   comparison: If['comparison'],
   basicValue: number,
 ): If;
 export function ifCompare(
   target: Target,
-  name: PlayerValueType,
+  type: PlayerValueType,
   arg1: number | If['comparison'],
   arg2: If['comparison'] | number,
   arg3?: number,
@@ -82,22 +82,22 @@ export function ifCompare(
   if (arguments.length === 4) {
     const comparison = arg1 as If['comparison'];
     const basicValue = arg2 as number;
-    return ifCompare(target, name, 1, comparison, basicValue);
+    return ifCompare(target, type, 1, comparison, basicValue);
   }
   const multiplier = arg1 as number;
   const comparison = arg2 as If['comparison'];
   const basicValue = arg3 as number;
   return {
-    value: value(target, name, multiplier),
+    value: value(target, type, multiplier),
     comparison,
     value2: value(basicValue),
   };
 }
 
 // returns a CardEffect.If that checks if a given player value is > 0
-export function ifHas(target: Target, name: PlayerValueType): If {
+export function ifHas(target: Target, type: PlayerValueType): If {
   return {
-    value: value(target, name),
+    value: value(target, type),
     comparison: '>',
     value2: value(0),
   };
@@ -111,18 +111,18 @@ export function ifHas(target: Target, name: PlayerValueType): If {
  */
 export function value(
   target: Target,
-  name: PlayerValueType,
+  type: PlayerValueType,
   multiplier?: number,
 ): PlayerValueDescriptor;
 export function value(value: number): BasicValueDescriptor;
 export function value(
   valueOrTarget: number | Target,
-  name?: PlayerValueType,
+  type?: PlayerValueType,
   multiplier?: number,
 ): ValueDescriptor {
   if (typeof valueOrTarget === 'number') {
     return { type: 'basicValue', value: valueOrTarget };
   }
-  assertIsNonNullable(name);
-  return { type: 'playerValue', target: valueOrTarget, valueType: name, multiplier };
+  assertIsNonNullable(type);
+  return { type: 'playerValue', target: valueOrTarget, valueType: type, multiplier };
 }

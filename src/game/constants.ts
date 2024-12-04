@@ -5,20 +5,19 @@ export const BLEED_DAMAGE = 3;
 
 export const MAX_SHOCK = 3;
 
-export const NUM_CARD_SELECTION_OPTIONS = 4;
-export const NUM_CARD_SELECTION_PICKS = 1;
+export const NUM_ADD_CARD_OPTIONS = 4;
+export const NUM_ADD_CARD_PICKS = 1;
+export const NUM_FIRST_ADD_CARD_OPTIONS = 8;
+export const NUM_FIRST_ADD_CARD_PICKS = 2;
 
-export const NUM_FIRST_CARD_SELECTION_OPTIONS = 8;
-export const NUM_FIRST_CARD_SELECTION_PICKS = 2;
+export const NUM_ADD_POTION_OPTIONS = 3;
+export const NUM_ADD_POTION_PICKS = 1;
 
-export const NUM_POTION_SELECTION_OPTIONS = 3;
-export const NUM_POTION_SELECTION_PICKS = 1;
-
-export const NUM_CARD_REMOVAL_PICKS = 1;
-export const NUM_CARD_FEATHER_PICKS = 1;
+export const NUM_REMOVE_CARD_PICKS = 1;
+export const NUM_FEATHER_CARD_PICKS = 1;
 export const NUM_CARD_CHAIN_PICKS = 2;
 
-export const NUM_RELIC_SELECTION_OPTIONS = 4;
+export const NUM_ADD_RELIC_OPTIONS = 4;
 
 export const NUM_STARTING_CARDS = 3;
 

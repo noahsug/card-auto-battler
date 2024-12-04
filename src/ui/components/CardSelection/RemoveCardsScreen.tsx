@@ -1,4 +1,4 @@
-import { NUM_CARD_REMOVAL_PICKS } from '../../../game/constants';
+import { NUM_REMOVE_CARD_PICKS } from '../../../game/constants';
 import { CardSelection, sortCards } from './CardSelection';
 import { GenericCardSelectionProps } from './CardSelectionScreen';
 
@@ -9,7 +9,7 @@ export function RemoveCardsScreen(props: GenericCardSelectionProps) {
     <CardSelection
       {...props}
       cards={cards}
-      numCardSelections={NUM_CARD_REMOVAL_PICKS}
+      numCardSelections={NUM_REMOVE_CARD_PICKS}
       buttonText="Remove"
     />
   );

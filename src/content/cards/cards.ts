@@ -714,17 +714,19 @@ export const enemyCardsByType = {
   ),
 };
 
-export const nonBasicCardsByType = {
+// cards that show up in user card selection
+export const userCardsByType = {
   ...greenCardsByType,
   ...redCardsByType,
   ...purpleCardsByType,
 };
-
-export const nonBasicCards = Object.values(nonBasicCardsByType);
+export const userCards = Object.values(userCardsByType);
 
 export const cardsByType = {
   ...basicCardsByType,
-  ...nonBasicCardsByType,
+  ...userCardsByType,
+  ...potionByType,
+  ...enemyCardsByType,
 };
-
 export const allCards = Object.values(cardsByType);
+export type CardType = keyof typeof cardsByType;

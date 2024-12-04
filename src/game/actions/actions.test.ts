@@ -4,16 +4,15 @@ import sampleSize from 'lodash/sampleSize';
 import shuffle from 'lodash/shuffle';
 
 import { getRandomSeed } from '../../utils/Random';
-import {
-  MAX_TURNS_IN_BATTLE,
-  NUM_CARD_FEATHER_PICKS,
-  NUM_CARD_REMOVAL_PICKS,
-  NUM_CARD_SELECTION_PICKS,
-  NUM_FIRST_CARD_SELECTION_PICKS,
-} from '../constants';
+import { MAX_TURNS_IN_BATTLE, NUM_FEATHER_CARD_PICKS, NUM_REMOVE_CARD_PICKS } from '../constants';
 import { CardState, createGameState, GameState, RelicState, ShopType } from '../gameState';
 import { getChainCreatesLoop } from '../utils/cards';
-import { getBattleWinner, getIsGameOver, getIsTurnOver } from '../utils/selectors';
+import {
+  getBattleWinner,
+  getIsGameOver,
+  getIsTurnOver,
+  getNumCardAddPicks,
+} from '../utils/selectors';
 import {
   addCards,
   addRelic,
@@ -159,17 +158,17 @@ const chooseRandomCardsToChain: ChoiceFunctions['chooseCardsToChain'] = (game: G
 };
 
 const chooseRandomCardsToAdd: ChoiceFunctions['chooseCardsToAdd'] = (game, cards) => {
-  const size = game.wins === 0 ? NUM_FIRST_CARD_SELECTION_PICKS : NUM_CARD_SELECTION_PICKS;
-  return sampleSize(cards, size);
+  const picks = getNumCardAddPicks(game);
+  return sampleSize(cards, picks);
 };
 
 const randomPickActions: ChoiceFunctions = {
   chooseShop: (_, shops) => sample(shops)!,
   chooseCardsToAdd: chooseRandomCardsToAdd,
-  chooseCardsToRemove: (game) => sampleSize(game.user.cards, NUM_CARD_REMOVAL_PICKS),
+  chooseCardsToRemove: (game) => sampleSize(game.user.cards, NUM_REMOVE_CARD_PICKS),
   chooseCardsToChain: chooseRandomCardsToChain,
   chooseRelicToAdd: (_, relics) => sample(relics)!,
-  chooseCardsToFeather: (game) => sampleSize(game.user.cards, NUM_CARD_FEATHER_PICKS),
+  chooseCardsToFeather: (game) => sampleSize(game.user.cards, NUM_FEATHER_CARD_PICKS),
 };
 
 type ChoiceResults = {

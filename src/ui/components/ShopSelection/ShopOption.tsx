@@ -2,11 +2,11 @@ import { ShopType } from '../../../game/gameState';
 import { Button } from '../shared/Button';
 
 interface Props {
-  name: ShopType;
+  shopType: ShopType;
   onShopSelected: () => void;
 }
 
-const displayNames: Record<ShopType, string> = {
+const shopNamesByType: Record<ShopType, string> = {
   addPotions: 'Add Potions',
   addRelics: 'Add Relics',
   chainCards: 'Chain Cards',
@@ -14,6 +14,6 @@ const displayNames: Record<ShopType, string> = {
   featherCards: 'Lighten Cards',
 };
 
-export function ShopOption({ name, onShopSelected }: Props) {
-  return <Button onClick={onShopSelected}>{displayNames[name]}</Button>;
+export function ShopOption({ shopType, onShopSelected }: Props) {
+  return <Button onClick={onShopSelected}>{shopNamesByType[shopType]}</Button>;
 }

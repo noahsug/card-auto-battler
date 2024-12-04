@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NUM_CARD_FEATHER_PICKS } from '../../../game/constants';
+import { NUM_FEATHER_CARD_PICKS } from '../../../game/constants';
 import { CardSelection, sortCards } from './CardSelection';
 import { GenericCardSelectionProps } from './CardSelectionScreen';
 import { addFeatherCharm } from '../../../game/utils/cards';
@@ -18,7 +18,7 @@ export function FeatherCardsScreen(props: GenericCardSelectionProps) {
     <CardSelection
       {...props}
       cards={cards}
-      numCardSelections={NUM_CARD_FEATHER_PICKS}
+      numCardSelections={NUM_FEATHER_CARD_PICKS}
       buttonText="Lighten"
       onCardSelectionChange={setSelectedCardIndexes}
     />

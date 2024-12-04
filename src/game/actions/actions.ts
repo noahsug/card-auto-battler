@@ -1,15 +1,13 @@
 import range from 'lodash/range';
 
-import { nonBasicCards, potionByType } from '../../content/cards/cards';
+import { potionByType, userCards } from '../../content/cards/cards';
 import { allRelics, RelicType } from '../../content/relics';
 import { assert } from '../../utils/asserts';
 import {
   MAX_SHOCK,
   MAX_TURNS_IN_BATTLE,
-  NUM_CARD_SELECTION_OPTIONS,
-  NUM_FIRST_CARD_SELECTION_OPTIONS,
-  NUM_POTION_SELECTION_OPTIONS,
-  NUM_RELIC_SELECTION_OPTIONS,
+  NUM_ADD_POTION_OPTIONS,
+  NUM_ADD_RELIC_OPTIONS,
 } from '../constants';
 import {
   CardState,
@@ -28,7 +26,14 @@ import {
   convertBasicAttacksToMonkAttack,
   getMatchingCards,
 } from '../utils/cards';
-import { getBattleWinner, getNextEnemy, getPlayers, getRandom, getRelic } from '../utils/selectors';
+import {
+  getBattleWinner,
+  getNextEnemy,
+  getNumCardAddOptions,
+  getPlayers,
+  getRandom,
+  getRelic,
+} from '../utils/selectors';
 import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './applyCardEffects';
 import { BattleEvent, createBattleEvent } from './battleEvent';
 
@@ -55,10 +60,9 @@ export function getShopOptions(game: GameState): ShopType[] {
 export function getAddCardOptions(game: GameState): CardState[] {
   const { sample: sampleSize } = getRandom(game);
 
-  const numOptions =
-    game.wins === 0 ? NUM_FIRST_CARD_SELECTION_OPTIONS : NUM_CARD_SELECTION_OPTIONS;
+  const numOptions = getNumCardAddOptions(game);
 
-  const cards = structuredClone(sampleSize(Object.values(nonBasicCards), numOptions));
+  const cards = structuredClone(sampleSize(Object.values(userCards), numOptions));
   cards.forEach((card, i) => {
     card.acquiredId = i;
   });
@@ -75,15 +79,15 @@ export function getAddPotionOptions(game: GameState): CardState[] {
   const { sample: sampleSize } = getRandom(game);
 
   const cards = Object.values(potionByType);
-  return structuredClone(sampleSize(cards, NUM_POTION_SELECTION_OPTIONS));
+  return structuredClone(sampleSize(cards, NUM_ADD_POTION_OPTIONS));
 }
 
 export function getAddRelicOptions(game: GameState): RelicState[] {
   const { sample: sampleSize } = getRandom(game);
 
-  const existingRelicNames = new Set(game.user.relics.map((relic) => relic.type));
-  const availableRelics = allRelics.filter((relic) => !existingRelicNames.has(relic.type));
-  return structuredClone(sampleSize(availableRelics, NUM_RELIC_SELECTION_OPTIONS));
+  const existingRelicTypes = new Set(game.user.relics.map((relic) => relic.type));
+  const availableRelics = allRelics.filter((relic) => !existingRelicTypes.has(relic.type));
+  return structuredClone(sampleSize(availableRelics, NUM_ADD_RELIC_OPTIONS));
 }
 
 export function addCards(game: GameState, cards: CardState[]) {

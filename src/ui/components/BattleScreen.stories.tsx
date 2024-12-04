@@ -59,8 +59,8 @@ export const EnemyIsDead: Story = {
 export const StatusEffectsAndRelics: Story = {
   args: (() => {
     const game = createGameState();
-    statusEffectTypes.forEach((effectName) => {
-      game.enemy[effectName] = 3;
+    statusEffectTypes.forEach((effectType) => {
+      game.enemy[effectType] = 3;
     });
     game.user.strength = -5;
     game.user.relics = Object.values(relicsByType);
@@ -95,13 +95,13 @@ export const Boss: Story = {
   })(),
 };
 
-function fightEnemy(enemyName: EnemyType, isEarlyBattleRound: boolean): Story {
+function fightEnemy(enemyType: EnemyType, isEarlyBattleRound: boolean): Story {
   return {
     args: (() => {
       const game = createGameState();
-      const enemyInfo = Object.entries(enemiesByType).find(([name]) => name === enemyName)![1];
+      const enemyInfo = Object.entries(enemiesByType).find(([t]) => t === enemyType)![1];
       game.wins = isEarlyBattleRound ? enemyInfo.battleRange[0] : enemyInfo.battleRange[1];
-      game.enemyOrder[game.wins] = enemyName;
+      game.enemyOrder[game.wins] = enemyType;
       startBattle(game);
       return { game };
     })(),

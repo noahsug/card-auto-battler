@@ -14,7 +14,7 @@ import treeMonsterImage from './images/tree-monster.png';
 import { cardsByType } from '../cards';
 import { CardState, PlayerState } from '../../game/gameState';
 import { MAX_WINS } from '../../game/constants';
-import { enemyCardsByType } from '../cards/cards';
+import { enemyCardsByType, CardType } from '../cards/cards';
 import { addDamage } from '../../game/utils/cards';
 
 export interface EnemyInfo {
@@ -41,9 +41,9 @@ function getScalingHealthFn(ratio: number) {
   };
 }
 
-function chainCards(cards: CardState[], fromCardName: string, toCardName: string) {
-  const fromCard = cards.find((card) => card.name === fromCardName)!;
-  const toCard = cards.find((card) => card.name === toCardName)!;
+function chainCards(cards: CardState[], fromCardType: CardType, toCardType: CardType) {
+  const fromCard = cards.find((card) => card.name === cardsByType[fromCardType].name)!;
+  const toCard = cards.find((card) => card.name === cardsByType[toCardType].name)!;
   fromCard.chain.toId = toCard.acquiredId;
   toCard.chain.fromId = fromCard.acquiredId;
 }
@@ -78,7 +78,7 @@ export const enemiesByType = {
       return cards;
     },
     initialize: (player) => {
-      chainCards(player.cards, enemyCardsByType.windUp.name, enemyCardsByType.bigPunch.name);
+      chainCards(player.cards, 'windUp', 'bigPunch');
     },
     getHealth: getScalingHealthFn(1),
     scale: 0.5,

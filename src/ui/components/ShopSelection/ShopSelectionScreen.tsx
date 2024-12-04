@@ -38,7 +38,7 @@ export function ShopSelectionScreen({ game, shopOptions, onViewDeck, onShopSelec
         <Message>select a boon</Message>
         <ShopOptions>
           {shopOptions.map((shop) => (
-            <ShopOption key={shop} name={shop} onShopSelected={() => onShopSelected(shop)} />
+            <ShopOption key={shop} shopType={shop} onShopSelected={() => onShopSelected(shop)} />
           ))}
         </ShopOptions>
       </CenterContentWithMargin>

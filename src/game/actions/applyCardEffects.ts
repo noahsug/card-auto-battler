@@ -7,6 +7,7 @@ import {
   MaybeValue,
   PlayerState,
   PlayerValueDescriptor,
+  StatusEffectType,
   Target,
   Tribe,
   ValueDescriptor,
@@ -137,41 +138,41 @@ function calculateTribePercent(player: PlayerState, tribe: Tribe): number {
 }
 
 function getPlayerValue(
-  { target, valueType: name }: PlayerValueDescriptor,
+  { target, valueType }: PlayerValueDescriptor,
   { game, events }: PlayCardContext,
 ): number {
   const player = getTargetedPlayer(game, target);
 
-  if (name === 'turn') {
+  if (valueType === 'turn') {
     return Math.floor(game.turn / 2);
   }
 
-  if (name === 'cardDamageDealtToTarget') {
+  if (valueType === 'cardDamageDealtToTarget') {
     return getDamageDealt(events, target, 'card');
   }
 
-  if (name === 'percentGreen') {
+  if (valueType === 'percentGreen') {
     return calculateTribePercent(player, 'green');
   }
-  if (name === 'percentRed') {
+  if (valueType === 'percentRed') {
     return calculateTribePercent(player, 'red');
   }
-  if (name === 'percentPurple') {
+  if (valueType === 'percentPurple') {
     return calculateTribePercent(player, 'purple');
   }
 
   const previousCardTribe = player.previousCard?.tribe;
-  if (name === 'prevCardIsGreen') {
+  if (valueType === 'prevCardIsGreen') {
     return previousCardTribe === 'green' ? 1 : 0;
   }
-  if (name === 'prevCardIsRed') {
+  if (valueType === 'prevCardIsRed') {
     return previousCardTribe === 'red' ? 1 : 0;
   }
-  if (name === 'prevCardIsPurple') {
+  if (valueType === 'prevCardIsPurple') {
     return previousCardTribe === 'purple' ? 1 : 0;
   }
 
-  const value = player[name];
+  const value = player[valueType];
   // e.g. number of relics
   if (Array.isArray(value)) {
     return value.length;
@@ -370,8 +371,9 @@ function trashCards({ value, multiplier = 1, target }: EffectOptions, context: P
   // trashNextCards({ player, isActivePlayer, numCardsToTrash: value });
 }
 
-function maybeFloorValue(value: number, name: keyof PlayerState) {
-  if (name === 'lifesteal' || name === 'lifestealWhenBurning') {
+function maybeFloorValue(value: number, valueType: string) {
+  if (valueType === 'lifesteal' || valueType === 'lifestealWhenBurning') {
+    valueType satisfies StatusEffectType;
     // these values use % so don't round them
     return value;
   }

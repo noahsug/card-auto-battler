@@ -1,9 +1,8 @@
-import warrior from './images/warrior.png';
 import { PlayerInfo } from '../../game/gameState';
 import { cardsByType } from '../cards';
-import { noop } from '../../utils/functions';
+import warrior from './images/warrior.png';
 
-export const heroesByName = {
+export const heroesByType = {
   warrior: {
     name: 'Warrior',
     image: warrior,

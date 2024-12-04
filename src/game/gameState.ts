@@ -1,5 +1,5 @@
 import { EnemyType } from '../content/enemies';
-import { heroesByName } from '../content/heroes';
+import { heroesByType } from '../content/heroes';
 import { getRandomState, Random } from '../utils/Random';
 import { addCardsToPlayer } from './utils/cards';
 import { getEnemyOrder } from './utils/enemies';
@@ -186,7 +186,7 @@ export function createGameState(seed?: number): GameState {
   const enemyOrder = getEnemyOrder(random);
 
   const game = {
-    user: createPlayer(heroesByName.warrior),
+    user: createPlayer(heroesByType.warrior),
     enemy: getNextEnemy({ enemyOrder, wins: 0 }),
     enemyOrder,
     turn: 0,

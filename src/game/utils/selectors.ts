@@ -2,7 +2,14 @@ import { EnemyType } from '../../content/enemies/enemies';
 import { getEnemyInfo } from './enemies';
 import { RelicType } from '../../content/relics/relics';
 import { Random } from '../../utils/Random';
-import { MAX_LOSSES, MAX_WINS } from '../constants';
+import {
+  MAX_LOSSES,
+  MAX_WINS,
+  NUM_FIRST_ADD_CARD_OPTIONS,
+  NUM_ADD_CARD_OPTIONS,
+  NUM_FIRST_ADD_CARD_PICKS,
+  NUM_ADD_CARD_PICKS,
+} from '../constants';
 import { CardState, GameState, PlayerState, Target, createPlayer } from '../gameState';
 
 export function getIsStartOfBattle(game: GameState) {
@@ -40,8 +47,8 @@ export function getPlayerTargets({ turn }: { turn: number }): [Target, Target] {
   return getIsUserTurn({ turn }) ? ['self', 'opponent'] : ['opponent', 'self'];
 }
 
-export function getRelic(player: PlayerState, relicName: RelicType) {
-  return player.relics.find((relic) => relic.type === relicName);
+export function getRelic(player: PlayerState, relicType: RelicType) {
+  return player.relics.find((relic) => relic.type === relicType);
 }
 
 export function getIsBossBattle({ wins }: { wins: number }) {
@@ -72,4 +79,12 @@ export function getNextEnemy({ enemyOrder, wins }: { enemyOrder: EnemyType[]; wi
   const enemy = createPlayer(enemyInfo);
   enemyInfo.initialize?.(enemy, wins);
   return enemy;
+}
+
+export function getNumCardAddOptions({ wins }: { wins: number }) {
+  return wins === 0 ? NUM_FIRST_ADD_CARD_OPTIONS : NUM_ADD_CARD_OPTIONS;
+}
+
+export function getNumCardAddPicks({ wins }: { wins: number }) {
+  return wins === 0 ? NUM_FIRST_ADD_CARD_PICKS : NUM_ADD_CARD_PICKS;
 }
