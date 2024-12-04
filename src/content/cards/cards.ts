@@ -62,7 +62,7 @@ export const basicCardsByName = {
     [
       {
         target: 'self',
-        name: 'heal',
+        type: 'heal',
         value: v(4),
       },
     ],
@@ -76,7 +76,7 @@ export const basicCardsByName = {
     [
       {
         target: 'self',
-        name: 'dodge',
+        type: 'dodge',
       },
     ],
     {
@@ -107,7 +107,7 @@ export const greenCardsByName = {
     [
       {
         target: 'self',
-        name: 'crit',
+        type: 'crit',
         if: ifCompare('self', 'percentGreen', '>=', 0.5),
       },
       {
@@ -124,7 +124,7 @@ export const greenCardsByName = {
     [
       {
         target: 'self',
-        name: 'heal',
+        type: 'heal',
         value: v(4),
       },
     ],
@@ -142,7 +142,7 @@ export const greenCardsByName = {
     [
       {
         target: 'self',
-        name: 'regen',
+        type: 'regen',
         value: v(3),
       },
     ],
@@ -156,12 +156,12 @@ export const greenCardsByName = {
     [
       {
         target: 'self',
-        name: 'strength',
+        type: 'strength',
         value: v('self', 'regen'),
       },
       {
         target: 'self',
-        name: 'regen',
+        type: 'regen',
         value: v(2),
       },
     ],
@@ -225,7 +225,7 @@ export const redCardsByName = {
     [
       {
         target: 'self',
-        name: 'temporaryFireCrit',
+        type: 'temporaryFireCrit',
       },
       playAnotherCard(),
     ],
@@ -238,13 +238,13 @@ export const redCardsByName = {
   fireSpears: createCard(
     [
       {
-        name: 'damage',
+        type: 'damage',
         value: v(3),
         multiHit: v(2),
       },
       {
         target: 'self',
-        name: 'burn',
+        type: 'burn',
         value: v(2),
       },
     ],
@@ -257,21 +257,21 @@ export const redCardsByName = {
   fireDamageToAll: createCard(
     [
       {
-        name: 'damage',
+        type: 'damage',
         value: v(6),
       },
       {
-        name: 'burn',
+        type: 'burn',
         value: v(4),
       },
       {
         target: 'self',
-        name: 'damage',
+        type: 'damage',
         value: v(6),
       },
       {
         target: 'self',
-        name: 'burn',
+        type: 'burn',
         value: v(4),
       },
     ],
@@ -284,11 +284,11 @@ export const redCardsByName = {
   phoenixFire: createCard(
     [
       {
-        name: 'damage',
+        type: 'damage',
         value: v(3),
       },
       {
-        name: 'burn',
+        type: 'burn',
         value: v('opponent', 'cardDamageDealtToTarget'),
       },
     ],
@@ -314,12 +314,12 @@ export const redCardsByName = {
   bloodBath: createCard(
     [
       {
-        name: 'bleed',
+        type: 'bleed',
         value: v(4),
       },
       {
         target: 'self',
-        name: 'bleed',
+        type: 'bleed',
         value: v(1),
       },
     ],
@@ -334,18 +334,18 @@ export const redCardsByName = {
     [
       {
         target: 'self',
-        name: 'burn',
+        type: 'burn',
         value: v(4),
       },
       {
         target: 'self',
-        name: 'strength',
+        type: 'strength',
         value: v(3),
       },
       {
         target: 'self',
-        name: 'set',
-        valueName: 'bleed',
+        type: 'set',
+        valueType: 'bleed',
         value: v(0),
       },
     ],
@@ -372,12 +372,12 @@ export const redCardsByName = {
     [
       {
         target: 'self',
-        name: 'lifestealWhenBurning',
+        type: 'lifestealWhenBurning',
         value: v(1),
       },
       {
         target: 'self',
-        name: 'burn',
+        type: 'burn',
         value: v(4),
       },
     ],
@@ -391,15 +391,15 @@ export const redCardsByName = {
   bleedAndBurn: createCard(
     [
       {
-        name: 'damage',
+        type: 'damage',
         value: v(2),
       },
       {
-        name: 'bleed',
+        type: 'bleed',
         value: v(2),
       },
       {
-        name: 'burn',
+        type: 'burn',
         value: v(2),
       },
     ],
@@ -435,7 +435,7 @@ export const purpleCardsByName = {
     [
       {
         target: 'self',
-        name: 'crit',
+        type: 'crit',
         if: ifCompare('self', 'cardsPlayedThisTurn', '>=', 2),
       },
       {
@@ -468,11 +468,11 @@ export const purpleCardsByName = {
   shock: createCard(
     [
       {
-        name: 'damage',
+        type: 'damage',
         value: v(4),
       },
       {
-        name: 'shock',
+        type: 'shock',
         value: v(1),
       },
     ],
@@ -485,7 +485,7 @@ export const purpleCardsByName = {
   shockTrap: createCard(
     [
       {
-        name: 'delayedShock',
+        type: 'delayedShock',
         value: v(1),
       },
       playAnotherCard(),
@@ -499,7 +499,7 @@ export const purpleCardsByName = {
   shockPunch: createCard(
     [
       {
-        name: 'shock',
+        type: 'shock',
       },
       playAnotherCard(),
     ],
@@ -526,12 +526,12 @@ export const purpleCardsByName = {
     [
       {
         target: 'self',
-        name: 'temporaryDodge',
+        type: 'temporaryDodge',
         value: v(Infinity),
       },
       {
         target: 'self',
-        name: 'crit',
+        type: 'crit',
       },
     ],
     {
@@ -544,7 +544,7 @@ export const purpleCardsByName = {
     [
       {
         target: 'self',
-        name: 'temporaryStrength',
+        type: 'temporaryStrength',
         value: v(2),
       },
       playAnotherCard(),
@@ -565,7 +565,7 @@ export const potionByName = {
     [
       {
         target: 'self',
-        name: 'regen',
+        type: 'regen',
         value: v(5),
       },
       playAnotherCard(),
@@ -581,7 +581,7 @@ export const potionByName = {
   damagePotion: createCard(
     [
       {
-        name: 'damage',
+        type: 'damage',
         value: v(12),
       },
       playAnotherCard(),
@@ -598,7 +598,7 @@ export const potionByName = {
     [
       {
         target: 'self',
-        name: 'strength',
+        type: 'strength',
         value: v(4),
       },
       playAnotherCard(),
@@ -622,7 +622,7 @@ export const potionByName = {
     [
       {
         target: 'self',
-        name: 'crit',
+        type: 'crit',
         value: v(3),
       },
       playAnotherCard(),
@@ -639,7 +639,7 @@ export const potionByName = {
     [
       {
         target: 'self',
-        name: 'dodge',
+        type: 'dodge',
         value: v(2),
       },
       playAnotherCard(),
@@ -678,7 +678,7 @@ export const enemyCardsByName = {
   surpriseAttack: createCard(
     [
       {
-        name: 'crit',
+        type: 'crit',
         target: 'self',
         if: ifCompare('self', 'dodge', '>=', 1),
       },
@@ -686,9 +686,9 @@ export const enemyCardsByName = {
         value: v(4),
       },
       {
-        name: 'set',
+        type: 'set',
         target: 'self',
-        valueName: 'dodge',
+        valueType: 'dodge',
         value: v(0),
       },
     ],
@@ -702,7 +702,7 @@ export const enemyCardsByName = {
     [
       {
         target: 'self',
-        name: 'dodge',
+        type: 'dodge',
         value: v(1),
       },
     ],

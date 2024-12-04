@@ -217,9 +217,9 @@ function trackPickActions(choices: ChoiceFunctions): {
     return cardPicks;
   };
   const chooseRelicToAdd = (game: GameState, relicOptions: RelicState[]) => {
-    const options = relicOptions.map((relic) => relic.name);
+    const options = relicOptions.map((relic) => relic.type);
     const relicPick = choices.chooseRelicToAdd(game, relicOptions);
-    pickResults.push({ type: 'chooseRelicToAdd', options, picks: [relicPick.name] });
+    pickResults.push({ type: 'chooseRelicToAdd', options, picks: [relicPick.type] });
     return relicPick;
   };
 

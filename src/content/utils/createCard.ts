@@ -4,7 +4,7 @@ import {
   CardState,
   If,
   PlayerValueDescriptor,
-  PlayerValueName,
+  PlayerValueType,
   Target,
   ValueDescriptor,
 } from '../../game/gameState';
@@ -13,7 +13,7 @@ import { assertIsNonNullable } from '../../utils/asserts';
 export function playAnotherCard(value?: ValueDescriptor): CardEffect {
   return createEffect({
     target: 'self',
-    name: 'extraCardPlays',
+    type: 'extraCardPlays',
     value,
   });
 }
@@ -21,7 +21,7 @@ export function playAnotherCard(value?: ValueDescriptor): CardEffect {
 // returns a CardEffect with defaults
 export function createEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {
   partialEffect.target = partialEffect.target || 'opponent';
-  partialEffect.name = partialEffect.name || 'damage';
+  partialEffect.type = partialEffect.type || 'damage';
   partialEffect.value = partialEffect.value || value(1);
   return partialEffect as CardEffect;
 }
@@ -61,20 +61,20 @@ export function createCard(
 // returns a CardEffect.If with defaults
 export function ifCompare(
   target: Target,
-  name: PlayerValueName,
+  name: PlayerValueType,
   multiplier: number,
   comparison: If['comparison'],
   basicValue: number,
 ): If;
 export function ifCompare(
   target: Target,
-  name: PlayerValueName,
+  name: PlayerValueType,
   comparison: If['comparison'],
   basicValue: number,
 ): If;
 export function ifCompare(
   target: Target,
-  name: PlayerValueName,
+  name: PlayerValueType,
   arg1: number | If['comparison'],
   arg2: If['comparison'] | number,
   arg3?: number,
@@ -95,7 +95,7 @@ export function ifCompare(
 }
 
 // returns a CardEffect.If that checks if a given player value is > 0
-export function ifHas(target: Target, name: PlayerValueName): If {
+export function ifHas(target: Target, name: PlayerValueType): If {
   return {
     value: value(target, name),
     comparison: '>',
@@ -111,18 +111,18 @@ export function ifHas(target: Target, name: PlayerValueName): If {
  */
 export function value(
   target: Target,
-  name: PlayerValueName,
+  name: PlayerValueType,
   multiplier?: number,
 ): PlayerValueDescriptor;
 export function value(value: number): BasicValueDescriptor;
 export function value(
   valueOrTarget: number | Target,
-  name?: PlayerValueName,
+  name?: PlayerValueType,
   multiplier?: number,
 ): ValueDescriptor {
   if (typeof valueOrTarget === 'number') {
     return { type: 'basicValue', value: valueOrTarget };
   }
   assertIsNonNullable(name);
-  return { type: 'playerValue', target: valueOrTarget, name, multiplier };
+  return { type: 'playerValue', target: valueOrTarget, valueType: name, multiplier };
 }

@@ -33,7 +33,7 @@ export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
   statusEffectTypes.map((effectType) => [effectType, 0]),
 ) as StatusEffects;
 
-type CalculatedPlayerValueName =
+type CalculatedPlayerValueType =
   | 'percentGreen'
   | 'percentRed'
   | 'percentPurple'
@@ -43,12 +43,12 @@ type CalculatedPlayerValueName =
   | 'cardDamageDealtToTarget'
   | 'turn';
 
-export type PlayerValueName =
+export type PlayerValueType =
   | keyof Omit<PlayerState, 'name' | 'image' | 'previousCard'>
-  | CalculatedPlayerValueName;
+  | CalculatedPlayerValueType;
 
 // TODO: Add 'selfDamage' as a type, which isn't affected by things like strength
-export type CardEffectName = StatusEffectType | 'damage' | 'heal' | 'trash';
+export type CardEffectType = StatusEffectType | 'damage' | 'heal' | 'trash';
 
 export interface BasicValueDescriptor {
   type: 'basicValue';
@@ -58,7 +58,7 @@ export interface BasicValueDescriptor {
 export interface PlayerValueDescriptor {
   type: 'playerValue';
   target: Target;
-  name: PlayerValueName;
+  valueType: PlayerValueType;
   multiplier?: number;
 }
 
@@ -77,7 +77,7 @@ export interface MaybeValue<T = ValueDescriptor> {
 
 export interface BasicCardEffect {
   target: Target;
-  name: CardEffectName;
+  type: CardEffectType;
   value: ValueDescriptor;
   add?: MaybeValue;
   multiply?: MaybeValue<BasicValueDescriptor>;
@@ -85,9 +85,9 @@ export interface BasicCardEffect {
   if?: If;
 }
 
-export interface SetValueCardEffect extends Omit<BasicCardEffect, 'name'> {
-  name: 'set';
-  valueName: StatusEffectType | 'health';
+export interface SetValueCardEffect extends Omit<BasicCardEffect, 'type'> {
+  type: 'set';
+  valueType: StatusEffectType | 'health';
 }
 
 export type CardEffect = BasicCardEffect | SetValueCardEffect;
@@ -101,22 +101,22 @@ export interface CardState {
   lifesteal?: MaybeValue;
   trash: boolean;
   uses?: { current: number; max: number };
+  // unique ID used to sort cards from first added to last added
+  chain: { toId?: number; fromId?: number };
+  charm?: 'feather';
   name: string;
   description: string;
   image: string;
   tribe: Tribe;
-  // unique ID used to sort cards from first added to last added
   acquiredId: number;
-  chain: { toId?: number; fromId?: number };
-  charm?: 'feather';
 }
 
 export interface RelicState {
-  name: string;
-  displayName: string;
+  type: string;
   description: string;
   value: number;
   value2: number;
+  name: string;
   image: string;
   tribe: Tribe;
 }

@@ -46,7 +46,7 @@ it('handles percentages', () => {
     createCard(
       [
         {
-          name: 'lifestealWhenBurning',
+          type: 'lifestealWhenBurning',
           value: v(0.5),
           target: 'self',
         },

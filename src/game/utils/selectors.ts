@@ -41,7 +41,7 @@ export function getPlayerTargets({ turn }: { turn: number }): [Target, Target] {
 }
 
 export function getRelic(player: PlayerState, relicName: RelicName) {
-  return player.relics.find((relic) => relic.name === relicName);
+  return player.relics.find((relic) => relic.type === relicName);
 }
 
 export function getIsBossBattle({ wins }: { wins: number }) {

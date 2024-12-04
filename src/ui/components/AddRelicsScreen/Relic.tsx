@@ -67,7 +67,7 @@ export function Relic({ relic, onClick, style }: Props) {
     <Root onClick={onClick} style={style}>
       <RelicImage src={relic.image} $tribe={relic.tribe} />
       <TextContainer>
-        <Title>{relic.displayName}</Title>
+        <Title>{relic.name}</Title>
         <Text>
           <DescriptionText text={description} />
         </Text>

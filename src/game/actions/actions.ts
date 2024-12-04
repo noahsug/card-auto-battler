@@ -81,8 +81,8 @@ export function getAddPotionOptions(game: GameState): CardState[] {
 export function getAddRelicOptions(game: GameState): RelicState[] {
   const { sample: sampleSize } = getRandom(game);
 
-  const existingRelicNames = new Set(game.user.relics.map((relic) => relic.name));
-  const availableRelics = allRelics.filter((relic) => !existingRelicNames.has(relic.name));
+  const existingRelicNames = new Set(game.user.relics.map((relic) => relic.type));
+  const availableRelics = allRelics.filter((relic) => !existingRelicNames.has(relic.type));
   return structuredClone(sampleSize(availableRelics, NUM_RELIC_SELECTION_OPTIONS));
 }
 
@@ -123,7 +123,7 @@ export function featherCards(game: GameState, cardsToFeather: CardState[]) {
 export function addRelic(game: GameState, relic: RelicState) {
   game.user.relics.push(relic);
 
-  if (relic.name === ('monk' satisfies RelicName)) {
+  if (relic.type === ('monk' satisfies RelicName)) {
     convertBasicAttacksToMonkAttack(game.user.cards);
   }
 }

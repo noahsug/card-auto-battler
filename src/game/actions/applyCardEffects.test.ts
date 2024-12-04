@@ -120,7 +120,7 @@ describe('self damage', () => {
 
 describe('heal', () => {
   beforeEach(() => {
-    effect.name = 'heal';
+    effect.type = 'heal';
   });
 
   it('increases opponent hp', () => {
@@ -146,18 +146,18 @@ describe('heal', () => {
 
 describe('set', () => {
   beforeEach(() => {
-    effect.name = 'set';
+    effect.type = 'set';
   });
 
   it('sets health', () => {
-    (effect as SetValueCardEffect).valueName = 'health';
+    (effect as SetValueCardEffect).valueType = 'health';
     const { opponent } = getPlayCardResult();
 
     expect(opponent.health).toBe(1);
   });
 
   it('sets bleed', () => {
-    (effect as SetValueCardEffect).valueName = 'bleed';
+    (effect as SetValueCardEffect).valueType = 'bleed';
     effect.target = 'self';
     effect.value = v(0);
     const { diff } = getPlayCardResult({ self: { bleed: 4 } });
@@ -275,7 +275,7 @@ describe('if', () => {
 
   it('compares to damage dealt by the current card', () => {
     card.effects[1] = createEffect({
-      name: 'bleed',
+      type: 'bleed',
       value: v(3),
       if: ifCompare('opponent', 'cardDamageDealtToTarget', '>=', 7),
     });
@@ -423,7 +423,7 @@ describe('multiply', () => {
 describe('battle events', () => {
   it('returns battle events', () => {
     card.effects.push({
-      name: 'heal',
+      type: 'heal',
       target: 'self',
       value: v(5),
     });
@@ -446,7 +446,7 @@ describe('battle events', () => {
   });
 
   it('indicates when damage is a crit', () => {
-    card.effects[0] = createEffect({ target: 'self', name: 'crit' });
+    card.effects[0] = createEffect({ target: 'self', type: 'crit' });
     card.effects[1] = createEffect();
 
     const { events } = getPlayCardResult();
@@ -459,7 +459,7 @@ describe('battle events', () => {
 describe('status effects', () => {
   describe('dodge', () => {
     beforeEach(() => {
-      effect.name = 'dodge';
+      effect.type = 'dodge';
     });
 
     it('increases opponent dodge', () => {
@@ -497,9 +497,9 @@ describe('status effects', () => {
 
     it('each stack applies to one instance of damage from a fire card', () => {
       card.effects = [
-        createEffect({ name: 'damage', value: v(1) }),
-        createEffect({ name: 'damage', value: v(2) }),
-        createEffect({ name: 'damage', value: v(3) }),
+        createEffect({ type: 'damage', value: v(1) }),
+        createEffect({ type: 'damage', value: v(2) }),
+        createEffect({ type: 'damage', value: v(3) }),
       ];
       const { diff } = getPlayCardResult({
         self: { temporaryFireCrit: 2 },
@@ -559,7 +559,7 @@ describe('status effects', () => {
     });
 
     it('is added to self via card effect', () => {
-      effect.name = 'lifesteal';
+      effect.type = 'lifesteal';
       effect.target = 'self';
       effect.value = v(0.5);
       const { diff } = getPlayCardResult();
@@ -570,7 +570,7 @@ describe('status effects', () => {
 
   describe('shock', () => {
     it('increases opponent shock', () => {
-      effect.name = 'shock';
+      effect.type = 'shock';
       const { diff } = getPlayCardResult();
 
       expect(diff).toEqual({ opponent: { shock: 1 } });
@@ -621,7 +621,7 @@ describe('relics', () => {
     const relics = [strengthAffectsHealing];
     beforeEach(() => {
       card.effects[0] = {
-        name: 'heal',
+        type: 'heal',
         target: 'self',
         value: v(1),
       };

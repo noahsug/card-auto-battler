@@ -68,7 +68,7 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
 
   value *= multiplier;
 
-  switch (effect.name) {
+  switch (effect.type) {
     case 'damage': {
       const dodged = dodgeDamage(effect, context);
       if (!dodged) {
@@ -88,13 +88,13 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
       break;
 
     case 'set': {
-      player[effect.valueName] = maybeFloorValue(value, effect.valueName);
+      player[effect.valueType] = maybeFloorValue(value, effect.valueType);
       break;
     }
 
     default: {
       // status effects
-      player[effect.name] += maybeFloorValue(value, effect.name);
+      player[effect.type] += maybeFloorValue(value, effect.type);
     }
   }
 
@@ -137,7 +137,7 @@ function calculateTribePercent(player: PlayerState, tribe: Tribe): number {
 }
 
 function getPlayerValue(
-  { target, name }: PlayerValueDescriptor,
+  { target, valueType: name }: PlayerValueDescriptor,
   { game, events }: PlayCardContext,
 ): number {
   const player = getTargetedPlayer(game, target);

@@ -20,7 +20,7 @@ export function convertBasicAttacksToMonkAttack(cards: CardState[]) {
     if (card.name !== attack.name) return;
     card.effects.push({
       target: 'self',
-      name: 'extraCardPlays',
+      type: 'extraCardPlays',
       value: v(1),
     });
     card.description += ' Play another card.';
@@ -29,7 +29,7 @@ export function convertBasicAttacksToMonkAttack(cards: CardState[]) {
 }
 
 export function addDamage(card: CardState, damage: number) {
-  const effect = card.effects.find((effect) => effect.name === 'damage');
+  const effect = card.effects.find((effect) => effect.type === 'damage');
   const value = effect?.value;
   assertType(value, 'basicValue', card.name);
   value.value += damage;
