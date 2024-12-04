@@ -489,7 +489,7 @@ export const purpleCardsByType = {
       },
       {
         type: 'shock',
-        value: v(1),
+        value: v(2),
       },
     ],
     {

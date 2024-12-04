@@ -66,7 +66,7 @@ Object.values(greenRelics).forEach((relic) => {
 export const redRelics = {
   permaBleed: createRelic({
     name: 'Eternal Wound',
-    description: 'Apply $V bleed to the enemy at the start of your turn if they have no bleed.',
+    description: 'The enemy gains $V bleed at the start of their turn.',
     value: 1,
     image: openWoundImage,
   }),
@@ -91,7 +91,7 @@ Object.values(redRelics).forEach((relic) => {
 export const purpleRelics = {
   extraCardPlaysAtStart: createRelic({
     name: 'Adrenaline Rush',
-    description: 'Play $V extra cards at the start of each battle.',
+    description: 'Play $V extra cards at the start of battle.',
     value: 2,
     image: fireSilhouetteImage,
   }),

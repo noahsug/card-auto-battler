@@ -211,11 +211,9 @@ export function startTurn(game: GameState): BattleEvent[] {
   }
 
   // permaBleed
-  if (nonActivePlayer.bleed === 0) {
-    const permaBleed = getRelic(activePlayer, 'permaBleed');
-    if (permaBleed) {
-      nonActivePlayer.bleed += permaBleed.value;
-    }
+  const permaBleed = getRelic(nonActivePlayer, 'permaBleed');
+  if (permaBleed) {
+    activePlayer.bleed += permaBleed.value;
   }
 
   // die if out of cards
