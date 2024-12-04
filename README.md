@@ -2,9 +2,10 @@
 
 Game TODO:
 
-1. Charms act like equipment and can be moved around any time via "view deck" screen, entering a
+1. "Select 2 Cards" -> "Manage Deck Screen", with "Fight" button in corner
+2. Charms act like equipment and can be moved around any time via "view deck" screen, entering a
    shop adds a charm and then brings you into the view deck screen
-1. choice of which charm shop to enter and more charm shops:
+3. choice of which charm shop to enter and more charm shops:
    1. ✅ chain = play after other chained card
    2. ✅ remove = remove card
    3. ✅ feather = card on top + exhaust
@@ -15,10 +16,10 @@ Game TODO:
    8. add "play another card" keyword?
    9. add "crit" keyword?
    10. add "repeat" keyword?
-1. storybook visual testing
-1. more heroes?
-1. card rarity? so we don't spam folks with mythics that are OP but situational
-1. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
+4. storybook visual testing
+5. more heroes?
+6. card rarity? so we don't spam folks with mythics that are OP but situational
+7. add more effects that allow you to play multiple cards or remove cards (e.g. boss relics allow 2
    cards/turn?), since this gets you through a big deck faster and makes picking cards feel more
    impactful later in the game
 

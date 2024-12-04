@@ -1,12 +1,12 @@
-import { ShopName } from '../../../game/gameState';
+import { ShopType } from '../../../game/gameState';
 import { Button } from '../shared/Button';
 
 interface Props {
-  name: ShopName;
+  name: ShopType;
   onShopSelected: () => void;
 }
 
-const displayNames: Record<ShopName, string> = {
+const displayNames: Record<ShopType, string> = {
   addPotions: 'Add Potions',
   addRelics: 'Add Relics',
   chainCards: 'Chain Cards',

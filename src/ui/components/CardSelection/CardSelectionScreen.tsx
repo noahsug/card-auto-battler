@@ -1,5 +1,5 @@
 import React from 'react';
-import { CardState, GameState, CardShopName } from '../../../game/gameState';
+import { CardState, GameState, CardShopType } from '../../../game/gameState';
 import { AddCardsScreen } from './AddCardsScreen';
 import { RemoveCardsScreen } from './RemoveCardsScreen';
 import { ChainCardsScreen } from './ChainCardsScreen';
@@ -7,10 +7,9 @@ import { AddPotionsScreen } from './AddPotionsScreen';
 import { ScreenType } from '../App/App';
 import { FeatherCardsScreen } from './FeatherCardsScreen';
 
-// TODO: rename CardShopName to CardShopType
-export type CardSelectionScreenType = CardShopName | 'addCards';
+export type CardSelectionScreenType = CardShopType | 'addCards';
 
-const screensByName = {
+const screensByShopType = {
   addCards: AddCardsScreen,
   addPotions: AddPotionsScreen,
   removeCards: RemoveCardsScreen,
@@ -19,7 +18,7 @@ const screensByName = {
 } satisfies Record<CardSelectionScreenType, object>;
 
 export function isCardSelectionScreen(screen: ScreenType): screen is CardSelectionScreenType {
-  return screen in screensByName;
+  return screen in screensByShopType;
 }
 
 export interface GenericCardSelectionProps {
@@ -40,7 +39,7 @@ export function CardSelectionScreen({
   onCardsSelected,
   onViewDeck,
 }: CardSelectionScreenProps) {
-  const Screen = screensByName[type];
+  const Screen = screensByShopType[type];
   return (
     <Screen game={game} cards={cards} onCardsSelected={onCardsSelected} onViewDeck={onViewDeck} />
   );

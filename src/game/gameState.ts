@@ -5,8 +5,8 @@ import { addCardsToPlayer } from './utils/cards';
 import { getEnemyOrder } from './utils/enemies';
 import { getNextEnemy } from './utils/selectors';
 
-export type CardShopName = 'removeCards' | 'chainCards' | 'addPotions' | 'featherCards';
-export type ShopName = CardShopName | 'addRelics';
+export type CardShopType = 'removeCards' | 'chainCards' | 'addPotions' | 'featherCards';
+export type ShopType = CardShopType | 'addRelics';
 
 export type Target = 'self' | 'opponent';
 

@@ -17,7 +17,7 @@ import {
   GameState,
   PlayerState,
   RelicState,
-  ShopName,
+  ShopType,
   statusEffectNames,
 } from '../gameState';
 import {
@@ -33,7 +33,7 @@ import { applyCardEffects, applyHeal, getDamageDealt, reduceHealth } from './app
 import { BattleEvent, createBattleEvent } from './battleEvent';
 
 // which shops to choose from after adding new cards
-export function getShopOptions(game: GameState): ShopName[] {
+export function getShopOptions(game: GameState): ShopType[] {
   const { sample } = getRandom(game);
   const { wins } = game;
 
@@ -43,7 +43,7 @@ export function getShopOptions(game: GameState): ShopName[] {
   const relicRounds = [1, 4, 6, 8];
   if (relicRounds.includes(wins)) return ['addRelics'];
 
-  const shopOptions: ShopName[] = ['removeCards', 'chainCards', 'featherCards'];
+  const shopOptions: ShopType[] = ['removeCards', 'chainCards', 'featherCards'];
   if (game.wins <= 7) {
     // no potions before the last boss
     shopOptions.push('addPotions');

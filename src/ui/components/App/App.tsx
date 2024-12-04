@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-import { CardState, GameState, RelicState, ShopName } from '../../../game/gameState';
+import { CardState, GameState, RelicState, ShopType } from '../../../game/gameState';
 import { getBattleWinner, getIsGameOver } from '../../../game/utils/selectors';
 import { assertIsNonNullable } from '../../../utils/asserts';
 import { useGameState } from '../../hooks/useGameState';
@@ -15,7 +15,7 @@ import { StartScreen } from '../StartScreen';
 import { ViewDeckOverlay } from '../ViewDeckOverlay';
 import backgroundImage from './main-background.png';
 
-export type ScreenType = ShopName | 'selectShop' | 'start' | 'addCards' | 'battle';
+export type ScreenType = ShopType | 'selectShop' | 'start' | 'addCards' | 'battle';
 type OverlayType = 'battleResults' | 'deck' | 'none';
 
 export const Root = styled.div`
@@ -58,7 +58,7 @@ export function App() {
   const wonLastBattleRef = useRef(false);
   const cardOptionsRef = useRef<CardState[]>([]);
   const relicOptionsRef = useRef<RelicState[]>([]);
-  const shopOptionsRef = useRef<ShopName[]>([]);
+  const shopOptionsRef = useRef<ShopType[]>([]);
   const rewindGameStateRef = useRef<GameState>();
 
   // DEBUG
@@ -101,7 +101,7 @@ export function App() {
   }, [getAddCardOptions, goToScreen, select]);
 
   const handleGoToShop = useCallback(
-    async (shop: ShopName) => {
+    async (shop: ShopType) => {
       if (shop === 'addRelics') {
         relicOptionsRef.current = await getAddRelicOptions();
       } else if (shop === 'addPotions') {

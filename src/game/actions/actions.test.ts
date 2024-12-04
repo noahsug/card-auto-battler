@@ -11,7 +11,7 @@ import {
   NUM_CARD_SELECTION_PICKS,
   NUM_FIRST_CARD_SELECTION_PICKS,
 } from '../constants';
-import { CardState, createGameState, GameState, RelicState, ShopName } from '../gameState';
+import { CardState, createGameState, GameState, RelicState, ShopType } from '../gameState';
 import { getChainCreatesLoop } from '../utils/cards';
 import { getBattleWinner, getIsGameOver, getIsTurnOver } from '../utils/selectors';
 import {
@@ -33,7 +33,7 @@ import {
 } from './actions';
 
 type ChoiceFunctions = {
-  chooseShop: (game: GameState, shopOptions: ShopName[]) => ShopName;
+  chooseShop: (game: GameState, shopOptions: ShopType[]) => ShopType;
   chooseCardsToAdd: (game: GameState, cardOptions: CardState[]) => CardState[];
   chooseCardsToRemove: (game: GameState) => CardState[];
   chooseCardsToChain: (game: GameState) => CardState[];
@@ -183,7 +183,7 @@ function trackPickActions(choices: ChoiceFunctions): {
   results: ChoiceResults[];
 } {
   const pickResults: ChoiceResults[] = [];
-  const chooseShop = (game: GameState, shopOptions: ShopName[]) => {
+  const chooseShop = (game: GameState, shopOptions: ShopType[]) => {
     const pick = choices.chooseShop(game, shopOptions);
     pickResults.push({ type: 'chooseShop', options: shopOptions, picks: [pick] });
     return pick;

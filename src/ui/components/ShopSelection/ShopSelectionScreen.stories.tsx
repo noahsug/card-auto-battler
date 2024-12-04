@@ -1,10 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
+import { getShopOptions } from '../../../game/actions/actions';
 import { createGameState } from '../../../game/gameState';
 import { ShopSelectionScreen } from './ShopSelectionScreen';
-import { getShopOptions } from '../../../game/actions/actions';
-import { ShopName } from '../../../game/gameState';
 
 const meta = {
   title: 'ShopSelectionScreen',

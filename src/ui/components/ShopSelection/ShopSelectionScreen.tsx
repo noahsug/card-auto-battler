@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-import { GameState, ShopName } from '../../../game/gameState';
+import { GameState, ShopType } from '../../../game/gameState';
 import { HUD } from '../HUD';
 import { CenterContent } from '../shared/CenterContent';
 import { Container } from '../shared/Container';
@@ -7,9 +7,9 @@ import { ShopOption } from './ShopOption';
 
 interface Props {
   game: GameState;
-  shopOptions: ShopName[];
+  shopOptions: ShopType[];
   onViewDeck: () => void;
-  onShopSelected: (shop: ShopName) => void;
+  onShopSelected: (shop: ShopType) => void;
 }
 
 const CenterContentWithMargin = styled(CenterContent)`
