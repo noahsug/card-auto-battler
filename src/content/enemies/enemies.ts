@@ -53,7 +53,7 @@ const middle = Math.floor(MAX_WINS / 2) - 1;
 const twoThirds = Math.floor((2 * MAX_WINS) / 3) - 1;
 const end = MAX_WINS - 2;
 
-export const enemiesByName = {
+export const enemiesByType = {
   // dodges, weak to multi-hit
   greenMonster: {
     name: 'Green Monster',
@@ -162,4 +162,4 @@ export const enemiesByName = {
   },
 } satisfies Record<string, EnemyInfo>;
 
-export type EnemyName = keyof typeof enemiesByName;
+export type EnemyType = keyof typeof enemiesByType;

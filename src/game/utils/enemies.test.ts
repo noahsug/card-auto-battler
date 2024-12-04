@@ -2,7 +2,7 @@ import range from 'lodash/range';
 
 import { getEnemyOrder } from './enemies';
 import { Random } from '../../utils/Random';
-import { enemiesByName } from '../../content/enemies/enemies';
+import { enemiesByType } from '../../content/enemies/enemies';
 import { MAX_WINS } from '../constants';
 
 it('gets an ordering of unique enemies', () => {
@@ -16,7 +16,7 @@ it('gets an ordering of unique enemies', () => {
 
   for (let index = 0; index < MAX_WINS; index++) {
     const enemy = enemyOrder[index];
-    const enemyInfo = enemiesByName[enemy];
+    const enemyInfo = enemiesByType[enemy];
     expect(enemyInfo).toBeDefined();
 
     const [min, max] = enemyInfo.battleRange;

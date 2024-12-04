@@ -1,4 +1,4 @@
-import { EnemyName } from '../content/enemies';
+import { EnemyType } from '../content/enemies';
 import { heroesByName } from '../content/heroes';
 import { getRandomState, Random } from '../utils/Random';
 import { addCardsToPlayer } from './utils/cards';
@@ -140,7 +140,7 @@ export interface PlayerState extends StatusEffects {
 export interface GameState {
   user: PlayerState;
   enemy: PlayerState;
-  enemyOrder: EnemyName[];
+  enemyOrder: EnemyType[];
   turn: number;
   wins: number;
   losses: number;

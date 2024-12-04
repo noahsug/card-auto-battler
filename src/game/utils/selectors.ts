@@ -1,4 +1,4 @@
-import { EnemyName } from '../../content/enemies/enemies';
+import { EnemyType } from '../../content/enemies/enemies';
 import { getEnemyInfo } from './enemies';
 import { RelicName } from '../../content/relics/relics';
 import { Random } from '../../utils/Random';
@@ -67,7 +67,7 @@ export function getRandom({ randomnessState }: { randomnessState: GameState['ran
   return new Random(randomnessState);
 }
 
-export function getNextEnemy({ enemyOrder, wins }: { enemyOrder: EnemyName[]; wins: number }) {
+export function getNextEnemy({ enemyOrder, wins }: { enemyOrder: EnemyType[]; wins: number }) {
   const enemyInfo = getEnemyInfo(enemyOrder[wins], wins);
   const enemy = createPlayer(enemyInfo);
   enemyInfo.initialize?.(enemy, wins);

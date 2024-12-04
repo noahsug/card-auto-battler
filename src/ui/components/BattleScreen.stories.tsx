@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { enemiesByName } from '../../content/enemies';
-import { EnemyName } from '../../content/enemies/enemies';
+import { enemiesByType } from '../../content/enemies';
+import { EnemyType } from '../../content/enemies/enemies';
 import { relicsByName } from '../../content/relics';
 import { startBattle } from '../../game/actions';
 import { MAX_WINS } from '../../game/constants';
@@ -95,11 +95,11 @@ export const Boss: Story = {
   })(),
 };
 
-function fightEnemy(enemyName: EnemyName, isEarlyBattleRound: boolean): Story {
+function fightEnemy(enemyName: EnemyType, isEarlyBattleRound: boolean): Story {
   return {
     args: (() => {
       const game = createGameState();
-      const enemyInfo = Object.entries(enemiesByName).find(([name]) => name === enemyName)![1];
+      const enemyInfo = Object.entries(enemiesByType).find(([name]) => name === enemyName)![1];
       game.wins = isEarlyBattleRound ? enemyInfo.battleRange[0] : enemyInfo.battleRange[1];
       game.enemyOrder[game.wins] = enemyName;
       startBattle(game);
