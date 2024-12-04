@@ -11,10 +11,10 @@ import targetingImage from './images/targeting.png';
 import thunderBladeImage from './images/thunder-blade.png';
 import transfuseImage from './images/transfuse.png';
 
-import { cardsByName } from '../cards/cards';
+import { cardsByType } from '../cards/cards';
 import { createRelic } from '../utils/createRelic';
 
-const { attack } = cardsByName;
+const { attack } = cardsByType;
 
 // basic
 export const basicRelics = {
@@ -120,16 +120,16 @@ Object.values(purpleRelics).forEach((relic) => {
   relic.tribe = 'purple';
 });
 
-export const relicsByName = {
+export const relicsByType = {
   ...basicRelics,
   ...greenRelics,
   ...redRelics,
   ...purpleRelics,
 };
-Object.entries(relicsByName).forEach(([name, relic]) => {
-  relic.type = name;
+Object.entries(relicsByType).forEach(([type, relic]) => {
+  relic.type = type;
 });
 
-export type RelicName = keyof typeof relicsByName;
+export type RelicType = keyof typeof relicsByType;
 
-export const allRelics = Object.values(relicsByName);
+export const allRelics = Object.values(relicsByType);

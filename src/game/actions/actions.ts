@@ -1,7 +1,7 @@
 import range from 'lodash/range';
 
-import { nonBasicCards, potionByName } from '../../content/cards/cards';
-import { allRelics, RelicName } from '../../content/relics';
+import { nonBasicCards, potionByType } from '../../content/cards/cards';
+import { allRelics, RelicType } from '../../content/relics';
 import { assert } from '../../utils/asserts';
 import {
   MAX_SHOCK,
@@ -74,7 +74,7 @@ export function getAddCardOptions(game: GameState): CardState[] {
 export function getAddPotionOptions(game: GameState): CardState[] {
   const { sample: sampleSize } = getRandom(game);
 
-  const cards = Object.values(potionByName);
+  const cards = Object.values(potionByType);
   return structuredClone(sampleSize(cards, NUM_POTION_SELECTION_OPTIONS));
 }
 
@@ -123,7 +123,7 @@ export function featherCards(game: GameState, cardsToFeather: CardState[]) {
 export function addRelic(game: GameState, relic: RelicState) {
   game.user.relics.push(relic);
 
-  if (relic.type === ('monk' satisfies RelicName)) {
+  if (relic.type === ('monk' satisfies RelicType)) {
     convertBasicAttacksToMonkAttack(game.user.cards);
   }
 }

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { relicsByName } from '../../../content/relics';
+import { relicsByType } from '../../../content/relics';
 import { getAddRelicOptions } from '../../../game/actions';
 import { createGameState } from '../../../game/gameState';
 import { AddRelicsScreen } from './AddRelicsScreen';
@@ -29,6 +29,6 @@ export const Primary: Story = {
 export const AllRelics: Story = {
   args: {
     game: createGameState(),
-    relics: Object.values(relicsByName),
+    relics: Object.values(relicsByType),
   },
 };

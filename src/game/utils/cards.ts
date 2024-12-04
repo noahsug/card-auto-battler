@@ -1,11 +1,11 @@
 import groupBy from 'lodash/groupBy';
 
-import { cardsByName } from '../../content/cards';
+import { cardsByType } from '../../content/cards';
 import { value as v } from '../../content/utils/createCard';
 import { assertIsNonNullable, assertType } from '../../utils/asserts';
 import { CardState, PlayerState } from '../gameState';
 
-const { attack } = cardsByName;
+const { attack } = cardsByType;
 
 export function addCardsToPlayer(player: PlayerState, cards: CardState[]) {
   const maxAcquiredId = player.cards.reduce((max, card) => Math.max(max, card.acquiredId), -1);

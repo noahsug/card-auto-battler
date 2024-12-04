@@ -3,7 +3,7 @@ import { fn } from '@storybook/test';
 
 import { enemiesByType } from '../../content/enemies';
 import { EnemyType } from '../../content/enemies/enemies';
-import { relicsByName } from '../../content/relics';
+import { relicsByType } from '../../content/relics';
 import { startBattle } from '../../game/actions';
 import { MAX_WINS } from '../../game/constants';
 import { createGameState, GameState, statusEffectTypes } from '../../game/gameState';
@@ -63,7 +63,7 @@ export const StatusEffectsAndRelics: Story = {
       game.enemy[effectName] = 3;
     });
     game.user.strength = -5;
-    game.user.relics = Object.values(relicsByName);
+    game.user.relics = Object.values(relicsByType);
     return { game };
   })(),
 };

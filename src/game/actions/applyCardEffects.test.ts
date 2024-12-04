@@ -1,4 +1,4 @@
-import { relicsByName } from '../../content/relics';
+import { relicsByType } from '../../content/relics';
 import {
   createCard,
   createEffect,
@@ -23,7 +23,7 @@ const {
   sharedPain,
   strengthAffectsHealing,
   strengthOnSelfDamage,
-} = relicsByName;
+} = relicsByType;
 
 let card: CardState;
 let effect: CardEffect;

@@ -45,7 +45,7 @@ import { createCard, ifCompare, ifHas, value as v, playAnotherCard } from '../ut
 /**
  * Basic cards
  */
-export const basicCardsByName = {
+export const basicCardsByType = {
   attack: createCard(
     [
       {
@@ -90,7 +90,7 @@ export const basicCardsByName = {
 /**
  * Green cards
  */
-export const greenCardsByName = {
+export const greenCardsByType = {
   damagePerTurn: createCard(
     [
       {
@@ -200,14 +200,14 @@ export const greenCardsByName = {
     },
   ),
 };
-Object.values(greenCardsByName).forEach((card) => {
+Object.values(greenCardsByType).forEach((card) => {
   card.tribe = 'green';
 });
 
 /**
  * Red cards
  */
-export const redCardsByName = {
+export const redCardsByType = {
   fireball: createCard(
     [
       {
@@ -410,14 +410,14 @@ export const redCardsByName = {
     },
   ),
 };
-Object.values(redCardsByName).forEach((card) => {
+Object.values(redCardsByType).forEach((card) => {
   card.tribe = 'red';
 });
 
 /**
  * Purple cards
  */
-export const purpleCardsByName = {
+export const purpleCardsByType = {
   jabOne: createCard(
     [
       {
@@ -556,11 +556,11 @@ export const purpleCardsByName = {
     },
   ),
 };
-Object.values(purpleCardsByName).forEach((card) => {
+Object.values(purpleCardsByType).forEach((card) => {
   card.tribe = 'purple';
 });
 
-export const potionByName = {
+export const potionByType = {
   regenPotion: createCard(
     [
       {
@@ -654,7 +654,7 @@ export const potionByName = {
   ),
 };
 
-export const enemyCardsByName = {
+export const enemyCardsByType = {
   // punchy
   bigPunch: createCard(
     [
@@ -714,17 +714,17 @@ export const enemyCardsByName = {
   ),
 };
 
-export const nonBasicCardsByName = {
-  ...greenCardsByName,
-  ...redCardsByName,
-  ...purpleCardsByName,
+export const nonBasicCardsByType = {
+  ...greenCardsByType,
+  ...redCardsByType,
+  ...purpleCardsByType,
 };
 
-export const nonBasicCards = Object.values(nonBasicCardsByName);
+export const nonBasicCards = Object.values(nonBasicCardsByType);
 
-export const cardsByName = {
-  ...basicCardsByName,
-  ...nonBasicCardsByName,
+export const cardsByType = {
+  ...basicCardsByType,
+  ...nonBasicCardsByType,
 };
 
-export const allCards = Object.values(cardsByName);
+export const allCards = Object.values(cardsByType);

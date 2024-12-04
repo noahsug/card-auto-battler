@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { cardsByName, enemyCardsByName } from '../../../content/cards';
-import { relicsByName } from '../../../content/relics';
+import { cardsByType, enemyCardsByType } from '../../../content/cards';
+import { relicsByType } from '../../../content/relics';
 import { getAddCardOptions } from '../../../game/actions';
 import { CardState, createGameState } from '../../../game/gameState';
 import { getRandomRelics } from '../../../testing/utils';
@@ -41,7 +41,7 @@ export const LaterTurns: Story = {
 export const MonkRelic: Story = {
   args: (() => {
     const game = createGameState();
-    game.user.relics.push(relicsByName.monk);
+    game.user.relics.push(relicsByType.monk);
     let cards: CardState[] = [];
     for (let i = 0; i < 100; i++) {
       cards = getAddCardOptions(game);
@@ -54,13 +54,13 @@ export const MonkRelic: Story = {
 export const AllCards: Story = {
   args: {
     game: createGameState(),
-    cards: Object.values(cardsByName),
+    cards: Object.values(cardsByType),
   },
 };
 
 export const EnemyCards: Story = {
   args: {
     game: createGameState(),
-    cards: Object.values(enemyCardsByName),
+    cards: Object.values(enemyCardsByType),
   },
 };

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
-import { potionByName } from '../../../content/cards';
+import { potionByType } from '../../../content/cards';
 import { getAddPotionOptions } from '../../../game/actions';
 import { createGameState } from '../../../game/gameState';
 import { AddPotionsScreen } from './AddPotionsScreen';
@@ -29,6 +29,6 @@ export const Primary: Story = {
 export const AllPotions: Story = {
   args: {
     game: createGameState(),
-    cards: Object.values(potionByName),
+    cards: Object.values(potionByType),
   },
 };

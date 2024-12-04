@@ -11,10 +11,10 @@ import grumpyRockImage from './images/grumpy-rock.png';
 import punchyImage from './images/punchy.png';
 import treeMonsterImage from './images/tree-monster.png';
 
-import { cardsByName } from '../cards';
+import { cardsByType } from '../cards';
 import { CardState, PlayerState } from '../../game/gameState';
 import { MAX_WINS } from '../../game/constants';
-import { enemyCardsByName } from '../cards/cards';
+import { enemyCardsByType } from '../cards/cards';
 import { addDamage } from '../../game/utils/cards';
 
 export interface EnemyInfo {
@@ -29,7 +29,7 @@ export interface EnemyInfo {
 }
 
 function basicAttacks(battleNumber: number) {
-  return range(0, battleNumber + 1).map(() => cardsByName.attack);
+  return range(0, battleNumber + 1).map(() => cardsByType.attack);
 }
 
 function getScalingHealthFn(ratio: number) {
@@ -60,9 +60,9 @@ export const enemiesByType = {
     image: greenMonsterImage,
     battleRange: [0, 2],
     getCards: (n) => {
-      const attack = structuredClone(enemyCardsByName.surpriseAttack);
+      const attack = structuredClone(enemyCardsByType.surpriseAttack);
       addDamage(attack, n);
-      const cards = [attack, attack, enemyCardsByName.hide, enemyCardsByName.hide];
+      const cards = [attack, attack, enemyCardsByType.hide, enemyCardsByType.hide];
       return cards;
     },
     getHealth: getScalingHealthFn(0.9),
@@ -73,12 +73,12 @@ export const enemiesByType = {
     image: punchyImage,
     battleRange: [0, 2],
     getCards: () => {
-      const cards = range(0, 3).map(() => cardsByName.attack);
-      cards.push(enemyCardsByName.windUp, enemyCardsByName.bigPunch);
+      const cards = range(0, 3).map(() => cardsByType.attack);
+      cards.push(enemyCardsByType.windUp, enemyCardsByType.bigPunch);
       return cards;
     },
     initialize: (player) => {
-      chainCards(player.cards, enemyCardsByName.windUp.name, enemyCardsByName.bigPunch.name);
+      chainCards(player.cards, enemyCardsByType.windUp.name, enemyCardsByType.bigPunch.name);
     },
     getHealth: getScalingHealthFn(1),
     scale: 0.5,
@@ -89,7 +89,7 @@ export const enemiesByType = {
     image: armoredLizardImage,
     battleRange: [1, twoThirds],
     getCards: () => {
-      return [cardsByName.attack];
+      return [cardsByType.attack];
       // return [attack, multi-attack, thickSkin, takes double damage when weak skin = 0
     },
     initialize: (player, n) => {

@@ -1,6 +1,6 @@
 import { EnemyType } from '../../content/enemies/enemies';
 import { getEnemyInfo } from './enemies';
-import { RelicName } from '../../content/relics/relics';
+import { RelicType } from '../../content/relics/relics';
 import { Random } from '../../utils/Random';
 import { MAX_LOSSES, MAX_WINS } from '../constants';
 import { CardState, GameState, PlayerState, Target, createPlayer } from '../gameState';
@@ -40,7 +40,7 @@ export function getPlayerTargets({ turn }: { turn: number }): [Target, Target] {
   return getIsUserTurn({ turn }) ? ['self', 'opponent'] : ['opponent', 'self'];
 }
 
-export function getRelic(player: PlayerState, relicName: RelicName) {
+export function getRelic(player: PlayerState, relicName: RelicType) {
   return player.relics.find((relic) => relic.type === relicName);
 }
 
