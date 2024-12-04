@@ -6,7 +6,7 @@ import { EnemyType } from '../../content/enemies/enemies';
 import { relicsByName } from '../../content/relics';
 import { startBattle } from '../../game/actions';
 import { MAX_WINS } from '../../game/constants';
-import { createGameState, GameState, statusEffectNames } from '../../game/gameState';
+import { createGameState, GameState, statusEffectTypes } from '../../game/gameState';
 import { getRandomCards } from '../../testing/utils';
 import { useGameState } from '../hooks/useGameState';
 import { BattleScreen } from './BattleScreen';
@@ -59,7 +59,7 @@ export const EnemyIsDead: Story = {
 export const StatusEffectsAndRelics: Story = {
   args: (() => {
     const game = createGameState();
-    statusEffectNames.forEach((effectName) => {
+    statusEffectTypes.forEach((effectName) => {
       game.enemy[effectName] = 3;
     });
     game.user.strength = -5;

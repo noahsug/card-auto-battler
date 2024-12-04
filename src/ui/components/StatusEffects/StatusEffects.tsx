@@ -11,7 +11,7 @@ import lightningBranchesImage from './images/lightning-branches.png';
 import knockedOutStarsImage from './images/knocked-out-stars.png';
 import arrowScopeImage from './images/arrow-scope.png';
 
-import { PlayerState, StatusEffectName } from '../../../game/gameState';
+import { PlayerState, StatusEffectType } from '../../../game/gameState';
 import { IsSubtype } from '../../../utils/types';
 import { maskImage } from '../../style';
 import { Number } from '../shared/Number';
@@ -19,16 +19,16 @@ import { Row } from '../shared/Row';
 import { getRelic } from '../../../game/utils/selectors';
 
 type StatusEffectsWithoutIcons = IsSubtype<
-  StatusEffectName,
+  StatusEffectType,
   | 'lifestealWhenBurning'
   | 'temporaryFireCrit'
   | 'delayedShock'
   | 'temporaryDodge'
   | 'temporaryStrength'
 >;
-type VisibleStatusEffectName = Exclude<StatusEffectName, StatusEffectsWithoutIcons>;
+type VisibleStatusEffectType = Exclude<StatusEffectType, StatusEffectsWithoutIcons>;
 
-const effectToImage: Record<VisibleStatusEffectName, string> = {
+const effectToImage: Record<VisibleStatusEffectType, string> = {
   bleed: bleedImage,
   dodge: dodgeImage,
   extraCardPlays: extraCardPlaysImage,
@@ -41,7 +41,7 @@ const effectToImage: Record<VisibleStatusEffectName, string> = {
   crit: arrowScopeImage,
 };
 
-const visibleStatusEffects = Object.keys(effectToImage) as VisibleStatusEffectName[];
+const visibleStatusEffects = Object.keys(effectToImage) as VisibleStatusEffectType[];
 
 const size = 1.7;
 
@@ -68,10 +68,10 @@ interface Props {
   player: PlayerState;
 }
 
-function getDisplayedStatusEffectValue(player: PlayerState, effectName: VisibleStatusEffectName) {
-  const value = player[effectName];
+function getDisplayedStatusEffectValue(player: PlayerState, effectType: VisibleStatusEffectType) {
+  const value = player[effectType];
 
-  if (effectName === 'lifesteal') {
+  if (effectType === 'lifesteal') {
     return `${(value * 100).toFixed(0)}%`;
   }
 

@@ -18,7 +18,7 @@ import {
   PlayerState,
   RelicState,
   ShopType,
-  statusEffectNames,
+  statusEffectTypes,
 } from '../gameState';
 import {
   addCardsToPlayer,
@@ -327,8 +327,8 @@ function resetPlayerAfterBattle(player: PlayerState) {
   player.previousCard = undefined;
   player.cards = [...player.trashedCards, ...player.cards];
   player.trashedCards = [];
-  statusEffectNames.forEach((statusEffectName) => {
-    player[statusEffectName] = 0;
+  statusEffectTypes.forEach((statusEffectType) => {
+    player[statusEffectType] = 0;
   });
 }
 

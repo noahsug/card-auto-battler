@@ -76,8 +76,8 @@ function getLeastAvailableSlots(enemyTypesBySlots: Set<EnemyType>[], takenSlots:
   }, [] as number[]);
 }
 
-function removeEnemyFromSlots(enemyTypesBySlot: Set<EnemyType>[], enemy: EnemyType) {
-  for (const enemies of enemyTypesBySlot) {
-    enemies.delete(enemy);
+function removeEnemyFromSlots(enemyTypesBySlot: Set<EnemyType>[], enemyType: EnemyType) {
+  for (const enemyTypes of enemyTypesBySlot) {
+    enemyTypes.delete(enemyType);
   }
 }

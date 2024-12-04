@@ -10,7 +10,7 @@ export type ShopType = CardShopType | 'addRelics';
 
 export type Target = 'self' | 'opponent';
 
-export const statusEffectNames = [
+export const statusEffectTypes = [
   'bleed',
   'extraCardPlays',
   'dodge',
@@ -27,10 +27,10 @@ export const statusEffectNames = [
   'crit',
   'temporaryFireCrit',
 ] as const;
-export type StatusEffectName = (typeof statusEffectNames)[number];
-export type StatusEffects = Record<StatusEffectName, number>;
+export type StatusEffectType = (typeof statusEffectTypes)[number];
+export type StatusEffects = Record<StatusEffectType, number>;
 export const EMPTY_STATUS_EFFECTS = Object.fromEntries(
-  statusEffectNames.map((effectName) => [effectName, 0]),
+  statusEffectTypes.map((effectType) => [effectType, 0]),
 ) as StatusEffects;
 
 type CalculatedPlayerValueName =
@@ -48,7 +48,7 @@ export type PlayerValueName =
   | CalculatedPlayerValueName;
 
 // TODO: Add 'selfDamage' as a type, which isn't affected by things like strength
-export type CardEffectName = StatusEffectName | 'damage' | 'heal' | 'trash';
+export type CardEffectName = StatusEffectType | 'damage' | 'heal' | 'trash';
 
 export interface BasicValueDescriptor {
   type: 'basicValue';
@@ -87,7 +87,7 @@ export interface BasicCardEffect {
 
 export interface SetValueCardEffect extends Omit<BasicCardEffect, 'name'> {
   name: 'set';
-  valueName: StatusEffectName | 'health';
+  valueName: StatusEffectType | 'health';
 }
 
 export type CardEffect = BasicCardEffect | SetValueCardEffect;
