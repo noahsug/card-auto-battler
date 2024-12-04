@@ -39,6 +39,8 @@ import strengthPotionImage from './images/strength-potion.jpeg';
 import windUpImage from './images/enemy/wind-up.png';
 import greenMonsterAttackImage from './images/enemy/green-monster-attack.png';
 import hideImage from './images/enemy/hide.png';
+import thickSkinImage from './images/enemy/thick-skin.png';
+import swipeImage from './images/enemy/swipe.png';
 
 import { createCard, ifCompare, ifHas, value as v, playAnotherCard } from '../utils/createCard';
 
@@ -63,7 +65,7 @@ export const basicCardsByType = {
       {
         target: 'self',
         type: 'heal',
-        value: v(4),
+        value: v(5),
       },
     ],
     {
@@ -91,7 +93,21 @@ export const basicCardsByType = {
  * Green cards
  */
 export const greenCardsByType = {
-  damagePerTurn: createCard(
+  thickSkin: createCard(
+    [
+      {
+        target: 'self',
+        type: 'thickSkin',
+        value: v(4),
+      },
+    ],
+    {
+      name: 'Thick Skin',
+      description: 'Gain $V thick skin.',
+      image: thickSkinImage,
+    },
+  ),
+  growingClub: createCard(
     [
       {
         value: v('self', 'turn', 1),
@@ -710,6 +726,21 @@ export const enemyCardsByType = {
       name: 'Hide',
       description: 'Gain $V dodge.',
       image: hideImage,
+    },
+  ),
+
+  // armored lizard
+  swipe: createCard(
+    [
+      {
+        value: v(3),
+        multiHit: v(2),
+      },
+    ],
+    {
+      name: 'Swipe',
+      description: 'Deal $V damage $N times.',
+      image: swipeImage,
     },
   ),
 };

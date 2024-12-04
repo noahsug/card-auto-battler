@@ -18,7 +18,7 @@ import {
 import { applyCardEffects } from './applyCardEffects';
 
 const {
-  permaThickSkin,
+  extraThickSkin: permaThickSkin,
   regenForHighDamage,
   sharedPain,
   strengthAffectsHealing,
@@ -611,31 +611,23 @@ describe('status effects', () => {
       expect(diff).toEqual({ opponent: { health: -1, shock: 1 } });
     });
   });
+
+  describe('thick skin', () => {
+    it('reduces damage to 1 when X or less', () => {
+      effect.value = v(4);
+      const { diff } = getPlayCardResult({ opponent: { thickSkin: 4 } });
+      expect(diff).toEqual({ opponent: { health: -1, thickSkin: -1 } });
+    });
+
+    it('does not reduce damage when greater than X', () => {
+      effect.value = v(5);
+      const { diff } = getPlayCardResult({ opponent: { thickSkin: 4 } });
+      expect(diff).toEqual({ opponent: { health: -5, thickSkin: -1 } });
+    });
+  });
 });
 
 describe('relics', () => {
-  describe('permaThickSkin', () => {
-    const relics = [permaThickSkin];
-
-    it('reduces damage to 1 when 4 or less', () => {
-      effect.value = v(4);
-      const { diff } = getPlayCardResult({ opponent: { relics } });
-      expect(diff).toEqual({ opponent: { health: -1 } });
-    });
-
-    it('does nothing when damage is 5 or more', () => {
-      effect.value = v(5);
-      const { diff } = getPlayCardResult({ opponent: { relics } });
-      expect(diff).toEqual({ opponent: { health: -5 } });
-    });
-
-    it('stacks with normal thick skin', () => {
-      effect.value = v(5);
-      const { diff } = getPlayCardResult({ opponent: { relics, thickSkin: 1 } });
-      expect(diff).toEqual({ opponent: { health: -1, thickSkin: -1 } });
-    });
-  });
-
   describe('regenForHighDamage', () => {
     const relics = [regenForHighDamage];
 

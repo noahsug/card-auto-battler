@@ -83,19 +83,24 @@ export const enemiesByType = {
     getHealth: getScalingHealthFn(1),
     scale: 0.5,
   },
-  // takes 1 damage from <= x damage, weak to large damage and multi-hit
+  // takes 1 damage from <= x damage, weak to multi-hit
   armoredLizard: {
     name: 'Armored Lizard',
     image: armoredLizardImage,
     battleRange: [1, twoThirds],
     getCards: () => {
-      return [cardsByType.attack];
-      // return [attack, multi-attack, thickSkin
+      return [
+        cardsByType.attack,
+        cardsByType.attack,
+        cardsByType.thickSkin,
+        cardsByType.swipe,
+        cardsByType.swipe,
+      ];
     },
     initialize: (player, n) => {
       player.thickSkin = n;
     },
-    getHealth: getScalingHealthFn(0.75),
+    getHealth: getScalingHealthFn(0.67),
   },
   // deals multi-hits when not hit, weak to offense
   coolBird: {

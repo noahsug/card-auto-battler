@@ -38,10 +38,10 @@ Object.values(basicRelics).forEach((relic) => {
 
 // green
 export const greenRelics = {
-  permaThickSkin: createRelic({
-    name: 'Permanently Thick Skin',
-    description: 'Gain $V thick skin that never decreases.',
-    value: 4,
+  extraThickSkin: createRelic({
+    name: 'Extra Thick Skin',
+    description: 'Start each battle with $V thick skin.',
+    value: 6,
     image: thickSkinImage,
   }),
   regenForHighDamage: createRelic({

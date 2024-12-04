@@ -294,6 +294,10 @@ wants
 - if a synergy uses early game cards it should be hard to assemble (e.g. lot of parts)
 - a synergy can be easy to assemble if it relies on mostly late game cards
 
+### Status Effect Text
+
+Thick Skin - Whenever you would receive X or less attack damage, reduce it to 1.
+
 ### Cards (10/23/24)
 
 Colors

@@ -98,9 +98,6 @@ export function StatusEffects({ player }: Props) {
     calculatedStatusEffects.strength += strengthWithDodge.value;
   }
 
-  const permaThickSkin = getRelic(player, 'permaThickSkin');
-  if (permaThickSkin) calculatedStatusEffects.thickSkin += permaThickSkin.value;
-
   calculatedStatusEffects.dodge += player.temporaryDodge;
   calculatedStatusEffects.strength += player.temporaryStrength;
 

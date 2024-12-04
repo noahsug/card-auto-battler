@@ -239,13 +239,10 @@ function dealCardDamage({ value, multiplier = 1 }: EffectOptions, context: PlayC
     }
 
     // thickSkin
-    let thickSkin = opponent.thickSkin;
-    const permaThickSkin = getRelic(opponent, 'permaThickSkin');
-    if (permaThickSkin) thickSkin += permaThickSkin.value;
-    if (value <= thickSkin) {
-      value = 1;
-    }
     if (opponent.thickSkin > 0) {
+      if (value <= opponent.thickSkin) {
+        value = 1;
+      }
       opponent.thickSkin -= 1;
     }
   }

@@ -149,6 +149,12 @@ function triggerStartOfBattleEffects(
   if (strengthAffectsHealing) {
     self.strength += strengthAffectsHealing.value;
   }
+
+  // extraThickSkin
+  const extraThickSkin = getRelic(self, 'extraThickSkin');
+  if (extraThickSkin) {
+    self.thickSkin += extraThickSkin.value;
+  }
 }
 
 export function startBattle(game: GameState) {
