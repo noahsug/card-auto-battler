@@ -483,6 +483,35 @@ describe('status effects', () => {
     });
   });
 
+  describe('crit', () => {
+    it('doubles damage', () => {
+      const { diff } = getPlayCardResult({ self: { crit: 1 } });
+
+      expect(diff).toEqual({ self: { crit: -1 }, opponent: { health: -2 } });
+    });
+
+    it('does not apply to self damage', () => {
+      effect.target = 'self';
+      const { diff } = getPlayCardResult({ self: { crit: 1 } });
+
+      expect(diff).toEqual({ self: { health: -1 } });
+    });
+
+    it('is consumed when an attack is dodged', () => {
+      const { diff } = getPlayCardResult({ self: { crit: 1 }, opponent: { dodge: 1 } });
+
+      expect(diff).toEqual({ self: { crit: -1 }, opponent: { dodge: -1 } });
+    });
+
+    it('is consumed by each hit', () => {
+      card.effects[0].multiHit = v(3);
+
+      const { diff } = getPlayCardResult({ self: { crit: 2 } });
+
+      expect(diff).toEqual({ self: { crit: -2 }, opponent: { health: -5 } });
+    });
+  });
+
   describe('temporaryFireCrit', () => {
     beforeEach(() => {
       card.name = 'Fireball';

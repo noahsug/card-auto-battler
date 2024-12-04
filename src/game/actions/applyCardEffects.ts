@@ -14,6 +14,7 @@ import {
 } from '../gameState';
 import {
   getActivePlayer,
+  getNonActivePlayer,
   getPlayers,
   getRandom,
   getRelic,
@@ -71,10 +72,7 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
 
   switch (effect.type) {
     case 'damage': {
-      const dodged = dodgeDamage(effect, context);
-      if (!dodged) {
-        dealCardDamage(effectOptions, context);
-      }
+      dealCardDamage(effectOptions, context);
       break;
     }
 
@@ -190,29 +188,15 @@ function compareValues(value1: number, comparison: If['comparison'], value2: num
   throw new Error(`invalid comparison: ${comparison}`);
 }
 
-function dodgeDamage(effect: CardEffect, { game, events }: PlayCardContext) {
-  // dodge doesn't apply to self damage
-  if (effect.target === 'self') return false;
-
-  const player = getTargetedPlayer(game, effect.target);
-
-  // temporaryDodge
-  if (player.temporaryDodge > 0) {
-    player.temporaryDodge -= 1;
-  } else if (player.dodge > 0) {
-    player.dodge -= 1;
-  } else {
-    return false; // did not dodge
-  }
-
-  events.push(createBattleEvent('miss', effect.target));
-  return true;
-}
-
 function dealCardDamage(
   { value, multiplier = 1, target }: EffectOptions,
   context: PlayCardContext,
 ) {
+  // crit is consumed even when the attack is dodged
+  const isCrit = target === 'opponent' ? consumeCrit(context) : false;
+
+  if (target === 'opponent' && dodgeDamage(context)) return;
+
   const [self, opponent] = getPlayers(context.game);
   const targetPlayer = getTargetedPlayer(context.game, target);
   const { card } = context;
@@ -222,7 +206,6 @@ function dealCardDamage(
     value += getStrength(context);
   }
 
-  const isCrit = consumeCrit(context);
   if (isCrit) {
     multiplier *= 2;
 
@@ -282,6 +265,22 @@ function getStrength(context: PlayCardContext) {
   return strength;
 }
 
+function dodgeDamage({ game, events }: PlayCardContext) {
+  const opponent = getNonActivePlayer(game);
+
+  // temporaryDodge
+  if (opponent.temporaryDodge > 0) {
+    opponent.temporaryDodge -= 1;
+  } else if (opponent.dodge > 0) {
+    opponent.dodge -= 1;
+  } else {
+    return false; // did not dodge
+  }
+
+  events.push(createBattleEvent('miss', 'opponent'));
+  return true;
+}
+
 function consumeCrit(context: PlayCardContext) {
   const self = getActivePlayer(context.game);
   const { card, game } = context;
@@ -337,9 +336,9 @@ export function reduceHealth(
   }
 
   targetPlayer.health -= value;
-  const event = createBattleEvent('damage', value, target);
-  events.push(event);
-  return event as ValueBattleEvent;
+  const damageEvent = createBattleEvent('damage', value, target);
+  events.push(damageEvent);
+  return damageEvent as ValueBattleEvent;
 }
 
 export function applyHeal(

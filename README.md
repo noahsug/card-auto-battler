@@ -2,9 +2,15 @@
 
 Game TODO:
 
-1. "Select 2 Cards" -> "Manage Deck Screen", with "Fight" button in corner
-2. Charms act like equipment and can be moved around any time via "view deck" screen, entering a
+1. Lifesteal has no stacks, you either have it or you don't, it's always 100%, lifesteal relic does NOT show up as a
+   status effect
+2. Charms/Chains act like equipment and can be moved around any time via "view deck" screen, entering a
    shop adds a charm and then brings you into the view deck screen
+   1. "Select 2 Cards" -> "Manage Deck Screen", with "Fight" button in bottom right
+   2. "Chain Cards" is the "Manage Deck Screen" but with "chain" mode active
+   3. "Cards" overlay is "Manage Deck Screen" with no mode active
+   4. Can click a card and select "Remove Chain/Charm"
+   5. Removed Charms/Chain shown on left side, click to attach them to a card
 3. choice of which charm shop to enter and more charm shops:
    1. ✅ chain = play after other chained card
    2. ✅ remove = remove card

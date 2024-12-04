@@ -10,6 +10,7 @@ import heartPlusImage from './images/heart-plus.png';
 import lightningBranchesImage from './images/lightning-branches.png';
 import knockedOutStarsImage from './images/knocked-out-stars.png';
 import arrowScopeImage from './images/arrow-scope.png';
+import layeredArmorImage from './images/layered-armor.png';
 
 import { PlayerState, StatusEffectType } from '../../../game/gameState';
 import { IsSubtype } from '../../../utils/types';
@@ -39,6 +40,7 @@ const effectToImage: Record<VisibleStatusEffectType, string> = {
   shock: lightningBranchesImage,
   stun: knockedOutStarsImage,
   crit: arrowScopeImage,
+  thickSkin: layeredArmorImage,
 };
 
 const visibleStatusEffects = Object.keys(effectToImage) as VisibleStatusEffectType[];

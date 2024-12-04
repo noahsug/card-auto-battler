@@ -90,11 +90,10 @@ export const enemiesByType = {
     battleRange: [1, twoThirds],
     getCards: () => {
       return [cardsByType.attack];
-      // return [attack, multi-attack, thickSkin, takes double damage when weak skin = 0
+      // return [attack, multi-attack, thickSkin
     },
     initialize: (player, n) => {
-      // TODO: reduces damage <= X to 1, decreases by 1 each time it's hit
-      // player.thickSkin = n;
+      player.thickSkin = n;
     },
     getHealth: getScalingHealthFn(0.75),
   },

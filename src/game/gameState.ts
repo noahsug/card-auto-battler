@@ -26,6 +26,7 @@ export const statusEffectTypes = [
   'stun',
   'crit',
   'temporaryFireCrit',
+  'thickSkin',
 ] as const;
 export type StatusEffectType = (typeof statusEffectTypes)[number];
 export type StatusEffects = Record<StatusEffectType, number>;
