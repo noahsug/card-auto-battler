@@ -48,7 +48,6 @@ export type PlayerValueType =
   | keyof Omit<PlayerState, 'name' | 'image' | 'previousCard'>
   | CalculatedPlayerValueType;
 
-// TODO: Add 'selfDamage' as a type, which isn't affected by things like strength
 export type CardEffectType = StatusEffectType | 'damage' | 'heal' | 'trash';
 
 export interface BasicValueDescriptor {

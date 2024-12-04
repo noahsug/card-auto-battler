@@ -1,4 +1,3 @@
-import lifestealImage from '../../ui/components/StatusEffects/images/heart-plus.png';
 import openWoundImage from './images/bleeding-wound.png';
 import cowledImage from './images/cowled.png';
 import fireSilhouetteImage from './images/fire-silhouette.png';
@@ -10,6 +9,9 @@ import pyromaniacImage from './images/pyromaniac.png';
 import targetingImage from './images/targeting.png';
 import thunderBladeImage from './images/thunder-blade.png';
 import transfuseImage from './images/transfuse.png';
+
+import lifestealImage from '../../ui/components/StatusEffects/images/heart-plus.png';
+import thickSkinImage from '../../ui/components/StatusEffects/images/layered-armor.png';
 
 import { cardsByType } from '../cards/cards';
 import { createRelic } from '../utils/createRelic';
@@ -36,12 +38,11 @@ Object.values(basicRelics).forEach((relic) => {
 
 // green
 export const greenRelics = {
-  reduceLowDamage: createRelic({
-    name: 'Thick Bark',
-    description: 'Whenever you would receive $V or less damage, reduce it to $V2.',
+  permaThickSkin: createRelic({
+    name: 'Permanently Thick Skin',
+    description: 'Gain $V thick skin that never decreases.',
     value: 4,
-    value2: 1,
-    image: planksImage,
+    image: thickSkinImage,
   }),
   regenForHighDamage: createRelic({
     name: 'Sprouter',

@@ -72,7 +72,11 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
 
   switch (effect.type) {
     case 'damage': {
-      dealCardDamage(effectOptions, context);
+      if (effect.target === 'opponent') {
+        dealCardDamage(effectOptions, context);
+      } else {
+        dealSelfDamage(effectOptions, context);
+      }
       break;
     }
 
@@ -188,25 +192,26 @@ function compareValues(value1: number, comparison: If['comparison'], value2: num
   throw new Error(`invalid comparison: ${comparison}`);
 }
 
-function dealCardDamage(
-  { value, multiplier = 1, target }: EffectOptions,
-  context: PlayCardContext,
-) {
-  // crit is consumed even when the attack is dodged
-  const isCrit = target === 'opponent' ? consumeCrit(context) : false;
+function dealSelfDamage({ value, multiplier = 1 }: EffectOptions, context: PlayCardContext) {
+  value = Math.floor(value * multiplier);
+  reduceHealth({ value, target: 'self' }, context);
+}
 
-  if (target === 'opponent' && dodgeDamage(context)) return;
+function dealCardDamage({ value, multiplier = 1 }: EffectOptions, context: PlayCardContext) {
+  // crit is consumed even when the attack is dodged
+  const isCrit = consumeCrit(context);
+
+  // dodge
+  if (dodgeDamage(context)) return;
 
   const [self, opponent] = getPlayers(context.game);
-  const targetPlayer = getTargetedPlayer(context.game, target);
   const { card } = context;
 
   // strength
-  if (target === 'opponent') {
-    value += getStrength(context);
-  }
+  value += getStrength(context);
 
   if (isCrit) {
+    // crit
     multiplier *= 2;
 
     // shockOnCrit
@@ -229,25 +234,38 @@ function dealCardDamage(
     }
 
     // shock
-    if (targetPlayer.shock > 0) {
-      targetPlayer.shock += 1;
+    if (opponent.shock > 0) {
+      opponent.shock += 1;
+    }
+
+    // thickSkin
+    let thickSkin = opponent.thickSkin;
+    const permaThickSkin = getRelic(opponent, 'permaThickSkin');
+    if (permaThickSkin) thickSkin += permaThickSkin.value;
+    if (value <= thickSkin) {
+      value = 1;
+    }
+    if (opponent.thickSkin > 0) {
+      opponent.thickSkin -= 1;
     }
   }
 
-  const damageEvent = reduceHealth({ value, target }, context);
+  const damageEvent = reduceHealth({ value, target: 'opponent' }, context);
   damageEvent.source = 'card';
   damageEvent.isCrit = isCrit;
 
-  // regenForHighDamage
-  const regenForHighDamage = getRelic(self, 'regenForHighDamage');
-  if (regenForHighDamage && value >= regenForHighDamage.value) {
-    self.regen += regenForHighDamage.value2;
-  }
+  if (value > 0) {
+    // regenForHighDamage
+    const regenForHighDamage = getRelic(self, 'regenForHighDamage');
+    if (regenForHighDamage && value >= regenForHighDamage.value) {
+      self.regen += regenForHighDamage.value2;
+    }
 
-  // bleed
-  if (value > 0 && target === 'opponent' && opponent.bleed > 0) {
-    reduceHealth({ value: BLEED_DAMAGE, target }, context);
-    opponent.bleed -= 1;
+    // bleed
+    if (opponent.bleed > 0) {
+      reduceHealth({ value: BLEED_DAMAGE, target: 'opponent' }, context);
+      opponent.bleed -= 1;
+    }
   }
 }
 
@@ -314,12 +332,6 @@ export function reduceHealth(
   const { game, events } = context;
   const targetPlayer = getTargetedPlayer(game, target);
   value = Math.floor(value * multiplier);
-
-  // reduceLowDamage
-  const reduceLowDamage = getRelic(targetPlayer, 'reduceLowDamage');
-  if (reduceLowDamage && value <= reduceLowDamage.value && value > reduceLowDamage.value2) {
-    value = reduceLowDamage.value2;
-  }
 
   if (target === 'self' && value > 0) {
     // strengthOnSelfDamage

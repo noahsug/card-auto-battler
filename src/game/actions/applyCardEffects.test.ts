@@ -18,7 +18,7 @@ import {
 import { applyCardEffects } from './applyCardEffects';
 
 const {
-  reduceLowDamage,
+  permaThickSkin: reduceLowDamage,
   regenForHighDamage,
   sharedPain,
   strengthAffectsHealing,
