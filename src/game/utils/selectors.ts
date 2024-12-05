@@ -1,16 +1,16 @@
 import { EnemyType } from '../../content/enemies/enemies';
-import { getEnemyInfo } from './enemies';
 import { RelicType } from '../../content/relics/relics';
 import { Random } from '../../utils/Random';
 import {
   MAX_LOSSES,
   MAX_WINS,
-  NUM_FIRST_ADD_CARD_OPTIONS,
   NUM_ADD_CARD_OPTIONS,
-  NUM_FIRST_ADD_CARD_PICKS,
   NUM_ADD_CARD_PICKS,
+  NUM_FIRST_ADD_CARD_OPTIONS,
+  NUM_FIRST_ADD_CARD_PICKS,
 } from '../constants';
-import { CardState, GameState, PlayerState, Target, createPlayer } from '../gameState';
+import { GameState, PlayerState, Target, createPlayer } from '../gameState';
+import { getEnemyInfo } from './enemies';
 
 export function getIsStartOfBattle(game: GameState) {
   return game.turn === 0 && game.user.cardsPlayedThisTurn === 0;
