@@ -98,7 +98,6 @@ export type Tribe = (typeof tribes)[number];
 export interface CardState {
   effects: CardEffect[];
   repeat?: MaybeValue;
-  lifesteal?: MaybeValue;
   trash: boolean;
   uses?: { current: number; max: number };
   // unique ID used to sort cards from first added to last added

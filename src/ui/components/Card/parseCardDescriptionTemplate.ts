@@ -56,7 +56,6 @@ function parseMaybeValue(maybeValue: MaybeValue | undefined, prefix: string): Te
  *       value2: { type: 'basicValue', value: $RI },
  *     },
  *   },
- *   lifesteal: { value: $L },
  * }
  * ```
  */
@@ -77,7 +76,6 @@ export function parseCardDescriptionTemplate(card: CardState) {
   const templateMap = {
     ...effectsTemplateMap,
     ...parseMaybeValue(card.repeat, 'R'),
-    ...parseMaybeValue(card.lifesteal, 'L'),
   };
 
   const getValue = (templateStr: string) => templateMap[templateStr];

@@ -41,22 +41,6 @@ it('handles percentages', () => {
     ),
   );
   expect(description).toBe('Deal 30% of your current health as damage.');
-
-  const description2 = parseCardDescriptionTemplate(
-    createCard(
-      [
-        {
-          type: 'lifestealWhenBurning',
-          value: v(0.5),
-          target: 'self',
-        },
-      ],
-      {
-        description: 'Gain $V% lifesteal when burning.',
-      },
-    ),
-  );
-  expect(description2).toBe('Gain 50% lifesteal when burning.');
 });
 
 it('handles addition', () => {

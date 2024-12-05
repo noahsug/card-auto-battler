@@ -17,13 +17,8 @@ import {
 } from '../gameState';
 import { applyCardEffects } from './applyCardEffects';
 
-const {
-  extraThickSkin: permaThickSkin,
-  regenForHighDamage,
-  sharedPain,
-  strengthAffectsHealing,
-  strengthOnSelfDamage,
-} = relicsByType;
+const { regenForHighDamage, sharedPain, strengthAffectsHealing, strengthOnSelfDamage } =
+  relicsByType;
 
 let card: CardState;
 let effect: CardEffect;
@@ -552,31 +547,27 @@ describe('status effects', () => {
     it('heals self for damage dealt', () => {
       const { diff } = getPlayCardResult({ self: { lifesteal: 1 } });
 
-      expect(diff).toEqual({ self: { health: 1 }, opponent: { health: -1 } });
+      expect(diff).toEqual({ self: { health: 1, lifesteal: -1 }, opponent: { health: -1 } });
     });
 
     it('does not heal from bleed damage', () => {
       const { diff } = getPlayCardResult({ self: { lifesteal: 1 }, opponent: { bleed: 1 } });
 
       expect(diff).toEqual({
-        self: { health: 1 },
+        self: { health: 1, lifesteal: -1 },
         opponent: { health: -1 - BLEED_DAMAGE, bleed: -1 },
       });
     });
 
-    it('lifestealWhenBurning adds to lifesteal', () => {
+    it('lifestealWhenBurning is used before lifesteal', () => {
       const { diff } = getPlayCardResult({
         self: { lifesteal: 1, lifestealWhenBurning: 1, burn: 1 },
       });
 
-      expect(diff).toEqual({ self: { health: 2 }, opponent: { health: -1 } });
-    });
-
-    it('card lifesteal adds to lifesteal', () => {
-      card.lifesteal = { value: v(1) };
-      const { diff } = getPlayCardResult({ self: { lifesteal: 1 } });
-
-      expect(diff).toEqual({ self: { health: 2 }, opponent: { health: -1 } });
+      expect(diff).toEqual({
+        self: { health: 1, lifestealWhenBurning: -1 },
+        opponent: { health: -1 },
+      });
     });
 
     it('does not heal when lifesteal is 0', () => {
@@ -590,10 +581,10 @@ describe('status effects', () => {
     it('is added to self via card effect', () => {
       effect.type = 'lifesteal';
       effect.target = 'self';
-      effect.value = v(0.5);
+      effect.value = v(2);
       const { diff } = getPlayCardResult();
 
-      expect(diff).toEqual({ self: { lifesteal: 0.5 } });
+      expect(diff).toEqual({ self: { lifesteal: 2 } });
     });
   });
 

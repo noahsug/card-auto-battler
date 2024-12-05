@@ -53,6 +53,7 @@ import {
   value as v,
   playAnotherCard,
   ifCombo,
+  lifesteal,
 } from '../utils/createCard';
 
 /**
@@ -382,16 +383,16 @@ export const redCardsByType = {
       image: bloodBoilImage,
     },
   ),
-  lifesteal: createCard(
+  reap: createCard(
     [
       {
         value: v(3),
       },
+      lifesteal(),
     ],
     {
-      lifesteal: { value: v(1) },
       name: 'Reap',
-      description: 'Deal $V damage. Lifesteal.',
+      description: 'Deal $V damage. Heal for the damage dealt.',
       image: lifestealImage,
     },
   ),
@@ -400,7 +401,7 @@ export const redCardsByType = {
       {
         target: 'self',
         type: 'lifestealWhenBurning',
-        value: v(1),
+        value: v(Infinity),
       },
       {
         target: 'self',

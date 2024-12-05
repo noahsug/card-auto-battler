@@ -73,10 +73,6 @@ interface Props {
 function getDisplayedStatusEffectValue(player: PlayerState, effectType: VisibleStatusEffectType) {
   const value = player[effectType];
 
-  if (effectType === 'lifesteal') {
-    return `${(value * 100).toFixed(0)}%`;
-  }
-
   if (value === Infinity) {
     return '';
   }

@@ -91,13 +91,13 @@ function applyEffect(effect: CardEffect, context: PlayCardContext, multiHitsLeft
       break;
 
     case 'set': {
-      player[effect.valueType] = maybeFloorValue(value, effect.valueType);
+      player[effect.valueType] = Math.floor(value);
       break;
     }
 
     default: {
       // status effects
-      player[effect.type] += maybeFloorValue(value, effect.type);
+      player[effect.type] += Math.floor(value);
     }
   }
 
@@ -226,9 +226,8 @@ function dealCardDamage({ value, multiplier = 1 }: EffectOptions, context: PlayC
   if (value > 0) {
     // lifesteal
     const relicLifesteal = getRelic(self, 'lifesteal')?.value || 0;
-    const cardLifesteal = maybeGetValue(card.lifesteal, context) || 0;
-    const burnLifesteal = self.burn > 0 ? self.lifestealWhenBurning : 0;
-    const lifesteal = self.lifesteal + cardLifesteal + burnLifesteal + relicLifesteal;
+    const hasLifesteal = consumeLifesteal(context);
+    const lifesteal = (hasLifesteal ? 1 : 0) + relicLifesteal;
     if (lifesteal > 0) {
       applyHeal({ value: lifesteal * value, target: 'self' }, context);
     }
@@ -296,9 +295,25 @@ function dodgeDamage({ game, events }: PlayCardContext) {
   return true;
 }
 
+function consumeLifesteal(context: PlayCardContext) {
+  const { game } = context;
+  const self = getActivePlayer(game);
+
+  if (self.burn > 0 && self.lifestealWhenBurning) {
+    self.lifestealWhenBurning -= 1;
+    return true;
+  }
+  if (self.lifesteal > 0) {
+    self.lifesteal -= 1;
+
+    return true;
+  }
+  return false;
+}
+
 function consumeCrit(context: PlayCardContext) {
-  const self = getActivePlayer(context.game);
   const { card, game } = context;
+  const self = getActivePlayer(game);
   const { random } = getRandom(game);
 
   // critChance
@@ -377,15 +392,6 @@ function trashCards({ value, multiplier = 1, target }: EffectOptions, context: P
   // const player = context[target];
   // const isActivePlayer = target === 'self';
   // trashNextCards({ player, isActivePlayer, numCardsToTrash: value });
-}
-
-function maybeFloorValue(value: number, valueType: string) {
-  if (valueType === 'lifesteal' || valueType === 'lifestealWhenBurning') {
-    valueType satisfies StatusEffectType;
-    // these values use % so don't round them
-    return value;
-  }
-  return Math.floor(value);
 }
 
 export function getDamageDealt(

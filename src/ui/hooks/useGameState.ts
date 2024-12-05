@@ -43,6 +43,8 @@ export function useGameState(initialGameState: GameState = createGameState()) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState]);
 
+  // select is important for accessing the most up-to-date game state inside of callbacks or after
+  // async state changes
   const select: SelectGameState = useCallback(
     (fn) => {
       const { promise, resolve } = getResolvablePromise();

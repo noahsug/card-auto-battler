@@ -22,6 +22,14 @@ export function ifCombo(): If {
   return ifCompare('self', 'cardsPlayedThisTurn', '>=', 2);
 }
 
+export function lifesteal(multiplier?: number): CardEffect {
+  return createEffect({
+    target: 'self',
+    type: 'heal',
+    value: value('self', 'cardDamageDealtToTarget', multiplier),
+  });
+}
+
 // returns a CardEffect with defaults
 export function createEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {
   partialEffect.target = partialEffect.target || 'opponent';
