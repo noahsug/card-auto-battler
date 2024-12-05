@@ -275,7 +275,7 @@ export function playCard(game: GameState): BattleEvent[] {
   // shock
   if (nonActivePlayer.shock >= MAX_SHOCK) {
     nonActivePlayer.shock -= MAX_SHOCK;
-    nonActivePlayer.stun = 1;
+    nonActivePlayer.stun = Infinity;
   }
 
   activePlayer.previousCard = card;

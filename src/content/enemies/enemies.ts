@@ -113,7 +113,7 @@ export const enemiesByType = {
     },
     getHealth: getScalingHealthFn(0.67),
   },
-  // burst damage (bleed + multi-hit), stunned for a turn receiving >= 8 damage
+  // burst damage (bleed + multi-hit), stunned for a turn receiving >= 8 damage?
   coolBird: {
     name: 'Cool Bird',
     image: coolBirdImage,
