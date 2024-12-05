@@ -68,8 +68,7 @@
     "build-storybook": "storybook build",
     "predeploy": "yarn build",
     "deploy": "gh-pages -d dist",
-    "analyze": "tsx scripts/analysis",
-    "deckOfCards": "tsx scripts/deckOfCards/play --"
+    "analyze": "tsx scripts/analysis"
   },
   "type": "module",
   "browserslist": {
