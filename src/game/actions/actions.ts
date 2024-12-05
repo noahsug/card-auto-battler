@@ -244,6 +244,14 @@ export function startTurn(game: GameState): BattleEvent[] {
 export function playCard(game: GameState): BattleEvent[] {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
   const card = activePlayer.cards[activePlayer.currentCardIndex];
+  console.log(
+    'A playCard, turn:',
+    game.turn,
+    'cardsPlayedThisTurn:',
+    activePlayer.cardsPlayedThisTurn,
+    'extraCardPlays:',
+    activePlayer.extraCardPlays,
+  );
 
   // stun
   if (activePlayer.stun > 0) {
@@ -251,14 +259,6 @@ export function playCard(game: GameState): BattleEvent[] {
     return [];
   }
 
-  console.log(
-    'A playCard',
-    activePlayer === game.user ? 'user' : 'enemy',
-    'cardsPlayedThisTurn:',
-    activePlayer.cardsPlayedThisTurn,
-    'extraCardPlays:',
-    activePlayer.extraCardPlays,
-  );
   if (activePlayer.cardsPlayedThisTurn > 0) {
     // TODO: this assert failed once
     assert(activePlayer.extraCardPlays > 0);
@@ -315,6 +315,15 @@ export function playCard(game: GameState): BattleEvent[] {
 
 export function endTurn(game: GameState) {
   const [activePlayer, nonActivePlayer] = getPlayers(game);
+  console.log(
+    'A end turn, turn:',
+    game.turn,
+    'cardsPlayedThisTurn:',
+    activePlayer.cardsPlayedThisTurn,
+    'extraCardPlays:',
+    activePlayer.extraCardPlays,
+  );
+
   assert(activePlayer.extraCardPlays === 0);
 
   activePlayer.temporaryFireCrit = 0;
@@ -325,7 +334,6 @@ export function endTurn(game: GameState) {
   // the start of the turn
   nonActivePlayer.cardsPlayedThisTurn = 0;
 
-  console.log('A end turn, turn:', game.turn);
   game.turn++;
 }
 

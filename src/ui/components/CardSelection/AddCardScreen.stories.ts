@@ -28,7 +28,7 @@ export const FirstTurn: Story = {
   })(),
 };
 
-export const LaterTurns: Story = {
+export const SecondTurn: Story = {
   args: (() => {
     const game = createGameState();
     game.wins = 1;

@@ -78,10 +78,8 @@ function getDisplayedStatusEffectValue(player: PlayerState, effectType: VisibleS
   }
 
   if (value === Infinity) {
-    return '∞';
+    return '';
   }
-
-  if (value === 1) return '';
 
   return value;
 }

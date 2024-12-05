@@ -70,6 +70,10 @@ export function getBattleWinner(game: GameState) {
   return null;
 }
 
+export function getIsBattleOver(game: GameState) {
+  return getBattleWinner(game) != null;
+}
+
 export function getRandom({ randomnessState }: { randomnessState: GameState['randomnessState'] }) {
   return new Random(randomnessState);
 }

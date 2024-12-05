@@ -18,6 +18,10 @@ export function playAnotherCard(value?: ValueDescriptor): CardEffect {
   });
 }
 
+export function ifCombo(): If {
+  return ifCompare('self', 'cardsPlayedThisTurn', '>=', 2);
+}
+
 // returns a CardEffect with defaults
 export function createEffect(partialEffect: Partial<CardEffect> = {}): CardEffect {
   partialEffect.target = partialEffect.target || 'opponent';

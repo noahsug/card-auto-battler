@@ -15,6 +15,7 @@ type BoundActions = {
 export type StartTurnAction = BoundActions['startTurn'];
 export type PlayCardAction = BoundActions['playCard'];
 export type EndTurnAction = BoundActions['endTurn'];
+export type SelectGameState = <T = GameState>(fn?: (gameState: GameState) => T) => Promise<T>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Action = (state: GameState, ...args: any[]) => any;
@@ -42,11 +43,11 @@ export function useGameState(initialGameState: GameState = createGameState()) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState]);
 
-  const select = useCallback(
-    <T>(fn: (gameState: GameState) => T) => {
-      const { promise, resolve } = getResolvablePromise<T>();
+  const select: SelectGameState = useCallback(
+    (fn) => {
+      const { promise, resolve } = getResolvablePromise();
       setGameState((gameState) => {
-        resolve(fn(gameState));
+        resolve(fn?.(gameState) ?? gameState);
         return gameState;
       });
       return promise;

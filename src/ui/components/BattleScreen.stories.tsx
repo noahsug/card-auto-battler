@@ -12,12 +12,13 @@ import { useGameState } from '../hooks/useGameState';
 import { BattleScreen } from './BattleScreen';
 
 function BattleScreenTest({ game: initialGameState }: { game: GameState }) {
-  const { game, actions, setGameState } = useGameState(initialGameState);
+  const { game, actions, select, setGameState } = useGameState(initialGameState);
 
   return (
     <BattleScreen
       game={game}
       setGameState={setGameState}
+      select={select}
       {...actions}
       onBattleOver={fn()}
       onViewDeck={fn()}

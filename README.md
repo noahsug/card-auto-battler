@@ -15,10 +15,10 @@ Game TODO:
    1. ✅ chain = play after other chained card
    2. ✅ remove = remove card
    3. ✅ feather = card on top + exhaust
-   4. anchor = card on bottom + crit
+   4. remove "trash" keyword
    5. ✅ potion = powerful 1 time use
-   6. dup card (does not dup chain)?
-   7. remove "trash" keyword?
+   6. anchor = card on bottom + crit
+   7. dup card (does not dup chain)?
    8. add "play another card" keyword?
    9. add "crit" keyword?
    10. add "repeat" keyword?
@@ -31,6 +31,7 @@ Game TODO:
 
 Polish TODO:
 
+1. Buy photoshop or some other AI photo editor and make awesome artwork
 1. implement easy to use scaling size between desktop/mobile
 1. Button should have an icon prop and be used everywhere (no custom buttons)
 1. save progress via local storage

@@ -23,5 +23,6 @@ game.user.relics = getRandomRelics(3);
 export const Primary: Story = {
   args: {
     game,
+    cards: game.user.cards,
   },
 };

@@ -232,6 +232,7 @@ export function App() {
             game={endOfBattleGameRef.current || game}
             {...actions}
             setGameState={setGameState}
+            select={select}
             onBattleOver={handleBattleOver}
             onViewDeck={handleOnViewDeck}
             hasOverlay={overlay !== 'none'}

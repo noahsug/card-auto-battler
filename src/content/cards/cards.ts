@@ -1,7 +1,7 @@
 import channelImage from './images/channel.jpeg';
 import eviscerateImage from './images/eviscerate.jpeg';
 import firePowerImage from './images/fire-power.png';
-import fireballImage from './images/fireball.png';
+import fireballImage from './images/fireball.jpeg';
 import parryImage from './images/parry.png';
 import phoenixImage from './images/phoenix.jpeg';
 import punchImage from './images/punch.png';
@@ -35,6 +35,7 @@ import regenPotionImage from './images/regen-potion.jpeg';
 import damagePotionImage from './images/damage-potion.jpeg';
 import adrenalinePotionImage from './images/adrenaline-potion.jpeg';
 import strengthPotionImage from './images/strength-potion.jpeg';
+import flowImage from './images/flow.jpeg';
 
 import windUpImage from './images/enemy/wind-up.png';
 import greenMonsterAttackImage from './images/enemy/green-monster-attack.png';
@@ -45,7 +46,14 @@ import focusedImage from './images/enemy/focused.png';
 import scratchImage from './images/enemy/scratch.png';
 import peckImage from './images/enemy/peck.png';
 
-import { createCard, ifCompare, ifHas, value as v, playAnotherCard } from '../utils/createCard';
+import {
+  createCard,
+  ifCompare,
+  ifHas,
+  value as v,
+  playAnotherCard,
+  ifCombo,
+} from '../utils/createCard';
 
 /**
  * Basic cards
@@ -411,20 +419,20 @@ export const redCardsByType = {
     [
       {
         type: 'damage',
-        value: v(2),
-      },
-      {
-        type: 'bleed',
-        value: v(2),
+        value: v(3),
       },
       {
         type: 'burn',
         value: v(2),
       },
+      {
+        type: 'bleed',
+        value: v(1),
+      },
     ],
     {
       name: 'Searing Blade',
-      description: 'Deal $V damage. Apply $2V bleed and $3V burn.',
+      description: 'Deal $V damage. Apply $2V burn. Apply $3V bleed.',
       image: bladeBloodFireImage,
     },
   ),
@@ -455,14 +463,14 @@ export const purpleCardsByType = {
       {
         target: 'self',
         type: 'crit',
-        if: ifCompare('self', 'cardsPlayedThisTurn', '>=', 2),
+        if: ifCombo(),
       },
       {
         value: v(4),
       },
       {
         ...playAnotherCard(),
-        if: ifCompare('self', 'cardsPlayedThisTurn', '>=', 2),
+        if: ifCombo(),
       },
     ],
     {
@@ -572,6 +580,20 @@ export const purpleCardsByType = {
       name: 'Pumped Up',
       description: 'Gain $V strength this turn. Play another card.',
       image: pumpUpImage,
+    },
+  ),
+  flow: createCard(
+    [
+      playAnotherCard(),
+      {
+        ...playAnotherCard(),
+        if: ifCombo(),
+      },
+    ],
+    {
+      name: 'Flow',
+      description: 'Play another card. Combo: play another card.',
+      image: flowImage,
     },
   ),
 };
@@ -779,7 +801,7 @@ export const enemyCardsByType = {
   ),
   focus: createCard([playAnotherCard(v(2))], {
     trash: true,
-    name: 'Focus',
+    name: 'Focused',
     description: 'Play $V cards.',
     image: focusedImage,
   }),
