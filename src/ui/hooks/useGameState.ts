@@ -46,10 +46,10 @@ export function useGameState(initialGameState: GameState = createGameState()) {
   // select is important for accessing the most up-to-date game state inside of callbacks or after
   // async state changes
   const select: SelectGameState = useCallback(
-    (fn) => {
-      const { promise, resolve } = getResolvablePromise();
+    <T>(fn?: (gameState: GameState) => T) => {
+      const { promise, resolve } = getResolvablePromise<T>();
       setGameState((gameState) => {
-        resolve(fn?.(gameState) ?? gameState);
+        resolve((fn?.(gameState) ?? gameState) as T);
         return gameState;
       });
       return promise;

@@ -10,6 +10,7 @@ const meta = {
   component: BattleResultOverlay,
   args: {
     onContinue: fn(),
+    onGiveUp: fn(),
     game: createGameState(),
   },
 } satisfies Meta<typeof BattleResultOverlay>;

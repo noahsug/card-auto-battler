@@ -66,8 +66,7 @@
     "lint": "eslint src scripts/analysis --ext .ts,.tsx",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "predeploy": "yarn build",
-    "deploy": "gh-pages -d dist",
+    "deploy": "yarn build && gh-pages -d dist",
     "analyze": "tsx scripts/analysis"
   },
   "type": "module",
