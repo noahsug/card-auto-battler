@@ -116,3 +116,6 @@ export const GreenMonster2: Story = fightEnemy('greenMonster', false);
 
 export const ArmoredLizard: Story = fightEnemy('armoredLizard', true);
 export const ArmoredLizard2: Story = fightEnemy('armoredLizard', false);
+
+export const CoolBird: Story = fightEnemy('coolBird', true);
+export const CoolBird2: Story = fightEnemy('coolBird', false);

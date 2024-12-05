@@ -41,6 +41,9 @@ import greenMonsterAttackImage from './images/enemy/green-monster-attack.png';
 import hideImage from './images/enemy/hide.png';
 import thickSkinImage from './images/enemy/thick-skin.png';
 import swipeImage from './images/enemy/swipe.png';
+import focusedImage from './images/enemy/focused.png';
+import scratchImage from './images/enemy/scratch.png';
+import peckImage from './images/enemy/peck.png';
 
 import { createCard, ifCompare, ifHas, value as v, playAnotherCard } from '../utils/createCard';
 
@@ -675,7 +678,7 @@ export const enemyCardsByType = {
   bigPunch: createCard(
     [
       {
-        value: v(8),
+        value: v(9),
       },
     ],
     {
@@ -743,6 +746,43 @@ export const enemyCardsByType = {
       image: swipeImage,
     },
   ),
+
+  // cool bird
+  peck: createCard(
+    [
+      {
+        value: v(1),
+      },
+      {
+        type: 'bleed',
+        value: v(2),
+      },
+    ],
+    {
+      name: 'Vicious Peck',
+      description: 'Deal $V damage. Apply $2V bleed.',
+      image: peckImage,
+    },
+  ),
+  rake: createCard(
+    [
+      {
+        value: v(1),
+        multiHit: v(3),
+      },
+    ],
+    {
+      name: 'Rake',
+      description: 'Deal $V damage $N times.',
+      image: scratchImage,
+    },
+  ),
+  focus: createCard([playAnotherCard(v(2))], {
+    trash: true,
+    name: 'Focus',
+    description: 'Play $V cards.',
+    image: focusedImage,
+  }),
 };
 
 // cards that show up in user card selection

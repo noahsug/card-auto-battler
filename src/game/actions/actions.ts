@@ -158,6 +158,7 @@ function triggerStartOfBattleEffects(
 }
 
 export function startBattle(game: GameState) {
+  // TODO: this assert failed once after choosing relics
   assert(game.turn === 0);
   const { random } = getRandom(game);
 
@@ -251,10 +252,11 @@ export function playCard(game: GameState): BattleEvent[] {
   }
 
   console.log(
+    'A playCard',
     activePlayer === game.user ? 'user' : 'enemy',
-    'cardsPlayedThisTurn',
+    'cardsPlayedThisTurn:',
     activePlayer.cardsPlayedThisTurn,
-    'extraCardPlays',
+    'extraCardPlays:',
     activePlayer.extraCardPlays,
   );
   if (activePlayer.cardsPlayedThisTurn > 0) {
@@ -323,6 +325,7 @@ export function endTurn(game: GameState) {
   // the start of the turn
   nonActivePlayer.cardsPlayedThisTurn = 0;
 
+  console.log('A end turn, turn:', game.turn);
   game.turn++;
 }
 
@@ -345,6 +348,7 @@ export function endBattle(game: GameState) {
   winner === 'user' ? game.wins++ : game.losses++;
 
   game.turn = 0;
+  console.log('A end battle, turn:', game.turn);
 
   resetPlayerAfterBattle(game.user);
 }

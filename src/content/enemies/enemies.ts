@@ -41,11 +41,16 @@ function getScalingHealthFn(ratio: number) {
   };
 }
 
-function chainCards(cards: CardState[], fromCardType: CardType, toCardType: CardType) {
-  const fromCard = cards.find((card) => card.name === cardsByType[fromCardType].name)!;
-  const toCard = cards.find((card) => card.name === cardsByType[toCardType].name)!;
-  fromCard.chain.toId = toCard.acquiredId;
-  toCard.chain.fromId = fromCard.acquiredId;
+function chainCards(cards: CardState[], fromCardsType: CardType, toCardsType: CardType) {
+  const fromCards = cards.filter((card) => card.name === cardsByType[fromCardsType].name)!;
+  const toCards = cards.filter((card) => card.name === cardsByType[toCardsType].name)!;
+  fromCards.forEach((fromCard, i) => {
+    const toCard = toCards[i];
+    if (toCard) {
+      fromCard.chain.toId = toCard.acquiredId;
+      toCard.chain.fromId = fromCard.acquiredId;
+    }
+  });
 }
 
 const third = Math.floor(MAX_WINS / 3) - 1;
@@ -54,7 +59,7 @@ const twoThirds = Math.floor((2 * MAX_WINS) / 3) - 1;
 const end = MAX_WINS - 2;
 
 export const enemiesByType = {
-  // dodges, weak to multi-hit
+  // dodges, weak to offense
   greenMonster: {
     name: 'Green Monster',
     image: greenMonsterImage,
@@ -62,28 +67,34 @@ export const enemiesByType = {
     getCards: (n) => {
       const attack = structuredClone(enemyCardsByType.surpriseAttack);
       addDamage(attack, n);
-      const cards = [attack, attack, enemyCardsByType.hide, enemyCardsByType.hide];
-      return cards;
+      return [attack, attack, enemyCardsByType.hide, enemyCardsByType.hide];
     },
-    getHealth: getScalingHealthFn(0.9),
+    getHealth: getScalingHealthFn(1),
+    scale: 0.85,
   },
   // winds up for an attack, weak to dodge
   punchy: {
     name: 'Punchy',
     image: punchyImage,
     battleRange: [0, 2],
-    getCards: () => {
-      const cards = range(0, 3).map(() => cardsByType.attack);
-      cards.push(enemyCardsByType.windUp, enemyCardsByType.bigPunch);
-      return cards;
+    getCards: (n) => {
+      const bigPunch = structuredClone(enemyCardsByType.bigPunch);
+      addDamage(bigPunch, n);
+      return [
+        cardsByType.attack,
+        enemyCardsByType.windUp,
+        bigPunch,
+        enemyCardsByType.windUp,
+        bigPunch,
+      ];
     },
     initialize: (player) => {
       chainCards(player.cards, 'windUp', 'bigPunch');
     },
-    getHealth: getScalingHealthFn(1),
+    getHealth: getScalingHealthFn(0.97),
     scale: 0.5,
   },
-  // takes 1 damage from <= x damage, weak to multi-hit
+  // builds up thick skin, weak to lots of offense, multi-hit, status effects
   armoredLizard: {
     name: 'Armored Lizard',
     image: armoredLizardImage,
@@ -102,16 +113,27 @@ export const enemiesByType = {
     },
     getHealth: getScalingHealthFn(0.67),
   },
-  // deals multi-hits when not hit, weak to offense
+  // burst damage (bleed + multi-hit), stunned for a turn receiving >= 8 damage
   coolBird: {
     name: 'Cool Bird',
     image: coolBirdImage,
     battleRange: [1, twoThirds],
-    getCards: basicAttacks,
-    getHealth: getScalingHealthFn(1),
-    scale: 0.5,
+    getCards: (n) => {
+      const focusCards = range(0, n / 2 + 1).map(() => cardsByType.focus);
+      return [
+        cardsByType.peck,
+        cardsByType.peck,
+        cardsByType.rake,
+        cardsByType.rake,
+        cardsByType.rake,
+        ...focusCards,
+      ];
+    },
+    getHealth: getScalingHealthFn(0.7),
+    scale: 0.6,
   },
   // applies burn to you and self each turn, takes half damage from burn
+  // trashes own cards, will kill self in time, weak to defense
   fireMonster: {
     name: 'Fire Spirit',
     image: fireMonsterImage,
@@ -120,7 +142,7 @@ export const enemiesByType = {
     getHealth: getScalingHealthFn(1),
     scale: 0.5,
   },
-  // takes double damage from status effects??
+  // takes double damage from status effects??, reflect?
   frostLizard: {
     name: 'Frost Lizard',
     image: frostLizardImage,
@@ -128,7 +150,7 @@ export const enemiesByType = {
     getCards: basicAttacks,
     getHealth: getScalingHealthFn(1),
   },
-  // gets stronger each time it's hit, weak to large single damage/defense
+  // gets stronger each time it's hit, weak to large single damage/defense/scaling
   grumpyRock: {
     name: 'Grumpy Rock',
     image: grumpyRockImage,
