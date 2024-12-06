@@ -2,7 +2,7 @@
 
 Play here: http://noahsug.github.io/card-auto-battler
 
-Game TODO:
+## TODO
 
 1. Charms/Chains act like equipment and can be moved around any time via "view deck" screen, entering a
    shop adds a charm and then brings you into the view deck screen
