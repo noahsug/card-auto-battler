@@ -71,7 +71,6 @@ function print() { __p += __j.call(arguments, '') }
     border-bottom-left-radius: 15px 255px;
   `}function Lr({src:e}){return Dm`
     mask-image: url(${e});
-    -webkit-mask-image: url(${e});
     mask-repeat: no-repeat;
     mask-size: 100%;
   `}const oa=q.div`
@@ -158,7 +157,7 @@ function print() { __p += __j.call(arguments, '') }
   padding-bottom: 0;
 `,wi=q.div`
   position: relative;
-  height: 100vh;
+  height: 100%;
   display: flex;
   margin: auto;
   flex-flow: column;
@@ -227,9 +226,6 @@ function print() { __p += __j.call(arguments, '') }
   object-position: center;
   -webkit-user-drag: none;
   user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
 `,qW="/card-auto-battler/assets/chain-B9n3mqaj.png",XW="/card-auto-battler/assets/feather-BJyKiuNP.png",Wc={width:12,height:20},bg={small:.7,medium:.8,large:1.1},YW=q.div`
   font-size: ${({$size:e})=>bg[e]}rem;
 `;function ZW(e){return wo(e,{brighten:10})}function JW(e){return wo(e,{saturate:10,brighten:-65})}function eV(e){return wo(e,{saturate:e==="basic"?0:30,brighten:-60})}const tV=q(wi)`
@@ -407,15 +403,12 @@ function print() { __p += __j.call(arguments, '') }
   text-transform: uppercase;
 `,JG=q(_u)`
   margin: auto;
-`;function eK({game:e,onClose:t}){const n=Ff(e.user.cards.concat(e.user.trashedCards));return O.jsx(Ao,{game:e,onCardsSelected:t,cards:n,buttonText:"Close"})}const tK="/card-auto-battler/assets/main-background-DxivEqSm.png",nK=q.div`
+`;function eK({game:e,onClose:t}){const n=Ff(e.user.cards.concat(e.user.trashedCards));return O.jsx(Ao,{game:e,onCardsSelected:t,cards:n,buttonText:"Close"})}const tK=q.div`
   width: 100vw;
-  height: 100vh;
-  background-image: url(${tK});
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  height: 100%;
   overflow: hidden;
-`,rK=q.div`
-  width: min(100vh, 100vw);
+`,nK=q.div`
+  width: 100vmin;
+  height: 100%;
   margin: auto;
-`;function iK(){const{game:e,actions:t,select:n,setGameState:r}=GU(),{getAddCardOptions:o,getAddRelicOptions:s,getAddPotionOptions:l,getShopOptions:f,addCards:d,removeCards:p,chainCards:C,featherCards:_,addRelic:S,endBattle:P,resetGame:A,startBattle:T,rewind:$}=t,v=bA(e),y=xf(e),w=N.useRef(),R=N.useRef(!1),D=N.useRef([]),z=N.useRef([]),M=N.useRef([]),H=N.useRef(),[X,ee]=N.useState("start"),[ge,Re]=N.useState("none"),me=N.useCallback(async we=>{we==="battle"&&T(),ee(we),Re("none")},[T]),te=N.useCallback(async()=>{H.current=await n(we=>structuredClone(we)),w.current=void 0,D.current=await o(),me("addCards")},[o,me,n]),oe=N.useCallback(async we=>{we==="addRelics"?z.current=await s():we==="addPotions"?D.current=await l():D.current=e.user.cards,me(we)},[e.user.cards,l,s,me]),Me=N.useCallback(async we=>{d(we);const Ie=await f();Ie.length===2?(M.current=Ie,me("selectShop")):Ie.length===1?oe(Ie[0]):me("battle")},[d,f,me,oe]),Ee=N.useCallback(we=>{S(we),me("battle")},[S,me]),j=N.useCallback(async we=>{if(X==="addCards"){Me(we);return}X==="addPotions"?d(we):X==="removeCards"?p(we):X==="chainCards"?C(we):X==="featherCards"&&_(we),me("battle")},[d,C,_,me,Me,p,X]),K=N.useCallback(()=>{w.current=e,R.current=y==="user",P(),Re("battleResults")},[e,y,P]),J=N.useCallback(()=>{A(),me("start")},[me,A]),ue=N.useCallback(()=>{v?J():(R.current||(du(H.current),$(H.current)),te())},[J,v,$,te]),ce=N.useCallback(()=>{Re("none")},[]),ft=N.useCallback(()=>{Re("deck")},[]);return O.jsx(nK,{children:O.jsxs(rK,{children:[X==="start"&&O.jsx(YG,{onContinue:te}),jG(X)&&O.jsx(WG,{type:X,game:e,cards:D.current,onCardsSelected:j,onViewDeck:ft}),X==="addRelics"&&O.jsx(dj,{game:e,relics:z.current,onRelicSelected:Ee,onViewDeck:ft}),X==="selectShop"&&O.jsx(XG,{game:e,shopOptions:M.current,onShopSelected:oe,onViewDeck:ft}),X==="battle"&&O.jsx(kH,{game:w.current||e,...t,setGameState:r,select:n,onBattleOver:K,onViewDeck:ft,hasOverlay:ge!=="none"}),ge!=="none"&&O.jsxs(VG,{children:[ge==="battleResults"&&O.jsx(NW,{game:e,wonLastBattle:R.current,onContinue:ue,onGiveUp:J}),ge==="deck"&&O.jsx(eK,{game:e,onClose:ce})]})]})})}const aK=np.createRoot(document.getElementById("root"));aK.render(O.jsx(pi.StrictMode,{children:O.jsx(iK,{})}));
+`;function rK(){const{game:e,actions:t,select:n,setGameState:r}=GU(),{getAddCardOptions:o,getAddRelicOptions:s,getAddPotionOptions:l,getShopOptions:f,addCards:d,removeCards:p,chainCards:C,featherCards:_,addRelic:S,endBattle:P,resetGame:A,startBattle:T,rewind:$}=t,v=bA(e),y=xf(e),w=N.useRef(),R=N.useRef(!1),D=N.useRef([]),z=N.useRef([]),M=N.useRef([]),H=N.useRef(),[X,ee]=N.useState("start"),[ge,Re]=N.useState("none"),me=N.useCallback(async we=>{we==="battle"&&T(),ee(we),Re("none")},[T]),te=N.useCallback(async()=>{H.current=await n(we=>structuredClone(we)),w.current=void 0,D.current=await o(),me("addCards")},[o,me,n]),oe=N.useCallback(async we=>{we==="addRelics"?z.current=await s():we==="addPotions"?D.current=await l():D.current=e.user.cards,me(we)},[e.user.cards,l,s,me]),Me=N.useCallback(async we=>{d(we);const Ie=await f();Ie.length===2?(M.current=Ie,me("selectShop")):Ie.length===1?oe(Ie[0]):me("battle")},[d,f,me,oe]),Ee=N.useCallback(we=>{S(we),me("battle")},[S,me]),j=N.useCallback(async we=>{if(X==="addCards"){Me(we);return}X==="addPotions"?d(we):X==="removeCards"?p(we):X==="chainCards"?C(we):X==="featherCards"&&_(we),me("battle")},[d,C,_,me,Me,p,X]),K=N.useCallback(()=>{w.current=e,R.current=y==="user",P(),Re("battleResults")},[e,y,P]),J=N.useCallback(()=>{A(),me("start")},[me,A]),ue=N.useCallback(()=>{v?J():(R.current||(du(H.current),$(H.current)),te())},[J,v,$,te]),ce=N.useCallback(()=>{Re("none")},[]),ft=N.useCallback(()=>{Re("deck")},[]);return O.jsx(tK,{children:O.jsxs(nK,{children:[X==="start"&&O.jsx(YG,{onContinue:te}),jG(X)&&O.jsx(WG,{type:X,game:e,cards:D.current,onCardsSelected:j,onViewDeck:ft}),X==="addRelics"&&O.jsx(dj,{game:e,relics:z.current,onRelicSelected:Ee,onViewDeck:ft}),X==="selectShop"&&O.jsx(XG,{game:e,shopOptions:M.current,onShopSelected:oe,onViewDeck:ft}),X==="battle"&&O.jsx(kH,{game:w.current||e,...t,setGameState:r,select:n,onBattleOver:K,onViewDeck:ft,hasOverlay:ge!=="none"}),ge!=="none"&&O.jsxs(VG,{children:[ge==="battleResults"&&O.jsx(NW,{game:e,wonLastBattle:R.current,onContinue:ue,onGiveUp:J}),ge==="deck"&&O.jsx(eK,{game:e,onClose:ce})]})]})})}const iK=np.createRoot(document.getElementById("root"));iK.render(O.jsx(pi.StrictMode,{children:O.jsx(rK,{})}));
